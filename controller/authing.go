@@ -1,4 +1,4 @@
-package controllers
+package controller
 
 import (
 	"encoding/json"
@@ -29,7 +29,7 @@ type tokenItem struct {
 // @Tags  Authing
 // @Accept json
 // @Produce json
-// @Router /v1/auth/loginok [get]
+// @Router /auth/loginok [get]
 func AuthingLoginOk(c *gin.Context) {
 	code, _ := c.GetQuery("code")
 	// authorization_code
@@ -86,7 +86,7 @@ func AuthingLoginOk(c *gin.Context) {
 // @Param	authingUserId		path 	string	true		"The key for staticblock"
 // @Accept json
 // @Produce json
-// @Router /v1/auth/getDetail/{authingUserId} [get]
+// @Router /auth/getDetail/{authingUserId} [get]
 func AuthingGetUserDetail(c *gin.Context) {
 	authingUserId := c.Param("authingUserId")
 	userDetail, err := models.AuthingClient.Detail(authingUserId)
@@ -143,7 +143,7 @@ func AuthingGetUserDetail(c *gin.Context) {
 // @Param	body		body 	models.CreateUserInput	true		"body for user info"
 // @Accept json
 // @Produce json
-// @Router /v1/auth/createUser [post]
+// @Router /auth/createUser [post]
 func AuthingCreateUser(c *gin.Context) {
 	token := c.GetHeader("token")
 	if token == "" {

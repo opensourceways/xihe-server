@@ -3,34 +3,23 @@ package util
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"strconv"
-
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 //app config
 type Config struct {
-	AppName        string         `json:"app_name"`
-	AppModel       string         `json:"app_model"`
-	AppHost        string         `json:"app_host"`
-	AppPort        int            `json:"app_port"`
-	Database       DatabaseConfig `json:"database"`
-	RedisConfig    RedisConfig    `json:"redis_config"`
-	BuildParam     BuildParam     `json:"buildParam"`
-	DefaultPkgList PkgList
-	CustomPkgList  PkgList
-	WSConfig       WSConfig      `json:"ws_config"`
-	K8sConfig      K8sConfig     `json:"k8s"`
-	AuthingConfig  AuthingConfig `json:"authing"`
-	JwtConfig      JwtConfig     `json:"jwt"`
-	BuildServer    BuildServer   `json:"buildServer"`
-	Statistic      Statistic     `json:"statistic"`
-	MQ             MessageQueue  `json:"mq"`
+	AppName       string         `json:"app_name"`
+	AppModel      string         `json:"app_model"`
+	AppHost       string         `json:"app_host"`
+	AppPort       int            `json:"app_port"`
+	Database      DatabaseConfig `json:"database"`
+	RedisConfig   RedisConfig    `json:"redis_config"`
+	WSConfig      WSConfig       `json:"ws_config"`
+	K8sConfig     K8sConfig      `json:"k8s"`
+	AuthingConfig AuthingConfig  `json:"authing"`
+	JwtConfig     JwtConfig      `json:"jwt"`
+	Statistic     Statistic      `json:"statistic"`
 }
 
 type K8sConfig struct {
@@ -59,19 +48,6 @@ type RedisConfig struct {
 	Db       int    `json:"db"`
 }
 
-//
-type BuildParam struct {
-	Arch             []string `json:"arch"`
-	Release          []string `json:"release"`
-	BuildType        []string `json:"buildType"`
-	OpeneulerMinimal string   `json:"openeulerMinimal"`
-	CustomRpmAPI     string   `json:"customRpmAPI"`
-	PackageName      string   `json:"packageName"`
-}
-type PkgList struct {
-	Packages []string `json:"packages"`
-}
-
 //websocket config
 type WSConfig struct {
 	Host        string `json:"host"`
@@ -92,13 +68,6 @@ type AuthingConfig struct {
 type JwtConfig struct {
 	Expire int    `json:"expire"`
 	JwtKey string `json:"jwtKey"`
-}
-
-//Build Server
-type BuildServer struct {
-	ApiUrl              string `json:"apiUrl"`
-	OmniRepoAPI         string `json:"omniRepoAPI"`
-	OmniRepoAPIInternal string `json:"omniRepoAPIInternal"`
 }
 
 //Statistic function
@@ -135,13 +104,7 @@ func InitConfig(path string) {
 	if os.Getenv("GIN_MODE") != "" {
 		cfg.AppModel = os.Getenv("GIN_MODE")
 	}
-	if cfg.AppModel == gin.DebugMode {
-		//info level
-		Log.SetLevel(logrus.InfoLevel)
-	} else {
-		//info level
-		Log.SetLevel(logrus.ErrorLevel)
-	}
+
 	if os.Getenv("APP_PORT") != "" {
 		cfg.AppPort, _ = strconv.Atoi(os.Getenv("APP_PORT"))
 	}
@@ -173,9 +136,7 @@ func InitConfig(path string) {
 	if os.Getenv("WS_PORT") != "" {
 		cfg.WSConfig.Port, _ = strconv.Atoi(os.Getenv("WS_PORT"))
 	}
-	if os.Getenv("CUSTOM_RPM_API") != "" {
-		cfg.BuildParam.CustomRpmAPI = os.Getenv("CUSTOM_RPM_API")
-	}
+
 	if os.Getenv("AUTHING_APP_ID") != "" {
 		cfg.AuthingConfig.AppID = os.Getenv("AUTHING_APP_ID")
 	}
@@ -191,36 +152,7 @@ func InitConfig(path string) {
 	if os.Getenv("JWT_KEY") != "" {
 		cfg.JwtConfig.JwtKey = os.Getenv("JWT_KEY")
 	}
-	if os.Getenv("BUILIDER_API") != "" {
-		cfg.BuildServer.ApiUrl = os.Getenv("BUILIDER_API")
-	}
-	if os.Getenv("OMNI_REPO_API") != "" {
-		cfg.BuildServer.OmniRepoAPI = os.Getenv("OMNI_REPO_API")
-	}
 
-	// load openeuler_minimal.json file from github resp, and reload and update it'data every night at 3:00 / beijing
-	minimalPath := fmt.Sprintf(GetConfig().BuildParam.OpeneulerMinimal, GetConfig().BuildParam.PackageName)
-	respo, err := http.Get(minimalPath)
-	if err != nil {
-		Log.Errorf("load openEuler-minimal.json file failed, app must exit .please check url path:%s. and error:%s", minimalPath, err)
-		os.Exit(1)
-		return
-	}
-	defer respo.Body.Close()
-
-	defaultPkg, err := ioutil.ReadAll(respo.Body)
-	if err != nil {
-		Log.Errorf("read data from %s file failed.err:%s", minimalPath, err)
-		os.Exit(1)
-		return
-	}
-	err = json.Unmarshal(defaultPkg, &(GetConfig().DefaultPkgList))
-	if err != nil {
-		Log.Errorf("config default package list is not json format :%s", err)
-		Log.Errorln(minimalPath)
-		os.Exit(1)
-		return
-	}
 }
 
 //external

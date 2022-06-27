@@ -38,11 +38,6 @@ func ExportData(code int, title interface{}, data ...interface{}) *JsonData {
 
 	}
 	if code > 300 {
-		// if GetConfig().AppModel == "release" {
-		// 	Log.Errorf("code:%d,title:%s,data:%v", resultData.Code, resultData.Title, resultData.Data)
-		// 	resultData.Title = "Error Information"
-		// 	resultData.Data = ""
-		// }
 		if err, ok := data[0].(error); ok {
 			Log.Warnln(err.Error())
 		} else {

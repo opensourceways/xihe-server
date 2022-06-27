@@ -1,7 +1,7 @@
 package routers
 
 import (
-	"github.com/opensourceways/xihe-server/controllers"
+	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/models"
 	"github.com/opensourceways/xihe-server/util"
@@ -22,10 +22,15 @@ func InitRouter() *gin.Engine {
 	docs.SwaggerInfo.Description = "set token name: 'Authorization' at header "
 	auth := r.Group(docs.SwaggerInfo.BasePath)
 	{
-		auth.GET("/v1/auth/loginok", controllers.AuthingLoginOk)
-		auth.GET("/v1/auth/getDetail/:authingUserId", controllers.AuthingGetUserDetail)
+		auth.GET("/auth/loginok", controller.AuthingLoginOk)
+		auth.GET("/auth/getDetail/:authingUserId", controller.AuthingGetUserDetail)
 		auth.Use(models.Authorize()) //
-		auth.POST("/v1/auth/createUser", controllers.AuthingCreateUser)
+		auth.POST("/auth/createUser", controller.AuthingCreateUser)
+	}
+	v1 := r.Group(docs.SwaggerInfo.BasePath)
+	{
+		v1.GET("/v1/helloworld", controller.HelloWorld)
+
 	}
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

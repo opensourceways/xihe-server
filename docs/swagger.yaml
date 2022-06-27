@@ -1,0 +1,147 @@
+definitions:
+  models.CreateUserInput:
+    properties:
+      address:
+        type: string
+      birthdate:
+        type: string
+      blocked:
+        type: boolean
+      browser:
+        type: string
+      company:
+        type: string
+      country:
+        type: string
+      device:
+        type: string
+      email:
+        type: string
+      emailVerified:
+        type: boolean
+      externalId:
+        type: string
+      familyName:
+        type: string
+      formatted:
+        type: string
+      gender:
+        type: string
+      givenName:
+        type: string
+      isDeleted:
+        type: boolean
+      lastIP:
+        type: string
+      lastLogin:
+        type: string
+      locale:
+        type: string
+      locality:
+        type: string
+      loginsCount:
+        type: integer
+      middleName:
+        type: string
+      name:
+        type: string
+      nickname:
+        type: string
+      oauth:
+        type: string
+      openid:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      phoneVerified:
+        type: boolean
+      photo:
+        type: string
+      postalCode:
+        type: string
+      preferredUsername:
+        type: string
+      profile:
+        type: string
+      region:
+        type: string
+      registerSource:
+        items:
+          type: string
+        type: array
+      signedUp:
+        type: string
+      streetAddress:
+        type: string
+      unionid:
+        type: string
+      username:
+        type: string
+      website:
+        type: string
+      zoneinfo:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/createUser:
+    post:
+      consumes:
+      - application/json
+      description: AuthingCreateUser
+      parameters:
+      - description: body for user info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreateUserInput'
+      produces:
+      - application/json
+      responses: {}
+      summary: AuthingCreateUser
+      tags:
+      - Authing
+  /auth/getDetail/{authingUserId}:
+    get:
+      consumes:
+      - application/json
+      description: AuthingGetToken
+      parameters:
+      - description: The key for staticblock
+        in: path
+        name: authingUserId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: AuthingGetToken
+      tags:
+      - Authing
+  /auth/loginok:
+    get:
+      consumes:
+      - application/json
+      description: login success redirect url
+      produces:
+      - application/json
+      responses: {}
+      summary: login success redirect url
+      tags:
+      - Authing
+  /v1/helloworld:
+    get:
+      consumes:
+      - application/json
+      description: helloworld
+      produces:
+      - application/json
+      responses: {}
+      summary: helloworld
+      tags:
+      - V1
+swagger: "2.0"
