@@ -79,15 +79,17 @@ var AppClient *model.Application
 var UserClient *authentication.Client
 var AuthingJWKSItem AuthingJWKS
 
-func InitAuthing(userpoolid, secret string) {
+func InitAuthing(userpoolid, secret string) (err error) {
 	if userpoolid == "" {
 		userpoolid = util.GetConfig().AuthingConfig.UserPoolID
+	}
+	if secret == "" {
 		secret = util.GetConfig().AuthingConfig.Secret
 	}
 	AuthingClient = management.NewClient(userpoolid, secret)
-	AppClient, _ = AuthingClient.FindApplicationById(util.GetConfig().AuthingConfig.AppID)
 	UserClient = authentication.NewClient(util.GetConfig().AuthingConfig.AppID, util.GetConfig().AuthingConfig.AppSecret)
-
+	AppClient, err = AuthingClient.FindApplicationById(util.GetConfig().AuthingConfig.AppID)
+	return err
 }
 func ParseAuthingUserInput(userinput *CreateUserInput) *model.CreateUserRequest {
 	var testuser model.CreateUserRequest

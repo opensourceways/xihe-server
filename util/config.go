@@ -3,8 +3,12 @@ package util
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"os"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 //app config
@@ -83,7 +87,7 @@ type MessageQueue struct {
 	KafkaServer string `json:"kafka_server"`
 }
 
-func InitConfig(path string) {
+func InitConfig(path string) error {
 	//app.json must be set right folder
 
 	if dir, err := os.Getwd(); err == nil {
@@ -95,9 +99,7 @@ func InitConfig(path string) {
 
 		err = parseConfig(dir)
 		if err != nil {
-			Log.Errorf("load app.json failed, app must exit .please check app.json path:%s,and error:%s", dir, err)
-			os.Exit(1)
-			return
+			return err
 		}
 	}
 
@@ -153,6 +155,15 @@ func InitConfig(path string) {
 		cfg.JwtConfig.JwtKey = os.Getenv("JWT_KEY")
 	}
 
+	if GetConfig().AppModel == "dev" || GetConfig().AppModel == "debug" {
+		Log.SetLevel(logrus.DebugLevel)
+		GetConfig().AppModel = gin.DebugMode
+	} else {
+		Log.SetLevel(logrus.InfoLevel)
+		GetConfig().AppModel = gin.ReleaseMode
+	}
+	gin.SetMode(GetConfig().AppModel)
+	return nil
 }
 
 //external
@@ -166,13 +177,15 @@ var cfg *Config = nil
 func parseConfig(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
-		Log.Errorf("read config file failed, please check path .  app exit now .")
-		os.Exit(1)
+		err = fmt.Errorf("read config file failed, please check path .  app exit now .")
+		return err
 	}
 	defer file.Close()
 	reader := bufio.NewReader(file)
 	decoder := json.NewDecoder(reader)
 	if err = decoder.Decode(&cfg); err != nil {
+		err = fmt.Errorf("load app.json failed, app must exit and error:%s", err)
+
 		return err
 	}
 	return nil

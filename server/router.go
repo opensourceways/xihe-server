@@ -1,6 +1,8 @@
-package routers
+package server
 
 import (
+	"fmt"
+
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/models"
@@ -12,8 +14,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//InitRouter init router
-func InitRouter() *gin.Engine {
+func StartWebServer() {
+	r := setRouter()
+	address := fmt.Sprintf(":%d", util.GetConfig().AppPort)
+	util.Log.Infof(" startup meta http service at port %s .and %s mode \n", address, util.GetConfig().AppModel)
+	if err := r.Run(address); err != nil {
+		util.Log.Infof("startup meta  http service failed, err:%v\n", err)
+	}
+
+}
+
+//setRouter init router
+func setRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(util.LoggerToFile())
