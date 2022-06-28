@@ -1,0 +1,15 @@
+info:
+  contact: {}
+paths:
+  /v1/helloworld:
+    get:
+      consumes:
+      - application/json
+      description: helloworld
+      produces:
+      - application/json
+      responses: {}
+      summary: helloworld
+      tags:
+      - Project
+swagger: "2.0"
