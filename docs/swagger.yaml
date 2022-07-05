@@ -1,15 +1,320 @@
+definitions:
+  entity.Project:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  infrastructure.FindUserRequest:
+    properties:
+      email:
+        type: string
+      externalId:
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+      withCustomData:
+        type: boolean
+    type: object
 info:
   contact: {}
 paths:
-  /v1/helloworld:
-    get:
+  /v1/project/save:
+    post:
       consumes:
       - application/json
-      description: helloworld
+      description: Save
+      parameters:
+      - description: email username phone
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Project'
       produces:
       - application/json
       responses: {}
-      summary: helloworld
+      summary: Save
       tags:
       - Project
+  /v1/user/bindPhone:
+    put:
+      consumes:
+      - application/json
+      description: 绑定手机号
+      parameters:
+      - description: '  phone '
+        in: query
+        name: phone
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: BindPhone
+      tags:
+      - Authing
+  /v1/user/callback:
+    get:
+      consumes:
+      - application/json
+      description: login success callback
+      produces:
+      - application/json
+      responses: {}
+      summary: AuthingCallback
+      tags:
+      - Authing
+  /v1/user/checkLogin:
+    get:
+      consumes:
+      - application/json
+      description: CheckLogin
+      produces:
+      - application/json
+      responses: {}
+      summary: CheckLogin
+      tags:
+      - Authing
+  /v1/user/findUser:
+    get:
+      consumes:
+      - application/json
+      description: FindUser
+      parameters:
+      - description: email username phone
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/infrastructure.FindUserRequest'
+      produces:
+      - application/json
+      responses: {}
+      summary: FindUser
+      tags:
+      - Authing
+  /v1/user/getCurrentUser:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户资料, 在请求的request的header中必须带有accessToken
+      produces:
+      - application/json
+      responses: {}
+      summary: GetCurrentUser
+      tags:
+      - Authing
+  /v1/user/resetPasswordByEmailCode:
+    put:
+      consumes:
+      - application/json
+      description: 通过邮箱验证码来重置密码,
+      parameters:
+      - description: '  email '
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: '  code '
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: '  newpswd '
+        in: query
+        name: newpswd
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: ResetPasswordByEmailCode
+      tags:
+      - Authing
+  /v1/user/sendEmailToResetPswd:
+    get:
+      consumes:
+      - application/json
+      description: 发送重置密码的邮件，内含验证码
+      parameters:
+      - description: '  email '
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: SendEmailToResetPswd
+      tags:
+      - Authing
+  /v1/user/sendEmailToVerifyEmail:
+    get:
+      consumes:
+      - application/json
+      description: 发送验证邮件,
+      parameters:
+      - description: '  email '
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: SendEmailToVerifyEmail
+      tags:
+      - Authing
+  /v1/user/sendSmsCode:
+    get:
+      consumes:
+      - application/json
+      description: 发送验证码
+      parameters:
+      - description: 'new phone '
+        in: query
+        name: phone
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: SendSmsCode
+      tags:
+      - Authing
+  /v1/user/updatePhone:
+    put:
+      consumes:
+      - application/json
+      description: 更换手机号，需要新号码和旧号码都发验证码
+      parameters:
+      - description: 'new phone '
+        in: query
+        name: newphone
+        required: true
+        type: string
+      - description: new code of new phone
+        in: query
+        name: newcode
+        required: true
+        type: string
+      - description: 'old phone '
+        in: query
+        name: oldphone
+        required: true
+        type: string
+      - description: 'old code  of old phone '
+        in: query
+        name: oldcode
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: UpdatePhone
+      tags:
+      - Authing
+  /v1/user/updateProfile/{id}:
+    put:
+      consumes:
+      - application/json
+      description: 修改用户资料， 需要修改哪个就填哪个。不填的不修改
+      parameters:
+      - description: '  user id '
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: '  username 用户名'
+        in: query
+        name: username
+        type: string
+      - description: '  nickname 昵称'
+        in: query
+        name: nickname
+        type: string
+      - description: '  name 真实姓名'
+        in: query
+        name: name
+        type: string
+      - description: '  photo 头像 '
+        in: query
+        name: photo
+        type: string
+      - description: '  company  公司 '
+        in: query
+        name: company
+        type: string
+      - description: '  givenName '
+        in: query
+        name: givenName
+        type: string
+      - description: '  middleName '
+        in: query
+        name: middleName
+        type: string
+      - description: '  Profile Url '
+        in: query
+        name: profile
+        type: string
+      - description: '  gender   性别, M（Man） 表示男性、F（Female） 表示女性、未知表示 U（Unknown）'
+        in: query
+        name: gender
+        type: string
+      - description: '  preferredUsername '
+        in: query
+        name: preferredUsername
+        type: string
+      - description: '  website 个人网站'
+        in: query
+        name: website
+        type: string
+      - description: '  address 详细地址'
+        in: query
+        name: address
+        type: string
+      - description: '  birthdate 生日 '
+        in: query
+        name: birthdate
+        type: string
+      - description: '  streetAddress 街道地址'
+        in: query
+        name: streetAddress
+        type: string
+      - description: '  postalCode 邮编'
+        in: query
+        name: postalCode
+        type: string
+      - description: '  city 城市'
+        in: query
+        name: city
+        type: string
+      - description: '  province 省份 '
+        in: query
+        name: province
+        type: string
+      - description: '  country 国家'
+        in: query
+        name: country
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: UpdateProfile
+      tags:
+      - Authing
 swagger: "2.0"

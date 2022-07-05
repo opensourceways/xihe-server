@@ -4,9 +4,9 @@
         "contact": {}
     },
     "paths": {
-        "/v1/helloworld": {
-            "get": {
-                "description": "helloworld",
+        "/v1/project/save": {
+            "post": {
+                "description": "Save",
                 "consumes": [
                     "application/json"
                 ],
@@ -16,8 +16,460 @@
                 "tags": [
                     "Project"
                 ],
-                "summary": "helloworld",
+                "summary": "Save",
+                "parameters": [
+                    {
+                        "description": "email username phone",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Project"
+                        }
+                    }
+                ],
                 "responses": {}
+            }
+        },
+        "/v1/user/bindPhone": {
+            "put": {
+                "description": "绑定手机号",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "BindPhone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "  phone ",
+                        "name": "phone",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/user/callback": {
+            "get": {
+                "description": "login success callback",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "AuthingCallback",
+                "responses": {}
+            }
+        },
+        "/v1/user/checkLogin": {
+            "get": {
+                "description": "CheckLogin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "CheckLogin",
+                "responses": {}
+            }
+        },
+        "/v1/user/findUser": {
+            "get": {
+                "description": "FindUser",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "FindUser",
+                "parameters": [
+                    {
+                        "description": "email username phone",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/infrastructure.FindUserRequest"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/user/getCurrentUser": {
+            "get": {
+                "description": "获取用户资料, 在请求的request的header中必须带有accessToken",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "GetCurrentUser",
+                "responses": {}
+            }
+        },
+        "/v1/user/resetPasswordByEmailCode": {
+            "put": {
+                "description": "通过邮箱验证码来重置密码,",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "ResetPasswordByEmailCode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "  email ",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "  code ",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "  newpswd ",
+                        "name": "newpswd",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/user/sendEmailToResetPswd": {
+            "get": {
+                "description": "发送重置密码的邮件，内含验证码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "SendEmailToResetPswd",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "  email ",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/user/sendEmailToVerifyEmail": {
+            "get": {
+                "description": "发送验证邮件,",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "SendEmailToVerifyEmail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "  email ",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/user/sendSmsCode": {
+            "get": {
+                "description": "发送验证码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "SendSmsCode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "new phone ",
+                        "name": "phone",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/user/updatePhone": {
+            "put": {
+                "description": "更换手机号，需要新号码和旧号码都发验证码",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "UpdatePhone",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "new phone ",
+                        "name": "newphone",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "new code of new phone",
+                        "name": "newcode",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "old phone ",
+                        "name": "oldphone",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "old code  of old phone ",
+                        "name": "oldcode",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/user/updateProfile/{id}": {
+            "put": {
+                "description": "修改用户资料， 需要修改哪个就填哪个。不填的不修改",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authing"
+                ],
+                "summary": "UpdateProfile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "  user id ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "  username 用户名",
+                        "name": "username",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  nickname 昵称",
+                        "name": "nickname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  name 真实姓名",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  photo 头像 ",
+                        "name": "photo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  company  公司 ",
+                        "name": "company",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  givenName ",
+                        "name": "givenName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  middleName ",
+                        "name": "middleName",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  Profile Url ",
+                        "name": "profile",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  gender   性别, M（Man） 表示男性、F（Female） 表示女性、未知表示 U（Unknown）",
+                        "name": "gender",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  preferredUsername ",
+                        "name": "preferredUsername",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  website 个人网站",
+                        "name": "website",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  address 详细地址",
+                        "name": "address",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  birthdate 生日 ",
+                        "name": "birthdate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  streetAddress 街道地址",
+                        "name": "streetAddress",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  postalCode 邮编",
+                        "name": "postalCode",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  city 城市",
+                        "name": "city",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  province 省份 ",
+                        "name": "province",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  country 国家",
+                        "name": "country",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "entity.Project": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "infrastructure.FindUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "externalId": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "withCustomData": {
+                    "type": "boolean"
+                }
             }
         }
     }
