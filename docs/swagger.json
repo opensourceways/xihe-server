@@ -4,6 +4,72 @@
         "contact": {}
     },
     "paths": {
+        "/v1/project/getSingleOne/{id}": {
+            "get": {
+                "description": "GetSingleOne",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "GetSingleOne",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/project/query": {
+            "get": {
+                "description": "Query",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "Query",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "title",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "  offset  default :0",
+                        "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "  limit , default :10 ",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  order by create time, default :desc ",
+                        "name": "order",
+                        "in": "query"
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/v1/project/save": {
             "post": {
                 "description": "Save",
@@ -18,6 +84,40 @@
                 ],
                 "summary": "Save",
                 "parameters": [
+                    {
+                        "description": "email username phone",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.Project"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/project/update/{id}": {
+            "put": {
+                "description": "Update",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "Update",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "  Project id ",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "description": "email username phone",
                         "name": "body",
@@ -293,7 +393,7 @@
         },
         "/v1/user/updateProfile/{id}": {
             "put": {
-                "description": "修改用户资料， 需要修改哪个就填哪个。不填的不修改",
+                "description": "修改用户资料， 需要修改哪个就填哪个。不填的不被修改",
                 "consumes": [
                     "application/json"
                 ],

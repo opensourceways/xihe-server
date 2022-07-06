@@ -32,6 +32,50 @@ definitions:
 info:
   contact: {}
 paths:
+  /v1/project/getSingleOne/{id}:
+    get:
+      consumes:
+      - application/json
+      description: GetSingleOne
+      parameters:
+      - description: id
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: GetSingleOne
+      tags:
+      - Project
+  /v1/project/query:
+    get:
+      consumes:
+      - application/json
+      description: Query
+      parameters:
+      - description: title
+        in: query
+        name: title
+        type: string
+      - description: '  offset  default :0'
+        in: query
+        name: offset
+        type: integer
+      - description: '  limit , default :10 '
+        in: query
+        name: limit
+        type: integer
+      - description: '  order by create time, default :desc '
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: Query
+      tags:
+      - Project
   /v1/project/save:
     post:
       consumes:
@@ -48,6 +92,29 @@ paths:
       - application/json
       responses: {}
       summary: Save
+      tags:
+      - Project
+  /v1/project/update/{id}:
+    put:
+      consumes:
+      - application/json
+      description: Update
+      parameters:
+      - description: '  Project id '
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: email username phone
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Project'
+      produces:
+      - application/json
+      responses: {}
+      summary: Update
       tags:
       - Project
   /v1/user/bindPhone:
@@ -232,7 +299,7 @@ paths:
     put:
       consumes:
       - application/json
-      description: 修改用户资料， 需要修改哪个就填哪个。不填的不修改
+      description: 修改用户资料， 需要修改哪个就填哪个。不填的不被修改
       parameters:
       - description: '  user id '
         in: path

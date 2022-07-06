@@ -51,8 +51,55 @@ func (f *UserApp) UpdatePhone(newphone, newcode, oldphone, oldcode string) (*mod
 	return thisUser, nil
 }
 
-func (f *UserApp) GetTokenFromAuthing(code string) (interface{}, error) {
+func (f *UserApp) BindPhone(userid string, updateUserInput model.UpdateUserInput) (*model.User, error) {
+	result, err := infrastructure.AuthingManageClient.UpdateUser(userid, updateUserInput)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
 
+func (f *UserApp) SendSmsCode(phoneNum string) (interface{}, error) {
+	result, err := infrastructure.AuthingDefaultUserClient.SendSmsCode(phoneNum)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (f *UserApp) SendEmailToResetPswd(email string) (interface{}, error) {
+	result, err := infrastructure.AuthingDefaultUserClient.SendEmail(email, model.EnumEmailSceneResetPassword)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (f *UserApp) SendEmailToVerifyEmail(email string) (interface{}, error) {
+	result, err := infrastructure.AuthingDefaultUserClient.SendEmail(email, model.EnumEmailSceneVerifyEmail)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (f *UserApp) ResetPasswordByEmailCode(email, code, newpswd string) (interface{}, error) {
+	result, err := infrastructure.AuthingDefaultUserClient.ResetPasswordByEmailCode(email, code, newpswd)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+func (f *UserApp) UpdateUser(subID string, updateUserInput entity.User) (interface{}, error) {
+	authingUpdateUserInput, err := updateUserInput.ExportToAuthingData()
+	if err != nil {
+		return nil, err
+	}
+	result, err := infrastructure.AuthingManageClient.UpdateUser(subID, *authingUpdateUserInput)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (f *UserApp) GetTokenFromAuthing(code string) (interface{}, error) {
 	oauth2Token, err := infrastructure.OIDCConfig.Exchange(context.Background(), code)
 	if err != nil {
 		return nil, err

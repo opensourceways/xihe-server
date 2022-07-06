@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/infrastructure"
@@ -23,7 +22,7 @@ func StartWebServer() {
 		address, util.GetConfig().AppModel,
 	)
 	if err := r.Run(address); err != nil {
-		util.Log.Infof("startup meta  http service failed, err:%v\n", err.Error())
+		util.Log.Fatalf("startup meta  http service failed, err:%v\n", err.Error())
 	}
 }
 
@@ -37,8 +36,8 @@ func setRouter() *gin.Engine {
 	docs.SwaggerInfo.Description = "请在请求的header中加入 'Authorization'  "
 	repo, err := infrastructure.NewRepositories()
 	if err != nil {
-		util.Log.Infof(" start repository failed, err:%v\n", err.Error())
-		os.Exit(1)
+		util.Log.Fatalf(" start repository failed, err:%v\n", err.Error())
+
 		return nil
 	}
 	projectController := interfaces.NewProject(repo.ProjectRepo)
@@ -67,19 +66,19 @@ func setRouter() *gin.Engine {
 		}
 		project := v1.Group("/project")
 		{
-
 			project.Use(infrastructure.Authorize())
 			project.POST("/save", projectController.Save)
+			project.PUT("/update/:id", projectController.Update)
+			project.GET("/getSingleOne/:id", projectController.GetSingleOne)
+			project.GET("/query", projectController.Query)
 		}
 		model := v1.Group("/model")
 		{
 			model.Use(infrastructure.Authorize())
-
 		}
 		dataset := v1.Group("/dataset")
 		{
 			dataset.Use(infrastructure.Authorize())
-
 		}
 	}
 

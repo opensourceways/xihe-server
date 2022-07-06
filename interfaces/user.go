@@ -153,7 +153,7 @@ func (u *User) UpdatePhone(c *gin.Context) {
 // @Router /v1/user/sendSmsCode [get]
 func (u *User) SendSmsCode(c *gin.Context) {
 	phoneNum := c.Query("phone")
-	result, err := infrastructure.AuthingDefaultUserClient.SendSmsCode(phoneNum)
+	result, err := u.app.SendSmsCode(phoneNum)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "SendSmsCode error", err.Error()),
@@ -187,7 +187,7 @@ func (u *User) BindPhone(c *gin.Context) {
 	}
 	var updateUserInput model.UpdateUserInput
 	updateUserInput.Phone = &phone
-	result, err := infrastructure.AuthingManageClient.UpdateUser(userid, updateUserInput)
+	result, err := u.app.BindPhone(userid, updateUserInput)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "BindPhone error", err.Error()),
@@ -206,7 +206,7 @@ func (u *User) BindPhone(c *gin.Context) {
 // @Router /v1/user/sendEmailToResetPswd [get]
 func (u *User) SendEmailToResetPswd(c *gin.Context) {
 	email := c.Query("email")
-	result, err := infrastructure.AuthingDefaultUserClient.SendEmail(email, model.EnumEmailSceneResetPassword)
+	result, err := u.app.SendEmailToResetPswd(email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "SendEmailToResetPswd error", err.Error()),
@@ -225,7 +225,7 @@ func (u *User) SendEmailToResetPswd(c *gin.Context) {
 // @Router /v1/user/sendEmailToVerifyEmail [get]
 func (u *User) SendEmailToVerifyEmail(c *gin.Context) {
 	email := c.Query("email")
-	result, err := infrastructure.AuthingDefaultUserClient.SendEmail(email, model.EnumEmailSceneVerifyEmail)
+	result, err := u.app.SendEmailToVerifyEmail(email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "SendEmailToVerifyEmail error", err.Error()),
@@ -248,7 +248,7 @@ func (u *User) ResetPasswordByEmailCode(c *gin.Context) {
 	email := c.Query("email")
 	code := c.Query("code")
 	newpswd := c.Query("newpswd")
-	result, err := infrastructure.AuthingDefaultUserClient.ResetPasswordByEmailCode(email, code, newpswd)
+	result, err := u.app.ResetPasswordByEmailCode(email, code, newpswd)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "ResetPasswordByEmailCode error", err.Error()),
@@ -259,7 +259,7 @@ func (u *User) ResetPasswordByEmailCode(c *gin.Context) {
 }
 
 // @Summary UpdateProfile
-// @Description 修改用户资料， 需要修改哪个就填哪个。不填的不修改
+// @Description 修改用户资料， 需要修改哪个就填哪个。不填的不被修改
 // @Tags  Authing
 // @Param	id		path 	string	true		"  user id "
 // @Param	username		query 	string	false		"  username 用户名"
@@ -284,7 +284,6 @@ func (u *User) ResetPasswordByEmailCode(c *gin.Context) {
 // @Produce json
 // @Router /v1/user/updateProfile/{id} [put]
 func (u *User) UpdateProfile(c *gin.Context) {
-
 	subID := c.Param("id")
 	var updateUserInput entity.User
 	err := c.BindQuery(&updateUserInput)
@@ -294,17 +293,10 @@ func (u *User) UpdateProfile(c *gin.Context) {
 		)
 		return
 	}
-	authingUpdateUserInput, err := updateUserInput.ExportToAuthingData()
+	result, err := u.app.UpdateUser(subID, updateUserInput)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
-			util.ExportData(util.CodeStatusServerError, "UpdateProfile ExportTo error", err.Error()),
-		)
-		return
-	}
-	result, err := infrastructure.AuthingManageClient.UpdateUser(subID, *authingUpdateUserInput)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError,
-			util.ExportData(util.CodeStatusServerError, "UpdateProfile error", err.Error()),
+			util.ExportData(util.CodeStatusServerError, "UpdateProfile UpdateUser error", err.Error()),
 		)
 		return
 	}
