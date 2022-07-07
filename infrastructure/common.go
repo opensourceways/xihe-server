@@ -22,7 +22,7 @@ func (r *CommonRepo) Update(filter bson.M, item interface{}) (*mongo.UpdateResul
 
 func (r *CommonRepo) Query(filter bson.M, offset, limit int64, order string) (result []bson.M, err error) {
 	var cursor *mongo.Cursor
-	opts := options.Find().SetSkip(offset).SetLimit(limit).SetSort(bson.D{{"updatedat", 1}})
+	opts := options.Find().SetSkip(offset).SetLimit(limit).SetSort(bson.D{{"commonentity.updatedat", -1}})
 	if cursor, err = r.Collection.Find(context.TODO(), filter, opts); err == nil {
 		result = make([]bson.M, cursor.RemainingBatchLength())
 		err = cursor.All(context.Background(), &result)

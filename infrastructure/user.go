@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/Authing/authing-go-sdk/lib/authentication"
-	"github.com/Authing/authing-go-sdk/lib/management"
 	"github.com/Authing/authing-go-sdk/lib/model"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/dgrijalva/jwt-go"
@@ -47,7 +46,7 @@ type FindUserRequest struct {
 	WithCustomData bool    `json:"withCustomData,omitempty"`
 }
 
-var AuthingManageClient *management.Client
+// var AuthingManageClient *management.Client
 
 // var AppClient *model.Application
 var AuthingDefaultUserClient *authentication.Client
@@ -88,7 +87,7 @@ func InitAuthing() (err error) {
 		util.GetConfig().AuthingConfig.Secret = os.Getenv("AUTHING_APP_SECRET")
 	}
 
-	AuthingManageClient = management.NewClient(util.GetConfig().AuthingConfig.UserPoolID, util.GetConfig().AuthingConfig.Secret)
+	// AuthingManageClient = management.NewClient(util.GetConfig().AuthingConfig.UserPoolID, util.GetConfig().AuthingConfig.Secret)
 	AuthingDefaultUserClient = authentication.NewClient(util.GetConfig().AuthingConfig.AppID, util.GetConfig().AuthingConfig.AppSecret)
 	ctx := context.Background()
 	oidcProvider, err = oidc.NewProvider(ctx, util.GetConfig().AuthingConfig.AuthingUrl+"/oidc")
@@ -129,13 +128,17 @@ func GetUserInfoByToken(access_token string) (userinfo *AuthingLoginUser, err er
 func Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
-		userInfo, err := CheckAuthorization(token)
+		currentUserClient := authentication.NewClient(util.GetConfig().AuthingConfig.AppID, util.GetConfig().AuthingConfig.AppSecret)
+		currentUser, err := currentUserClient.GetCurrentUser(&token)
+		currentUserClient.SetCurrentUser(currentUser)
+		// userInfo, err := CheckAuthorization(token)
 		if err != nil {
 			c.Abort()
 			c.JSON(http.StatusUnauthorized, util.ExportData(util.CodeStatusClientError, "forbidden", err.Error()))
 			return
 		}
-		c.Keys = userInfo
+		c.Keys = make(map[string]any)
+		c.Keys["me"] = currentUserClient
 	}
 }
 

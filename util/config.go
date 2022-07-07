@@ -20,16 +20,15 @@ type Config struct {
 	Database      DatabaseConfig `json:"database"`
 	RedisConfig   RedisConfig    `json:"redis_config"`
 	WSConfig      WSConfig       `json:"ws_config"`
-	K8sConfig     K8sConfig      `json:"k8s"`
+	GitLabConfig  GitLabConfig   `json:"gitlab"`
 	AuthingConfig AuthingConfig  `json:"authing"`
 	JwtConfig     JwtConfig      `json:"jwt"`
 	Statistic     Statistic      `json:"statistic"`
 }
 
-type K8sConfig struct {
-	Namespace string `json:"namespace"`
-	Image     string `json:"image"`
-	FfileType string `json:"ffileType"`
+type GitLabConfig struct {
+	Baseurl     string `json:"baseurl"`
+	AccessToken string `json:"access_token"`
 }
 
 //sql config

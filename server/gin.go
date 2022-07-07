@@ -49,7 +49,6 @@ func setRouter() *gin.Engine {
 		{
 			user.GET("/checkLogin", userController.CheckLogin)
 			user.GET("/callback", userController.AuthingCallback)
-			user.GET("/findUser", userController.FindUser)
 			user.Use(infrastructure.Authorize())
 			user.GET("/getCurrentUser", userController.GetCurrentUser)
 			user.PUT("/updatePhone", userController.UpdatePhone)

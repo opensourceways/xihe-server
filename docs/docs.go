@@ -163,6 +163,13 @@ const docTemplate = `{
                         "name": "phone",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "  phone code",
+                        "name": "phoneCode",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {}
@@ -197,33 +204,6 @@ const docTemplate = `{
                     "Authing"
                 ],
                 "summary": "CheckLogin",
-                "responses": {}
-            }
-        },
-        "/v1/user/findUser": {
-            "get": {
-                "description": "FindUser",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Authing"
-                ],
-                "summary": "FindUser",
-                "parameters": [
-                    {
-                        "description": "email username phone",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/infrastructure.FindUserRequest"
-                        }
-                    }
-                ],
                 "responses": {}
             }
         },
@@ -531,6 +511,12 @@ const docTemplate = `{
                         "description": "  country 国家",
                         "name": "country",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "  自定义数据, 格式为   key:value",
+                        "name": "customData",
+                        "in": "query"
                     }
                 ],
                 "responses": {}
@@ -561,26 +547,6 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "infrastructure.FindUserRequest": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "externalId": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                },
-                "withCustomData": {
-                    "type": "boolean"
                 }
             }
         }

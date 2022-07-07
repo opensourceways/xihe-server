@@ -16,19 +16,6 @@ definitions:
       user_id:
         type: integer
     type: object
-  infrastructure.FindUserRequest:
-    properties:
-      email:
-        type: string
-      externalId:
-        type: string
-      phone:
-        type: string
-      username:
-        type: string
-      withCustomData:
-        type: boolean
-    type: object
 info:
   contact: {}
 paths:
@@ -128,6 +115,11 @@ paths:
         name: phone
         required: true
         type: string
+      - description: '  phone code'
+        in: query
+        name: phoneCode
+        required: true
+        type: string
       produces:
       - application/json
       responses: {}
@@ -154,24 +146,6 @@ paths:
       - application/json
       responses: {}
       summary: CheckLogin
-      tags:
-      - Authing
-  /v1/user/findUser:
-    get:
-      consumes:
-      - application/json
-      description: FindUser
-      parameters:
-      - description: email username phone
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/infrastructure.FindUserRequest'
-      produces:
-      - application/json
-      responses: {}
-      summary: FindUser
       tags:
       - Authing
   /v1/user/getCurrentUser:
@@ -377,6 +351,10 @@ paths:
       - description: '  country 国家'
         in: query
         name: country
+        type: string
+      - description: '  自定义数据, 格式为   key:value'
+        in: query
+        name: customData
         type: string
       produces:
       - application/json

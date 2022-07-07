@@ -3,7 +3,7 @@ package interfaces
 import (
 	"net/http"
 
-	"github.com/Authing/authing-go-sdk/lib/model"
+	"github.com/Authing/authing-go-sdk/lib/authentication"
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/opensourceways/xihe-server/application"
 	"github.com/opensourceways/xihe-server/domain/entity"
@@ -67,34 +67,6 @@ func (u *User) AuthingCallback(c *gin.Context) {
 	c.JSON(http.StatusOK, util.ExportData(util.CodeStatusNormal, "ok", result))
 }
 
-// @Summary FindUser
-// @Description FindUser
-// @Tags  Authing
-// @Param	body		body 	infrastructure.FindUserRequest	true		"email username phone"
-// @Accept json
-// @Produce json
-// @Router /v1/user/findUser [get]
-func (u *User) FindUser(c *gin.Context) {
-	var findUserRequest infrastructure.FindUserRequest
-	err := c.BindJSON(&findUserRequest)
-	if err != nil {
-		c.JSON(
-			http.StatusInternalServerError,
-			util.ExportData(util.CodeStatusServerError, "BindQuery error", err.Error()),
-		)
-		return
-	}
-	thisUser, err := u.app.FindUser(&findUserRequest)
-	if err != nil {
-		c.JSON(
-			http.StatusInternalServerError,
-			util.ExportData(util.CodeStatusServerError, "FindUser error", err.Error()),
-		)
-		return
-	}
-	c.JSON(http.StatusOK, util.ExportData(util.CodeStatusNormal, "ok", thisUser))
-}
-
 // @Summary GetCurrentUser
 // @Description 获取用户资料, 在请求的request的header中必须带有accessToken
 // @Tags  Authing
@@ -102,21 +74,8 @@ func (u *User) FindUser(c *gin.Context) {
 // @Produce json
 // @Router /v1/user/getCurrentUser [get]
 func (u *User) GetCurrentUser(c *gin.Context) {
-	accessToken := c.GetHeader("accessToken")
-	if len(accessToken) < 10 {
-		c.JSON(http.StatusInternalServerError,
-			util.ExportData(util.CodeStatusServerError, "accessToken inValidate ", accessToken),
-		)
-		return
-	}
-	userDetail, err := u.app.GetCurrentUser(accessToken)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError,
-			util.ExportData(util.CodeStatusServerError, "GetCurrentUser error", err.Error()),
-		)
-		return
-	}
-	c.JSON(http.StatusOK, util.ExportData(util.CodeStatusNormal, "ok", userDetail))
+	currentUser := c.Keys["me"].(*authentication.Client)
+	c.JSON(http.StatusOK, util.ExportData(util.CodeStatusNormal, "ok", currentUser.ClientUser))
 }
 
 // @Summary UpdatePhone
@@ -134,7 +93,8 @@ func (u *User) UpdatePhone(c *gin.Context) {
 	newcode := c.Query("newcode")
 	oldphone := c.Query("oldphone")
 	oldcode := c.Query("oldcode")
-	thisUser, err := u.app.UpdatePhone(newphone, newcode, oldphone, oldcode)
+	currentUser := c.Keys["me"].(*authentication.Client)
+	thisUser, err := u.app.UpdatePhone(currentUser, newphone, newcode, oldphone, oldcode)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "UpdatePhone error", err.Error()),
@@ -153,7 +113,9 @@ func (u *User) UpdatePhone(c *gin.Context) {
 // @Router /v1/user/sendSmsCode [get]
 func (u *User) SendSmsCode(c *gin.Context) {
 	phoneNum := c.Query("phone")
-	result, err := u.app.SendSmsCode(phoneNum)
+
+	currentUser := c.Keys["me"].(*authentication.Client)
+	result, err := u.app.SendSmsCode(currentUser, phoneNum)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "SendSmsCode error", err.Error()),
@@ -167,27 +129,22 @@ func (u *User) SendSmsCode(c *gin.Context) {
 // @Description 绑定手机号
 // @Tags  Authing
 // @Param	phone		query 	string	true		"  phone "
+// @Param	phoneCode		query 	string	true		"  phone code"
 // @Accept json
 // @Produce json
 // @Router /v1/user/bindPhone [put]
 func (u *User) BindPhone(c *gin.Context) {
 	phone := c.Query("phone")
-	userid := c.Keys["id"].(string)
-	if len(userid) == 0 {
-		c.JSON(http.StatusBadRequest,
-			util.ExportData(util.CodeStatusServerError, "token error", nil),
-		)
-		return
-	}
+	phoneCode := c.Query("phoneCode")
+	currentUser := c.Keys["me"].(*authentication.Client)
 	if len(phone) == 0 {
 		c.JSON(http.StatusBadRequest,
 			util.ExportData(util.CodeStatusServerError, "phone error", phone),
 		)
 		return
 	}
-	var updateUserInput model.UpdateUserInput
-	updateUserInput.Phone = &phone
-	result, err := u.app.BindPhone(userid, updateUserInput)
+
+	result, err := u.app.BindPhone(currentUser, phone, phoneCode)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "BindPhone error", err.Error()),
@@ -206,7 +163,8 @@ func (u *User) BindPhone(c *gin.Context) {
 // @Router /v1/user/sendEmailToResetPswd [get]
 func (u *User) SendEmailToResetPswd(c *gin.Context) {
 	email := c.Query("email")
-	result, err := u.app.SendEmailToResetPswd(email)
+	currentUser := c.Keys["me"].(*authentication.Client)
+	result, err := u.app.SendEmailToResetPswd(currentUser, email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "SendEmailToResetPswd error", err.Error()),
@@ -225,7 +183,8 @@ func (u *User) SendEmailToResetPswd(c *gin.Context) {
 // @Router /v1/user/sendEmailToVerifyEmail [get]
 func (u *User) SendEmailToVerifyEmail(c *gin.Context) {
 	email := c.Query("email")
-	result, err := u.app.SendEmailToVerifyEmail(email)
+	currentUser := c.Keys["me"].(*authentication.Client)
+	result, err := u.app.SendEmailToVerifyEmail(currentUser, email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "SendEmailToVerifyEmail error", err.Error()),
@@ -248,7 +207,8 @@ func (u *User) ResetPasswordByEmailCode(c *gin.Context) {
 	email := c.Query("email")
 	code := c.Query("code")
 	newpswd := c.Query("newpswd")
-	result, err := u.app.ResetPasswordByEmailCode(email, code, newpswd)
+	currentUser := c.Keys["me"].(*authentication.Client)
+	result, err := u.app.ResetPasswordByEmailCode(currentUser, email, code, newpswd)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "ResetPasswordByEmailCode error", err.Error()),
@@ -280,6 +240,7 @@ func (u *User) ResetPasswordByEmailCode(c *gin.Context) {
 // @Param	city		query 	string	false		"  city 城市"
 // @Param	province		query 	string	false		"  province 省份 "
 // @Param	country		query 	string	false		"  country 国家"
+// @Param	customData		query 	string	false		"  自定义数据, 格式为   key:value"
 // @Accept json
 // @Produce json
 // @Router /v1/user/updateProfile/{id} [put]
@@ -293,12 +254,16 @@ func (u *User) UpdateProfile(c *gin.Context) {
 		)
 		return
 	}
-	result, err := u.app.UpdateUser(subID, updateUserInput)
+
+	currentUser := c.Keys["me"].(*authentication.Client)
+
+	result, err := u.app.UpdateUser(currentUser, subID, updateUserInput)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError,
 			util.ExportData(util.CodeStatusServerError, "UpdateProfile UpdateUser error", err.Error()),
 		)
 		return
 	}
+
 	c.JSON(http.StatusOK, util.ExportData(util.CodeStatusNormal, "ok", result))
 }

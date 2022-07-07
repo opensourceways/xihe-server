@@ -12,9 +12,9 @@ require (
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe
 	github.com/swaggo/gin-swagger v1.5.0
 	github.com/swaggo/swag v1.8.3
+	github.com/xanzy/go-gitlab v0.68.2
 	go.mongodb.org/mongo-driver v1.9.1
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
-	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
 )
 
 require (
@@ -32,8 +32,11 @@ require (
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/goccy/go-json v0.9.8 // indirect
-	github.com/golang/protobuf v1.5.0 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
+	github.com/hashicorp/go-retryablehttp v0.7.1 // indirect
 	github.com/jehiah/go-strftime v0.0.0-20171201141054-1d33003b3869 // indirect
 	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
@@ -62,8 +65,9 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
 	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b // indirect
 	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 	golang.org/x/tools v0.1.11 // indirect
-	google.golang.org/appengine v1.6.6 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect

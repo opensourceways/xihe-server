@@ -30,5 +30,9 @@
         "log_file": "xihe",
         "log_file_size": 10000000,
         "log_file_suffix": "00000001"
-    } 
+    } ,
+    "gitlab": {
+        "baseurl": "http://192.168.1.193:70",
+        "access_token": "3sRnxoQwGsGkqfi1u3mr"
+    }
 }

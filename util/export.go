@@ -40,8 +40,6 @@ func ExportData(code int, title interface{}, data ...interface{}) *JsonData {
 	if code > 300 {
 		if err, ok := data[0].(error); ok {
 			Log.Warnln(err.Error())
-		} else {
-			Log.Warnln(data)
 		}
 	}
 	return &resultData
