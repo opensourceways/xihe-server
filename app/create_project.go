@@ -5,60 +5,25 @@ import (
 )
 
 type CreateProjectCmd struct {
-	Name      string
-	Desc      string
-	Type      string
+	Name      domain.ProjName
+	Desc      domain.ProjDesc
+	Type      domain.RepoType
 	CoverId   string
-	Protocol  string
-	Training  string
-	Inference string
+	Protocol  domain.ProtocolName
+	Training  domain.TrainingSDK
+	Inference domain.InferenceSDK
 }
 
-func (cmd *CreateProjectCmd) toDomainProject() (p domain.Project, err error) {
-	p.NewOne = true
-
-	n, err := domain.NewProjName(cmd.Name)
-	if err != nil {
-		return
+func (cmd *CreateProjectCmd) toProject() domain.Project {
+	return domain.Project{
+		Name:      cmd.Name,
+		Desc:      cmd.Desc,
+		Type:      cmd.Type,
+		CoverId:   cmd.CoverId,
+		Protocol:  cmd.Protocol,
+		Training:  cmd.Training,
+		Inference: cmd.Inference,
 	}
-	p.Name = n
-
-	t, err := domain.NewRepoType(cmd.Type)
-	if err != nil {
-		return
-	}
-	p.Type = t
-
-	d, err := domain.NewProjDesc(cmd.Desc)
-	if err != nil {
-		return
-	}
-	p.Desc = d
-
-	// TODO: check cover id
-	p.CoverId = cmd.CoverId
-
-	pv, err := domain.NewProtocolName(cmd.Protocol)
-	if err != nil {
-		return
-	}
-	p.Protocol = pv
-
-	tv, err := domain.NewTrainingSDK(cmd.Training)
-	if err != nil {
-		return
-	}
-	p.Training = tv
-
-	iv, err := domain.NewInferenceSDK(cmd.Inference)
-	if err != nil {
-		return
-	}
-	p.Inference = iv
-
-	err = p.Validate()
-
-	return
 }
 
 type ProjectDTO struct {
@@ -86,10 +51,7 @@ type createProjectService struct {
 func (s createProjectService) Create(userId string, cmd CreateProjectCmd) (ProjectDTO, error) {
 	dto := ProjectDTO{}
 
-	p, err := cmd.toDomainProject()
-	if err != nil {
-		return dto, err
-	}
+	p := cmd.toProject()
 
 	if err := s.repo.Save(p); err != nil {
 		return dto, err

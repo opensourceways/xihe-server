@@ -21,7 +21,8 @@ func LoadConfig(path string) (*Config, error) {
 }
 
 type Config struct {
-	Mongodb MongodbConfig `json:"mongodb" required:"true"`
+	Authing AuthingService `json:"authing_service" required:"true"`
+	Mongodb MongodbConfig  `json:"mongodb" required:"true"`
 }
 
 func (cfg *Config) setDefault() {
@@ -35,4 +36,9 @@ type MongodbConfig struct {
 	MongodbConn       string `json:"mongodb_conn" required:"true"`
 	DBName            string `json:"mongodb_db" required:"true"`
 	ProjectCollection string `json:"project_collection" required:"true"`
+}
+
+type AuthingService struct {
+	UserPoolId string `json:"user_pool_id" required:"true"`
+	Secret     string `json:"secret" required:"true"`
 }

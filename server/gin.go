@@ -14,7 +14,9 @@ import (
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/docs"
-	"github.com/opensourceways/xihe-server/infra/mongodb"
+	"github.com/opensourceways/xihe-server/infrastructure/authing"
+	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
+	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 )
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
@@ -45,6 +47,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		controller.AddRouterForProjectController(
 			v1,
 			mongodb.NewProjectRepository(cfg.Mongodb.ProjectCollection),
+		)
+
+		controller.AddRouterForUserController(
+			v1,
+			repositories.NewUserRepository(authing.NewUserMapper()),
 		)
 	}
 

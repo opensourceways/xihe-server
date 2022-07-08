@@ -3,6 +3,7 @@ module github.com/opensourceways/xihe-server
 go 1.16
 
 require (
+	github.com/Authing/authing-go-sdk v0.2.7
 	github.com/gin-gonic/gin v1.8.1
 	github.com/opensourceways/community-robot-lib v0.0.0-20220623114205-07aa27bde501
 	github.com/sirupsen/logrus v1.8.1
