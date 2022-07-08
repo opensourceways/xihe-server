@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -32,7 +33,7 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	}
 
 	defer interrupts.WaitForGracefulShutdown()
-
+	log.Println("server start at :" + srv.Addr)
 	interrupts.ListenAndServe(srv, timeout)
 }
 
@@ -53,6 +54,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 			v1,
 			repositories.NewUserRepository(authing.NewUserMapper()),
 		)
+
 	}
 
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

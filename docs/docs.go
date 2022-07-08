@@ -16,9 +16,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/v1/helloworld": {
-            "get": {
-                "description": "helloworld",
+        "/v1/project": {
+            "post": {
+                "description": "create project",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,71 @@ const docTemplate = `{
                 "tags": [
                     "Project"
                 ],
-                "summary": "helloworld",
+                "summary": "create project",
+                "responses": {}
+            }
+        },
+        "/v1/user": {
+            "put": {
+                "description": "update user basic info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update",
+                "responses": {}
+            }
+        },
+        "/v1/user/callback": {
+            "get": {
+                "description": "login success callback",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "AuthingCallback",
+                "responses": {}
+            }
+        },
+        "/v1/user/checkLogin": {
+            "get": {
+                "description": "CheckLogin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "CheckLogin",
+                "responses": {}
+            }
+        },
+        "/v1/user/getCurrentUser": {
+            "get": {
+                "description": "获取用户资料, 在请求的request的header中必须带有accessToken",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "GetCurrentUser",
                 "responses": {}
             }
         }

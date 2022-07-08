@@ -27,8 +27,7 @@ func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 			changed = true
 		}
 	}
-
-	if cmd.NickName.Nickname() != cmd.NickName.Nickname() {
+	if cmd.NickName.Nickname() != u.Nickname.Nickname() {
 		u.Nickname = cmd.NickName
 		set()
 	}
@@ -38,7 +37,7 @@ func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 		set()
 	}
 
-	if cmd.Bio.Bio() != cmd.Bio.Bio() {
+	if cmd.Bio.Bio() != u.Bio.Bio() {
 		u.Bio = cmd.Bio
 		set()
 	}

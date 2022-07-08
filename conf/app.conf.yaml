@@ -1,0 +1,21 @@
+mongodb:
+  mongodb_conn: mongodb://root:123@localhost:32768
+  mongodb_db: cla
+  link_collection: links
+  corp_pdf_collection: corp_pdfs
+  org_email_collection: org_emails
+  verification_code_collection: verification_codes
+  corp_signing_collection: corp_signings
+  individual_signing_collection: individual_signings
+
+gitlab:
+  accees_token: huaweicloud-obs
+  host: http://192.168.1.193:70
+
+authing_service:
+  user_pool_id: 6219de6ce6b********1
+  secret: d5a008f73***********9
+  app_id: 623d6**************e4b
+  app_secret: 374a7***********820e
+  authing_url: https://xihe-ai.authing.cn
+  redirect_url: http://localhost:8888/api/v1/user/callback

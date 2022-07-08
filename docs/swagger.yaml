@@ -1,15 +1,59 @@
 info:
   contact: {}
 paths:
-  /v1/helloworld:
-    get:
+  /v1/project:
+    post:
       consumes:
       - application/json
-      description: helloworld
+      description: create project
       produces:
       - application/json
       responses: {}
-      summary: helloworld
+      summary: create project
       tags:
       - Project
+  /v1/user:
+    put:
+      consumes:
+      - application/json
+      description: update user basic info
+      produces:
+      - application/json
+      responses: {}
+      summary: Update
+      tags:
+      - User
+  /v1/user/callback:
+    get:
+      consumes:
+      - application/json
+      description: login success callback
+      produces:
+      - application/json
+      responses: {}
+      summary: AuthingCallback
+      tags:
+      - User
+  /v1/user/checkLogin:
+    get:
+      consumes:
+      - application/json
+      description: CheckLogin
+      produces:
+      - application/json
+      responses: {}
+      summary: CheckLogin
+      tags:
+      - User
+  /v1/user/getCurrentUser:
+    get:
+      consumes:
+      - application/json
+      description: 获取用户资料, 在请求的request的header中必须带有accessToken
+      produces:
+      - application/json
+      responses: {}
+      summary: GetCurrentUser
+      tags:
+      - User
 swagger: "2.0"
