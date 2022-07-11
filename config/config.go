@@ -26,6 +26,7 @@ type Config struct {
 	Authing AuthingService `json:"authing_service" required:"true"`
 	Mongodb MongodbConfig  `json:"mongodb" required:"true"`
 	Gitlab  GitlabConfig   `json:"gitlab" required:"true"`
+	Kafka   KafkaConfig    `json:"kafka" required:"true"`
 }
 
 func (cfg *Config) setDefault() {
@@ -66,4 +67,7 @@ type AuthingService struct {
 type GitlabConfig struct {
 	AcceesToken string `json:"accees_token" required:"true"`
 	Host        string `json:"host" required:"true"`
+}
+type KafkaConfig struct {
+	KafkaBrokers string `json:"kafka_brokers" required:"true"`
 }

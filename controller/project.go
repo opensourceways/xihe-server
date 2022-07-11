@@ -97,3 +97,15 @@ func (pc *ProjectController) genCreateProjectCmd(p *projectModel) (cmd app.Creat
 
 	return
 }
+
+// @Summary LikeCountIncrease
+// @Description like count increase
+// @Tags  Project
+// @Param	project_id		query 	string	true		"id for project"
+// @Param	user_id		query 	string	true		"id for user"
+// @Accept json
+// @Produce json
+// @Router /v1/project/likeCount [put]
+func (pc *ProjectController) LikeCountIncrease(ctx *gin.Context) {
+
+}

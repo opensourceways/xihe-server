@@ -19,3 +19,6 @@ authing_service:
   app_secret: 374a7***********820e
   authing_url: https://xihe-ai.authing.cn
   redirect_url: http://localhost:8888/api/v1/user/callback
+
+kafka:
+  kafka_brokers: 192.168.1.193:9092

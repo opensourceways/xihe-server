@@ -16,6 +16,13 @@ type project struct {
 func (impl project) Save(p domain.Project) (r domain.Project, err error) {
 	return
 }
+func (impl project) Update(p domain.Project) (r domain.Project, err error) {
+	return
+}
+func (impl project) LikeCountIncrease(project_id, user_id string) error {
+
+	return nil
+}
 
 type ProjectMapper interface {
 }

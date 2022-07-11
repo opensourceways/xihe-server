@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authing"
 )
@@ -18,7 +17,6 @@ func AddRouterForGitProjectController(
 }
 
 type GitProjectController struct {
-	repo app.ProjectRepository
 }
 
 // @Summary CreateProject
