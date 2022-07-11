@@ -54,7 +54,15 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 			v1,
 			repositories.NewUserRepository(authing.NewUserMapper()),
 		)
-
+		controller.AddRouterForGitGroupController(
+			v1,
+		)
+		controller.AddRouterForGitProjectController(
+			v1,
+		)
+		controller.AddRouterForGitUserController(
+			v1,
+		)
 	}
 
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
