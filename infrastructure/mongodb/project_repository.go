@@ -1,7 +1,6 @@
 package mongodb
 
 import (
-	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 )
 
@@ -14,10 +13,6 @@ type cProject struct {
 	Protocol  string `bson:"protocol"  json:"protocol"`
 	Training  string `bson:"training"  json:"training"`
 	Inference string `bson:"inference" json:"inference"`
-}
-
-func NewProjectRepository(collectionName string) app.ProjectRepository {
-	return projectRepository{collectionName}
 }
 
 type projectRepository struct {

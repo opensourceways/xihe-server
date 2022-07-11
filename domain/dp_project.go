@@ -60,6 +60,23 @@ func (r projDesc) ProjDesc() string {
 	return string(r)
 }
 
+// InferenceSDK
+type CoverId interface {
+	CoverId() string
+}
+
+func NewConverId(v string) (CoverId, error) {
+	// TODO: limited value
+
+	return coverId(v), nil
+}
+
+type coverId string
+
+func (c coverId) CoverId() string {
+	return string(c)
+}
+
 // ProtocolName
 type ProtocolName interface {
 	ProtocolName() string

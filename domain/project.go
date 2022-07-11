@@ -1,18 +1,17 @@
 package domain
 
 type Project struct {
-	NewOne bool
-	UserId string
+	Id    string
+	Owner string
 
 	Name      ProjName
 	Desc      ProjDesc
 	Type      RepoType
-	CoverId   string
+	CoverId   CoverId
 	Protocol  ProtocolName
 	Training  TrainingSDK
 	Inference InferenceSDK
-}
 
-func (p *Project) Validate() error {
-	return nil
+	LikeAccount int
+	Downloads   map[string]int
 }
