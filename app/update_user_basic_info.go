@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/infrastructure"
 )
 
 type UpdateUserBasicInfoCmd struct {
@@ -27,8 +27,7 @@ func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 			changed = true
 		}
 	}
-
-	if cmd.NickName.Nickname() != cmd.NickName.Nickname() {
+	if cmd.NickName.Nickname() != u.Nickname.Nickname() {
 		u.Nickname = cmd.NickName
 		set()
 	}
@@ -38,7 +37,7 @@ func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 		set()
 	}
 
-	if cmd.Bio.Bio() != cmd.Bio.Bio() {
+	if cmd.Bio.Bio() != u.Bio.Bio() {
 		u.Bio = cmd.Bio
 		set()
 	}
@@ -48,14 +47,16 @@ func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 
 type UserService interface {
 	UpdateBasicInfo(userId string, cmd UpdateUserBasicInfoCmd) error
+	RecordLikeProject(userId, projectId string) error
 }
 
-func NewUserService(repo repository.User) UserService {
+func NewUserService() UserService {
+	var repo infrastructure.UserMapper
 	return userService{repo}
 }
 
 type userService struct {
-	repo repository.User
+	repo infrastructure.UserMapper
 }
 
 func (s userService) UpdateBasicInfo(userId string, cmd UpdateUserBasicInfoCmd) error {
@@ -68,9 +69,14 @@ func (s userService) UpdateBasicInfo(userId string, cmd UpdateUserBasicInfoCmd) 
 		return err
 	}
 
-	if b := cmd.toUser(&user); !b {
-		return nil
-	}
+	// if b := cmd.toUser(&user); !b {
+	// 	return nil
+	// }
 
 	return s.repo.Save(user)
+}
+func (s userService) RecordLikeProject(userId, projectId string) error {
+	s.repo.LikeProject(projectId)
+	return nil
+
 }

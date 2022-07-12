@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -11,11 +12,10 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/docs"
-	"github.com/opensourceways/xihe-server/infrastructure/authing"
-	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 )
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
@@ -31,7 +31,7 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	}
 
 	defer interrupts.WaitForGracefulShutdown()
-
+	log.Println("server start at :" + srv.Addr)
 	interrupts.ListenAndServe(srv, timeout)
 }
 
@@ -45,12 +45,21 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	{
 		controller.AddRouterForProjectController(
 			v1,
-			repositories.NewProjectRepository(nil),
+			*app.NewPorjectAPP(),
 		)
 
 		controller.AddRouterForUserController(
 			v1,
-			repositories.NewUserRepository(authing.NewUserMapper()),
+			app.NewUserService(),
+		)
+		controller.AddRouterForGitGroupController(
+			v1,
+		)
+		controller.AddRouterForGitProjectController(
+			v1,
+		)
+		controller.AddRouterForGitUserController(
+			v1,
 		)
 	}
 

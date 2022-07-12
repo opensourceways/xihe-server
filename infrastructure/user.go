@@ -1,4 +1,4 @@
-package repositories
+package infrastructure
 
 import (
 	"github.com/opensourceways/xihe-server/domain"
@@ -72,5 +72,7 @@ type UserDO struct {
 
 type UserMapper interface {
 	Get(string) (UserDO, error)
+	Save(UserDO) error
 	Update(UserDO) error
+	LikeProject(project_id string) error
 }

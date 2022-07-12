@@ -4,9 +4,52 @@
         "contact": {}
     },
     "paths": {
-        "/v1/helloworld": {
-            "get": {
-                "description": "helloworld",
+        "/v1/git/group": {
+            "post": {
+                "description": "Create Group of git",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GitGroup"
+                ],
+                "summary": "CreateGroup",
+                "responses": {}
+            }
+        },
+        "/v1/git/project": {
+            "post": {
+                "description": "Create Project for gitlab",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GitProject"
+                ],
+                "summary": "CreateProject",
+                "parameters": [
+                    {
+                        "description": "body for CreateProject content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.GitlabProject"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/project": {
+            "post": {
+                "description": "create project",
                 "consumes": [
                     "application/json"
                 ],
@@ -16,8 +59,126 @@
                 "tags": [
                     "Project"
                 ],
-                "summary": "helloworld",
+                "summary": "create project",
                 "responses": {}
+            }
+        },
+        "/v1/project/likeCount": {
+            "put": {
+                "description": "like count increase",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "LikeCountIncrease",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id for project",
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "id for user",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/user": {
+            "put": {
+                "description": "update user basic info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update",
+                "responses": {}
+            }
+        },
+        "/v1/user/callback": {
+            "get": {
+                "description": "login success callback",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "AuthingCallback",
+                "responses": {}
+            }
+        },
+        "/v1/user/checkLogin": {
+            "get": {
+                "description": "CheckLogin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "CheckLogin",
+                "responses": {}
+            }
+        },
+        "/v1/user/getCurrentUser": {
+            "get": {
+                "description": "获取用户资料, 在请求的request的header中必须带有accessToken",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "GetCurrentUser",
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "domain.GitlabProject": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "mergeRequestsEnabled": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "snippetsEnabled": {
+                    "type": "boolean"
+                },
+                "visibility": {
+                    "type": "boolean"
+                }
             }
         }
     }
