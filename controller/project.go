@@ -6,19 +6,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/repository"
 )
 
-func AddRouterForProjectController(rg *gin.RouterGroup, repo repository.Project) {
+func AddRouterForProjectController(rg *gin.RouterGroup, app app.ProjectApp) {
 	pc := ProjectController{
-		repo: repo,
+		app: app,
 	}
 
 	rg.POST("/v1/project", pc.Create)
+	rg.PUT("/v1/project/likeCount", pc.LikeCountIncrease)
 }
 
 type ProjectController struct {
-	repo repository.Project
+	app app.ProjectApp
 }
 
 // @Summary create project
@@ -44,11 +44,10 @@ func (pc *ProjectController) Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, newResponseError(
 			errorBadRequestParam, err,
 		))
-
 		return
 	}
 
-	s := app.NewCreateProjectService(pc.repo)
+	s := app.NewCreateProjectService(nil)
 
 	d, err := s.Create(cmd)
 	if err != nil {
@@ -106,6 +105,15 @@ func (pc *ProjectController) genCreateProjectCmd(p *projectModel) (cmd app.Creat
 // @Accept json
 // @Produce json
 // @Router /v1/project/likeCount [put]
-func (pc *ProjectController) LikeCountIncrease(ctx *gin.Context) {
-
+func (pc *ProjectController) LikeCountIncrease(c *gin.Context) {
+	project_id := c.Query("project_id")
+	user_id := c.Query("user_id")
+	data, err := pc.app.LikeCountIncrease(nil, project_id, user_id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, newResponseError(
+			errorSystemError, err,
+		))
+		return
+	}
+	c.JSON(http.StatusOK, newResponse("200", "ok", data))
 }

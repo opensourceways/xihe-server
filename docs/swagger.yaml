@@ -1,6 +1,49 @@
+definitions:
+  domain.GitlabProject:
+    properties:
+      description:
+        type: string
+      mergeRequestsEnabled:
+        type: boolean
+      name:
+        type: string
+      snippetsEnabled:
+        type: boolean
+      visibility:
+        type: boolean
+    type: object
 info:
   contact: {}
 paths:
+  /v1/git/group:
+    post:
+      consumes:
+      - application/json
+      description: Create Group of git
+      produces:
+      - application/json
+      responses: {}
+      summary: CreateGroup
+      tags:
+      - GitGroup
+  /v1/git/project:
+    post:
+      consumes:
+      - application/json
+      description: Create Project for gitlab
+      parameters:
+      - description: body for CreateProject content
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/domain.GitlabProject'
+      produces:
+      - application/json
+      responses: {}
+      summary: CreateProject
+      tags:
+      - GitProject
   /v1/project:
     post:
       consumes:
@@ -10,6 +53,28 @@ paths:
       - application/json
       responses: {}
       summary: create project
+      tags:
+      - Project
+  /v1/project/likeCount:
+    put:
+      consumes:
+      - application/json
+      description: like count increase
+      parameters:
+      - description: id for project
+        in: query
+        name: project_id
+        required: true
+        type: string
+      - description: id for user
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: LikeCountIncrease
       tags:
       - Project
   /v1/user:

@@ -20,7 +20,7 @@ func TestMQ(t *testing.T) {
 
 	InitMQ(cfg)
 
-	go StartEventLinsten(ProjectLikeCountIncreaseEvent, "thisguroup", testReceiveFunction)
+	// go StartEventLinsten(ProjectLikeCountIncreaseEvent, "thisguroup", testReceiveFunction)
 
 	for i := 0; i < 10; i++ {
 		projectLikeCount := make(map[string]interface{})

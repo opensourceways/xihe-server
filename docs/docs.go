@@ -16,6 +16,49 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/git/group": {
+            "post": {
+                "description": "Create Group of git",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GitGroup"
+                ],
+                "summary": "CreateGroup",
+                "responses": {}
+            }
+        },
+        "/v1/git/project": {
+            "post": {
+                "description": "Create Project for gitlab",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "GitProject"
+                ],
+                "summary": "CreateProject",
+                "parameters": [
+                    {
+                        "description": "body for CreateProject content",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.GitlabProject"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/v1/project": {
             "post": {
                 "description": "create project",
@@ -29,6 +72,38 @@ const docTemplate = `{
                     "Project"
                 ],
                 "summary": "create project",
+                "responses": {}
+            }
+        },
+        "/v1/project/likeCount": {
+            "put": {
+                "description": "like count increase",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "LikeCountIncrease",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id for project",
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "id for user",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {}
             }
         },
@@ -94,6 +169,28 @@ const docTemplate = `{
                 ],
                 "summary": "GetCurrentUser",
                 "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "domain.GitlabProject": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "mergeRequestsEnabled": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "snippetsEnabled": {
+                    "type": "boolean"
+                },
+                "visibility": {
+                    "type": "boolean"
+                }
             }
         }
     }

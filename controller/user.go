@@ -8,14 +8,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/infrastructure/authing"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForUserController(
 	rg *gin.RouterGroup,
-	repoUser repository.User,
+	repoUser app.UserService,
 ) {
 	pc := UserController{
 		repoUser: repoUser,
@@ -29,7 +28,7 @@ func AddRouterForUserController(
 }
 
 type UserController struct {
-	repoUser repository.User
+	repoUser app.UserService
 }
 
 // @Summary Update
@@ -59,7 +58,7 @@ func (uc *UserController) Update(ctx *gin.Context) {
 		return
 	}
 
-	s := app.NewUserService(uc.repoUser)
+	s := uc.repoUser
 
 	if err := s.UpdateBasicInfo("", cmd); err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(

@@ -16,7 +16,9 @@ import (
 	"golang.org/x/oauth2"
 
 	"github.com/opensourceways/xihe-server/config"
-	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/infrastructure"
 )
 
 var cli *management.Client
@@ -29,11 +31,84 @@ func Init(cfg *config.AuthingService) error {
 	return initAuthing()
 }
 
-func NewUserMapper() repositories.UserMapper {
-	return userMapper{}
+func NewUserRepository(mapper UserMapper) repository.User {
+	return user{mapper}
+}
+
+type user struct {
+	mapper UserMapper
+}
+
+func (impl user) Get(index string) (r domain.User, err error) {
+	do, err := impl.mapper.Get(index)
+	if err != nil {
+		return
+	}
+
+	r.Id = do.Id
+
+	if r.Bio, err = domain.NewBio(do.Bio); err != nil {
+		return
+	}
+
+	if r.Email, _ = domain.NewEmail(do.Email); err != nil {
+		return
+	}
+
+	if r.Account, _ = domain.NewAccount(do.Account); err != nil {
+		return
+	}
+
+	if r.Nickname, _ = domain.NewNickname(do.Nickname); err != nil {
+		return
+	}
+
+	if r.AvatarId, _ = domain.NewAvatarId(do.AvatarId); err != nil {
+		return
+	}
+
+	r.PhoneNumber, err = domain.NewPhoneNumber(do.PhoneNumber)
+
+	return
+}
+
+func (impl user) Save(u domain.User) error {
+	do := UserDO{
+		Id:          u.Id,
+		Bio:         u.Bio.Bio(),
+		Email:       u.Email.Email(),
+		Account:     u.Account.Account(),
+		Nickname:    u.Nickname.Nickname(),
+		AvatarId:    u.AvatarId.AvatarId(),
+		PhoneNumber: u.PhoneNumber.PhoneNumber(),
+	}
+
+	return impl.mapper.Update(do)
+}
+
+type UserDO struct {
+	Id          string
+	Bio         string
+	Email       string
+	Account     string
+	Nickname    string
+	AvatarId    string
+	PhoneNumber string
+}
+
+type UserMapper interface {
+	Get(string) (UserDO, error)
+	Update(UserDO) error
+	Save(UserDO) error
+	LikeProject(project_id string) error
+}
+
+func NewUserMapper(user *UserDO) infrastructure.UserMapper {
+	return userMapper{user}
 }
 
 type userMapper struct {
+	*UserDO
 }
 
 type AuthingLoginUser struct {
@@ -52,7 +127,7 @@ type AuthingLoginUser struct {
 	PhoneNumberVerified bool   `json:"phone_number_verified,omitempty"`
 }
 
-func (u userMapper) Get(userId string) (do repositories.UserDO, err error) {
+func (u userMapper) Get(userId string) (do infrastructure.UserDO, err error) {
 	v, err := cli.Detail(userId)
 	if err != nil {
 		return
@@ -85,19 +160,25 @@ func (u userMapper) Get(userId string) (do repositories.UserDO, err error) {
 
 	return
 }
+func (u userMapper) Save(do infrastructure.UserDO) error {
 
-func (u userMapper) Update(do repositories.UserDO) error {
+	return nil
+}
+func (u userMapper) Update(do infrastructure.UserDO) error {
 	m := model.UpdateUserInput{}
-
 	//TODO bio
 	m.Email = &do.Email
 	m.Photo = &do.AvatarId
 	m.Phone = &do.PhoneNumber
 	m.Nickname = &do.Nickname
-
 	_, err := cli.UpdateUser(do.Id, m)
-
 	return err
+}
+
+// record who like which project
+func (u userMapper) LikeProject(project_id string) error {
+
+	return nil
 }
 
 func Authorize() gin.HandlerFunc {

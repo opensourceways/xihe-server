@@ -22,3 +22,8 @@ authing_service:
 
 kafka:
   kafka_brokers: 192.168.1.193:9092
+redis:
+  addr: 192.168.1.193
+  port: 6379
+  password: 58243586
+  db: 10

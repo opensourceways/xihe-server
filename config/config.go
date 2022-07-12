@@ -27,6 +27,7 @@ type Config struct {
 	Mongodb MongodbConfig  `json:"mongodb" required:"true"`
 	Gitlab  GitlabConfig   `json:"gitlab" required:"true"`
 	Kafka   KafkaConfig    `json:"kafka" required:"true"`
+	Redis   RedisConfig    `json:"redis" required:"true"`
 }
 
 func (cfg *Config) setDefault() {
@@ -70,4 +71,11 @@ type GitlabConfig struct {
 }
 type KafkaConfig struct {
 	KafkaBrokers string `json:"kafka_brokers" required:"true"`
+}
+
+type RedisConfig struct {
+	Addr     string `json:"addr" required:"true"`
+	Port     string `json:"port" required:"true"`
+	Password string `json:"password" required:"true"`
+	Db       int    `json:"db" required:"true"`
 }

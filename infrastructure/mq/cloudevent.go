@@ -73,19 +73,19 @@ func PushEvent(eventType MQEventName, data map[string]interface{}) error {
 	e.SetType(string(eventType))
 	e.SetSource(SourceUrl)
 	e.SetData(cloudevents.ApplicationJSON, data)
-	go func() {
-		err := clientItem.Send(kafka_sarama.WithMessageKey(context.Background(), sarama.StringEncoder(e.ID())), e)
-		if err != nil {
-			log.Error(fmt.Sprintf("[PushEvent] failed to send message ,error: %v", err))
-		}
-		log.Info(fmt.Sprintf("[PushEvent] message send with event type %s,  data %v", eventType, data))
-	}()
+
+	err := clientItem.Send(kafka_sarama.WithMessageKey(context.Background(), sarama.StringEncoder(e.ID())), e)
+	if err != nil {
+		log.Error(fmt.Sprintf("[PushEvent] failed to send message ,error: %v", err))
+	}
+	// log.Info(fmt.Sprintf("[PushEvent] message send with event type %s,  data %v", eventType, data))
+
 	return nil
 }
 
 // go StartEventLinsten(ProjectLikeCountIncreaseEvent, handleDownloadStatusEvent)
 func StartEventLinsten(topicName MQEventName, GroupID string, handleFunc func(ctx context.Context, event cloudevents.Event)) {
-	receiver, err := kafka_sarama.NewConsumer(brokers, saramaConfig, GroupID, string(topicName))
+	receiver, err := kafka_sarama.NewConsumer(brokers, saramaConfig, GroupID, string(ProjectLikeCountIncreaseEvent))
 	if err != nil {
 		log.Printf("failed to create protocol: %s", err.Error())
 
