@@ -1,20 +1,24 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/xanzy/go-gitlab"
 )
 
 func AddRouterForProjectController(rg *gin.RouterGroup, app app.ProjectApp) {
 	pc := ProjectController{
 		app: app,
 	}
-
 	rg.POST("/v1/project", pc.Create)
 	rg.PUT("/v1/project/likeCount", pc.LikeCountIncrease)
+	rg.POST("/v1/project/multipleUpload", pc.MultipleUpload)
+	rg.DELETE("/v1/project/deleteFiles", pc.DeleteFiles)
+
 }
 
 type ProjectController struct {
@@ -108,6 +112,12 @@ func (pc *ProjectController) genCreateProjectCmd(p *projectModel) (cmd app.Creat
 func (pc *ProjectController) LikeCountIncrease(c *gin.Context) {
 	project_id := c.Query("project_id")
 	user_id := c.Query("user_id")
+	if len(project_id) == 0 || len(user_id) == 0 {
+		c.JSON(http.StatusBadRequest, newResponseError(
+			errorBadRequestParam, fmt.Errorf("project_id and user_id are not allowed empty "),
+		))
+		return
+	}
 	data, err := pc.app.LikeCountIncrease(nil, project_id, user_id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, newResponseError(
@@ -116,4 +126,74 @@ func (pc *ProjectController) LikeCountIncrease(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, newResponse("200", "ok", data))
+}
+
+// @Summary MultipleUpload
+// @Description MultipleUpload
+// @Tags  Project
+// @Accept multipart/form-data
+// @Param	project_id	query	string	true	"id for project"
+// @Param	files	formData	file	true	"multiple  file"
+// @Produce json
+// @Router /v1/project/multipleUpload [post]
+func (pc *ProjectController) MultipleUpload(c *gin.Context) {
+	project_id := c.Query("project_id")
+	if len(project_id) == 0 {
+		c.JSON(http.StatusBadRequest, newResponseError(
+			errorBadRequestParam, fmt.Errorf("project_id  is not allowed empty "),
+		))
+		return
+	}
+	forms, err := c.MultipartForm()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, newResponseError(
+			errorSystemError, err,
+		))
+	}
+	files := forms.File["files"]
+	if len(files) == 0 {
+		c.JSON(http.StatusBadRequest, newResponseError(
+			errorBadRequestParam, fmt.Errorf("files  is not allowed empty "),
+		))
+	}
+	var result []*gitlab.ProjectFile
+	result, err = pc.app.MulitpleUpload(project_id, files)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, newResponseError(
+			errorSystemError, err,
+		))
+		return
+	}
+	c.JSON(http.StatusOK, newResponse("200", "ok", result))
+}
+
+// @Summary DeleteFiles
+// @Description DeleteFiles
+// @Tags  Project
+// @Accept multipart/form-data
+// @Param	project_id		query 	string	true		"id for project"
+// @Param	fileurl		query 	string	true		"file url"
+// @Produce json
+// @Router /v1/project/deleteFiles [delete]
+func (pc *ProjectController) DeleteFiles(c *gin.Context) {
+	project_id := c.Query("project_id")
+	fileurl := c.Query("fileurl")
+	if len(project_id) == 0 || len(fileurl) == 0 {
+		c.JSON(http.StatusBadRequest, newResponseError(
+			errorBadRequestParam, fmt.Errorf("project_id fileurl are not allowed empty "),
+		))
+		return
+	}
+	var deleteFile gitlab.ProjectFile
+	deleteFile.URL = fileurl
+	err := pc.app.DeleteFile(project_id, []*gitlab.ProjectFile{&deleteFile})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, newResponseError(
+			errorBadRequestParam, fmt.Errorf("DeleteFile error:%v ", err),
+		))
+		return
+	}
+	c.JSON(http.StatusOK, newResponse(
+		"200", "ok", deleteFile,
+	))
 }

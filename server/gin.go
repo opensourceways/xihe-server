@@ -45,7 +45,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	{
 		controller.AddRouterForProjectController(
 			v1,
-			*app.NewPorjectAPP(),
+			*app.NewPorjectAPP(cfg),
 		)
 
 		controller.AddRouterForUserController(

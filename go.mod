@@ -14,6 +14,8 @@ require (
 	github.com/go-openapi/swag v0.21.1 // indirect
 	github.com/go-playground/validator/v10 v10.10.1 // indirect
 	github.com/gomodule/redigo v1.8.9
+	github.com/google/go-querystring v1.1.0
+	github.com/hashicorp/go-retryablehttp v0.7.1
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/opensourceways/community-robot-lib v0.0.0-20220623114205-07aa27bde501
 	github.com/pquerna/cachecontrol v0.1.0 // indirect

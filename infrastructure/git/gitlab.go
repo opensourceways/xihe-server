@@ -1,26 +1,16 @@
 package git
 
 import (
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/config"
 	"github.com/xanzy/go-gitlab"
 )
 
-type UserGitlabClient struct {
+type GitLabClient struct {
 	*gitlab.Client
 }
 
-func NewUserGitlabClient(username, pswd, host string) (userGitLabClient *UserGitlabClient, err error) {
-	userGitLabClient = new(UserGitlabClient)
-	userGitLabClient.Client, err = gitlab.NewBasicAuthClient(username, pswd, gitlab.WithBaseURL(host))
+func NewGitlabClient(cfg *config.Config) (userGitLabClient *GitLabClient, err error) {
+	userGitLabClient = new(GitLabClient)
+	userGitLabClient.Client, err = gitlab.NewBasicAuthClient(cfg.Gitlab.RootUser, cfg.Gitlab.RootPswd, gitlab.WithBaseURL(cfg.Gitlab.Host))
 	return
-}
-func (u *UserGitlabClient) CreateProject(name, desc, visibility string, mergeRequestsEnabled, snippetsEnabled bool) error {
-	var newGitlabProject domain.GitlabProject
-	createOpts, err := newGitlabProject.MakeCreateOpt(name, desc, visibility, mergeRequestsEnabled, snippetsEnabled)
-	if err != nil {
-		return err
-	}
-	_, _, err = u.Client.Projects.CreateProject(createOpts)
-
-	return err
 }

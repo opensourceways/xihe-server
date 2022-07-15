@@ -10,7 +10,9 @@ mongodb:
 
 gitlab:
   accees_token: huaweicloud-obs
-  host: http://192.168.1.193:70
+  rootuser: root
+  rootpswd: luonancom@qq.com
+  host: http://192.168.1.193:70 
 
 authing_service:
   user_pool_id: 6219de6ce6b********1

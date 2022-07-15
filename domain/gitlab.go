@@ -16,7 +16,6 @@ type GitlabProject struct {
 
 func (p *GitlabProject) MakeCreateOpt(name, desc, visibility string, mergeRequestsEnabled, snippetsEnabled bool) (createProjectOptions *gitlab.CreateProjectOptions, err error) {
 	createProjectOptions = new(gitlab.CreateProjectOptions)
-
 	switch visibility {
 	case string(gitlab.PrivateVisibility):
 		temp := gitlab.VisibilityValue(gitlab.PrivateVisibility)

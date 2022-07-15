@@ -68,6 +68,8 @@ type AuthingService struct {
 type GitlabConfig struct {
 	AcceesToken string `json:"accees_token" required:"true"`
 	Host        string `json:"host" required:"true"`
+	RootUser    string `json:"rootuser" required:"true"`
+	RootPswd    string `json:"rootpswd" required:"true"`
 }
 type KafkaConfig struct {
 	KafkaBrokers string `json:"kafka_brokers" required:"true"`

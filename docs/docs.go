@@ -75,6 +75,38 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/v1/project/deleteFiles": {
+            "delete": {
+                "description": "DeleteFiles",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "DeleteFiles",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id for project",
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "file url",
+                        "name": "fileurl",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/v1/project/likeCount": {
             "put": {
                 "description": "like count increase",
@@ -101,6 +133,38 @@ const docTemplate = `{
                         "description": "id for user",
                         "name": "user_id",
                         "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/v1/project/multipleUpload": {
+            "post": {
+                "description": "MultipleUpload",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Project"
+                ],
+                "summary": "MultipleUpload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id for project",
+                        "name": "project_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "multiple  file",
+                        "name": "files",
+                        "in": "formData",
                         "required": true
                     }
                 ],

@@ -18,7 +18,7 @@ func TestLikeCount(t *testing.T) {
 	}
 	mq.InitMQ(cfg)
 	redis.InitRedis(cfg)
-	app := NewPorjectAPP()
+	app := NewPorjectAPP(cfg)
 
 	var wg sync.WaitGroup
 	for i := 0; i < 12; i++ {
@@ -36,6 +36,6 @@ func TestReceive(t *testing.T) {
 	}
 	mq.InitMQ(cfg)
 	redis.InitRedis(cfg)
-	mq.StartEventLinsten(mq.ProjectLikeCountIncreaseEvent, "thisguroup", ReceiveFunction)
+	mq.StartEventLinsten(mq.ProjectLikeCountIncreaseEvent, "thisguroup", ProjectLikeCountHandle)
 
 }

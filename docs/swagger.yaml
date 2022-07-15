@@ -55,6 +55,28 @@ paths:
       summary: create project
       tags:
       - Project
+  /v1/project/deleteFiles:
+    delete:
+      consumes:
+      - multipart/form-data
+      description: DeleteFiles
+      parameters:
+      - description: id for project
+        in: query
+        name: project_id
+        required: true
+        type: string
+      - description: file url
+        in: query
+        name: fileurl
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: DeleteFiles
+      tags:
+      - Project
   /v1/project/likeCount:
     put:
       consumes:
@@ -75,6 +97,28 @@ paths:
       - application/json
       responses: {}
       summary: LikeCountIncrease
+      tags:
+      - Project
+  /v1/project/multipleUpload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: MultipleUpload
+      parameters:
+      - description: id for project
+        in: query
+        name: project_id
+        required: true
+        type: string
+      - description: multiple  file
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses: {}
+      summary: MultipleUpload
       tags:
       - Project
   /v1/user:

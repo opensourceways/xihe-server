@@ -27,11 +27,4 @@ func (p Project) ValidateID() error {
 
 type LikeAccount int
 
-func (la LikeAccount) Validate() error {
-	if la < 0 {
-		return fmt.Errorf("LikeAccount must great than zero")
-	}
-	return nil
-}
-
 type ProjectDownloads map[string]int

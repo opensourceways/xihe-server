@@ -11,6 +11,7 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/infrastructure/authing"
+	"github.com/opensourceways/xihe-server/infrastructure/git"
 	"github.com/opensourceways/xihe-server/infrastructure/mq"
 	"github.com/opensourceways/xihe-server/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/server"
@@ -50,6 +51,7 @@ func main() {
 	authing.Init(&cfg.Authing)
 	redis.InitRedis(cfg)
 	mq.InitMQ(cfg)
-	go mq.StartEventLinsten(mq.ProjectLikeCountIncreaseEvent, "test", app.ReceiveFunction)
+	git.NewGitlabClient(cfg)
+	go mq.StartEventLinsten(mq.ProjectLikeCountIncreaseEvent, "test", app.ProjectLikeCountHandle)
 	server.StartWebServer(o.service.Port, o.service.GracePeriod, cfg)
 }
