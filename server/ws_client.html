@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>jobs log</title>
+</head>
+
+<body>
+
+    <div for="jobid" style="width: 100%;">jobid:
+        <input type="number" name="jobid" id="jobidUI">
+        <button onclick="connectServer()">连接</button>
+    </div>
+    <textarea id="resultList" style="width:100% ;" cols="30" rows="10"></textarea>
+    <script type="text/javascript">
+        function connectServer() {
+            var jobid = document.getElementById("jobidUI");
+            var resultList = document.getElementById("resultList");
+            var ws = new WebSocket("ws://127.0.0.1:9527/queryJob?Authorization=eyJhbO2H7r2YRV_AeEMM&jobid=" + jobid.value);
+            ws.onopen = function (evt) {
+                console.log("OPEN");
+            }
+            ws.onclose = function (evt) {
+                console.log("CLOSE");
+                ws = null;
+            }
+            ws.onmessage = function (evt) {
+                console.log("RESPONSE: " +evt.data); 
+
+                resultList.value = resultList.value + "\n" + (evt.data);
+            }
+            ws.onerror = function (evt) {
+                console.log("ERROR: " + evt.data);
+            }
+        };
+    </script>
+</body>
+
+</html>
