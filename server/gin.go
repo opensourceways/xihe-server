@@ -97,6 +97,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	bigmodel := bigmodels.NewBigModelService()
 	gitlabUser := gitlab.NewUserSerivce()
+	gitlabRepo := gitlab.NewRepoFile()
 	authingUser := authing.NewAuthingUser()
 	sender := messages.NewMessageSender()
 	trainingAdapter := trainingimpl.NewTraining(&cfg.Training)
@@ -144,6 +145,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 		controller.AddRouterForTrainingController(
 			v1, trainingAdapter, training, model, proj, dataset, sender,
+		)
+
+		controller.AddRouterForRepoFileController(
+			v1, gitlabRepo, model, proj, dataset, sender,
 		)
 	}
 

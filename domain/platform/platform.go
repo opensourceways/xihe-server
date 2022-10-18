@@ -43,7 +43,7 @@ type RepoFileInfo struct {
 }
 
 type RepoFile interface {
-	//List(info *RepoFileInfo) error
+	List(u *UserInfo, info *RepoFileInfo) error
 	Create(u *UserInfo, f *RepoFileInfo, content *string) error
 	Update(u *UserInfo, f *RepoFileInfo, content *string) error
 	Delete(u *UserInfo, f *RepoFileInfo) error

@@ -163,6 +163,6 @@ func (impl *repoFile) modify(
 	return err
 }
 
-/*
-func (impl *repoFile) List(info *platform.RepoFileInfo) error                   {}
-*/
+func (impl *repoFile) List(u *platform.UserInfo, info *platform.RepoFileInfo) error {
+	return nil
+}

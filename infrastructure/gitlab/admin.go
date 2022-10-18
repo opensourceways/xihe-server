@@ -28,6 +28,13 @@ func Init(cfg *Config) error {
 		return err
 	}
 
+	s, err := initOBS(cfg)
+	if err != nil {
+		return err
+	}
+
+	obsHelper = &s
+
 	admin = &administrator{v}
 	endpoint = strings.TrimSuffix(cfg.Endpoint, "/")
 	defaultBranch = cfg.DefaultBranch
