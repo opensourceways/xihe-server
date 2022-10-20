@@ -101,6 +101,7 @@ func (col training) List(user, projectId string) ([]repositories.TrainingSummary
 			trainingDocFilter(user, projectId),
 			bson.M{
 				fieldVersion:                    1,
+				subfieldOfItems(fieldId):        1,
 				subfieldOfItems(fieldJob):       1,
 				subfieldOfItems(fieldName):      1,
 				subfieldOfItems(fieldDesc):      1,
@@ -281,6 +282,7 @@ func (col training) UpdateJobDetail(info *repositories.TrainingInfoDO, detail *r
 
 func (col training) toTrainingSummary(t *trainingItem, s *repositories.TrainingSummaryDO) {
 	*s = repositories.TrainingSummaryDO{
+		Id:        t.Id,
 		Name:      t.Name,
 		Desc:      t.Desc,
 		JobId:     t.Job.JobId,
