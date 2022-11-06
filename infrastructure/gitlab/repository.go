@@ -112,6 +112,7 @@ func (r *repository) Update(repoId string, repo *platform.RepoOption) error {
 	if repo.Name != nil {
 		n := repo.Name.ResourceName()
 		opts.Name = &n
+		opts.Path = &n
 	}
 
 	if repo.RepoType != nil {
