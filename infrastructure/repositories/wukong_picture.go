@@ -8,10 +8,12 @@ import (
 )
 
 type WuKongPictureMapper interface {
-	List(string) ([]WuKongPictureDO, int, error)
-	Insert(string, *WuKongPictureDO, int) (string, error)
-	Delete(string, string) error
-	Get(string, string) (WuKongPictureDO, error)
+	GetVersion(string) (int, error)
+	ListLikesByUserName(string) ([]WuKongPictureDO, int, error)
+	InsertIntoLikes(string, *WuKongPictureDO, int) (string, error)
+	DeleteLike(string, string) error
+	GetLikeByUserName(string, string) (WuKongPictureDO, error)
+	GetPublicByUserName(string, string) (WuKongPictureDO, error)
 }
 
 func NewWuKongPictureRepository(mapper WuKongPictureMapper) repository.WuKongPicture {
@@ -22,10 +24,14 @@ type wukongPicture struct {
 	mapper WuKongPictureMapper
 }
 
-func (impl wukongPicture) List(user domain.Account) (
+func (impl wukongPicture) GetVersion(user domain.Account) (version int, err error) {
+	return impl.mapper.GetVersion(user.Account())
+}
+
+func (impl wukongPicture) ListLikesByUserName(user domain.Account) (
 	[]domain.WuKongPicture, int, error,
 ) {
-	v, version, err := impl.mapper.List(user.Account())
+	v, version, err := impl.mapper.ListLikesByUserName(user.Account())
 	if err != nil {
 		return nil, 0, err
 	}
@@ -40,7 +46,7 @@ func (impl wukongPicture) List(user domain.Account) (
 	return r, version, nil
 }
 
-func (impl wukongPicture) Save(p *domain.UserWuKongPicture, version int) (string, error) {
+func (impl wukongPicture) SaveLike(p *domain.WuKongPicture, version int) (string, error) {
 	if p.Id != "" {
 		return "", errors.New("must be a new picture")
 	}
@@ -52,7 +58,7 @@ func (impl wukongPicture) Save(p *domain.UserWuKongPicture, version int) (string
 	do.Style = p.Style
 	do.Desc = p.Desc.WuKongPictureDesc()
 
-	v, err := impl.mapper.Insert(p.User.Account(), &do, version)
+	v, err := impl.mapper.InsertIntoLikes(p.Owner.Account(), &do, version)
 	if err != nil {
 		return "", convertError(err)
 	}
@@ -60,18 +66,30 @@ func (impl wukongPicture) Save(p *domain.UserWuKongPicture, version int) (string
 	return v, nil
 }
 
-func (impl wukongPicture) Delete(user domain.Account, pid string) error {
-	if err := impl.mapper.Delete(user.Account(), pid); err != nil {
+func (impl wukongPicture) DeleteLike(user domain.Account, pid string) error {
+	if err := impl.mapper.DeleteLike(user.Account(), pid); err != nil {
 		return convertError(err)
 	}
 
 	return nil
 }
 
-func (impl wukongPicture) Get(user domain.Account, pid string) (
+func (impl wukongPicture) GetLikeByUserName(user domain.Account, pid string) (
 	p domain.WuKongPicture, err error,
 ) {
-	if v, err := impl.mapper.Get(user.Account(), pid); err != nil {
+	if v, err := impl.mapper.GetLikeByUserName(user.Account(), pid); err != nil {
+		err = convertError(err)
+	} else {
+		err = v.toWuKongPicture(&p)
+	}
+
+	return
+}
+
+func (impl wukongPicture) GetPublicByUserName(user domain.Account, pid string) (
+	p domain.WuKongPicture, err error,
+) {
+	if v, err := impl.mapper.GetPublicByUserName(user.Account(), pid); err != nil {
 		err = convertError(err)
 	} else {
 		err = v.toWuKongPicture(&p)
@@ -83,6 +101,8 @@ func (impl wukongPicture) Get(user domain.Account, pid string) (
 type WuKongPictureDO struct {
 	Id        string
 	OBSPath   string
+	Diggs     []string
+	DiggCount int
 	CreatedAt string
 
 	WuKongPictureMetaDO
@@ -91,6 +111,8 @@ type WuKongPictureDO struct {
 func (do *WuKongPictureDO) toWuKongPicture(r *domain.WuKongPicture) (err error) {
 	r.Id = do.Id
 	r.OBSPath = do.OBSPath
+	r.Diggs = do.Diggs
+	r.DiggCount = do.DiggCount
 	r.CreatedAt = do.CreatedAt
 
 	r.WuKongPictureMeta, err = do.toWuKongPictureMeta()

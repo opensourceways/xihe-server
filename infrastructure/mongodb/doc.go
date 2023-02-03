@@ -21,6 +21,8 @@ const (
 	fieldStatus         = "status"
 	fieldName           = "name"
 	fieldItems          = "items"
+	fieldLikes          = "likes"
+	fieldPublics        = "publics"
 	fieldOwner          = "owner"
 	fieldEmail          = "email"
 	fieldAccount        = "account"
@@ -491,9 +493,8 @@ type luojiaItem struct {
 }
 
 type dWuKong struct {
-	Id       string        `bson:"id"        json:"id"`
-	Samples  []dSample     `bson:"samples"   json:"samples"`
-	Pictures []pictureInfo `bson:"pictures"  json:"pictures"`
+	Id      string    `bson:"id"        json:"id"`
+	Samples []dSample `bson:"samples"   json:"samples"`
 }
 
 type dSample struct {
@@ -501,25 +502,23 @@ type dSample struct {
 	Name string `bson:"name"             json:"name"`
 }
 
-type pictureInfo struct {
-	Desc  string `bson:"desc"            json:"desc"`
-	Link  string `bson:"link"            json:"link"`
-	Style string `bson:"style"           json:"style"`
-}
-
 type dWuKongPicture struct {
 	Owner   string `bson:"owner"         json:"owner"`
 	Version int    `bson:"version"       json:"-"`
 
-	Items []pictureItem `bson:"items"    json:"-"`
+	Likes   []pictureItem `bson:"likes"    json:"-"` // like picture
+	Publics []pictureItem `bson:"publics" json:"-"`  // public picture
 }
 
 type pictureItem struct {
-	Id        string `bson:"id"          json:"id"`
-	Desc      string `bson:"desc"        json:"desc"`
-	Style     string `bson:"style"       json:"style"`
-	OBSPath   string `bson:"obspath"     json:"obspath"`
-	CreatedAt string `bson:"created_at"  json:"created_at"`
+	Id        string   `bson:"id"          json:"id"`
+	Desc      string   `bson:"desc"        json:"desc"`
+	Style     string   `bson:"style"       json:"style"`
+	OBSPath   string   `bson:"obspath"     json:"obspath"`
+	Diggs     []string `bson:"diggs" json:"diggs"`
+	DiggCount int      `bson:"digg_count" json:"digg_count"`
+	Version   int      `bson:"version"       json:"-"`
+	CreatedAt string   `bson:"created_at"  json:"created_at"`
 }
 
 type dFinetune struct {

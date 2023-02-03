@@ -9,7 +9,6 @@ type WuKongPictureListOptionDO = repository.WuKongPictureListOption
 
 type WuKongMapper interface {
 	ListSamples(string, []int) ([]string, error)
-	ListPictures(string, *WuKongPictureListOptionDO) (WuKongPicturesDO, error)
 }
 
 func NewWuKongRepository(mapper WuKongMapper) repository.WuKong {
@@ -22,51 +21,6 @@ type wukong struct {
 
 func (impl wukong) ListSamples(sid string, nums []int) ([]string, error) {
 	return impl.mapper.ListSamples(sid, nums)
-}
-
-func (impl wukong) ListPictures(sid string, opt *repository.WuKongPictureListOption) (
-	r repository.WuKongPictures, err error,
-) {
-	v, err := impl.mapper.ListPictures(sid, opt)
-	if err == nil {
-		err = v.toWuKongPictures(&r)
-	}
-
-	return
-}
-
-type WuKongPicturesDO struct {
-	Pictures []WuKongPictureInfoDO
-	Total    int
-}
-
-func (do *WuKongPicturesDO) toWuKongPictures(r *repository.WuKongPictures) (err error) {
-	r.Total = do.Total
-
-	r.Pictures = make([]domain.WuKongPictureInfo, len(do.Pictures))
-	for i := range do.Pictures {
-		err = do.Pictures[i].toWuKongPictureInfo(&r.Pictures[i])
-		if err != nil {
-			return
-		}
-	}
-
-	return
-}
-
-type WuKongPictureInfoDO struct {
-	Link string
-
-	WuKongPictureMetaDO
-}
-
-func (do *WuKongPictureInfoDO) toWuKongPictureInfo(info *domain.WuKongPictureInfo) (
-	err error,
-) {
-	info.Link = do.Link
-	info.WuKongPictureMeta, err = do.toWuKongPictureMeta()
-
-	return
 }
 
 type WuKongPictureMetaDO struct {

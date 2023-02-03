@@ -31,6 +31,8 @@ type BigModel interface {
 	GenPicturesByWuKong(domain.Account, *domain.WuKongPictureMeta) (map[string]string, error)
 	DeleteWuKongPicture(string) error
 	GenWuKongPictureLink(p string) (string, error)
-	MoveWuKongPictureToLikeDir(string, string) error
-	CheckWuKongPictureToLike(domain.Account, string) (domain.WuKongPictureMeta, string, error)
+	MoveWuKongPictureToDir(string, string) error
+	GenWuKongLinkFromOBSPath(string) string
+	CheckWuKongPictureTempToLike(domain.Account, string) (domain.WuKongPictureMeta, string, error)
+	CheckWuKongPublicToLike(domain.Account, string) (string, error)
 }

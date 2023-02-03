@@ -37,25 +37,37 @@ func (cmd *WuKongCmd) Validate() error {
 
 type WuKongPicturesListCmd = repository.WuKongPictureListOption
 
-type WuKongPictureAddLikeCmd struct {
+type WuKongAddLikeFromTempCmd struct {
 	User    domain.Account
 	OBSPath string
 }
 
-type WuKongPicturesDTO struct {
-	Pictures []WuKongPictureInfoDTO `json:"pictures"`
-	Total    int                    `json:"total"`
+type WuKongAddLikeFromPublicCmd struct {
+	User domain.Account
+	Id   string
 }
 
-type UserLikedWuKongPictureDTO struct {
-	WuKongPictureInfoDTO
+type WuKongGetPublicCmd = WuKongAddLikeFromPublicCmd
 
+type WuKongPictureBaseDTO struct {
 	Id        string `json:"id"`
+	Owner     string `json:"owner"` // owner of picture
+	Desc      string `json:"desc"`
+	Style     string `json:"style"`
+	Link      string `json:"link"`
 	CreatedAt string `json:"created_at"`
 }
 
-type WuKongPictureInfoDTO struct {
-	Link  string `json:"link"`
-	Desc  string `json:"desc"`
-	Style string `json:"style"`
+type WuKongLikeDTO struct { // like
+	IsPublic bool `json:"is_public"`
+	IsDigg   bool `json:"is_digg"`
+
+	WuKongPictureBaseDTO
+}
+
+type WuKongPublicDTO struct { // public
+	IsLike bool `json:"is_like"`
+	IsDigg bool `json:"is_digg"`
+
+	WuKongPictureBaseDTO
 }

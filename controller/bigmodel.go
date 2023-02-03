@@ -35,11 +35,11 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
 	rg.POST("/v1/bigmodel/codegeex", ctl.CodeGeex)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
-	rg.PUT("/v1/bigmodel/wukong", ctl.AddLike)
+	rg.POST("/v1/bigmodel/wukong/like", ctl.AddLike)
 	rg.PUT("/v1/bigmodel/wukong/link", ctl.GenDownloadURL)
 	rg.DELETE("/v1/bigmodel/wukong/:id", ctl.CancelLike)
 	rg.GET("/v1/bigmodel/wukong/samples/:batch", ctl.GenWuKongSamples)
-	rg.GET("/v1/bigmodel/wukong/pictures", ctl.WuKongPictures)
+	// rg.GET("/v1/bigmodel/wukong/pictures", ctl.WuKongPictures)
 	rg.GET("/v1/bigmodel/wukong", ctl.ListLike)
 	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
 }
@@ -427,49 +427,6 @@ func (ctl *BigModelController) GenWuKongSamples(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKongPictures
-// @Description list wukong pictures
-// @Tags  BigModel
-// @Param	count_per_page	query	int	false	"count per page"
-// @Param	page_num	query	int	false	"page num which starts from 1"
-// @Accept json
-// @Success 200 {object} app.WuKongPicturesDTO
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/pictures [get]
-func (ctl *BigModelController) WuKongPictures(ctx *gin.Context) {
-	cmd := app.WuKongPicturesListCmd{}
-
-	f := func() (err error) {
-		if v := ctl.getQueryParameter(ctx, "count_per_page"); v != "" {
-			if cmd.CountPerPage, err = strconv.Atoi(v); err != nil {
-				return
-			}
-		}
-
-		if v := ctl.getQueryParameter(ctx, "page_num"); v != "" {
-			if cmd.PageNum, err = strconv.Atoi(v); err != nil {
-				return
-			}
-		}
-
-		return
-	}
-
-	if err := f(); err != nil {
-		ctl.sendBadRequest(ctx, newResponseCodeError(
-			errorBadRequestParam, err,
-		))
-
-		return
-	}
-
-	if v, err := ctl.s.WuKongPictures(&cmd); err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
-	} else {
-		ctl.sendRespOfGet(ctx, v)
-	}
-}
-
 // @Title WuKong
 // @Description generates pictures by WuKong
 // @Tags  BigModel
@@ -505,32 +462,46 @@ func (ctl *BigModelController) WuKong(ctx *gin.Context) {
 	}
 }
 
-// @Title AddLike
+// @Title AddLikeFromTemp
 // @Description add like to wukong picture
 // @Tags  BigModel
 // @Param	body	body 	wukongAddLikeRequest	true	"body of wukong"
 // @Accept json
 // @Success 202 {object} wukongAddLikeResp
 // @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong [put]
+// @Router /v1/bigmodel/wukong/like [post]
 func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
 
-	req := wukongAddLikeRequest{}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctl.sendBadRequest(ctx, respBadRequestBody)
+	reqTemp := wukongAddLikeFromTempRequest{}
+	reqPublic := wukongAddLikeFromPublicRequest{}
 
+	errTemp := ctx.ShouldBindJSON(&reqTemp)
+	errPublic := ctx.ShouldBindJSON(&reqPublic)
+	if errTemp != nil && errPublic != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
 		return
 	}
 
-	cmd := req.toCmd(pl.DomainAccount())
-	if pid, code, err := ctl.s.AddLikeToWuKongPicture(&cmd); err != nil {
-		ctl.sendCodeMessage(ctx, code, err)
-	} else {
-		ctl.sendRespOfPut(ctx, wukongAddLikeResp{pid})
+	if errTemp == nil {
+		cmd := reqTemp.toCmd(pl.DomainAccount())
+		if pid, code, err := ctl.s.AddLikeFromTempPicture(&cmd); err != nil {
+			ctl.sendCodeMessage(ctx, code, err)
+		} else {
+			ctl.sendRespOfPut(ctx, wukongAddLikeResp{pid})
+		}
+	}
+
+	if errPublic == nil {
+		cmd := reqPublic.toCmd(pl.DomainAccount())
+		if pid, code, err := ctl.s.AddLikeFromPublicPicture(&cmd); err != nil {
+			ctl.sendCodeMessage(ctx, code, err)
+		} else {
+			ctl.sendRespOfPut(ctx, wukongAddLikeResp{pid})
+		}
 	}
 }
 
@@ -548,7 +519,7 @@ func (ctl *BigModelController) CancelLike(ctx *gin.Context) {
 		return
 	}
 
-	err := ctl.s.CancelLikeOnWuKongPicture(
+	err := ctl.s.CancelLike(
 		pl.DomainAccount(), ctx.Param("id"),
 	)
 	if err != nil {
@@ -571,7 +542,7 @@ func (ctl *BigModelController) ListLike(ctx *gin.Context) {
 		return
 	}
 
-	v, err := ctl.s.ListLikedWuKongPictures(pl.DomainAccount())
+	v, err := ctl.s.ListLike(pl.DomainAccount())
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
@@ -600,7 +571,7 @@ func (ctl *BigModelController) GenDownloadURL(ctx *gin.Context) {
 		return
 	}
 
-	link, code, err := ctl.s.ReGenerateDownloadURLOfWuKongPicture(
+	link, code, err := ctl.s.ReGenerateDownloadURL(
 		pl.DomainAccount(), req.Link,
 	)
 	if err != nil {

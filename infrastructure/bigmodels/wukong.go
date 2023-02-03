@@ -3,6 +3,7 @@ package bigmodels
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -145,7 +146,7 @@ func (s *service) genPicturesByWuKong(
 	return nil, errors.New(r.Msg)
 }
 
-func (s *service) MoveWuKongPictureToLikeDir(dst, src string) error {
+func (s *service) MoveWuKongPictureToDir(dst, src string) error {
 	info := &s.wukongInfo
 
 	return info.cli.copyObject(info.cfg.Bucket, dst, src)
@@ -165,7 +166,13 @@ func (s *service) GenWuKongPictureLink(p string) (string, error) {
 	)
 }
 
-func (s *service) CheckWuKongPictureToLike(user domain.Account, p string) (
+func (s *service) GenWuKongLinkFromOBSPath(obspath string) (link string) {
+	cfg := s.wukongInfo.cfg
+	// fmt.Printf("s.wukongInfo.cfg.Endpoint: %v\n", s.wukongInfo.cfg.Endpoint)
+	return fmt.Sprintf("https://%s.%s/%s", cfg.Bucket, cfg.Endpoint, obspath)
+}
+
+func (s *service) CheckWuKongPictureTempToLike(user domain.Account, p string) (
 	meta domain.WuKongPictureMeta, path string, err error,
 ) {
 	if meta, err = s.parseWuKongPictureMetaData(user, p); err == nil {
@@ -173,6 +180,15 @@ func (s *service) CheckWuKongPictureToLike(user domain.Account, p string) (
 		path = strings.Replace(p, v, v+"/like", 1)
 	}
 
+	return
+}
+
+func (s *service) CheckWuKongPublicToLike(user domain.Account, p string) (
+	path string, err error,
+) {
+	v := user.Account()
+	path = strings.Replace(p, "AI-gallery/gallery", "generate", 1)
+	path = strings.Replace(path, "generate/"+v, "generate/"+v+"/like", 1)
 	return
 }
 

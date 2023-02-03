@@ -113,14 +113,25 @@ type wukongPicturesGenerateResp struct {
 	Pictures map[string]string `json:"pictures"`
 }
 
-type wukongAddLikeRequest struct {
+type wukongAddLikeFromTempRequest struct {
 	OBSPath string `json:"obspath"`
 }
 
-func (req *wukongAddLikeRequest) toCmd(user domain.Account) app.WuKongPictureAddLikeCmd {
-	return app.WuKongPictureAddLikeCmd{
+func (req *wukongAddLikeFromTempRequest) toCmd(user domain.Account) app.WuKongAddLikeFromTempCmd {
+	return app.WuKongAddLikeFromTempCmd{
 		User:    user,
 		OBSPath: req.OBSPath,
+	}
+}
+
+type wukongAddLikeFromPublicRequest struct {
+	Id string `json:"id"`
+}
+
+func (req *wukongAddLikeFromPublicRequest) toCmd(user domain.Account) app.WuKongAddLikeFromPublicCmd {
+	return app.WuKongAddLikeFromPublicCmd{
+		User: user,
+		Id:   req.Id,
 	}
 }
 

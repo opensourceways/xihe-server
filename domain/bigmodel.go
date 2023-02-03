@@ -16,23 +16,15 @@ type LuoJiaRecordIndex struct {
 	Id   string
 }
 
-type UserWuKongPicture struct {
-	User Account
-	WuKongPicture
-}
-
 type WuKongPicture struct {
 	Id        string
+	Owner     Account
 	OBSPath   string
+	Diggs     []string
+	DiggCount int
 	CreatedAt string
 
 	WuKongPictureMeta
-}
-
-type WuKongPictureInfo struct {
-	WuKongPictureMeta
-
-	Link string
 }
 
 type WuKongPictureMeta struct {

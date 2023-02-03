@@ -57,6 +57,8 @@ const (
 	ErrorTrainNotFound     = "train_not_found"
 	ErrorTrainExccedMaxNum = "train_excced_max_num" // excced max training num for a user
 
+	ErrorWuKongInvalidId        = "wukong_invalid_id"
+	ErrorWuKongInvalidOwner     = "wukong_invalid_owner"
 	ErrorWuKongInvalidPath      = "wukong_invalid_path"
 	ErrorWuKongInvalidLink      = "wukong_invalid_link"
 	ErrorWuKongDuplicateLike    = "wukong_duplicate_like"

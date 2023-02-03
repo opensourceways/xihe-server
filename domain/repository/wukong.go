@@ -9,19 +9,15 @@ type WuKongPictureListOption struct {
 	PageNum      int
 }
 
-type WuKongPictures struct {
-	Pictures []domain.WuKongPictureInfo
-	Total    int
-}
-
 type WuKong interface {
 	ListSamples(string, []int) ([]string, error)
-	ListPictures(string, *WuKongPictureListOption) (WuKongPictures, error)
 }
 
 type WuKongPicture interface {
-	List(user domain.Account) ([]domain.WuKongPicture, int, error)
-	Save(*domain.UserWuKongPicture, int) (string, error)
-	Delete(user domain.Account, pid string) error
-	Get(user domain.Account, pid string) (domain.WuKongPicture, error)
+	GetVersion(user domain.Account) (int, error)
+	ListLikesByUserName(user domain.Account) ([]domain.WuKongPicture, int, error)
+	SaveLike(*domain.WuKongPicture, int) (string, error)
+	DeleteLike(user domain.Account, pid string) error
+	GetLikeByUserName(user domain.Account, pid string) (domain.WuKongPicture, error)
+	GetPublicByUserName(user domain.Account, pid string) (domain.WuKongPicture, error)
 }

@@ -18,7 +18,27 @@ type wukongPicture struct {
 	collectionName string
 }
 
-func (col wukongPicture) List(user string) ([]repositories.WuKongPictureDO, int, error) {
+func (col wukongPicture) GetVersion(user string) (version int, err error) {
+	v := new(dWuKongPicture)
+
+	f := func(ctx context.Context) error {
+		return cli.getDoc(
+			ctx, col.collectionName,
+			bson.M{fieldOwner: user},
+			bson.M{fieldVersion: 1},
+			v,
+		)
+	}
+
+	if err = withContext(f); err != nil {
+		return
+	}
+
+	version = v.Version
+	return
+}
+
+func (col wukongPicture) ListLikesByUserName(user string) ([]repositories.WuKongPictureDO, int, error) {
 	var v dWuKongPicture
 
 	f := func(ctx context.Context) error {
@@ -37,7 +57,7 @@ func (col wukongPicture) List(user string) ([]repositories.WuKongPictureDO, int,
 		return nil, 0, err
 	}
 
-	t := v.Items
+	t := v.Likes
 	r := make([]repositories.WuKongPictureDO, len(t))
 
 	for i := range t {
@@ -47,10 +67,10 @@ func (col wukongPicture) List(user string) ([]repositories.WuKongPictureDO, int,
 	return r, v.Version, nil
 }
 
-func (col wukongPicture) Insert(user string, do *repositories.WuKongPictureDO, version int) (
+func (col wukongPicture) InsertIntoLikes(user string, do *repositories.WuKongPictureDO, version int) (
 	identity string, err error,
 ) {
-	identity, err = col.insert(user, do, version)
+	identity, err = col.insert(user, do, version, fieldLikes)
 	if err == nil || !isDocNotExists(err) {
 		return
 	}
@@ -60,7 +80,28 @@ func (col wukongPicture) Insert(user string, do *repositories.WuKongPictureDO, v
 		return
 	}
 
-	identity, err = col.insert(user, do, version)
+	identity, err = col.insert(user, do, version, fieldLikes)
+	if err != nil && isDocNotExists(err) {
+		err = repositories.NewErrorConcurrentUpdating(err)
+	}
+
+	return
+}
+
+func (col wukongPicture) InsertIntoPublics(user string, do *repositories.WuKongPictureDO, version int) (
+	identity string, err error,
+) {
+	identity, err = col.insert(user, do, version, fieldPublics)
+	if err == nil || !isDocNotExists(err) {
+		return
+	}
+
+	// doc is not exist or duplicate insert
+	if err = col.newDoc(user); err != nil {
+		return
+	}
+
+	identity, err = col.insert(user, do, version, fieldPublics)
 	if err != nil && isDocNotExists(err) {
 		err = repositories.NewErrorConcurrentUpdating(err)
 	}
@@ -73,7 +114,8 @@ func (col wukongPicture) newDoc(user string) error {
 
 	doc := bson.M{
 		fieldOwner:   user,
-		fieldItems:   bson.A{},
+		fieldLikes:   bson.A{},
+		fieldPublics: bson.A{},
 		fieldVersion: 0,
 	}
 
@@ -92,7 +134,12 @@ func (col wukongPicture) newDoc(user string) error {
 	return nil
 }
 
-func (col wukongPicture) insert(user string, do *repositories.WuKongPictureDO, version int) (
+func (col wukongPicture) insert(
+	user string,
+	do *repositories.WuKongPictureDO,
+	version int,
+	filedName string,
+) (
 	identity string, err error,
 ) {
 	identity = newId()
@@ -107,7 +154,7 @@ func (col wukongPicture) insert(user string, do *repositories.WuKongPictureDO, v
 		return cli.updateDoc(
 			ctx, col.collectionName,
 			resourceOwnerFilter(user),
-			bson.M{fieldItems: doc}, mongoCmdPush, version,
+			bson.M{filedName: doc}, mongoCmdPush, version,
 		)
 	}
 
@@ -116,10 +163,10 @@ func (col wukongPicture) insert(user string, do *repositories.WuKongPictureDO, v
 	return
 }
 
-func (col wukongPicture) Delete(user string, pid string) error {
+func (col wukongPicture) DeleteLike(user string, pid string) error {
 	f := func(ctx context.Context) error {
 		return cli.pullArrayElem(
-			ctx, col.collectionName, fieldItems,
+			ctx, col.collectionName, fieldLikes,
 			resourceOwnerFilter(user),
 			resourceIdFilter(pid),
 		)
@@ -128,12 +175,15 @@ func (col wukongPicture) Delete(user string, pid string) error {
 	return withContext(f)
 }
 
-func (col wukongPicture) Get(user string, pid string) (do repositories.WuKongPictureDO, err error) {
+func (col wukongPicture) getByUserName(user, pid, field string) (
+	do repositories.WuKongPictureDO,
+	err error,
+) {
 	var v []dWuKongPicture
 
 	f := func(ctx context.Context) error {
 		return cli.getArrayElem(
-			ctx, col.collectionName, fieldItems,
+			ctx, col.collectionName, field,
 			resourceOwnerFilter(user),
 			resourceIdFilter(pid),
 			nil, &v,
@@ -144,21 +194,44 @@ func (col wukongPicture) Get(user string, pid string) (do repositories.WuKongPic
 		return
 	}
 
-	if len(v) == 0 || len(v[0].Items) == 0 {
+	var l []pictureItem
+	if field == fieldLikes {
+		l = v[0].Likes
+	} else {
+		l = v[0].Publics
+	}
+
+	if len(v) == 0 || len(l) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 
 		return
 	}
 
-	col.toPictureDO(&v[0].Items[0], &do)
+	col.toPictureDO(&l[0], &do)
 
 	return
+}
+
+func (col wukongPicture) GetLikeByUserName(user string, pid string) (
+	do repositories.WuKongPictureDO,
+	err error,
+) {
+	return col.getByUserName(user, pid, fieldLikes)
+}
+
+func (col wukongPicture) GetPublicByUserName(user string, pid string) (
+	do repositories.WuKongPictureDO,
+	err error,
+) {
+	return col.getByUserName(user, pid, fieldPublics)
 }
 
 func (col wukongPicture) toPictureDO(p *pictureItem, do *repositories.WuKongPictureDO) {
 	*do = repositories.WuKongPictureDO{
 		Id:        p.Id,
 		OBSPath:   p.OBSPath,
+		Diggs:     p.Diggs,
+		DiggCount: p.DiggCount,
 		CreatedAt: p.CreatedAt,
 	}
 
@@ -172,6 +245,8 @@ func (col wukongPicture) toPictureDoc(do *repositories.WuKongPictureDO) (bson.M,
 		Desc:      do.Desc,
 		Style:     do.Style,
 		OBSPath:   do.OBSPath,
+		Diggs:     do.Diggs,
+		DiggCount: do.DiggCount,
 		CreatedAt: do.CreatedAt,
 	})
 }
