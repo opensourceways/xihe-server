@@ -114,7 +114,7 @@ type wukongPicturesGenerateResp struct {
 }
 
 type wukongAddLikeFromTempRequest struct {
-	OBSPath string `json:"obspath"`
+	OBSPath string `json:"obspath" binding:"required"`
 }
 
 func (req *wukongAddLikeFromTempRequest) toCmd(user domain.Account) app.WuKongAddLikeFromTempCmd {
@@ -125,7 +125,7 @@ func (req *wukongAddLikeFromTempRequest) toCmd(user domain.Account) app.WuKongAd
 }
 
 type wukongAddLikeFromPublicRequest struct {
-	Id string `json:"id"`
+	Id string `json:"id" binding:"required"`
 }
 
 func (req *wukongAddLikeFromPublicRequest) toCmd(user domain.Account) app.WuKongAddLikeFromPublicCmd {
@@ -135,7 +135,29 @@ func (req *wukongAddLikeFromPublicRequest) toCmd(user domain.Account) app.WuKong
 	}
 }
 
+type wukongAddPublicFromTempRequest wukongAddLikeFromTempRequest
+
+func (req *wukongAddPublicFromTempRequest) toCmd(user domain.Account) app.WuKongAddPublicFromTempCmd {
+	return app.WuKongAddPublicFromTempCmd{
+		User:    user,
+		OBSPath: req.OBSPath,
+	}
+}
+
+type wukongAddPublicFromLikeRequest wukongAddLikeFromPublicRequest
+
+func (req *wukongAddPublicFromLikeRequest) toCmd(user domain.Account) app.WuKongAddPublicFromLikeCmd {
+	return app.WuKongAddPublicFromLikeCmd{
+		User: user,
+		Id:   req.Id,
+	}
+}
+
 type wukongAddLikeResp struct {
+	Id string `json:"id"`
+}
+
+type wukongAddPublicResp struct {
 	Id string `json:"id"`
 }
 

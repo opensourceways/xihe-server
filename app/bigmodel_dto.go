@@ -49,6 +49,10 @@ type WuKongAddLikeFromPublicCmd struct {
 
 type WuKongGetPublicCmd = WuKongAddLikeFromPublicCmd
 
+type WuKongAddPublicFromTempCmd = WuKongAddLikeFromTempCmd
+
+type WuKongAddPublicFromLikeCmd = WuKongAddLikeFromPublicCmd
+
 type WuKongPictureBaseDTO struct {
 	Id        string `json:"id"`
 	Owner     string `json:"owner"` // owner of picture
@@ -60,7 +64,6 @@ type WuKongPictureBaseDTO struct {
 
 type WuKongLikeDTO struct { // like
 	IsPublic bool `json:"is_public"`
-	IsDigg   bool `json:"is_digg"`
 
 	WuKongPictureBaseDTO
 }
@@ -70,4 +73,22 @@ type WuKongPublicDTO struct { // public
 	IsDigg bool `json:"is_digg"`
 
 	WuKongPictureBaseDTO
+}
+
+func (dto *WuKongPublicDTO) toWuKongPublicDTO(
+	p *domain.WuKongPicture, isLike bool, isDigg bool, link string,
+) {
+	*dto = WuKongPublicDTO{
+		IsLike: isLike,
+		IsDigg: isDigg,
+
+		WuKongPictureBaseDTO: WuKongPictureBaseDTO{
+			Id:        p.Id,
+			Owner:     p.Owner.Account(),
+			Desc:      p.Desc.WuKongPictureDesc(),
+			Style:     p.Style,
+			Link:      link,
+			CreatedAt: p.CreatedAt,
+		},
+	}
 }

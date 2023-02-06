@@ -22,6 +22,7 @@ type WuKongPicture struct {
 	OBSPath   string
 	Diggs     []string
 	DiggCount int
+	Version   int
 	CreatedAt string
 
 	WuKongPictureMeta

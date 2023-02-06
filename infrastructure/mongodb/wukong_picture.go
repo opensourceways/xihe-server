@@ -39,6 +39,14 @@ func (col wukongPicture) GetVersion(user string) (version int, err error) {
 }
 
 func (col wukongPicture) ListLikesByUserName(user string) ([]repositories.WuKongPictureDO, int, error) {
+	return col.listFiledNameByUserName(user, fieldLikes)
+}
+
+func (col wukongPicture) ListPublicsByUserName(user string) ([]repositories.WuKongPictureDO, int, error) {
+	return col.listFiledNameByUserName(user, fieldPublics)
+}
+
+func (col wukongPicture) listFiledNameByUserName(user, fieldName string) ([]repositories.WuKongPictureDO, int, error) {
 	var v dWuKongPicture
 
 	f := func(ctx context.Context) error {
@@ -57,7 +65,12 @@ func (col wukongPicture) ListLikesByUserName(user string) ([]repositories.WuKong
 		return nil, 0, err
 	}
 
-	t := v.Likes
+	var t []pictureItem
+	if fieldName == fieldLikes {
+		t = v.Likes
+	} else {
+		t = v.Publics
+	}
 	r := make([]repositories.WuKongPictureDO, len(t))
 
 	for i := range t {
@@ -70,28 +83,22 @@ func (col wukongPicture) ListLikesByUserName(user string) ([]repositories.WuKong
 func (col wukongPicture) InsertIntoLikes(user string, do *repositories.WuKongPictureDO, version int) (
 	identity string, err error,
 ) {
-	identity, err = col.insert(user, do, version, fieldLikes)
-	if err == nil || !isDocNotExists(err) {
-		return
-	}
-
-	// doc is not exist or duplicate insert
-	if err = col.newDoc(user); err != nil {
-		return
-	}
-
-	identity, err = col.insert(user, do, version, fieldLikes)
-	if err != nil && isDocNotExists(err) {
-		err = repositories.NewErrorConcurrentUpdating(err)
-	}
-
-	return
+	return col.inserIntoFieldName(user, do, version, fieldLikes)
 }
 
 func (col wukongPicture) InsertIntoPublics(user string, do *repositories.WuKongPictureDO, version int) (
 	identity string, err error,
 ) {
-	identity, err = col.insert(user, do, version, fieldPublics)
+	return col.inserIntoFieldName(user, do, version, fieldPublics)
+}
+
+func (col wukongPicture) inserIntoFieldName(
+	user string, do *repositories.WuKongPictureDO,
+	version int, fieldName string,
+) (
+	identity string, err error,
+) {
+	identity, err = col.insert(user, do, version, fieldName)
 	if err == nil || !isDocNotExists(err) {
 		return
 	}
@@ -101,7 +108,7 @@ func (col wukongPicture) InsertIntoPublics(user string, do *repositories.WuKongP
 		return
 	}
 
-	identity, err = col.insert(user, do, version, fieldPublics)
+	identity, err = col.insert(user, do, version, fieldName)
 	if err != nil && isDocNotExists(err) {
 		err = repositories.NewErrorConcurrentUpdating(err)
 	}
@@ -149,7 +156,6 @@ func (col wukongPicture) insert(
 	if err != nil {
 		return
 	}
-
 	f := func(ctx context.Context) error {
 		return cli.updateDoc(
 			ctx, col.collectionName,
@@ -226,12 +232,33 @@ func (col wukongPicture) GetPublicByUserName(user string, pid string) (
 	return col.getByUserName(user, pid, fieldPublics)
 }
 
+func (col wukongPicture) GetPublicsGlobal() (do []repositories.WuKongPictureDO, err error) {
+	var v []dWuKongPicture
+
+	f := func(ctx context.Context) error {
+		return cli.getDocs(
+			ctx, col.collectionName, nil,
+			bson.M{
+				fieldPublics: 1,
+			}, &v,
+		)
+	}
+
+	if err := withContext(f); err != nil {
+		return nil, err
+	}
+
+	return col.toArrayPictureDO(v), nil
+}
+
 func (col wukongPicture) toPictureDO(p *pictureItem, do *repositories.WuKongPictureDO) {
 	*do = repositories.WuKongPictureDO{
 		Id:        p.Id,
+		Owner:     p.Owner,
 		OBSPath:   p.OBSPath,
 		Diggs:     p.Diggs,
 		DiggCount: p.DiggCount,
+		Version:   p.Version,
 		CreatedAt: p.CreatedAt,
 	}
 
@@ -240,13 +267,38 @@ func (col wukongPicture) toPictureDO(p *pictureItem, do *repositories.WuKongPict
 }
 
 func (col wukongPicture) toPictureDoc(do *repositories.WuKongPictureDO) (bson.M, error) {
-	return genDoc(pictureItem{
+	doc, err := genDoc(pictureItem{
 		Id:        do.Id,
+		Owner:     do.Owner,
 		Desc:      do.Desc,
 		Style:     do.Style,
 		OBSPath:   do.OBSPath,
 		Diggs:     do.Diggs,
 		DiggCount: do.DiggCount,
+		Version:   do.Version,
 		CreatedAt: do.CreatedAt,
 	})
+	if err != nil {
+		return nil, err
+	}
+	doc["Version"] = do.Version
+	return doc, nil
+}
+
+func (col wukongPicture) toArrayPictureDO(p []dWuKongPicture) []repositories.WuKongPictureDO {
+	var length int
+	for i := range p {
+		length += len(p[i].Publics)
+	}
+
+	r := make([]repositories.WuKongPictureDO, length)
+	var count = 0
+	for i := range p {
+		for j := range p[i].Publics {
+			col.toPictureDO(&p[i].Publics[j], &r[count])
+			count++
+		}
+	}
+
+	return r
 }

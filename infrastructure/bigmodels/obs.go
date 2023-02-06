@@ -53,7 +53,6 @@ func (s *obsService) copyObject(bucket, dst, src string) error {
 	input.Key = dst
 	input.CopySourceBucket = bucket
 	input.CopySourceKey = src
-
 	_, err := s.cli.CopyObject(input)
 
 	return err

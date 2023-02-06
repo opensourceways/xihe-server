@@ -28,8 +28,12 @@ type BigModelService interface {
 	WuKong(domain.Account, *WuKongCmd) (map[string]string, string, error)
 	AddLikeFromTempPicture(*WuKongAddLikeFromTempCmd) (string, string, error)
 	AddLikeFromPublicPicture(*WuKongAddLikeFromPublicCmd) (string, string, error)
+	AddPublicFromTempPicture(*WuKongAddPublicFromTempCmd) (string, string, error)
+	AddPublicFromLikePicture(*WuKongAddPublicFromLikeCmd) (string, string, error)
+	GetPublicsGlobal(domain.Account) ([]WuKongPublicDTO, error)
+	ListPublics(domain.Account) ([]WuKongPublicDTO, error)
 	CancelLike(domain.Account, string) error
-	ListLike(domain.Account) ([]WuKongLikeDTO, error)
+	ListLikes(domain.Account) ([]WuKongLikeDTO, error)
 	ReGenerateDownloadURL(domain.Account, string) (string, string, error)
 }
 
@@ -194,7 +198,6 @@ func (s bigModelService) WuKong(
 	}
 
 	return
-
 }
 
 func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
@@ -221,7 +224,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 	for i := range v {
 		if v[i].OBSPath == p {
 			code = ErrorWuKongDuplicateLike
-			err = errors.New("the picture has been saved.")
+			err = errors.New("the picture has been saved")
 
 			return
 		}
@@ -235,6 +238,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 		&domain.WuKongPicture{
 			Owner:             cmd.User,
 			OBSPath:           p,
+			Version:           1,
 			CreatedAt:         utils.Date(),
 			WuKongPictureMeta: meta,
 		},
@@ -247,30 +251,50 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 func (s bigModelService) AddLikeFromPublicPicture(
 	cmd *WuKongAddLikeFromPublicCmd,
 ) (pid string, code string, err error) {
-	// get public picture info
 	p, err := s.wukongPicture.GetPublicByUserName(cmd.User, cmd.Id)
 	if err != nil {
 		code = ErrorWuKongInvalidId
 		return
 	}
 
+	// gen like path
+	likePath, _ := s.fm.CheckWuKongPicturePublicToLike(cmd.User, p.OBSPath)
+
+	// check
+	v, version, err := s.wukongPicture.ListLikesByUserName(cmd.User)
+	if err != nil {
+		return
+	}
+	if len(v) >= appConfig.WuKongMaxLikeNum {
+		code = ErrorWuKongExccedMaxLikeNum
+		err = errors.New("exceed the max num user can add like to pictures")
+
+		return
+	}
+
+	for i := range v {
+		if v[i].OBSPath == likePath {
+			code = ErrorWuKongDuplicateLike
+			err = errors.New("the picture has been liked")
+
+			return
+		}
+	}
+
 	// copy picture from public dir to like dir on obs
-	likePath, _ := s.fm.CheckWuKongPublicToLike(cmd.User, p.OBSPath)
 	if err = s.fm.MoveWuKongPictureToDir(likePath, p.OBSPath); err != nil {
 		code = ErrorCodeSytem
 		return
 	}
 
 	// save
-	version, err := s.wukongPicture.GetVersion(p.Owner)
-	if err != nil {
-		return
+	wp := &domain.WuKongPicture{
+		Owner:             p.Owner,
+		OBSPath:           likePath,
+		CreatedAt:         utils.Date(),
+		WuKongPictureMeta: p.WuKongPictureMeta,
 	}
-
-	pid, err = s.wukongPicture.SaveLike(&p, version)
-	if err != nil {
-		return
-	}
+	pid, err = s.wukongPicture.SaveLike(wp, version)
 
 	return
 }
@@ -294,7 +318,7 @@ func (s bigModelService) CancelLike(user domain.Account, pid string) (err error)
 	return
 }
 
-func (s bigModelService) ListLike(user domain.Account) (
+func (s bigModelService) ListLikes(user domain.Account) (
 	r []WuKongLikeDTO, err error,
 ) {
 	v, _, err := s.wukongPicture.ListLikesByUserName(user)
@@ -312,6 +336,12 @@ func (s bigModelService) ListLike(user domain.Account) (
 			return
 		}
 
+		dto.IsPublic, err = s.isPublic(item)
+		if err != nil {
+			return
+		}
+
+		dto.Owner = item.Owner.Account()
 		dto.Id = item.Id
 		dto.Desc = item.Desc.WuKongPictureDesc()
 		dto.Style = item.Style
@@ -319,6 +349,211 @@ func (s bigModelService) ListLike(user domain.Account) (
 	}
 
 	return
+}
+
+func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCmd) (
+	pid string, code string, err error,
+) {
+	// gen meta and public path
+	meta, publicPath, err := s.fm.CheckWuKongPictureToPublic(cmd.User, cmd.OBSPath)
+	if err != nil {
+		code = ErrorWuKongInvalidPath
+
+		return
+	}
+
+	// check
+	v, version, err := s.wukongPicture.ListPublicsByUserName(cmd.User)
+	if err != nil {
+		return
+	}
+
+	for i := range v {
+		if v[i].OBSPath == publicPath {
+			code = ErrorWuKongDuplicateLike
+			err = errors.New("the picture has been publiced")
+
+			return
+		}
+	}
+
+	// copy picture from public dir to like dir on obs
+	if err = s.fm.MoveWuKongPictureToDir(publicPath, cmd.OBSPath); err != nil {
+		code = ErrorCodeSytem
+
+		return
+	}
+
+	// save
+	p := &domain.WuKongPicture{
+		Owner:             cmd.User,
+		OBSPath:           publicPath,
+		CreatedAt:         utils.Date(),
+		WuKongPictureMeta: meta,
+	}
+	pid, err = s.wukongPicture.SavePublic(p, version)
+
+	return
+}
+
+func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCmd) (
+	pid string, code string, err error,
+) {
+	// get like infomation
+	p, err := s.wukongPicture.GetLikeByUserName(cmd.User, cmd.Id)
+	if err != nil {
+		code = ErrorWuKongInvalidPath
+
+		return
+	}
+
+	// gen public path
+	_, publicPath, err := s.fm.CheckWuKongPictureToPublic(cmd.User, p.OBSPath)
+	if err != nil {
+		code = ErrorWuKongInvalidPath
+
+		return
+	}
+
+	// check
+	v, version, err := s.wukongPicture.ListPublicsByUserName(cmd.User)
+	if err != nil {
+		return
+	}
+
+	for i := range v {
+		if v[i].OBSPath == publicPath {
+			code = ErrorWuKongDuplicateLike
+			err = errors.New("the picture has been publiced")
+
+			return
+		}
+	}
+
+	// copy picture from public dir to like dir on obs
+	if err = s.fm.MoveWuKongPictureToDir(publicPath, p.OBSPath); err != nil {
+		code = ErrorCodeSytem
+
+		return
+	}
+
+	// save
+	ps := &domain.WuKongPicture{
+		Owner:             p.Owner,
+		OBSPath:           publicPath,
+		CreatedAt:         p.CreatedAt,
+		WuKongPictureMeta: p.WuKongPictureMeta,
+	}
+	pid, err = s.wukongPicture.SavePublic(ps, version)
+
+	return
+}
+
+func (s bigModelService) GetPublicsGlobal(user domain.Account) (r []WuKongPublicDTO, err error) {
+	v, err := s.wukongPicture.GetPublicsGlobal()
+	if err != nil {
+		return
+	}
+
+	r = make([]WuKongPublicDTO, len(v))
+
+	for i := range v {
+		item := &v[i]
+		link := s.fm.GenWuKongLinkFromOBSPath(item.OBSPath)
+		var isLike, isDigg bool
+		if user != nil {
+			isLike, _ = s.isLike(item, user)
+			isDigg = s.isDigg(user, item.Diggs)
+		} else {
+			isLike = false
+			isDigg = false
+		}
+
+		r[i].toWuKongPublicDTO(item, isLike, isDigg, link)
+	}
+
+	return
+}
+
+func (s bigModelService) ListPublics(user domain.Account) (
+	r []WuKongPublicDTO, err error,
+) {
+	v, _, err := s.wukongPicture.ListPublicsByUserName(user)
+	if err != nil || len(v) == 0 {
+		return
+	}
+
+	r = make([]WuKongPublicDTO, len(v))
+	for i := range v {
+		item := &v[i]
+		dto := &r[i]
+
+		link := s.fm.GenWuKongLinkFromOBSPath(item.OBSPath)
+		isLike, _ := s.isLike(item, user)
+		isDigg := s.isDigg(user, item.Diggs)
+
+		dto.toWuKongPublicDTO(item, isLike, isDigg, link)
+	}
+
+	return
+}
+
+func (s bigModelService) isLike(
+	p *domain.WuKongPicture,
+	user domain.Account,
+) (bool, error) {
+	pics, _, err := s.wukongPicture.ListLikesByUserName(user)
+	if err != nil {
+		return false, err
+	}
+
+	for _, pic := range pics {
+		likePath, err := s.fm.CheckWuKongPicturePublicToLike(user, p.OBSPath)
+		if err != nil {
+			return false, err
+		}
+
+		if pic.OBSPath == likePath {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (s bigModelService) isPublic(
+	p *domain.WuKongPicture,
+) (bool, error) {
+	pics, _, err := s.wukongPicture.ListPublicsByUserName(p.Owner)
+	if err != nil {
+		return false, err
+	}
+
+	for _, pic := range pics {
+		_, publicPath, err := s.fm.CheckWuKongPictureToPublic(p.Owner, p.OBSPath)
+		if err != nil {
+			return false, err
+		}
+
+		if pic.OBSPath == publicPath {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
+func (s bigModelService) isDigg(
+	user domain.Account,
+	diggs []string,
+) bool {
+	for _, username := range diggs {
+		if user.Account() == username {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (s bigModelService) ReGenerateDownloadURL(

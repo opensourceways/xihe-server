@@ -183,12 +183,28 @@ func (s *service) CheckWuKongPictureTempToLike(user domain.Account, p string) (
 	return
 }
 
-func (s *service) CheckWuKongPublicToLike(user domain.Account, p string) (
+func (s *service) CheckWuKongPicturePublicToLike(user domain.Account, p string) (
 	path string, err error,
 ) {
 	v := user.Account()
 	path = strings.Replace(p, "AI-gallery/gallery", "generate", 1)
 	path = strings.Replace(path, "generate/"+v, "generate/"+v+"/like", 1)
+	return
+}
+
+func (s *service) CheckWuKongPictureToPublic(user domain.Account, p string) (
+	meta domain.WuKongPictureMeta, path string, err error,
+) {
+	if strings.Contains(p, "/like") {
+		path = strings.Replace(p, "/like", "", 1)
+		path = strings.Replace(path, "generate", "AI-gallery/gallery", 1)
+		return
+	}
+	if meta, err = s.parseWuKongPictureMetaData(user, p); err != nil {
+		return
+	}
+	path = strings.Replace(p, "generate", "AI-gallery/gallery", 1)
+
 	return
 }
 

@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/bigmodel"
@@ -36,10 +37,12 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/codegeex", ctl.CodeGeex)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
 	rg.POST("/v1/bigmodel/wukong/like", ctl.AddLike)
+	rg.POST("/v1/bigmodel/wukong/public", ctl.AddPublic)
+	rg.GET("/v1/bigmodel/wukong/public", ctl.ListPublic)
+	rg.GET("/v1/bigmodel/wukong/publics", ctl.GetPublicsGlobal)
 	rg.PUT("/v1/bigmodel/wukong/link", ctl.GenDownloadURL)
 	rg.DELETE("/v1/bigmodel/wukong/:id", ctl.CancelLike)
 	rg.GET("/v1/bigmodel/wukong/samples/:batch", ctl.GenWuKongSamples)
-	// rg.GET("/v1/bigmodel/wukong/pictures", ctl.WuKongPictures)
 	rg.GET("/v1/bigmodel/wukong", ctl.ListLike)
 	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
 }
@@ -462,7 +465,7 @@ func (ctl *BigModelController) WuKong(ctx *gin.Context) {
 	}
 }
 
-// @Title AddLikeFromTemp
+// @Title AddLike
 // @Description add like to wukong picture
 // @Tags  BigModel
 // @Param	body	body 	wukongAddLikeRequest	true	"body of wukong"
@@ -479,8 +482,8 @@ func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 	reqTemp := wukongAddLikeFromTempRequest{}
 	reqPublic := wukongAddLikeFromPublicRequest{}
 
-	errTemp := ctx.ShouldBindJSON(&reqTemp)
-	errPublic := ctx.ShouldBindJSON(&reqPublic)
+	errTemp := ctx.ShouldBindBodyWith(&reqTemp, binding.JSON)
+	errPublic := ctx.ShouldBindBodyWith(&reqPublic, binding.JSON)
 	if errTemp != nil && errPublic != nil {
 		ctl.sendBadRequest(ctx, respBadRequestBody)
 		return
@@ -491,7 +494,7 @@ func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 		if pid, code, err := ctl.s.AddLikeFromTempPicture(&cmd); err != nil {
 			ctl.sendCodeMessage(ctx, code, err)
 		} else {
-			ctl.sendRespOfPut(ctx, wukongAddLikeResp{pid})
+			ctl.sendRespOfPost(ctx, wukongAddLikeResp{pid})
 		}
 	}
 
@@ -500,7 +503,7 @@ func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 		if pid, code, err := ctl.s.AddLikeFromPublicPicture(&cmd); err != nil {
 			ctl.sendCodeMessage(ctx, code, err)
 		} else {
-			ctl.sendRespOfPut(ctx, wukongAddLikeResp{pid})
+			ctl.sendRespOfPost(ctx, wukongAddLikeResp{pid})
 		}
 	}
 }
@@ -542,7 +545,92 @@ func (ctl *BigModelController) ListLike(ctx *gin.Context) {
 		return
 	}
 
-	v, err := ctl.s.ListLike(pl.DomainAccount())
+	v, err := ctl.s.ListLikes(pl.DomainAccount())
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfGet(ctx, v)
+	}
+}
+
+// @Title AddPublic
+// @Description add public to wukong picture
+// @Tags  BigModel
+// @Param	body	body 	wukongAddPublicFromTempRequest/wukongAddPublicFromLikeRequest	true	"body of wukong"
+// @Accept json
+// @Success 202 {object} wukongAddPublicResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/public [post]
+func (ctl *BigModelController) AddPublic(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	reqTemp := wukongAddPublicFromTempRequest{}
+	reqPublic := wukongAddPublicFromLikeRequest{}
+
+	errTemp := ctx.ShouldBindBodyWith(&reqTemp, binding.JSON)
+	errPublic := ctx.ShouldBindBodyWith(&reqPublic, binding.JSON)
+	if errTemp != nil && errPublic != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
+		return
+	}
+
+	if errTemp == nil {
+		cmd := reqTemp.toCmd(pl.DomainAccount())
+		if pid, code, err := ctl.s.AddPublicFromTempPicture(&cmd); err != nil {
+			ctl.sendCodeMessage(ctx, code, err)
+		} else {
+			ctl.sendRespOfPost(ctx, wukongAddPublicResp{pid})
+		}
+	}
+
+	if errPublic == nil {
+		cmd := reqPublic.toCmd(pl.DomainAccount())
+		if pid, code, err := ctl.s.AddPublicFromLikePicture(&cmd); err != nil {
+			ctl.sendCodeMessage(ctx, code, err)
+		} else {
+			ctl.sendRespOfPost(ctx, wukongAddPublicResp{pid})
+		}
+	}
+}
+
+// @Title ListPublic
+// @Description list wukong pictures user publiced
+// @Tags  BigModel
+// @Accept json
+// @Success 200 {object} app.WuKongPublicDTO
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/public [get]
+func (ctl *BigModelController) ListPublic(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	v, err := ctl.s.ListPublics(pl.DomainAccount())
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfGet(ctx, v)
+	}
+}
+
+// @Title GetPublicGlobal
+// @Description list all wukong pictures publiced
+// @Tags  BigModel
+// @Accept json
+// @Success 200 {object} app.WuKongPublicDTO
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/publics [get]
+func (ctl *BigModelController) GetPublicsGlobal(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
+	v, err := ctl.s.GetPublicsGlobal(pl.DomainAccount())
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
