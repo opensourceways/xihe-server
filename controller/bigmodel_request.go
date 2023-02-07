@@ -153,6 +153,41 @@ func (req *wukongAddPublicFromLikeRequest) toCmd(user domain.Account) app.WuKong
 	}
 }
 
+type wukongAddDiggPublicRequest struct {
+	User string `json:"user"`
+	Id   string `json:"id"`
+}
+
+type wukongCancelDiggPublicRequest wukongAddDiggPublicRequest
+
+func (req *wukongAddDiggPublicRequest) toCmd(user domain.Account) (cmd app.WuKongAddDiggCmd, err error) {
+	owner, err := domain.NewAccount(req.User)
+	if err != nil {
+		return
+	}
+	cmd = app.WuKongAddDiggCmd{
+		User:  user,
+		Owner: owner,
+		Id:    req.Id,
+	}
+
+	return
+}
+
+func (req *wukongCancelDiggPublicRequest) toCmd(user domain.Account) (cmd app.WuKongCancelDiggCmd, err error) {
+	owner, err := domain.NewAccount(req.User)
+	if err != nil {
+		return
+	}
+	cmd = app.WuKongCancelDiggCmd{
+		User:  user,
+		Owner: owner,
+		Id:    req.Id,
+	}
+
+	return
+}
+
 type wukongAddLikeResp struct {
 	Id string `json:"id"`
 }
@@ -163,4 +198,8 @@ type wukongAddPublicResp struct {
 
 type wukongPictureLink struct {
 	Link string `json:"link"`
+}
+
+type wukongDiggResp struct {
+	DiggCount int `json:"digg_count"`
 }

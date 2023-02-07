@@ -14,9 +14,11 @@ type WuKongPictureMapper interface {
 	InsertIntoLikes(string, *WuKongPictureDO, int) (string, error)
 	InsertIntoPublics(string, *WuKongPictureDO, int) (string, error)
 	DeleteLike(string, string) error
+	DeletePublic(string, string) error
 	GetLikeByUserName(string, string) (WuKongPictureDO, error)
 	GetPublicByUserName(string, string) (WuKongPictureDO, error)
 	GetPublicsGlobal() ([]WuKongPictureDO, error)
+	UpdatePublicPicture(string, string, int, *WuKongPictureDO) error
 }
 
 func NewWuKongPictureRepository(mapper WuKongPictureMapper) repository.WuKongPicture {
@@ -74,6 +76,7 @@ func (impl wukongPicture) SaveLike(p *domain.WuKongPicture, version int) (string
 
 	do := new(WuKongPictureDO)
 	do.toWuKongPictureDO(p)
+	do.setDefault()
 
 	v, err := impl.mapper.InsertIntoLikes(p.Owner.Account(), do, version)
 	if err != nil {
@@ -90,6 +93,7 @@ func (impl wukongPicture) SavePublic(p *domain.WuKongPicture, version int) (stri
 
 	do := new(WuKongPictureDO)
 	do.toWuKongPictureDO(p)
+	do.setDefault()
 
 	v, err := impl.mapper.InsertIntoPublics(p.Owner.Account(), do, version)
 	if err != nil {
@@ -101,6 +105,14 @@ func (impl wukongPicture) SavePublic(p *domain.WuKongPicture, version int) (stri
 
 func (impl wukongPicture) DeleteLike(user domain.Account, pid string) error {
 	if err := impl.mapper.DeleteLike(user.Account(), pid); err != nil {
+		return convertError(err)
+	}
+
+	return nil
+}
+
+func (impl wukongPicture) DeletePublic(user domain.Account, pid string) error {
+	if err := impl.mapper.DeletePublic(user.Account(), pid); err != nil {
 		return convertError(err)
 	}
 
@@ -153,6 +165,16 @@ func (impl wukongPicture) GetPublicsGlobal() (r []domain.WuKongPicture, err erro
 	return
 }
 
+func (impl wukongPicture) UpdatePublicPicture(
+	user domain.Account, pid string, version int,
+	update *domain.WuKongPicture,
+) error {
+	do := new(WuKongPictureDO)
+	do.toWuKongPictureDO(update)
+
+	return impl.mapper.UpdatePublicPicture(user.Account(), pid, version, do)
+}
+
 type WuKongPictureDO struct {
 	Id        string
 	Owner     string
@@ -166,30 +188,25 @@ type WuKongPictureDO struct {
 }
 
 func (do *WuKongPictureDO) setDefault() {
-	if do.DiggCount == 0 {
-		do.DiggCount = 0
-	}
-
-	if do.Diggs == nil {
-		do.Diggs = []string{}
-	}
-
-	if do.Version == 0 {
-		do.Version = 1
-	}
+	do.Id = ""
+	do.DiggCount = 0
+	do.Diggs = []string{}
+	do.Version = 1
 }
 
 func (do *WuKongPictureDO) toWuKongPictureDO(p *domain.WuKongPicture) {
 	*do = WuKongPictureDO{
+		Id:        p.Id,
 		Owner:     p.Owner.Account(),
 		OBSPath:   p.OBSPath,
 		CreatedAt: p.CreatedAt,
+		Diggs:     p.Diggs,
+		DiggCount: p.DiggCount,
 		WuKongPictureMetaDO: WuKongPictureMetaDO{
 			Style: p.Style,
 			Desc:  p.Desc.WuKongPictureDesc(),
 		},
 	}
-	do.setDefault()
 }
 
 func (do *WuKongPictureDO) toWuKongPicture(r *domain.WuKongPicture) (err error) {
@@ -203,6 +220,7 @@ func (do *WuKongPictureDO) toWuKongPicture(r *domain.WuKongPicture) (err error) 
 	r.OBSPath = do.OBSPath
 	r.Diggs = do.Diggs
 	r.DiggCount = do.DiggCount
+	r.Version = do.Version
 	r.CreatedAt = do.CreatedAt
 
 	r.WuKongPictureMeta, err = do.toWuKongPictureMeta()

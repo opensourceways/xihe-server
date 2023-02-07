@@ -2,11 +2,24 @@ package mongodb
 
 import (
 	"context"
+	"errors"
 
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 )
+
+func wukongOwnerFilter(owner string) bson.M {
+	return bson.M{
+		fieldOwner: owner,
+	}
+}
+
+func wukongIdFilter(id string) bson.M {
+	return bson.M{
+		fieldId: id,
+	}
+}
 
 func NewWuKongPictureMapper(name string) repositories.WuKongPictureMapper {
 	return wukongPicture{
@@ -39,14 +52,14 @@ func (col wukongPicture) GetVersion(user string) (version int, err error) {
 }
 
 func (col wukongPicture) ListLikesByUserName(user string) ([]repositories.WuKongPictureDO, int, error) {
-	return col.listFiledNameByUserName(user, fieldLikes)
+	return col.listFieldNameByUserName(user, fieldLikes)
 }
 
 func (col wukongPicture) ListPublicsByUserName(user string) ([]repositories.WuKongPictureDO, int, error) {
-	return col.listFiledNameByUserName(user, fieldPublics)
+	return col.listFieldNameByUserName(user, fieldPublics)
 }
 
-func (col wukongPicture) listFiledNameByUserName(user, fieldName string) ([]repositories.WuKongPictureDO, int, error) {
+func (col wukongPicture) listFieldNameByUserName(user, fieldName string) ([]repositories.WuKongPictureDO, int, error) {
 	var v dWuKongPicture
 
 	f := func(ctx context.Context) error {
@@ -153,6 +166,7 @@ func (col wukongPicture) insert(
 	do.Id = identity
 
 	doc, err := col.toPictureDoc(do)
+	doc[fieldVersion] = do.Version
 	if err != nil {
 		return
 	}
@@ -170,16 +184,24 @@ func (col wukongPicture) insert(
 	return
 }
 
-func (col wukongPicture) DeleteLike(user string, pid string) error {
+func (col wukongPicture) deleteFieldName(user, pid, fieldName string) error {
 	f := func(ctx context.Context) error {
 		return cli.pullArrayElem(
-			ctx, col.collectionName, fieldLikes,
+			ctx, col.collectionName, fieldName,
 			resourceOwnerFilter(user),
 			resourceIdFilter(pid),
 		)
 	}
 
 	return withContext(f)
+}
+
+func (col wukongPicture) DeleteLike(user string, pid string) error {
+	return col.deleteFieldName(user, pid, fieldLikes)
+}
+
+func (col wukongPicture) DeletePublic(user string, pid string) error {
+	return col.deleteFieldName(user, pid, fieldPublics)
 }
 
 func (col wukongPicture) getByUserName(user, pid, field string) (
@@ -252,6 +274,41 @@ func (col wukongPicture) GetPublicsGlobal() (do []repositories.WuKongPictureDO, 
 	return col.toArrayPictureDO(v), nil
 }
 
+func (col wukongPicture) UpdatePublicPicture(
+	user string, pid string, version int,
+	do *repositories.WuKongPictureDO,
+) (err error) {
+	doc, err := col.toPictureDoc(do)
+	if err != nil {
+		return
+	}
+
+	updated := false
+
+	f := func(ctx context.Context) error {
+		updated, err = cli.updateArrayElem(
+			ctx, col.collectionName, fieldPublics,
+			wukongOwnerFilter(user),
+			wukongIdFilter(pid),
+			doc, version, 0,
+		)
+
+		return err
+	}
+
+	if err = withContext(f); err != nil {
+		return
+	}
+
+	if !updated {
+		return repositories.NewErrorConcurrentUpdating(
+			errors.New("no update"),
+		)
+	}
+
+	return
+}
+
 func (col wukongPicture) toPictureDO(p *pictureItem, do *repositories.WuKongPictureDO) {
 	*do = repositories.WuKongPictureDO{
 		Id:        p.Id,
@@ -276,13 +333,12 @@ func (col wukongPicture) toPictureDoc(do *repositories.WuKongPictureDO) (bson.M,
 		OBSPath:   do.OBSPath,
 		Diggs:     do.Diggs,
 		DiggCount: do.DiggCount,
-		Version:   do.Version,
 		CreatedAt: do.CreatedAt,
 	})
 	if err != nil {
 		return nil, err
 	}
-	doc[fieldVersion] = do.Version
+
 	return doc, nil
 }
 

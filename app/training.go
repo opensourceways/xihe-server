@@ -266,7 +266,7 @@ func (s trainingService) createTrainingJob(info *TrainingIndex, endpoint string)
 	if err != nil {
 		if repository.IsErrorResourceNotExists(err) {
 			err = errorUnavailableTraining{
-				errors.New("training is not exist."),
+				errors.New("training is not exist"),
 			}
 		} else {
 			retry = true

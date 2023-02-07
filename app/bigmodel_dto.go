@@ -25,6 +25,16 @@ type LuoJiaRecordDTO struct {
 	Id        string `json:"id"`
 }
 
+type WuKongPictureListOption struct {
+	CountPerPage int
+	PageNum      int
+}
+
+type WuKongListPublicGlobalCmd struct {
+	User domain.Account
+	WuKongPictureListOption
+}
+
 type WuKongCmd domain.WuKongPictureMeta
 
 func (cmd *WuKongCmd) Validate() error {
@@ -47,11 +57,19 @@ type WuKongAddLikeFromPublicCmd struct {
 	Id   string
 }
 
+type WuKongAddDiggCmd struct {
+	User  domain.Account
+	Owner domain.Account
+	Id    string
+}
+
 type WuKongGetPublicCmd = WuKongAddLikeFromPublicCmd
 
 type WuKongAddPublicFromTempCmd = WuKongAddLikeFromTempCmd
 
 type WuKongAddPublicFromLikeCmd = WuKongAddLikeFromPublicCmd
+
+type WuKongCancelDiggCmd WuKongAddDiggCmd
 
 type WuKongPictureBaseDTO struct {
 	Id        string `json:"id"`
@@ -69,18 +87,23 @@ type WuKongLikeDTO struct { // like
 }
 
 type WuKongPublicDTO struct { // public
-	IsLike bool `json:"is_like"`
-	IsDigg bool `json:"is_digg"`
+	Avatar    string `json:"avatar"`
+	IsLike    bool   `json:"is_like"`
+	IsDigg    bool   `json:"is_digg"`
+	DiggCount int    `json:"digg_count"`
 
 	WuKongPictureBaseDTO
 }
 
 func (dto *WuKongPublicDTO) toWuKongPublicDTO(
-	p *domain.WuKongPicture, isLike bool, isDigg bool, link string,
+	p *domain.WuKongPicture, avatar string,
+	isLike bool, isDigg bool, link string,
 ) {
 	*dto = WuKongPublicDTO{
-		IsLike: isLike,
-		IsDigg: isDigg,
+		Avatar:    avatar,
+		IsLike:    isLike,
+		IsDigg:    isDigg,
+		DiggCount: p.DiggCount,
 
 		WuKongPictureBaseDTO: WuKongPictureBaseDTO{
 			Id:        p.Id,
@@ -91,4 +114,9 @@ func (dto *WuKongPublicDTO) toWuKongPublicDTO(
 			CreatedAt: p.CreatedAt,
 		},
 	}
+}
+
+type WuKongPublicGlobalDTO struct {
+	Pictures []WuKongPublicDTO `json:"pictures"`
+	Total    int               `json:"total"`
 }

@@ -245,7 +245,7 @@ func (s finetuneMessageService) createFinetuneJob(info *FinetuneIndex) (
 	data, err := s.repo.Get(info)
 	if err != nil {
 		if repository.IsErrorResourceNotExists(err) {
-			err = errors.New("finetune is not exist.")
+			err = errors.New("finetune is not exist")
 		} else {
 			retry = true
 		}

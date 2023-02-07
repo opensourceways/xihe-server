@@ -16,6 +16,7 @@ import (
 
 func AddRouterForBigModelController(
 	rg *gin.RouterGroup,
+	user repository.User,
 	bm bigmodel.BigModel,
 	luojia repository.LuoJia,
 	wukong repository.WuKong,
@@ -23,7 +24,7 @@ func AddRouterForBigModelController(
 	sender message.Sender,
 ) {
 	ctl := BigModelController{
-		s: app.NewBigModelService(bm, luojia, wukong, wukongPicture, sender),
+		s: app.NewBigModelService(bm, user, luojia, wukong, wukongPicture, sender),
 	}
 
 	rg.POST("/v1/bigmodel/describe_picture", ctl.DescribePicture)
@@ -41,9 +42,12 @@ func AddRouterForBigModelController(
 	rg.GET("/v1/bigmodel/wukong/public", ctl.ListPublic)
 	rg.GET("/v1/bigmodel/wukong/publics", ctl.GetPublicsGlobal)
 	rg.PUT("/v1/bigmodel/wukong/link", ctl.GenDownloadURL)
-	rg.DELETE("/v1/bigmodel/wukong/:id", ctl.CancelLike)
+	rg.DELETE("/v1/bigmodel/wukong/like/:id", ctl.CancelLike)
+	rg.DELETE("/v1/bigmodel/wukong/public/:id", ctl.CancelPublic)
 	rg.GET("/v1/bigmodel/wukong/samples/:batch", ctl.GenWuKongSamples)
 	rg.GET("/v1/bigmodel/wukong", ctl.ListLike)
+	rg.POST("/v1/bigmodel/wukong/digg", ctl.AddDigg)
+	rg.DELETE("/v1/bigmodel/wukong/digg", ctl.CancelDigg)
 	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
 }
 
@@ -515,7 +519,7 @@ func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 // @Accept json
 // @Success 204
 // @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/{id} [delete]
+// @Router /v1/bigmodel/wukong/like/{id} [delete]
 func (ctl *BigModelController) CancelLike(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -523,6 +527,30 @@ func (ctl *BigModelController) CancelLike(ctx *gin.Context) {
 	}
 
 	err := ctl.s.CancelLike(
+		pl.DomainAccount(), ctx.Param("id"),
+	)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfDelete(ctx)
+	}
+}
+
+// @Title CancelPublic
+// @Description cancel public on wukong picture
+// @Tags  BigModel
+// @Param	id	path 	string	true	"picture id"
+// @Accept json
+// @Success 204
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/public/{id} [delete]
+func (ctl *BigModelController) CancelPublic(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	err := ctl.s.CancelPublic(
 		pl.DomainAccount(), ctx.Param("id"),
 	)
 	if err != nil {
@@ -550,6 +578,72 @@ func (ctl *BigModelController) ListLike(ctx *gin.Context) {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
 		ctl.sendRespOfGet(ctx, v)
+	}
+}
+
+// @Title AddDigg
+// @Description add digg to wukong picture
+// @Tags  BigModel
+// @Param	body	body 	wukongAddLikeRequest	true	"body of wukong"
+// @Accept json
+// @Success 202 {object} wukongDiggResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/digg [post]
+func (ctl *BigModelController) AddDigg(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := wukongAddDiggPublicRequest{}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
+		return
+	}
+
+	cmd, err := req.toCmd(pl.DomainAccount())
+	if err != nil {
+		return
+	}
+
+	if count, err := ctl.s.DiggPicture(&cmd); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPost(ctx, wukongDiggResp{count})
+	}
+}
+
+// @Title CancelDigg
+// @Description delete digg to wukong picture
+// @Tags  BigModel
+// @Param	body	body 	WuKongCancelDiggCmd	true	"body of wukong"
+// @Accept json
+// @Success 202 {object} wukongDiggResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/digg [delete]
+func (ctl *BigModelController) CancelDigg(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := wukongCancelDiggPublicRequest{}
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
+		return
+	}
+
+	cmd, err := req.toCmd(pl.DomainAccount())
+	if err != nil {
+		return
+	}
+
+	if count, err := ctl.s.CancelDiggPicture(&cmd); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPost(ctx, wukongDiggResp{count})
 	}
 }
 
@@ -630,7 +724,35 @@ func (ctl *BigModelController) GetPublicsGlobal(ctx *gin.Context) {
 		return
 	}
 
-	v, err := ctl.s.GetPublicsGlobal(pl.DomainAccount())
+	cmd := app.WuKongListPublicGlobalCmd{}
+
+	f := func() (err error) {
+		if v := ctl.getQueryParameter(ctx, "count_per_page"); v != "" {
+			if cmd.CountPerPage, err = strconv.Atoi(v); err != nil {
+				return
+			}
+		}
+
+		if v := ctl.getQueryParameter(ctx, "page_num"); v != "" {
+			if cmd.PageNum, err = strconv.Atoi(v); err != nil {
+				return
+			}
+		}
+
+		cmd.User = pl.DomainAccount()
+
+		return
+	}
+
+	if err := f(); err != nil {
+		ctl.sendBadRequest(ctx, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	v, err := ctl.s.GetPublicsGlobal(&cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {

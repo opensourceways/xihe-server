@@ -30,15 +30,19 @@ type BigModelService interface {
 	AddLikeFromPublicPicture(*WuKongAddLikeFromPublicCmd) (string, string, error)
 	AddPublicFromTempPicture(*WuKongAddPublicFromTempCmd) (string, string, error)
 	AddPublicFromLikePicture(*WuKongAddPublicFromLikeCmd) (string, string, error)
-	GetPublicsGlobal(domain.Account) ([]WuKongPublicDTO, error)
+	CancelPublic(domain.Account, string) error
+	GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (WuKongPublicGlobalDTO, error)
 	ListPublics(domain.Account) ([]WuKongPublicDTO, error)
 	CancelLike(domain.Account, string) error
 	ListLikes(domain.Account) ([]WuKongLikeDTO, error)
+	DiggPicture(*WuKongAddDiggCmd) (int, error)
+	CancelDiggPicture(*WuKongCancelDiggCmd) (int, error)
 	ReGenerateDownloadURL(domain.Account, string) (string, string, error)
 }
 
 func NewBigModelService(
 	fm bigmodel.BigModel,
+	user repository.User,
 	luojia repository.LuoJia,
 	wukong repository.WuKong,
 	wukongPicture repository.WuKongPicture,
@@ -46,6 +50,7 @@ func NewBigModelService(
 ) BigModelService {
 	return bigModelService{
 		fm:             fm,
+		user:           user,
 		sender:         sender,
 		luojia:         luojia,
 		wukong:         wukong,
@@ -58,6 +63,7 @@ type bigModelService struct {
 	fm bigmodel.BigModel
 
 	sender        message.Sender
+	user          repository.User
 	luojia        repository.LuoJia
 	wukong        repository.WuKong
 	wukongPicture repository.WuKongPicture
@@ -449,27 +455,59 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 	return
 }
 
-func (s bigModelService) GetPublicsGlobal(user domain.Account) (r []WuKongPublicDTO, err error) {
+func (s bigModelService) CancelPublic(user domain.Account, pid string) (err error) {
+	v, err := s.wukongPicture.GetPublicByUserName(user, pid)
+	if err != nil {
+		return
+	}
+
+	if err = s.wukongPicture.DeletePublic(v.Owner, v.Id); err != nil {
+		return
+	}
+
+	s.fm.DeleteWuKongPicture(v.OBSPath)
+
+	return
+}
+
+func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuKongPublicGlobalDTO, err error) {
 	v, err := s.wukongPicture.GetPublicsGlobal()
 	if err != nil {
 		return
 	}
 
-	r = make([]WuKongPublicDTO, len(v))
+	var b, e int
+	if b = cmd.CountPerPage * (cmd.PageNum - 1); b >= len(v) {
+		err = errors.New("paginator error")
 
+		return
+	}
+	if e = b + cmd.CountPerPage; e > len(v) {
+		e = len(v)
+	}
+	v = v[b:e]
+
+	d := make([]WuKongPublicDTO, len(v))
 	for i := range v {
 		item := &v[i]
 		link := s.fm.GenWuKongLinkFromOBSPath(item.OBSPath)
+		avatarId, _ := s.user.GetUserAvatarId(item.Owner)
+
 		var isLike, isDigg bool
-		if user != nil {
-			isLike, _ = s.isLike(item, user)
-			isDigg = s.isDigg(user, item.Diggs)
+		if cmd.User != nil {
+			isLike, _ = s.isLike(item, cmd.User)
+			isDigg = s.isDigg(cmd.User, item.Diggs)
 		} else {
 			isLike = false
 			isDigg = false
 		}
 
-		r[i].toWuKongPublicDTO(item, isLike, isDigg, link)
+		d[i].toWuKongPublicDTO(item, avatarId.AvatarId(), isLike, isDigg, link)
+	}
+
+	r = WuKongPublicGlobalDTO{
+		Total:    len(d),
+		Pictures: d,
 	}
 
 	return
@@ -492,9 +530,73 @@ func (s bigModelService) ListPublics(user domain.Account) (
 		isLike, _ := s.isLike(item, user)
 		isDigg := s.isDigg(user, item.Diggs)
 
-		dto.toWuKongPublicDTO(item, isLike, isDigg, link)
+		dto.toWuKongPublicDTO(item, "", isLike, isDigg, link)
 	}
 
+	return
+}
+
+func (s bigModelService) DiggPicture(cmd *WuKongAddDiggCmd) (count int, err error) {
+	// get picture info
+	p, err := s.wukongPicture.GetPublicByUserName(cmd.Owner, cmd.Id)
+	if err != nil {
+		return
+	}
+
+	// insert digg user and update diggcount
+	diggs := p.Diggs
+	for _, user := range diggs {
+		if user == cmd.User.Account() {
+			err = errors.New("the picture had been digged")
+
+			return
+		}
+	}
+	p.Diggs = append(p.Diggs, cmd.User.Account())
+	p.DiggCount = len(p.Diggs)
+
+	// save
+	if err = s.wukongPicture.UpdatePublicPicture(p.Owner, p.Id, p.Version, &p); err != nil {
+		return
+	}
+
+	count = p.DiggCount
+	return
+}
+
+func (s bigModelService) CancelDiggPicture(cmd *WuKongCancelDiggCmd) (count int, err error) {
+	// get picture info
+	p, err := s.wukongPicture.GetPublicByUserName(cmd.Owner, cmd.Id)
+	if err != nil {
+		return
+	}
+
+	// delete digg user and update diggcount
+	f := func(arr []string, s string) []string {
+		i := 0
+		for _, v := range arr {
+			if v != s {
+				arr[i] = v
+				i++
+			}
+		}
+		return arr[:i]
+	}
+
+	l := len(p.Diggs)
+	p.Diggs = f(p.Diggs, cmd.User.Account())
+	if l == len(p.Diggs) {
+		err = errors.New("user not digg this picture")
+		return
+	}
+	p.DiggCount = len(p.Diggs)
+
+	// save
+	if err = s.wukongPicture.UpdatePublicPicture(p.Owner, p.Id, p.Version, &p); err != nil {
+		return
+	}
+
+	count = p.DiggCount
 	return
 }
 

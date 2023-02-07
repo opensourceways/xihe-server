@@ -189,7 +189,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForBigModelController(
-			v1, bigmodel, luojia, wukong, wukongPicture, sender,
+			v1, user, bigmodel, luojia, wukong, wukongPicture, sender,
 		)
 
 		controller.AddRouterForTrainingController(

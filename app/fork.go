@@ -40,8 +40,6 @@ func (cmd *ProjectForkCmd) toProject(r *domain.Project) {
 	if cmd.Desc != nil {
 		r.Desc = cmd.Desc
 	}
-
-	return
 }
 
 func (s projectService) Fork(cmd *ProjectForkCmd, pr platform.Repository) (dto ProjectDTO, err error) {

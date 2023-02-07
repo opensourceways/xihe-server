@@ -168,7 +168,7 @@ func (s *service) GenWuKongPictureLink(p string) (string, error) {
 
 func (s *service) GenWuKongLinkFromOBSPath(obspath string) (link string) {
 	cfg := s.wukongInfo.cfg
-	// fmt.Printf("s.wukongInfo.cfg.Endpoint: %v\n", s.wukongInfo.cfg.Endpoint)
+
 	return fmt.Sprintf("https://%s.%s/%s", cfg.Bucket, cfg.Endpoint, obspath)
 }
 

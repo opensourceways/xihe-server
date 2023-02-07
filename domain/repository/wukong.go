@@ -14,13 +14,15 @@ type WuKong interface {
 }
 
 type WuKongPicture interface {
-	GetVersion(user domain.Account) (int, error)
-	ListLikesByUserName(user domain.Account) ([]domain.WuKongPicture, int, error)
-	ListPublicsByUserName(user domain.Account) ([]domain.WuKongPicture, int, error)
+	GetVersion(domain.Account) (int, error)
+	ListLikesByUserName(domain.Account) ([]domain.WuKongPicture, int, error)
+	ListPublicsByUserName(domain.Account) ([]domain.WuKongPicture, int, error)
 	SaveLike(*domain.WuKongPicture, int) (string, error)
 	SavePublic(*domain.WuKongPicture, int) (string, error)
-	DeleteLike(user domain.Account, pid string) error
-	GetLikeByUserName(user domain.Account, pid string) (domain.WuKongPicture, error)
-	GetPublicByUserName(user domain.Account, pid string) (domain.WuKongPicture, error)
-	GetPublicsGlobal()([]domain.WuKongPicture, error)
+	DeleteLike(domain.Account, string) error
+	DeletePublic(domain.Account, string) error
+	GetLikeByUserName(domain.Account, string) (domain.WuKongPicture, error)
+	GetPublicByUserName(domain.Account, string) (domain.WuKongPicture, error)
+	GetPublicsGlobal() ([]domain.WuKongPicture, error)
+	UpdatePublicPicture(domain.Account, string, int, *domain.WuKongPicture) error
 }
