@@ -244,7 +244,6 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 		&domain.WuKongPicture{
 			Owner:             cmd.User,
 			OBSPath:           p,
-			Version:           1,
 			CreatedAt:         utils.Date(),
 			WuKongPictureMeta: meta,
 		},

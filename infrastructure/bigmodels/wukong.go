@@ -103,6 +103,17 @@ func (s *service) GenPicturesByWuKong(
 		r[p] = l
 	}
 
+	checkUrls := make([]string, len(r))
+
+	var i int
+	for _, v := range r {
+		checkUrls[i] = v
+		i++
+	}
+	if err := s.check.checkImages(checkUrls); err != nil {
+		return nil, err
+	}
+
 	return r, nil
 }
 
