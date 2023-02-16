@@ -156,6 +156,7 @@ func (col wukongPicture) insert(
 	if err != nil {
 		return
 	}
+
 	f := func(ctx context.Context) error {
 		return cli.updateDoc(
 			ctx, col.collectionName,
@@ -281,7 +282,7 @@ func (col wukongPicture) toPictureDoc(do *repositories.WuKongPictureDO) (bson.M,
 	if err != nil {
 		return nil, err
 	}
-	doc["Version"] = do.Version
+	doc[fieldVersion] = do.Version
 	return doc, nil
 }
 
