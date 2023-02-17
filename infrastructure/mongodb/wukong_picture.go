@@ -325,7 +325,7 @@ func (col wukongPicture) toPictureDO(p *pictureItem, do *repositories.WuKongPict
 }
 
 func (col wukongPicture) toPictureDoc(do *repositories.WuKongPictureDO) (bson.M, error) {
-	doc, err := genDoc(pictureItem{
+	return genDoc(pictureItem{
 		Id:        do.Id,
 		Owner:     do.Owner,
 		Desc:      do.Desc,
@@ -335,11 +335,6 @@ func (col wukongPicture) toPictureDoc(do *repositories.WuKongPictureDO) (bson.M,
 		DiggCount: do.DiggCount,
 		CreatedAt: do.CreatedAt,
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	return doc, nil
 }
 
 func (col wukongPicture) toArrayPictureDO(p []dWuKongPicture) []repositories.WuKongPictureDO {
