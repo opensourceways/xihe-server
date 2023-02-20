@@ -179,8 +179,9 @@ func (s *service) GenWuKongPictureLink(p string) (string, error) {
 
 func (s *service) GenWuKongLinkFromOBSPath(obspath string) (link string) {
 	cfg := s.wukongInfo.cfg
+	endpoint := strings.Replace(cfg.Endpoint, "https://", "", 1)
 
-	return fmt.Sprintf("https://%s.%s/%s", cfg.Bucket, cfg.Endpoint, obspath)
+	return fmt.Sprintf("https://%s.%s/%s", cfg.Bucket, endpoint, obspath)
 }
 
 func (s *service) CheckWuKongPictureTempToLike(user domain.Account, p string) (
