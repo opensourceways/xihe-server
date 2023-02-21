@@ -675,6 +675,8 @@ func (ctl *BigModelController) AddPublic(ctx *gin.Context) {
 		} else {
 			ctl.sendRespOfPost(ctx, wukongAddPublicResp{pid})
 		}
+
+		return
 	}
 
 	if errPublic == nil {
@@ -684,6 +686,8 @@ func (ctl *BigModelController) AddPublic(ctx *gin.Context) {
 		} else {
 			ctl.sendRespOfPost(ctx, wukongAddPublicResp{pid})
 		}
+
+		return
 	}
 }
 
