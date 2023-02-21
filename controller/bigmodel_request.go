@@ -125,13 +125,16 @@ func (req *wukongAddLikeFromTempRequest) toCmd(user domain.Account) app.WuKongAd
 }
 
 type wukongAddLikeFromPublicRequest struct {
-	Id string `json:"id" binding:"required"`
+	Owner string `json:"owner" binding:"required"`
+	Id    string `json:"id" binding:"required"`
 }
 
 func (req *wukongAddLikeFromPublicRequest) toCmd(user domain.Account) app.WuKongAddLikeFromPublicCmd {
+	owner, _ := domain.NewAccount(req.Owner)
 	return app.WuKongAddLikeFromPublicCmd{
-		User: user,
-		Id:   req.Id,
+		Owner: owner,
+		User:  user,
+		Id:    req.Id,
 	}
 }
 
@@ -144,7 +147,9 @@ func (req *wukongAddPublicFromTempRequest) toCmd(user domain.Account) app.WuKong
 	}
 }
 
-type wukongAddPublicFromLikeRequest wukongAddLikeFromPublicRequest
+type wukongAddPublicFromLikeRequest struct {
+	Id string `json:"owner" biding:"required"`
+}
 
 func (req *wukongAddPublicFromLikeRequest) toCmd(user domain.Account) app.WuKongAddPublicFromLikeCmd {
 	return app.WuKongAddPublicFromLikeCmd{
