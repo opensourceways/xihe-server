@@ -241,6 +241,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 	}
 
 	pid, err = s.wukongPicture.SaveLike(
+		cmd.User,
 		&domain.WuKongPicture{
 			Owner:             cmd.User,
 			OBSPath:           p,
@@ -256,7 +257,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 func (s bigModelService) AddLikeFromPublicPicture(
 	cmd *WuKongAddLikeFromPublicCmd,
 ) (pid string, code string, err error) {
-	p, err := s.wukongPicture.GetPublicByUserName(cmd.User, cmd.Id)
+	p, err := s.wukongPicture.GetPublicByUserName(cmd.Owner, cmd.Id)
 	if err != nil {
 		code = ErrorWuKongInvalidId
 		return
@@ -299,7 +300,7 @@ func (s bigModelService) AddLikeFromPublicPicture(
 		CreatedAt:         utils.Date(),
 		WuKongPictureMeta: p.WuKongPictureMeta,
 	}
-	pid, err = s.wukongPicture.SaveLike(wp, version)
+	pid, err = s.wukongPicture.SaveLike(cmd.User, wp, version)
 
 	return
 }

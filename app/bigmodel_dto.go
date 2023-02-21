@@ -53,8 +53,9 @@ type WuKongAddLikeFromTempCmd struct {
 }
 
 type WuKongAddLikeFromPublicCmd struct {
-	User domain.Account
-	Id   string
+	User  domain.Account
+	Owner domain.Account
+	Id    string
 }
 
 type WuKongAddDiggCmd struct {
@@ -63,11 +64,12 @@ type WuKongAddDiggCmd struct {
 	Id    string
 }
 
-type WuKongGetPublicCmd = WuKongAddLikeFromPublicCmd
-
 type WuKongAddPublicFromTempCmd = WuKongAddLikeFromTempCmd
 
-type WuKongAddPublicFromLikeCmd = WuKongAddLikeFromPublicCmd
+type WuKongAddPublicFromLikeCmd struct {
+	User domain.Account
+	Id   string
+}
 
 type WuKongCancelDiggCmd WuKongAddDiggCmd
 

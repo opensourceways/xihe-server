@@ -17,7 +17,7 @@ type WuKongPicture interface {
 	GetVersion(domain.Account) (int, error)
 	ListLikesByUserName(domain.Account) ([]domain.WuKongPicture, int, error)
 	ListPublicsByUserName(domain.Account) ([]domain.WuKongPicture, int, error)
-	SaveLike(*domain.WuKongPicture, int) (string, error)
+	SaveLike(domain.Account, *domain.WuKongPicture, int) (string, error)
 	SavePublic(*domain.WuKongPicture, int) (string, error)
 	DeleteLike(domain.Account, string) error
 	DeletePublic(domain.Account, string) error

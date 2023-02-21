@@ -69,7 +69,7 @@ func (impl wukongPicture) ListPublicsByUserName(user domain.Account) (
 	return r, version, nil
 }
 
-func (impl wukongPicture) SaveLike(p *domain.WuKongPicture, version int) (string, error) {
+func (impl wukongPicture) SaveLike(user domain.Account, p *domain.WuKongPicture, version int) (string, error) {
 	if p.Id != "" {
 		return "", errors.New("must be a new picture")
 	}
@@ -78,7 +78,7 @@ func (impl wukongPicture) SaveLike(p *domain.WuKongPicture, version int) (string
 	do.toWuKongPictureDO(p)
 	do.setDefault()
 
-	v, err := impl.mapper.InsertIntoLikes(p.Owner.Account(), do, version)
+	v, err := impl.mapper.InsertIntoLikes(user.Account(), do, version)
 	if err != nil {
 		return "", convertError(err)
 	}
