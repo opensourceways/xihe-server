@@ -493,16 +493,18 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 		link := s.fm.GenWuKongLinkFromOBSPath(item.OBSPath)
 		avatarId, _ := s.user.GetUserAvatarId(item.Owner)
 
-		var isLike, isDigg bool
+		var (
+			isDigg  bool
+			LikeDto WuKongIsLikeDTO
+		)
 		if cmd.User != nil {
-			isLike, _ = s.isLike(item, cmd.User)
+			LikeDto, _ = s.isLike(item, cmd.User)
 			isDigg = s.isDigg(cmd.User, item.Diggs)
 		} else {
-			isLike = false
 			isDigg = false
 		}
 
-		d[i].toWuKongPublicDTO(item, avatarId.AvatarId(), isLike, isDigg, link)
+		d[i].toWuKongPublicDTO(item, avatarId.AvatarId(), LikeDto.IsLike, LikeDto.LikeID, isDigg, link)
 	}
 
 	r = WuKongPublicGlobalDTO{
@@ -527,10 +529,10 @@ func (s bigModelService) ListPublics(user domain.Account) (
 		dto := &r[i]
 
 		link := s.fm.GenWuKongLinkFromOBSPath(item.OBSPath)
-		isLike, _ := s.isLike(item, user)
+		likeDto, _ := s.isLike(item, user)
 		isDigg := s.isDigg(user, item.Diggs)
 
-		dto.toWuKongPublicDTO(item, "", isLike, isDigg, link)
+		dto.toWuKongPublicDTO(item, "", likeDto.IsLike, likeDto.LikeID, isDigg, link)
 	}
 
 	return
@@ -603,24 +605,27 @@ func (s bigModelService) CancelDiggPicture(cmd *WuKongCancelDiggCmd) (count int,
 func (s bigModelService) isLike(
 	p *domain.WuKongPicture,
 	user domain.Account,
-) (bool, error) {
+) (WuKongIsLikeDTO, error) {
 	pics, _, err := s.wukongPicture.ListLikesByUserName(user)
 	if err != nil {
-		return false, err
+		return WuKongIsLikeDTO{}, err
 	}
 
 	for _, pic := range pics {
 		likePath, err := s.fm.CheckWuKongPicturePublicToLike(user, p.OBSPath)
 		if err != nil {
-			return false, err
+			return WuKongIsLikeDTO{}, err
 		}
 
 		if pic.OBSPath == likePath {
-			return true, nil
+			return WuKongIsLikeDTO{
+				IsLike: true,
+				LikeID: pic.Id,
+			}, nil
 		}
 	}
 
-	return false, nil
+	return WuKongIsLikeDTO{}, nil
 }
 
 func (s bigModelService) isPublic(

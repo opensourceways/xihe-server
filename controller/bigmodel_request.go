@@ -148,7 +148,7 @@ func (req *wukongAddPublicFromTempRequest) toCmd(user domain.Account) app.WuKong
 }
 
 type wukongAddPublicFromLikeRequest struct {
-	Id string `json:"owner" biding:"required"`
+	Id string `json:"id" biding:"required"`
 }
 
 func (req *wukongAddPublicFromLikeRequest) toCmd(user domain.Account) app.WuKongAddPublicFromLikeCmd {

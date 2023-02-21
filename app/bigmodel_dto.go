@@ -91,6 +91,7 @@ type WuKongLikeDTO struct { // like
 type WuKongPublicDTO struct { // public
 	Avatar    string `json:"avatar"`
 	IsLike    bool   `json:"is_like"`
+	LikeID    string `json:"like_id"`
 	IsDigg    bool   `json:"is_digg"`
 	DiggCount int    `json:"digg_count"`
 
@@ -99,11 +100,12 @@ type WuKongPublicDTO struct { // public
 
 func (dto *WuKongPublicDTO) toWuKongPublicDTO(
 	p *domain.WuKongPicture, avatar string,
-	isLike bool, isDigg bool, link string,
+	isLike bool, likeId string, isDigg bool, link string,
 ) {
 	*dto = WuKongPublicDTO{
 		Avatar:    avatar,
 		IsLike:    isLike,
+		LikeID:    likeId,
 		IsDigg:    isDigg,
 		DiggCount: p.DiggCount,
 
@@ -116,6 +118,11 @@ func (dto *WuKongPublicDTO) toWuKongPublicDTO(
 			CreatedAt: p.CreatedAt,
 		},
 	}
+}
+
+type WuKongIsLikeDTO struct {
+	IsLike bool
+	LikeID string
 }
 
 type WuKongPublicGlobalDTO struct {
