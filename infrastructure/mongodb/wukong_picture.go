@@ -314,6 +314,7 @@ func (col wukongPicture) toPictureDO(p *pictureItem, do *repositories.WuKongPict
 		Id:        p.Id,
 		Owner:     p.Owner,
 		OBSPath:   p.OBSPath,
+		Level:     p.Level,
 		Diggs:     p.Diggs,
 		DiggCount: p.DiggCount,
 		Version:   p.Version,

@@ -31,7 +31,8 @@ type WuKongPictureListOption struct {
 }
 
 type WuKongListPublicGlobalCmd struct {
-	User domain.Account
+	User  domain.Account
+	Level domain.WuKongPictureLevel
 	WuKongPictureListOption
 }
 

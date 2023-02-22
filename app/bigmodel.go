@@ -471,7 +471,12 @@ func (s bigModelService) CancelPublic(user domain.Account, pid string) (err erro
 }
 
 func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuKongPublicGlobalDTO, err error) {
-	v, err := s.wukongPicture.GetPublicsGlobal()
+	var v []domain.WuKongPicture
+	if cmd.Level != nil && cmd.Level.WuKongPictureLevel() == "official" {
+		v, err = s.wukongPicture.GetOfficialPublicsGlobal()
+	} else {
+		v, err = s.wukongPicture.GetPublicsGlobal()
+	}
 	if err != nil {
 		return
 	}

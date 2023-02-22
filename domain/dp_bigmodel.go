@@ -25,6 +25,11 @@ var (
 	BigmodelCodeGeex    = BigmodelType(bigmodelCodeGeex)
 	BigmodelGenPicture  = BigmodelType(bigmodelGenPicture)
 	BigmodelDescPicture = BigmodelType(bigmodelDescPicture)
+
+	wukongPictureLevelMap = map[string]int{
+		"official": 2,
+		"good":     1,
+	}
 )
 
 // BigmodelType
@@ -70,4 +75,50 @@ type wukongPictureDesc string
 
 func (r wukongPictureDesc) WuKongPictureDesc() string {
 	return string(r)
+}
+
+// wukong level
+type WuKongPictureLevel interface {
+	WuKongPictureLevel() string
+	Int() int
+}
+
+func NewWuKongPictureLevel(v string) WuKongPictureLevel {
+	for k, n := range wukongPictureLevelMap {
+		if k == v {
+			return wukongPictureLevel{
+				level: n,
+				desc:  k,
+			}
+		}
+	}
+
+	return nil
+
+}
+
+func NewWuKongPictureLevelByNum(v int) WuKongPictureLevel {
+	for k, n := range resourceLevelMap {
+		if n == v {
+			return wukongPictureLevel{
+				level: n,
+				desc:  k,
+			}
+		}
+	}
+
+	return nil
+}
+
+type wukongPictureLevel struct {
+	level int
+	desc  string
+}
+
+func (r wukongPictureLevel) WuKongPictureLevel() string {
+	return r.desc
+}
+
+func (r wukongPictureLevel) Int() int {
+	return r.level
 }

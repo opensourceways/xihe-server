@@ -165,6 +165,31 @@ func (impl wukongPicture) GetPublicsGlobal() (r []domain.WuKongPicture, err erro
 	return
 }
 
+func (impl wukongPicture) GetOfficialPublicsGlobal() (r []domain.WuKongPicture, err error) {
+	do, err := impl.mapper.GetPublicsGlobal()
+	if err != nil {
+		return
+	}
+
+	var offDo []WuKongPictureDO
+	for i := range do {
+		if do[i].Level == 2 {
+			offDo = append(offDo, do[i])
+		}
+	}
+
+	r = make([]domain.WuKongPicture, len(offDo))
+
+	for i := range offDo {
+		err = offDo[i].toWuKongPicture(&r[i])
+		if err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 func (impl wukongPicture) UpdatePublicPicture(
 	user domain.Account, pid string, version int,
 	update *domain.WuKongPicture,
@@ -179,6 +204,7 @@ type WuKongPictureDO struct {
 	Id        string
 	Owner     string
 	OBSPath   string
+	Level     int
 	Diggs     []string
 	DiggCount int
 	Version   int

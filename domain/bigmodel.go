@@ -20,6 +20,7 @@ type WuKongPicture struct {
 	Id        string
 	Owner     Account
 	OBSPath   string
+	Level     WuKongPictureLevel
 	Diggs     []string
 	DiggCount int
 	Version   int

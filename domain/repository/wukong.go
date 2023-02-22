@@ -24,5 +24,6 @@ type WuKongPicture interface {
 	GetLikeByUserName(domain.Account, string) (domain.WuKongPicture, error)
 	GetPublicByUserName(domain.Account, string) (domain.WuKongPicture, error)
 	GetPublicsGlobal() ([]domain.WuKongPicture, error)
+	GetOfficialPublicsGlobal() ([]domain.WuKongPicture, error)
 	UpdatePublicPicture(domain.Account, string, int, *domain.WuKongPicture) error
 }

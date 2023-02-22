@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 
 	"github.com/opensourceways/xihe-server/app"
+	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/bigmodel"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -738,6 +739,10 @@ func (ctl *BigModelController) GetPublicsGlobal(ctx *gin.Context) {
 			if cmd.PageNum, err = strconv.Atoi(v); err != nil {
 				return
 			}
+		}
+
+		if v := ctl.getQueryParameter(ctx, "level"); v != "" {
+			cmd.Level = domain.NewWuKongPictureLevel(v)
 		}
 
 		cmd.User = pl.DomainAccount()
