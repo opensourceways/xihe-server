@@ -490,11 +490,10 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 	if e = b + cmd.CountPerPage; e > len(v) {
 		e = len(v)
 	}
-	v = v[b:e]
 
-	d := make([]WuKongPublicDTO, len(v))
-	for i := range v {
-		item := &v[i]
+	d := make([]WuKongPublicDTO, len(v[b:e]))
+	for i := range v[b:e] {
+		item := &v[b:e][i]
 		link := s.fm.GenWuKongLinkFromOBSPath(item.OBSPath)
 		avatarId, _ := s.user.GetUserAvatarId(item.Owner)
 
@@ -513,7 +512,7 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 	}
 
 	r = WuKongPublicGlobalDTO{
-		Total:    len(d),
+		Total:    len(v),
 		Pictures: d,
 	}
 
