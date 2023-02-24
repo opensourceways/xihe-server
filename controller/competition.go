@@ -107,7 +107,7 @@ func (ctl *CompetitionController) Get(ctx *gin.Context) {
 // @Summary List
 // @Description list competitions
 // @Tags  Competition
-// @Param	status	query	string	false	"competition status, such as done, preparing, in-progress"
+// @Param	status	query	string	false	"competition status, such as over, preparing, in-progress"
 // @Param	mine	query	string	false	"just list competitions of competitor, if it is set"
 // @Accept json
 // @Success 200 {object} app.CompetitionSummaryDTO

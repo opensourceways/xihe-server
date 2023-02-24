@@ -1990,7 +1990,7 @@ paths:
       - application/json
       description: list competitions
       parameters:
-      - description: competition status, such as done, preparing, in-progress
+      - description: competition status, such as over, preparing, in-progress
         in: query
         name: status
         type: string

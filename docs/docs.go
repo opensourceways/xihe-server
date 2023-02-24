@@ -898,7 +898,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "competition status, such as done, preparing, in-progress",
+                        "description": "competition status, such as over, preparing, in-progress",
                         "name": "status",
                         "in": "query"
                     },

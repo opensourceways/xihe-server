@@ -75,6 +75,10 @@ func (s *competitionService) GetSubmissions(cid string, user types.Account) (
 		domain.NewWorkIndex(cid, p.Id), competition.Phase,
 	)
 	if err != nil {
+		if repoerr.IsErrorResourceNotExists(err) {
+			err = nil
+		}
+
 		return
 	}
 

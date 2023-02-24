@@ -255,16 +255,16 @@ type competitionServer struct {
 }
 
 func (t competitionServer) SetSubmissionInfo(
-	index *competition.CompetitionIndex, v *competition.SubmissionInfo,
+	cid string, v *competition.SubmissionInfo,
 ) error {
-	phase, err := competitiondomain.NewCompetitionPhase(index.Phase)
+	phase, err := competitiondomain.NewCompetitionPhase(v.Phase)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return t.service.UpdateSubmission(
 		&competitionapp.CompetitionSubmissionUpdateCmd{
-			Index:  competitiondomain.NewWorkIndex("", ""), //TODO
+			Index:  competitiondomain.NewWorkIndex(cid, v.PlayerId),
 			Phase:  phase,
 			Id:     v.Id,
 			Status: v.Status,

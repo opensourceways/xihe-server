@@ -11,7 +11,7 @@ require (
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.11
 	github.com/opensourceways/community-robot-lib v0.0.0-20221212062947-85a66b110688
 	github.com/opensourceways/xihe-finetune v0.0.0-20230106042033-e2993e0d37f8
-	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20221229121659-50f9fa2ddbce
+	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230223031613-c1e542d34067
 	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20221102031424-b6e01d2ebc0e
 	github.com/opensourceways/xihe-training-center v0.0.0-20230112032258-ab5e153148d2
 	github.com/sirupsen/logrus v1.9.0
