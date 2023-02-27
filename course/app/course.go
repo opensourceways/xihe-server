@@ -13,19 +13,19 @@ type CourseService interface {
 }
 
 func NewCourseService(
-	userRepo user.User,
+	userregRepo user.UserReg,
 	courseRepo repository.Course,
 	playerRepo repository.Player,
 ) *courseService {
 	return &courseService{
-		userRepo:   userRepo,
+		userRepo:   userregRepo,
 		courseRepo: courseRepo,
 		playerRepo: playerRepo,
 	}
 }
 
 type courseService struct {
-	userRepo user.User
+	userRepo user.UserReg
 
 	courseRepo repository.Course
 	playerRepo repository.Player
