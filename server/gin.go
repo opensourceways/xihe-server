@@ -15,6 +15,9 @@ import (
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
+	courseapp "github.com/opensourceways/xihe-server/course/app"
+	courserepo "github.com/opensourceways/xihe-server/course/infrastructure/repositoryimpl"
+	usercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/infrastructure/authing"
@@ -27,6 +30,8 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	userapp "github.com/opensourceways/xihe-server/user/app"
+	"github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
@@ -152,11 +157,23 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	uploader := competitionimpl.NewCompetitionService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)
 
+	userAppService := userapp.NewUserService(
+		repositoryimpl.NewUserRegRepo(
+			mongodb.NewCollection(collections.UserRegInfo),
+		),
+	)
+
 	competitionAppService := competitionapp.NewCompetitionService(
 		competitionrepo.NewCompetitionRepo(mongodb.NewCollection(collections.Competition)),
 		competitionrepo.NewWorkRepo(mongodb.NewCollection(collections.CompetitionWork)),
 		competitionrepo.NewPlayerRepo(mongodb.NewCollection(collections.CompetitionPlayer)),
 		sender, uploader,
+	)
+
+	courseAppService := courseapp.NewCourseService(
+		usercli.NewUserCli(userAppService),
+		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
+		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 	)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
@@ -231,6 +248,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 		controller.AddRouterForChallengeController(
 			v1, competition, aiquestion, challengeHelper,
+		)
+
+		controller.AddRouterForCourseController(
+			v1, courseAppService,
 		)
 	}
 
