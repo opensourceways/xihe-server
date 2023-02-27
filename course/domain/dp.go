@@ -72,7 +72,7 @@ type StudentIdentity interface {
 	StudentIdentity() string
 }
 
-func NewstudentIdentity(v string) (StudentIdentity, error) {
+func NewStudentIdentity(v string) (StudentIdentity, error) {
 	b := v == studentIdentityStudent ||
 		v == studentIdentityTeacher ||
 		v == studentIdentityDeveloper ||

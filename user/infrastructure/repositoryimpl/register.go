@@ -10,7 +10,7 @@ import (
 	"github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
-func NewUserRepo(m mongodbClient) repository.User {
+func NewUserRegRepo(m mongodbClient) repository.UserReg {
 	return &userRepoImpl{m}
 }
 

@@ -132,6 +132,7 @@ type Mongodb struct {
 type MongodbCollections struct {
 	Tag               string `json:"tag"                    required:"true"`
 	User              string `json:"user"                   required:"true"`
+	UserRegInfo       string `json:"userinfo" required:"true"`
 	Like              string `json:"like"                   required:"true"`
 	Model             string `json:"model"                  required:"true"`
 	Login             string `json:"login"                  required:"true"`
@@ -150,6 +151,8 @@ type MongodbCollections struct {
 	WuKongPicture     string `json:"wukong_picture"         required:"true"`
 	CompetitionWork   string `json:"competition_work"       required:"true"`
 	CompetitionPlayer string `json:"competition_player"     required:"true"`
+	Course            string `json:"course" required:"true"`
+	CoursePlayer      string `json:"course_player" required:"true"`
 }
 
 type AuthingService struct {

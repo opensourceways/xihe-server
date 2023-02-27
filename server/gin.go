@@ -15,6 +15,8 @@ import (
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
+	courseapp "github.com/opensourceways/xihe-server/course/app"
+	courserepo "github.com/opensourceways/xihe-server/course/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/infrastructure/authing"
@@ -27,6 +29,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
@@ -159,6 +162,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		sender, uploader,
 	)
 
+	courseAppService := courseapp.NewCourseService(
+		userrepo.NewUserRegRepo(mongodb.NewCollection(collections.UserRegInfo)),
+		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
+		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
+	)
+
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	{
 		controller.AddRouterForProjectController(
@@ -231,6 +240,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 		controller.AddRouterForChallengeController(
 			v1, competition, aiquestion, challengeHelper,
+		)
+
+		controller.AddRouterForCourseController(
+			v1, courseAppService,
 		)
 	}
 
