@@ -17,6 +17,8 @@ type StudentApplyRequest struct {
 }
 
 func (req *StudentApplyRequest) toCmd(cid string, user types.Account) (cmd app.PlayerApplyCmd, err error) {
+	cmd.CourseId = cid
+
 	if cmd.Name, err = domain.NewStudentName(req.Name); err != nil {
 		return
 	}

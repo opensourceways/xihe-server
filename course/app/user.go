@@ -2,8 +2,6 @@ package app
 
 import (
 	"errors"
-
-	userDomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 func (s *courseService) Apply(cmd *PlayerApplyCmd) (err error) {
@@ -33,11 +31,7 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (err error) {
 	}
 
 	// save register info
-	var regInfo userDomain.UserRegInfo
-	if err = regInfo.NewRegFromStudent(&p.Student); err != nil {
-		return
-	}
-	if err = s.userRepo.AddUserRegInfo(&regInfo); err != nil {
+	if err = s.user.AddUserRegInfo(&p.Student); err != nil {
 		return
 	}
 

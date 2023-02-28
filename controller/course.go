@@ -25,9 +25,9 @@ type CourseController struct {
 }
 
 // @Summary Apply
-// @Description apply the competition
-// @Tags  Competition
-// @Param	id	path	string				true	"competition id"
+// @Description apply the course
+// @Tags  Course
+// @Param	id	path	string				true	"course id"
 // @Param	body	body	StudentApplyRequest	true	"body of applying"
 // @Accept json
 // @Success 201

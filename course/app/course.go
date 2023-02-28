@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/opensourceways/xihe-server/course/domain/repository"
-	user "github.com/opensourceways/xihe-server/user/domain/repository"
+	"github.com/opensourceways/xihe-server/course/domain/user"
 )
 
 type CourseService interface {
@@ -13,20 +13,19 @@ type CourseService interface {
 }
 
 func NewCourseService(
-	userregRepo user.UserReg,
+	user user.User,
 	courseRepo repository.Course,
 	playerRepo repository.Player,
 ) *courseService {
 	return &courseService{
-		userRepo:   userregRepo,
+		user:       user,
 		courseRepo: courseRepo,
 		playerRepo: playerRepo,
 	}
 }
 
 type courseService struct {
-	userRepo user.UserReg
-
+	user       user.User
 	courseRepo repository.Course
 	playerRepo repository.Player
 }
