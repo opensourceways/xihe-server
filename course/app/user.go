@@ -24,13 +24,12 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (err error) {
 
 	p := cmd.toPlayer()
 	p.CreateToday()
+	p.NewId()
 
-	// save player
 	if err = s.playerRepo.SavePlayer(&p); err != nil {
 		return
 	}
 
-	// save register info
 	if err = s.user.AddUserRegInfo(&p.Student); err != nil {
 		return
 	}

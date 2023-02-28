@@ -42,7 +42,7 @@ func (impl *playerRepoImpl) genPlayerDoc(p *domain.Player) (bson.M, error) {
 		Id:        p.Id,
 		CourseId:  p.CourseId,
 		Name:      p.Account.Account(),
-		CreatedAt: p.CreatedAt.CourseTimeInt(),
+		CreatedAt: p.CreatedAt.CourseTime(),
 	}
 
 	return genDoc(obj)
