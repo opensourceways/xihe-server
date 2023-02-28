@@ -3,7 +3,6 @@ package domain
 import (
 	"errors"
 	"net/url"
-	"time"
 )
 
 const (
@@ -398,26 +397,19 @@ func (r lessonDesc) LessonDesc() string {
 
 // Time
 type CourseTime interface {
-	CourseTimeStr() string
-	CourseTimeInt() int64
+	CourseTime() int64
 }
 
-func NewCourseTime(v string) (CourseTime, error) {
-	if v == "" {
+func NewCourseTime(v int64) (CourseTime, error) {
+	if v == 0 {
 		return nil, errors.New("empty value")
 	}
 
 	return coursetime(v), nil
 }
 
-type coursetime string
+type coursetime int64
 
-func (r coursetime) CourseTimeStr() string {
-	return string(r)
-}
-
-func (r coursetime) CourseTimeInt() int64 {
-	t, _ := time.Parse(string(r), "2022-02-15")
-
-	return t.Unix()
+func (r coursetime) CourseTime() int64 {
+	return int64(r)
 }
