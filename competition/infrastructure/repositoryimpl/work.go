@@ -113,7 +113,7 @@ func (impl workRepoImpl) SaveSubmission(
 ) error {
 	doc, err := genDoc(dSubmission{
 		Status: submission.Status,
-		Score:  submission.Score,
+		Score:  float64(submission.Score),
 	})
 	if err != nil {
 		return err

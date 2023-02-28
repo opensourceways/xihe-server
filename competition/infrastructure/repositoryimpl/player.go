@@ -51,22 +51,29 @@ func (impl playerRepoImpl) docFilterByUser(cid string, a types.Account) bson.M {
 	return filter
 }
 
-// SavePlayer
-func (impl playerRepoImpl) SavePlayer(p *domain.Player, version int) error {
-	if p.IsATeam() {
-		return impl.insertTeam(p, version)
+func (impl playerRepoImpl) disabledPlayerFilter(cid string, a types.Account) bson.M {
+	return bson.M{
+		fieldCid:     cid,
+		fieldEnabled: false,
+		fieldLeader:  a.Account(),
 	}
+}
 
+// AddPlayer
+func (impl playerRepoImpl) AddPlayer(p *domain.Player) error {
 	return impl.insertPlayer(p)
 }
 
 func (repo playerRepoImpl) genPlayerDoc(p *domain.Player) (bson.M, error) {
-	var c dCompetitor
-	toCompetitorDoc(&p.Leader, &c)
+	cs := make([]dCompetitor, p.CompetitorsCount())
+	for i, m := range p.Members() {
+		cs[i+1] = toCompetitorDoc(&m)
+	}
+	cs[0] = toCompetitorDoc(&p.Leader)
 
 	obj := dPlayer{
 		CompetitionId: p.CompetitionId,
-		Competitors:   []dCompetitor{c},
+		Competitors:   cs,
 		Leader:        p.Leader.Account.Account(),
 		Enabled:       true,
 	}
@@ -75,9 +82,6 @@ func (repo playerRepoImpl) genPlayerDoc(p *domain.Player) (bson.M, error) {
 	}
 
 	doc, err := genDoc(&obj)
-	if err == nil {
-		doc[fieldVersion] = 0
-	}
 
 	return doc, err
 }
@@ -87,9 +91,17 @@ func (impl playerRepoImpl) insertPlayer(p *domain.Player) error {
 	if err != nil {
 		return err
 	}
+	doc[fieldVersion] = 0
 
 	f := func(ctx context.Context) error {
 		filter := impl.docFilterByUser(p.CompetitionId, p.Leader.Account)
+
+		if p.IsATeam() {
+			v := impl.docFilter(p.CompetitionId)
+			v[fieldTeamName] = p.Team.Name.TeamName()
+
+			filter = bson.M{"$or": bson.A{filter, v}}
+		}
 
 		_, err := impl.cli.NewDocIfNotExist(ctx, filter, doc)
 
@@ -105,29 +117,22 @@ func (impl playerRepoImpl) insertPlayer(p *domain.Player) error {
 	return err
 }
 
-func (impl playerRepoImpl) insertTeam(p *domain.Player, version int) error {
-	if err := impl.updateEnabledOfPlayer(p, false, version); err != nil {
-		return err
-	}
-
-	return impl.insertPlayer(p)
-}
-
-func (impl playerRepoImpl) updateEnabledOfPlayer(p *domain.Player, enable bool, version int) error {
-	return impl.update(p, bson.M{fieldEnabled: enable}, version)
-}
-
-func (impl playerRepoImpl) update(p *domain.Player, doc bson.M, version int) error {
+func (impl playerRepoImpl) DeletePlayer(p *domain.Player, version int) error {
 	filter, err := impl.playerFilter(p)
 	if err != nil {
 		return err
 	}
 
+	return impl.update(filter, bson.M{fieldEnabled: false}, version)
+}
+
+func (impl playerRepoImpl) update(filter, doc bson.M, version int) error {
 	f := func(ctx context.Context) error {
 		return impl.cli.UpdateDoc(ctx, filter, doc, mongoCmdSet, version)
 	}
 
-	if err = withContext(f); err != nil {
+	err := withContext(f)
+	if err != nil {
 		if impl.cli.IsDocNotExists(err) {
 			err = repoerr.NewErrorConcurrentUpdating(err)
 		}
@@ -138,7 +143,12 @@ func (impl playerRepoImpl) update(p *domain.Player, doc bson.M, version int) err
 
 // SaveTeamName
 func (impl playerRepoImpl) SaveTeamName(p *domain.Player, version int) error {
-	return impl.update(p, bson.M{fieldTeamName: p.Team.Name.TeamName()}, version)
+	filter, err := impl.playerFilter(p)
+	if err != nil {
+		return err
+	}
+
+	return impl.update(filter, bson.M{fieldTeamName: p.Team.Name.TeamName()}, version)
 }
 
 // FindPlayer
@@ -194,7 +204,7 @@ func (impl playerRepoImpl) FindCompetitionsUserApplied(a types.Account) (
 // CompetitorsCount
 func (impl playerRepoImpl) CompetitorsCount(cid string) (int, error) {
 	var v []struct {
-		Total int `bson:"toal"`
+		Total int `bson:"total"`
 	}
 
 	f := func(ctx context.Context) error {
@@ -236,26 +246,14 @@ func (impl playerRepoImpl) AddMember(
 	team repository.PlayerVersion,
 	member repository.PlayerVersion,
 ) error {
-	err := impl.updateEnabledOfPlayer(member.Player, false, member.Version)
-	if err != nil {
-		return err
-	}
-
-	return impl.addMember(team, member.Player)
-}
-
-func (impl playerRepoImpl) addMember(
-	team repository.PlayerVersion, member *domain.Player,
-) error {
 	filter, err := impl.playerFilter(team.Player)
 	if err != nil {
 		return err
 	}
 
-	var c dCompetitor
-	toCompetitorDoc(&member.Leader, &c)
+	c := toCompetitorDoc(&member.Player.Leader)
 	doc, err := genDoc(&c)
-	if err == nil {
+	if err != nil {
 		return err
 	}
 
@@ -273,4 +271,53 @@ func (impl playerRepoImpl) addMember(
 	}
 
 	return err
+}
+
+// SavePlayer
+func (impl playerRepoImpl) SavePlayer(p *domain.Player, version int) error {
+	filter, err := impl.playerFilter(p)
+	if err != nil {
+		return err
+	}
+
+	doc, err := impl.genPlayerDoc(p)
+	if err != nil {
+		return err
+	}
+
+	f := func(ctx context.Context) error {
+		return impl.cli.UpdateDoc(ctx, filter, doc, mongoCmdSet, version)
+	}
+
+	if err = withContext(f); err != nil {
+		if impl.cli.IsDocNotExists(err) {
+			err = repoerr.NewErrorConcurrentUpdating(err)
+		}
+	}
+
+	return err
+}
+
+func (impl playerRepoImpl) getVersion(cid string, a types.Account) (int, error) {
+	var v dPlayer
+	f := func(ctx context.Context) error {
+		return impl.cli.GetDoc(
+			ctx, impl.disabledPlayerFilter(cid, a), bson.M{fieldVersion: 1}, &v,
+		)
+	}
+
+	err := withContext(f)
+
+	return v.Version, err
+}
+
+func (impl playerRepoImpl) ResumePlayer(cid string, a types.Account) error {
+	version, err := impl.getVersion(cid, a)
+	if err != nil {
+		return err
+	}
+
+	return impl.update(
+		impl.disabledPlayerFilter(cid, a), bson.M{fieldEnabled: true}, version,
+	)
 }

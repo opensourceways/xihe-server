@@ -15,6 +15,7 @@ const (
 	fieldUpdatedAt   = "updated_at"
 	fieldAccount     = "account"
 	fieldCompetitors = "competitors"
+	fieldLeader      = "leader"
 )
 
 type dCompetition struct {
@@ -51,12 +52,13 @@ type dSubmission struct {
 	Status   string  `bson:"status"      json:"status"`
 	OBSPath  string  `bson:"path"        json:"path"`
 	SubmitAt int64   `bson:"submit_at"   json:"submit_at"`
-	Score    float32 `bson:"score"       json:"score"`
+	Score    float64 `bson:"score"       json:"score"`
 }
 
 // dPlayer
 // Leader stands for the user who is an individual competitor or a team leader
 // Enabled: it will be set to false when the competitor become a team.
+// Competitors: the first one is the leader
 type dPlayer struct {
 	Id            primitive.ObjectID `bson:"_id"            json:"-"`
 	CompetitionId string             `bson:"cid"            json:"cid"`

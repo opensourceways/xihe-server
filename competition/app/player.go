@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/competition/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code string, err error) {
@@ -28,7 +29,7 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 	}
 
 	p := cmd.toPlayer(cid)
-	if err = s.playerRepo.SavePlayer(&p, 0); err != nil {
+	if err = s.playerRepo.AddPlayer(&p); err != nil {
 		if repoerr.IsErrorDuplicateCreating(err) {
 			code = errorCompetitorExists
 		}
@@ -37,35 +38,63 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 	return
 }
 
-func (s *competitionService) CreateTeam(cid string, cmd *CompetitionTeamCreateCmd) error {
+func (s *competitionService) CreateTeam(cid string, cmd *CompetitionTeamCreateCmd) (
+	code string, err error,
+) {
 	p, version, err := s.playerRepo.FindPlayer(cid, cmd.User)
 	if err != nil {
-		return err
+		return
 	}
 
-	if err := p.CreateTeam(cmd.Name); err != nil {
-		return err
+	if err = p.CreateTeam(cmd.Name); err != nil {
+		return
 	}
 
-	return s.playerRepo.SavePlayer(&p, version)
+	if err = s.playerRepo.DeletePlayer(&p, version); err != nil {
+		return
+	}
+
+	if err = s.playerRepo.AddPlayer(&p); err != nil {
+		if repoerr.IsErrorDuplicateCreating(err) {
+			code = errorTeamExists
+		}
+
+		utils.RetryThreeTimes(func() error {
+			return s.playerRepo.ResumePlayer(cid, p.Leader.Account)
+		})
+	}
+
+	return
 }
 
-func (s *competitionService) JoinTeam(cid string, cmd *CompetitionTeamJoinCmd) error {
+func (s *competitionService) JoinTeam(cid string, cmd *CompetitionTeamJoinCmd) (code string, err error) {
 	me, pv, err := s.playerRepo.FindPlayer(cid, cmd.User)
 	if err != nil {
-		return err
+		return
 	}
 
 	team, version, err := s.playerRepo.FindPlayer(cid, cmd.Leader)
 	if err != nil {
-		return err
+		if repoerr.IsErrorResourceNotExists(err) {
+			code = errorNoCorrespondingTeam
+		}
+
+		return
 	}
 
-	if err := me.JoinTo(&team); err != nil {
-		return err
+	if err = me.JoinTo(&team); err != nil {
+		if domain.IsErrorTeamMembersEnough(err) {
+			code = errorTeamMembersEnough
+		}
+
+		return
 	}
 
-	return s.playerRepo.AddMember(
+	if err = s.playerRepo.DeletePlayer(&me, pv); err != nil {
+		return
+	}
+
+	err = s.playerRepo.AddMember(
 		repository.PlayerVersion{
 			Player:  &team,
 			Version: version,
@@ -75,6 +104,13 @@ func (s *competitionService) JoinTeam(cid string, cmd *CompetitionTeamJoinCmd) e
 			Version: pv,
 		},
 	)
+	if err != nil {
+		utils.RetryThreeTimes(func() error {
+			return s.playerRepo.ResumePlayer(cid, me.Leader.Account)
+		})
+	}
+
+	return
 }
 
 func (s *competitionService) GetMyTeam(cid string, user types.Account) (
@@ -114,4 +150,64 @@ func (s *competitionService) GetMyTeam(cid string, user types.Account) (
 	dto.Members = members
 
 	return
+}
+
+func (s *competitionService) ChangeTeamName(cid string, cmd *CmdToChangeCompetitionTeamName) error {
+	p, version, err := s.playerRepo.FindPlayer(cid, cmd.User)
+	if err != nil {
+		return err
+	}
+
+	if err = p.ChangeTeamName(cmd.Name); err != nil {
+		return err
+	}
+
+	return s.playerRepo.SaveTeamName(&p, version)
+}
+
+func (s *competitionService) TransferLeader(cid string, cmd *CmdToTransferTeamLeader) error {
+	p, version, err := s.playerRepo.FindPlayer(cid, cmd.Leader)
+	if err != nil {
+		return err
+	}
+
+	if err = p.TransferLeader(cmd.User); err != nil {
+		return err
+	}
+
+	return s.playerRepo.SavePlayer(&p, version)
+}
+
+func (s *competitionService) QuitTeam(cid string, competitor types.Account) error {
+	p, version, err := s.playerRepo.FindPlayer(cid, competitor)
+	if err != nil {
+		return err
+	}
+
+	if err = p.Quit(); err != nil {
+		return err
+	}
+
+	if err = s.playerRepo.SavePlayer(&p, version); err != nil {
+		return err
+	}
+
+	return s.playerRepo.ResumePlayer(cid, competitor)
+}
+
+func (s *competitionService) DeleteMember(cid string, cmd *CmdToDeleteTeamMember) error {
+	p, version, err := s.playerRepo.FindPlayer(cid, cmd.Leader)
+	if err != nil {
+		return err
+	}
+
+	if err = p.Delete(cmd.User); err != nil {
+		return err
+	}
+
+	if err = s.playerRepo.SavePlayer(&p, version); err != nil {
+		return err
+	}
+
+	return s.playerRepo.ResumePlayer(cid, cmd.User)
 }

@@ -6,6 +6,12 @@ import (
 	types "github.com/opensourceways/xihe-server/domain"
 )
 
+var errorTeamMembersEnough = errors.New("members are enough")
+
+func IsErrorTeamMembersEnough(err error) bool {
+	return errors.Is(err, errorTeamMembersEnough)
+}
+
 type Competitor struct {
 	Account  types.Account
 	Name     CompetitorName
@@ -65,7 +71,7 @@ func (t *Team) remove(a types.Account) error {
 func (t *Team) join(c *Competitor) error {
 	// TODO config
 	if len(t.Members) >= 2 {
-		return errors.New("members are enough")
+		return errorTeamMembersEnough
 	}
 
 	if t.isMember(c.Account) {
@@ -135,6 +141,10 @@ func (p *Player) Name() string {
 
 func (p *Player) Members() []Competitor {
 	return p.Team.Members
+}
+
+func (p *Player) Has(u types.Account) bool {
+	return p.Leader.Account.Account() == u.Account() || p.Team.isMember(u)
 }
 
 func (p *Player) RoleOfCurrentCompetitor() string {
@@ -218,14 +228,14 @@ func (p *Player) TransferLeader(newOne types.Account) error {
 		return errors.New("invalid operation")
 	}
 
-	if p.isUserTheLeader() {
-		return errors.New("only leader can delete a member")
+	if !p.isUserTheLeader() {
+		return errors.New("only leader can transfer leader")
 	}
 
 	t := &p.Team
 	i := t.indexOfMember(newOne)
 	if i < 0 {
-		return errors.New("not a meber")
+		return errors.New("not a member")
 	}
 
 	p.Leader, t.Members[i] = t.Members[i], p.Leader

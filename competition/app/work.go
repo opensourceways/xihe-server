@@ -134,6 +134,13 @@ func (s *competitionService) AddRelatedProject(cmd *CompetitionAddReleatedProjec
 		return
 	}
 
+	if !p.Has(cmd.Project.Owner) {
+		code = errorDoesnotOwnProject
+		err = errors.New("the team or competitor does not own the project")
+
+		return
+	}
+
 	w, version, err := s.workRepo.FindWork(
 		domain.NewWorkIndex(cmd.Id, p.Id), competition.Phase,
 	)

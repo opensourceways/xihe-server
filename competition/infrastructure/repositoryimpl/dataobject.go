@@ -109,7 +109,7 @@ func (doc *dSubmission) toSubmission(s *domain.Submission) {
 		Status:   doc.Status,
 		OBSPath:  doc.OBSPath,
 		SubmitAt: doc.SubmitAt,
-		Score:    doc.Score,
+		Score:    float32(doc.Score),
 	}
 }
 
@@ -204,8 +204,8 @@ func (doc *dCompetitor) toCompetitor(c *domain.Competitor) (err error) {
 	return
 }
 
-func toCompetitorDoc(c *domain.Competitor, doc *dCompetitor) {
-	*doc = dCompetitor{
+func toCompetitorDoc(c *domain.Competitor) dCompetitor {
+	doc := dCompetitor{
 		Account:  c.Account.Account(),
 		Name:     c.Name.CompetitorName(),
 		Email:    c.Email.Email(),
@@ -224,4 +224,6 @@ func toCompetitorDoc(c *domain.Competitor, doc *dCompetitor) {
 	if c.Province != nil {
 		doc.Province = c.Province.Province()
 	}
+
+	return doc
 }

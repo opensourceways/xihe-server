@@ -32,6 +32,10 @@ func AddRouterForCompetitionController(
 	rg.POST("/v1/competition/:id/competitor", ctl.Apply)
 	rg.PUT("/v1/competition/:id/team", ctl.JoinTeam)
 	rg.PUT("/v1/competition/:id/realted_project", ctl.AddRelatedProject)
+	rg.PUT("/v1/competition/:id/team/action/change_name", ctl.ChangeName)
+	rg.PUT("/v1/competition/:id/team/action/transfer_leader", ctl.TransferLeader)
+	rg.PUT("/v1/competition/:id/team/action/quit", ctl.QuitTeam)
+	rg.PUT("/v1/competition/:id/team/action/delete_member", ctl.DeleteMember)
 }
 
 type CompetitionController struct {
@@ -173,8 +177,8 @@ func (ctl *CompetitionController) CreateTeam(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctl.s.CreateTeam(ctx.Param("id"), &cmd); err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+	if code, err := ctl.s.CreateTeam(ctx.Param("id"), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, "success")
 	}
@@ -209,8 +213,8 @@ func (ctl *CompetitionController) JoinTeam(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctl.s.JoinTeam(ctx.Param("id"), &cmd); err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+	if code, err := ctl.s.JoinTeam(ctx.Param("id"), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPut(ctx, "success")
 	}
@@ -376,6 +380,136 @@ func (ctl *CompetitionController) AddRelatedProject(ctx *gin.Context) {
 
 	if code, err := ctl.s.AddRelatedProject(&cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
+	}
+}
+
+// @Summary ChangeName
+// @Description change name of a team
+// @Tags  Competition
+// @Param	id	path	string	true	"competition id"
+// @Param	body	body	cc.ChangeTeamNameRequest	true	"body of team name"
+// @Accept json
+// @Success 202
+// @Failure 500 system_error        system error
+// @Router /v1/competition/{id}/team/action/change_name [put]
+func (ctl *CompetitionController) ChangeName(ctx *gin.Context) {
+	req := cc.ChangeTeamNameRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	cmd, err := req.ToCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if err := ctl.s.ChangeTeamName(ctx.Param("id"), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
+	}
+}
+
+// @Summary TransferLeader
+// @Description transfer leader to a member
+// @Tags  Competition
+// @Param	id	path	string	true	"competition id"
+// @Param	body	body	cc.TransferLeaderRequest	true	"body of member"
+// @Accept json
+// @Success 202
+// @Failure 500 system_error        system error
+// @Router /v1/competition/{id}/team/action/transfer_leader [put]
+func (ctl *CompetitionController) TransferLeader(ctx *gin.Context) {
+	req := cc.TransferLeaderRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	cmd, err := req.ToCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if err := ctl.s.TransferLeader(ctx.Param("id"), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
+	}
+}
+
+// @Summary QuitTeam
+// @Description quit team
+// @Tags  Competition
+// @Param	id	path	string	true	"competition id"
+// @Accept json
+// @Success 202
+// @Failure 500 system_error	system error
+// @Router /v1/competition/{id}/team/action/quit [put]
+func (ctl *CompetitionController) QuitTeam(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	err := ctl.s.QuitTeam(ctx.Param("id"), pl.DomainAccount())
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
+	}
+}
+
+// @Summary DeleteMember
+// @Description delete member of a team
+// @Tags  Competition
+// @Param	id	path	string	true	"competition id"
+// @Param	body	body	cc.DeleteMemberRequest	true	"body of delete member"
+// @Accept json
+// @Success 202
+// @Failure 500 system_error	system error
+// @Router /v1/competition/{id}/team/action/delete_member [put]
+func (ctl *CompetitionController) DeleteMember(ctx *gin.Context) {
+	req := cc.DeleteMemberRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	cmd, err := req.ToCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if err := ctl.s.DeleteMember(ctx.Param("id"), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
 	} else {
 		ctl.sendRespOfPut(ctx, "success")
 	}

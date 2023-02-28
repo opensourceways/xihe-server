@@ -12,9 +12,13 @@ import (
 type CompetitionService interface {
 	// player
 	Apply(string, *CompetitorApplyCmd) (string, error)
-	CreateTeam(cid string, cmd *CompetitionTeamCreateCmd) error
-	JoinTeam(cid string, cmd *CompetitionTeamJoinCmd) error
+	CreateTeam(cid string, cmd *CompetitionTeamCreateCmd) (string, error)
+	JoinTeam(cid string, cmd *CompetitionTeamJoinCmd) (string, error)
 	GetMyTeam(cid string, competitor types.Account) (CompetitionTeamDTO, string, error)
+	ChangeTeamName(cid string, cmd *CmdToChangeCompetitionTeamName) error
+	TransferLeader(cid string, cmd *CmdToTransferTeamLeader) error
+	QuitTeam(cid string, competitor types.Account) error
+	DeleteMember(cid string, cmd *CmdToDeleteTeamMember) error
 
 	// competition
 	Get(cid string, competitor types.Account) (UserCompetitionDTO, error)
