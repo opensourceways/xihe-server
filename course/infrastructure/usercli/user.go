@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/xihe-server/course/domain"
 	"github.com/opensourceways/xihe-server/course/domain/user"
 	userApp "github.com/opensourceways/xihe-server/user/app"
+	userDomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 func NewUserCli(c userApp.UserService) user.User {
@@ -15,18 +16,42 @@ type userImpl struct {
 }
 
 func (impl *userImpl) AddUserRegInfo(s *domain.Student) (err error) {
-	return impl.srv.AddUserRegInfo(toUserRegisterInfoCmd(s))
+	cmd := new(userApp.UserRegisterInfoCmd)
+	if err = toUserRegisterInfoCmd(s, cmd); err != nil {
+		return
+	}
+
+	return impl.srv.AddUserRegInfo(cmd)
 }
 
-func toUserRegisterInfoCmd(s *domain.Student) *userApp.UserRegisterInfoCmd {
-	return &userApp.UserRegisterInfoCmd{
-		Account:  s.Account.Account(),
-		Name:     s.Name.StudentName(),
-		City:     s.City.City(),
-		Email:    s.Email.Email(),
-		Phone:    s.Phone.Phone(),
-		Identity: s.Identity.StudentIdentity(),
-		Province: s.Province.Province(),
-		Detail:   s.Detail,
+func toUserRegisterInfoCmd(s *domain.Student, cmd *userApp.UserRegisterInfoCmd) (err error) {
+	cmd.Account = s.Account
+
+	if cmd.Name, err = userDomain.NewName(s.Name.StudentName()); err != nil {
+		return
 	}
+
+	if cmd.City, err = userDomain.NewCity(s.City.City()); err != nil {
+		return
+	}
+
+	if cmd.Email, err = userDomain.NewEmail(s.Email.Email()); err != nil {
+		return
+	}
+
+	if cmd.Phone, err = userDomain.NewPhone(s.Phone.Phone()); err != nil {
+		return
+	}
+
+	if cmd.Identity, err = userDomain.NewIdentity(s.Identity.StudentIdentity()); err != nil {
+		return
+	}
+
+	if cmd.Province, err = userDomain.NewProvince(s.Province.Province()); err != nil {
+		return
+	}
+
+	cmd.Detail = s.Detail
+
+	return
 }

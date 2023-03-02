@@ -159,7 +159,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	userAppService := userapp.NewUserService(
 		repositoryimpl.NewUserRegRepo(
-			mongodb.NewCollection(collections.UserRegInfo),
+			mongodb.NewCollection(collections.Registration),
 		),
 	)
 

@@ -25,9 +25,7 @@ type userService struct {
 
 func (s *userService) AddUserRegInfo(cmd *UserRegisterInfoCmd) (err error) {
 	r := new(domain.UserRegInfo)
-	if err = cmd.toUserRegInfo(r); err != nil {
-		return
-	}
+	cmd.toUserRegInfo(r)
 
 	return s.userregRepo.AddUserRegInfo(r)
 }
