@@ -8,24 +8,24 @@ import (
 type CourseService interface {
 	// player
 	Apply(*PlayerApplyCmd) error
-
-	// course
 }
 
 func NewCourseService(
-	user user.User,
+	userCli user.User,
+
 	courseRepo repository.Course,
 	playerRepo repository.Player,
 ) *courseService {
 	return &courseService{
-		user:       user,
+		userCli:    userCli,
 		courseRepo: courseRepo,
 		playerRepo: playerRepo,
 	}
 }
 
 type courseService struct {
-	user       user.User
+	userCli user.User
+
 	courseRepo repository.Course
 	playerRepo repository.Player
 }

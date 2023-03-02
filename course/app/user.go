@@ -30,7 +30,7 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (err error) {
 		return
 	}
 
-	if err = s.user.AddUserRegInfo(&p.Student); err != nil {
+	if err = s.userCli.AddUserRegInfo(&p.Student); err != nil {
 		return
 	}
 
