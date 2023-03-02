@@ -786,6 +786,25 @@ definitions:
       content:
         type: string
     type: object
+  controller.StudentApplyRequest:
+    properties:
+      city:
+        type: string
+      detail:
+        additionalProperties:
+          type: string
+        type: object
+      email:
+        type: string
+      identity:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      province:
+        type: string
+    type: object
   controller.TrainingCreateRequest:
     properties:
       boot_file:
@@ -2235,6 +2254,33 @@ paths:
       summary: JoinTeam
       tags:
       - Competition
+  /v1/course/{id}/player:
+    post:
+      consumes:
+      - application/json
+      description: apply the course
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: body of applying
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.StudentApplyRequest'
+      responses:
+        "201":
+          description: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: Apply
+      tags:
+      - Course
   /v1/dataset:
     get:
       consumes:
