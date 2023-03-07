@@ -100,9 +100,6 @@ func (impl *user) GetByCode(code, redirectURI string) (login authing.Login, err 
 }
 
 func (impl *user) getAccessTokenByCode(code, redirectURI string, result interface{}) error {
-	fmt.Printf("code: %v\n", code)
-	fmt.Printf("redirectURI: %v\n", redirectURI)
-
 	body := map[string]string{
 		"client_id":     impl.cfg.APPId,
 		"client_secret": impl.cfg.Secret,
