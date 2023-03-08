@@ -36,6 +36,18 @@ type WuKongListPublicGlobalCmd struct {
 	WuKongPictureListOption
 }
 
+func (cmd *WuKongListPublicGlobalCmd) Validate() error {
+	if cmd.WuKongPictureListOption.PageNum < 1 {
+		return errors.New("page_num less than 1")
+	}
+
+	if cmd.WuKongPictureListOption.CountPerPage < 1 {
+		return errors.New("count_per_page less than 1")
+	}
+
+	return nil
+}
+
 type WuKongCmd domain.WuKongPictureMeta
 
 func (cmd *WuKongCmd) Validate() error {

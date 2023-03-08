@@ -795,6 +795,12 @@ func (ctl *BigModelController) GetPublicsGlobal(ctx *gin.Context) {
 		return
 	}
 
+	if err := cmd.Validate(); err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
 	v, err := ctl.s.GetPublicsGlobal(&cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)

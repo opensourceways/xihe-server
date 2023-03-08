@@ -472,7 +472,7 @@ func (s bigModelService) CancelPublic(user domain.Account, pid string) (err erro
 
 func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuKongPublicGlobalDTO, err error) {
 	var v []domain.WuKongPicture
-	if cmd.Level != nil && cmd.Level.WuKongPictureLevel() == "official" {
+	if cmd.Level != nil && cmd.Level.IsOfficial() {
 		v, err = s.wukongPicture.GetOfficialPublicsGlobal()
 	} else {
 		v, err = s.wukongPicture.GetPublicsGlobal()
@@ -498,9 +498,11 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 		avatarId, _ := s.user.GetUserAvatarId(item.Owner)
 
 		var (
+			a       string
 			isDigg  bool
 			LikeDto WuKongIsLikeDTO
 		)
+
 		if cmd.User != nil {
 			LikeDto, _ = s.isLike(item, cmd.User)
 			isDigg = s.isDigg(cmd.User, item.Diggs)
@@ -508,7 +510,13 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 			isDigg = false
 		}
 
-		d[i].toWuKongPublicDTO(item, avatarId.AvatarId(), LikeDto.IsLike, LikeDto.LikeID, isDigg, link)
+		if avatarId != nil {
+			a = avatarId.AvatarId()
+		} else {
+			a = ""
+		}
+
+		d[i].toWuKongPublicDTO(item, a, LikeDto.IsLike, LikeDto.LikeID, isDigg, link)
 	}
 
 	r = WuKongPublicGlobalDTO{

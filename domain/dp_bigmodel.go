@@ -81,6 +81,7 @@ func (r wukongPictureDesc) WuKongPictureDesc() string {
 type WuKongPictureLevel interface {
 	WuKongPictureLevel() string
 	Int() int
+	IsOfficial() bool
 }
 
 func NewWuKongPictureLevel(v string) WuKongPictureLevel {
@@ -121,4 +122,8 @@ func (r wukongPictureLevel) WuKongPictureLevel() string {
 
 func (r wukongPictureLevel) Int() int {
 	return r.level
+}
+
+func (r wukongPictureLevel) IsOfficial() bool {
+	return r.WuKongPictureLevel() == "official"
 }
