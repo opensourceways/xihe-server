@@ -181,6 +181,10 @@ func (s bigModelService) setCode(err error) string {
 		return ErrorBigModelSensitiveInfo
 	}
 
+	if err != nil && bigmodel.IsErrorBusySource(err) {
+		return ErrorBigModelRecourseBusy
+	}
+
 	return ""
 }
 
@@ -201,6 +205,7 @@ func (s bigModelService) WuKong(
 	links, err = s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd))
 	if err != nil {
 		code = s.setCode(err)
+		err = errors.New("access overload, please try again later")
 	}
 
 	return

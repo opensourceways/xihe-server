@@ -127,6 +127,6 @@ func (s *service) doIfFree(
 		return err
 
 	default:
-		return errors.New("busy")
+		return bigmodel.NewErrorBusySource(errors.New("busy computation resource"))
 	}
 }
