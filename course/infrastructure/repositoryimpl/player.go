@@ -47,6 +47,8 @@ func (impl *playerRepoImpl) SavePlayer(p *domain.Player) (err error) {
 	if err != nil {
 		return
 	}
+	doc[fieldVersion] = 1
+
 	f := func(ctx context.Context) error {
 		_, err := impl.cli.NewDocIfNotExist(
 			ctx, bson.M{

@@ -421,7 +421,7 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 	// gen public path
 	_, publicPath, err := s.fm.CheckWuKongPictureToPublic(cmd.User, p.OBSPath)
 	if err != nil {
-		code = ErrorWuKongInvalidPath
+		code = ErrorWuKongNoAuthorization
 
 		return
 	}
@@ -455,7 +455,11 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 		CreatedAt:         p.CreatedAt,
 		WuKongPictureMeta: p.WuKongPictureMeta,
 	}
-	pid, err = s.wukongPicture.SavePublic(ps, version)
+	if pid, err = s.wukongPicture.SavePublic(ps, version); err != nil {
+		code = ErrorCodeSytem
+
+		return
+	}
 
 	return
 }

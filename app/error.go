@@ -61,6 +61,7 @@ const (
 	ErrorWuKongInvalidId        = "wukong_invalid_id"
 	ErrorWuKongInvalidOwner     = "wukong_invalid_owner"
 	ErrorWuKongInvalidPath      = "wukong_invalid_path"
+	ErrorWuKongNoAuthorization  = "wukong_no_authorization"
 	ErrorWuKongInvalidLink      = "wukong_invalid_link"
 	ErrorWuKongDuplicateLike    = "wukong_duplicate_like"
 	ErrorWuKongExccedMaxLikeNum = "wukong_excced_max_like_num"

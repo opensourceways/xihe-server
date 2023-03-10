@@ -6,6 +6,7 @@ const (
 	fieldAccount  = "account"
 	fieldStatus   = "status"
 	fieldType     = "type"
+	fieldVersion  = "version"
 )
 
 // Course
@@ -60,8 +61,9 @@ type dAssignments struct {
 
 // Course Player
 type DCoursePlayer struct {
-	Id        string `json:"id"         bson:"id"`
-	CourseId  string `json:"course_id"  bson:"course_id"`
-	Name      string `json:"name"       bson:"name"`
-	CreatedAt int64  `json:"created_at" bson:"created_at"`
+	Id        string `bson:"id"         json:"id"`
+	CourseId  string `bson:"course_id"  json:"course_id"`
+	Name      string `bson:"name"       json:"name"`
+	CreatedAt int64  `bson:"created_at" json:"created_at"`
+	Version   int    `bson:"version"    json:"-"`
 }
