@@ -176,7 +176,6 @@ func (r competitionBonus) CompetitionBonus() int {
 	return int(r)
 }
 
-//
 type CompetitionHost interface {
 	CompetitionHost() string
 }

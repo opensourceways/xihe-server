@@ -1,5 +1,9 @@
 package domain
 
+import (
+	types "github.com/opensourceways/xihe-server/domain"
+)
+
 // Course
 type CourseSummary struct {
 	Id    string
@@ -23,6 +27,19 @@ type Course struct {
 	PassScore CoursePassScore
 	Cert      URL
 	Sections  []Section
+}
+
+// CourseRepo
+type CourseProject struct {
+	Owner       types.Account
+	RepoRouting string
+}
+
+func NewCourseProject(owner types.Account, r string) CourseProject {
+	return CourseProject{
+		Owner:       owner,
+		RepoRouting: r,
+	}
 }
 
 // Assignment

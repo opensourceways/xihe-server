@@ -12,6 +12,7 @@ type CourseService interface {
 	// course
 	List(*CourseListCmd) ([]CourseSummaryDTO, error)
 	Get(*CourseGetCmd) (CourseDTO, error)
+	AddReleatedProject(*CourseAddReleatedProjectCmd) (string, error)
 }
 
 func NewCourseService(
@@ -78,8 +79,8 @@ func (s *courseService) Get(cmd *CourseGetCmd) (dto CourseDTO, err error) {
 	}
 
 	if cmd.User != nil {
-		player, _ := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
-		if c.IsApplyed(&player) {
+		p, _ := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
+		if c.IsApplyed(&p.Player) {
 			dto.toCourseDTO(&c, true, count)
 
 			return

@@ -9,6 +9,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const (
+	mongoCmdSet  = "$set"
+	mongoCmdPush = "$push"
+)
+
 type mongodbClient interface {
 	IsDocNotExists(error) bool
 	IsDocExists(error) bool
@@ -17,6 +22,7 @@ type mongodbClient interface {
 	NewDocIfNotExist(ctx context.Context, filterOfDoc, docInfo bson.M) (string, error)
 	GetDoc(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
 	GetDocs(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
+	UpdateDoc(ctx context.Context, filterOfDoc, update bson.M, op string, version int) error
 }
 
 func withContext(f func(context.Context) error) error {

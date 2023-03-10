@@ -11,7 +11,8 @@ type PlayerVersion struct {
 }
 
 type Player interface {
-	FindPlayer(cid string, account types.Account) (domain.Player, error)
+	FindPlayer(cid string, account types.Account) (PlayerVersion, error)
 	SavePlayer(*domain.Player) error
 	PlayerCount(cid string) (int, error)
+	SaveRepo(course_id string, a *domain.CourseProject, version int) error
 }

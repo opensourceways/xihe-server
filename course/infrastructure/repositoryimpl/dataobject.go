@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"github.com/opensourceways/xihe-server/course/domain"
+	"github.com/opensourceways/xihe-server/course/domain/repository"
 )
 
 // Course
@@ -142,10 +143,10 @@ func (doc *dPoint) toPoint(p *domain.Point) (err error) {
 }
 
 // player
-func (doc *DCoursePlayer) toPlayerNoStudent(p *domain.Player) (err error) {
-	p.Id = doc.Id
+func (doc *DCoursePlayer) toPlayerNoStudent(p *repository.PlayerVersion) (err error) {
+	p.Player.Id = doc.Id
 
-	p.CourseId = doc.CourseId
+	p.Player.CourseId = doc.CourseId
 
 	if p.CreatedAt, err = domain.NewCourseTime(doc.CreatedAt); err != nil {
 		return

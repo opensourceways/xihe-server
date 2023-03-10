@@ -39,6 +39,16 @@ type CourseGetCmd struct {
 	Cid  string
 }
 
+type CourseAddReleatedProjectCmd struct {
+	Cid     string
+	User    types.Account
+	Project types.ResourceSummary
+}
+
+func (cmd *CourseAddReleatedProjectCmd) repo() string {
+	return cmd.User.Account() + "/" + cmd.Project.Name.ResourceName()
+}
+
 type CourseDTO struct {
 	CourseSummaryDTO
 

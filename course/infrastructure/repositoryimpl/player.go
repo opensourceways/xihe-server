@@ -18,7 +18,7 @@ type playerRepoImpl struct {
 	cli mongodbClient
 }
 
-func (impl *playerRepoImpl) FindPlayer(cid string, user types.Account) (p domain.Player, err error) {
+func (impl *playerRepoImpl) FindPlayer(cid string, user types.Account) (p repository.PlayerVersion, err error) {
 	var v DCoursePlayer
 
 	f := func(ctx context.Context) error {
@@ -34,6 +34,7 @@ func (impl *playerRepoImpl) FindPlayer(cid string, user types.Account) (p domain
 
 		return
 	}
+	p.Version = v.Version
 
 	if err = v.toPlayerNoStudent(&p); err != nil {
 		return
@@ -90,7 +91,7 @@ func (impl *playerRepoImpl) PlayerCount(cid string) (int, error) {
 	f := func(ctx context.Context) error {
 
 		pipeline := bson.A{
-			bson.M{"$match": bson.M{"course_id": bson.M{"$eq": cid}}},
+			bson.M{"$match": bson.M{fieldCourseId: bson.M{"$eq": cid}}},
 			bson.M{"$count": "total"},
 		}
 
@@ -110,8 +111,30 @@ func (impl *playerRepoImpl) PlayerCount(cid string) (int, error) {
 }
 
 func (impl *playerRepoImpl) docFilterFindPlayer(cid, account string) bson.M {
+
 	return bson.M{
 		fieldCourseId: cid,
 		fieldAccount:  account,
 	}
+}
+
+func (impl *playerRepoImpl) SaveRepo(course_id string, a *domain.CourseProject, version int) error {
+	f := func(ctx context.Context) error {
+
+		return impl.cli.UpdateDoc(
+			ctx,
+			impl.docFilterFindPlayer(course_id, a.Owner.Account()),
+			bson.M{fieldRepo: a.RepoRouting}, mongoCmdSet, version,
+		)
+	}
+
+	err := withContext(f)
+
+	if err != nil {
+		if impl.cli.IsDocNotExists(err) {
+			err = repoerr.NewErrorConcurrentUpdating(err)
+		}
+	}
+
+	return err
 }

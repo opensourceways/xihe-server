@@ -7,6 +7,7 @@ const (
 	fieldStatus   = "status"
 	fieldType     = "type"
 	fieldVersion  = "version"
+	fieldRepo     = "repo"
 )
 
 // Course
@@ -65,5 +66,6 @@ type DCoursePlayer struct {
 	CourseId  string `bson:"course_id"  json:"course_id"`
 	Name      string `bson:"name"       json:"name"`
 	CreatedAt int64  `bson:"created_at" json:"created_at"`
+	Repo      string `bson:"repo"       json:"repo"`
 	Version   int    `bson:"version"    json:"-"`
 }

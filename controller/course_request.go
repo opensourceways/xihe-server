@@ -16,6 +16,23 @@ type StudentApplyRequest struct {
 	Detail   map[string]string `json:"detail"`
 }
 
+type AddCourseRelatedProjectRequest struct {
+	Owner string `json:"owner"`
+	Name  string `json:"project_name"`
+}
+
+func (req *AddCourseRelatedProjectRequest) ToInfo() (
+	owner types.Account, name types.ResourceName, err error,
+) {
+	if owner, err = types.NewAccount(req.Owner); err != nil {
+		return
+	}
+
+	name, err = types.NewResourceName(req.Name)
+
+	return
+}
+
 func (req *StudentApplyRequest) toCmd(cid string, user types.Account) (cmd app.PlayerApplyCmd, err error) {
 	cmd.CourseId = cid
 

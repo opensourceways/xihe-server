@@ -1,30 +1,36 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/xihe-server/course/app"
 	"github.com/opensourceways/xihe-server/course/domain"
+	"github.com/opensourceways/xihe-server/domain/repository"
 )
 
 func AddRouterForCourseController(
 	rg *gin.RouterGroup,
 	s app.CourseService,
+	project repository.Project,
 ) {
 	ctl := CourseController{
-		s: s,
+		s:       s,
+		project: project,
 	}
 
 	rg.POST("/v1/course/:id/player", ctl.Apply)
 	rg.GET("/v1/course", ctl.List)
 	rg.GET("/v1/course/:id", ctl.Get)
+	rg.PUT("/v1/course/:id/realted_project", ctl.AddCourseRelatedProject)
 }
 
 type CourseController struct {
 	baseController
 
-	s app.CourseService
+	s       app.CourseService
+	project repository.Project
 }
 
 // @Summary Apply
@@ -136,5 +142,62 @@ func (ctl *CourseController) Get(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, data)
+	}
+}
+
+// @Summary AddCourseRelatedProject
+// @Description add related project
+// @Tags  Course
+// @Param	id	path	string					true	"course id"
+// @Param	body	body	AddCourseRelatedProjectRequest	true	"project info"
+// @Accept json
+// @Success 202
+// @Failure 500 system_error        system error
+// @Router /v1/course/{id}/realted_project [put]
+func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := AddCourseRelatedProjectRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody,
+			"can't fetch request body",
+		))
+
+		return
+	}
+
+	owner, name, err := req.ToInfo()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+	p, err := ctl.project.GetSummaryByName(owner, name)
+	fmt.Printf("p: %v\n", p)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	cmd := app.CourseAddReleatedProjectCmd{
+		Cid:     ctx.Param("id"),
+		User:    pl.DomainAccount(),
+		Project: p,
+	}
+
+	if code, err := ctl.s.AddReleatedProject(&cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
 	}
 }
