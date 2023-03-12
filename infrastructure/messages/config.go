@@ -14,4 +14,6 @@ type Topics struct {
 	Submission      string `json:"submission"       required:"true"`
 	OperateLog      string `json:"operate_log"      required:"true"`
 	RelatedResource string `json:"related_resource" required:"true"`
+	Cloud           string `json:"cloud"            required:"true"`
+	Pod             string `json:"pod"              required:"true"`
 }

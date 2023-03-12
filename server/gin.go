@@ -11,6 +11,8 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
+	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/config"
@@ -178,6 +180,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
 	)
 
+	cloudAppService := cloudapp.NewCloudService(
+		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
+		cloudrepo.NewPodRepo(&cfg.Postgresql.Config),
+		sender,
+	)
+
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	{
 		controller.AddRouterForProjectController(
@@ -258,6 +266,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 		controller.AddRouterForHomeController(
 			v1, courseAppService, competitionAppService,
+		)
+
+		controller.AddRouterForCloudController(
+			v1, cloudAppService,
 		)
 
 	}

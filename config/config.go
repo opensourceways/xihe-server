@@ -9,6 +9,8 @@ import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	"github.com/opensourceways/xihe-server/app"
+	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -60,6 +62,7 @@ type Config struct {
 	BigModel    bigmodels.Config       `json:"bigmodel"     required:"true"`
 	Authing     authingimpl.Config     `json:"authing"      required:"true"`
 	Mongodb     Mongodb                `json:"mongodb"      required:"true"`
+	Postgresql  PostgresqlConfig       `json:"postgresql"   required:"true"`
 	Gitlab      gitlab.Config          `json:"gitlab"       required:"true"`
 	Domain      domain.Config          `json:"domain"       required:"true"`
 	App         app.Config             `json:"app"          required:"true"`
@@ -83,6 +86,8 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.Authing,
 		&cfg.Domain,
 		&cfg.Mongodb,
+		&cfg.Postgresql.DB,
+		&cfg.Postgresql.Config,
 		&cfg.Gitlab,
 		&cfg.App,
 		&cfg.API,
@@ -130,6 +135,12 @@ type Mongodb struct {
 	Collections MongodbCollections `json:"collections"   required:"true"`
 }
 
+type PostgresqlConfig struct {
+	DB pgsql.Config `json:"db" required:"true"`
+
+	cloudrepoimpl.Config
+}
+
 type MongodbCollections struct {
 	Tag               string `json:"tag"                    required:"true"`
 	User              string `json:"user"                   required:"true"`
@@ -155,6 +166,7 @@ type MongodbCollections struct {
 	Course            string `json:"course"                 required:"true"`
 	CoursePlayer      string `json:"course_player"          required:"true"`
 	CourseWork        string `json:"course_work"            required:"true"`
+	CloudConf         string `json:"cloud_conf"             required:"true"`
 }
 
 type MQ struct {

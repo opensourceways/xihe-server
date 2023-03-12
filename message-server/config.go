@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/opensourceways/community-robot-lib/utils"
 
+	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
@@ -16,11 +17,13 @@ type configuration struct {
 	TrainingEndpoint string `json:"training_endpoint"  required:"true"`
 	FinetuneEndpoint string `json:"finetune_endpoint"  required:"true"`
 
-	Inference inferenceConfig `json:"inference"    required:"true"`
-	Evaluate  evaluateConfig  `json:"evaluate"     required:"true"`
-	Mongodb   config.Mongodb  `json:"mongodb"      required:"true"`
-	Domain    domain.Config   `json:"domain"       required:"true"`
-	MQ        config.MQ       `json:"mq"           required:"true"`
+	Inference  inferenceConfig         `json:"inference"    required:"true"`
+	Evaluate   evaluateConfig          `json:"evaluate"     required:"true"`
+	Cloud      cloudConfig             `json:"cloud"        required:"true"`
+	Mongodb    config.Mongodb          `json:"mongodb"      required:"true"`
+	Postgresql config.PostgresqlConfig `json:"postgresql"   required:"true"`
+	Domain     domain.Config           `json:"domain"       required:"true"`
+	MQ         config.MQ               `json:"mq"           required:"true"`
 }
 
 func (cfg *configuration) getMQConfig() mq.MQConfig {
@@ -34,6 +37,8 @@ func (cfg *configuration) configItems() []interface{} {
 		&cfg.Inference,
 		&cfg.Evaluate,
 		&cfg.Mongodb,
+		&cfg.Postgresql.DB,
+		&cfg.Postgresql.Config,
 		&cfg.Domain,
 		&cfg.MQ,
 	}
@@ -130,6 +135,37 @@ func (cfg *evaluateConfig) SetDefault() {
 }
 
 func (cfg *evaluateConfig) Validate() error {
+	var i interface{}
+	i = &cfg.Config
+
+	if f, ok := i.(config.ConfigValidate); ok {
+		return f.Validate()
+	}
+
+	return nil
+}
+
+// cloud
+type cloudConfig struct {
+	SurvivalTime int `json:"survival_time"`
+
+	cloudimpl.Config
+}
+
+func (cfg *cloudConfig) SetDefault() {
+	if cfg.SurvivalTime <= 0 {
+		cfg.SurvivalTime = 5 * 3600
+	}
+
+	var i interface{}
+	i = &cfg.Config
+
+	if f, ok := i.(config.ConfigSetDefault); ok {
+		f.SetDefault()
+	}
+}
+
+func (cfg *cloudConfig) Validate() error {
 	var i interface{}
 	i = &cfg.Config
 

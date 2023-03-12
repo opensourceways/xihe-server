@@ -13,6 +13,10 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
+	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
+	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
+	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
@@ -84,6 +88,11 @@ func main() {
 
 	defer mongodb.Close()
 
+	// postgresql
+	if err := pgsql.Init(&cfg.Postgresql.DB); err != nil {
+		logrus.Fatalf("init db, err:%s", err.Error())
+	}
+
 	// cfg
 	cfg.initDomainConfig()
 
@@ -147,6 +156,12 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 			),
 			evaluateimpl.NewEvaluate(&cfg.Evaluate.Config),
 			cfg.Evaluate.SurvivalTime,
+		),
+
+		cloud: cloudapp.NewCloudMessageService(
+			cloudrepo.NewPodRepo(&cfg.Postgresql.Config),
+			cloudimpl.NewCloud(&cfg.Cloud.Config),
+			int64(cfg.Cloud.SurvivalTime),
 		),
 	}
 

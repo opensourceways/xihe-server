@@ -8,6 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
+	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
+	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -42,6 +44,7 @@ type handler struct {
 	finetune  app.FinetuneMessageService
 	evaluate  app.EvaluateMessageService
 	inference app.InferenceMessageService
+	cloud     cloudapp.CloudMessageService
 }
 
 func (h *handler) HandleEventAddRelatedResource(info *message.RelatedResource) error {
@@ -309,6 +312,18 @@ func (h *handler) HandleEventCreateEvaluate(info *message.EvaluateInfo) error {
 		}
 
 		return err
+	})
+}
+
+func (h *handler) HandleEventPodSubscribe(info *cloudtypes.PodInfo) error {
+	return h.do(func(bool) error {
+		if err := h.cloud.CreatePodInstance(info); err != nil {
+			if err != nil {
+				h.log.Error(err)
+			}
+		}
+
+		return nil
 	})
 }
 

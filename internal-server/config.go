@@ -8,14 +8,16 @@ import (
 )
 
 type configuration struct {
-	Mongodb config.Mongodb `json:"mongodb"  required:"true"`
-	Domain  domain.Config  `json:"domain"   required:"true"`
+	Mongodb    config.Mongodb          `json:"mongodb"      required:"true"`
+	Postgresql config.PostgresqlConfig `json:"postgresql"   required:"true"`
+	Domain     domain.Config           `json:"domain"       required:"true"`
 }
 
 func (cfg *configuration) configItems() []interface{} {
 	return []interface{}{
 		&cfg.Mongodb,
 		&cfg.Domain,
+		&cfg.Postgresql.DB,
 	}
 }
 

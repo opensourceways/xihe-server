@@ -9,6 +9,8 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/sirupsen/logrus"
 
+	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
+	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 )
@@ -102,6 +104,15 @@ func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) erro
 
 	// evaluate
 	s, err = registerHandlerForEvaluate(handler)
+	if err != nil {
+		return err
+	}
+	if s != nil {
+		subscribers[s.Topic()] = s
+	}
+
+	// cloud
+	s, err = registerHandlerForCloud(handler)
 	if err != nil {
 		return err
 	}
@@ -423,5 +434,40 @@ func registerHandlerForEvaluate(handler interface{}) (mq.Subscriber, error) {
 		v.TrainingId = body.TrainingId
 
 		return h.HandleEventCreateEvaluate(&v)
+	})
+}
+
+func registerHandlerForCloud(handler interface{}) (mq.Subscriber, error) {
+	h, ok := handler.(cloudmsg.CloudMessageHandler)
+	if !ok {
+		return nil, nil
+	}
+
+	return kafka.Subscribe(topics.Cloud, func(e mq.Event) (err error) {
+		msg := e.Message()
+		if msg == nil {
+			return
+		}
+
+		body := msgPodCreate{}
+		if err = json.Unmarshal(msg.Body, &body); err != nil {
+			return
+		}
+
+		user, err := domain.NewAccount(body.User)
+		if err != nil {
+			return
+		}
+
+		v := cloudtypes.PodInfo{
+			Pod: cloudtypes.Pod{
+				Id:      body.PodId,
+				CloudId: body.CloudId,
+				Owner:   user,
+			},
+		}
+		v.SetDefaultExpiry()
+
+		return h.HandleEventPodSubscribe(&v)
 	})
 }

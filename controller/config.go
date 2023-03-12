@@ -47,6 +47,7 @@ type APIConfig struct {
 	InferenceBootFile              string `json:"inference_boot_file"`
 	InferenceTimeout               int    `json:"inference_timeout"`
 	EvaluateTimeout                int    `json:"evaluate_timeout"`
+	PodTimeout                     int    `json:"pod_timeout"`
 	MaxPictureSizeToDescribe       int64  `json:"-"`
 	MaxPictureSizeToVQA            int64  `json:"-"`
 	MinSurvivalTimeOfEvaluate      int    `json:"min_survival_time_of_evaluate"`
@@ -78,6 +79,10 @@ func (cfg *APIConfig) SetDefault() {
 
 	if cfg.EvaluateTimeout <= 0 {
 		cfg.EvaluateTimeout = 300
+	}
+
+	if cfg.PodTimeout <= 0 {
+		cfg.PodTimeout = 300
 	}
 
 	if cfg.MaxTagsNumToSearchResource <= 0 {

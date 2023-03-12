@@ -187,3 +187,10 @@ type msgSubmission struct {
 	SId   string `json:"submission_id"`
 	Path  string `json:"path"`
 }
+
+type msgPodCreate struct {
+	User      string `json:"user"`
+	PodId     string `json:"pod_id"`
+	CloudId   string `json:"cloud_id"`
+	CloudName string `json:"cloud_name"`
+}

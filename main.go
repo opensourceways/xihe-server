@@ -8,6 +8,7 @@ import (
 	liboptions "github.com/opensourceways/community-robot-lib/options"
 	"github.com/sirupsen/logrus"
 
+	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -106,6 +107,11 @@ func main() {
 	}
 
 	defer mongodb.Close()
+
+	// postgresql
+	if err := pgsql.Init(&cfg.Postgresql.DB); err != nil {
+		logrus.Fatalf("init db, err:%s", err.Error())
+	}
 
 	// cfg
 	cfg.InitDomainConfig()
