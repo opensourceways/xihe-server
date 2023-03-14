@@ -13,6 +13,7 @@ type CourseService interface {
 	List(*CourseListCmd) ([]CourseSummaryDTO, error)
 	Get(*CourseGetCmd) (CourseDTO, error)
 	AddReleatedProject(*CourseAddReleatedProjectCmd) (string, error)
+	ListAssignments(*AsgListCmd) ([]AsgWorkDTO, error)
 }
 
 func NewCourseService(
@@ -20,11 +21,13 @@ func NewCourseService(
 
 	courseRepo repository.Course,
 	playerRepo repository.Player,
+	workRepo repository.Work,
 ) *courseService {
 	return &courseService{
 		userCli:    userCli,
 		courseRepo: courseRepo,
 		playerRepo: playerRepo,
+		workRepo:   workRepo,
 	}
 }
 
@@ -33,6 +36,7 @@ type courseService struct {
 
 	courseRepo repository.Course
 	playerRepo repository.Player
+	workRepo   repository.Work
 }
 
 // List
@@ -91,4 +95,37 @@ func (s *courseService) Get(cmd *CourseGetCmd) (dto CourseDTO, err error) {
 	dto.toCourseNoVideoDTO(&c, false, count)
 
 	return
+}
+
+// List Assignments
+func (s *courseService) ListAssignments(cmd *AsgListCmd) (
+	dtos []AsgWorkDTO, err error,
+) {
+
+	a, err := s.courseRepo.FindAssignments(cmd.Cid)
+
+	if err != nil || len(a) == 0 {
+		return
+	}
+
+	dtos = make([]AsgWorkDTO, len(a))
+	j := 0
+	for i := 0; i < len(a); i++ {
+
+		w, err := s.workRepo.GetWork(cmd.Cid, cmd.User, a[i].Id, cmd.Status)
+		status := w.Status
+		score := w.Score
+		if err != nil {
+			return nil, err
+		}
+
+		if cmd.Status != nil && cmd.Status.WorkStatus() != status {
+			continue
+
+		}
+		toAsgWorkDTO(&a[i], score, status, &dtos[j])
+		j++
+	}
+	return dtos[:j], err
+
 }

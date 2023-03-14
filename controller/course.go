@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +23,7 @@ func AddRouterForCourseController(
 	rg.GET("/v1/course", ctl.List)
 	rg.GET("/v1/course/:id", ctl.Get)
 	rg.PUT("/v1/course/:id/realted_project", ctl.AddCourseRelatedProject)
+	rg.GET("/v1/course/:id/asg", ctl.ListAssignments)
 }
 
 type CourseController struct {
@@ -179,7 +179,6 @@ func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 		return
 	}
 	p, err := ctl.project.GetSummaryByName(owner, name)
-	fmt.Printf("p: %v\n", p)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
@@ -199,5 +198,46 @@ func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPut(ctx, "success")
+	}
+}
+
+// @Summary ListAssignments
+// @Description list assignments
+// @Tags  Course
+// @Param	id	path	string					true	"course id"
+// @Param	status	query	string	false	"assignments status, such as finish"
+// @Accept json
+// @Success 201
+// @Failure 500 system_error        system error
+// @Router /v1/course/{id}/asg [get]
+func (ctl *CourseController) ListAssignments(ctx *gin.Context) {
+
+	pl, visitor, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	var cmd app.AsgListCmd
+	var err error
+	if str := ctl.getQueryParameter(ctx, "status"); str != "" {
+		cmd.Status, err = domain.NewWorkStatus(str)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+				errorBadRequestParam, err,
+			))
+
+			return
+		}
+	}
+
+	if !visitor {
+		cmd.User = pl.DomainAccount()
+	}
+	cmd.Cid = ctx.Param("id")
+
+	if data, err := ctl.s.ListAssignments(&cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, data)
 	}
 }

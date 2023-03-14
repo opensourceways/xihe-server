@@ -7,6 +7,7 @@ import (
 type Course interface {
 	FindCourse(cid string) (domain.Course, error)
 	FindCourses(*CourseListOption) ([]domain.CourseSummary, error)
+	FindAssignments(cid string) ([]domain.Assignment, error)
 }
 
 type CourseSummary struct {

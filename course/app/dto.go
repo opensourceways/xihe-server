@@ -216,3 +216,32 @@ func (dto *PointDTO) toPointNoVideoDTO(p *domain.Point) {
 
 	dto.Name = p.Name.PointName()
 }
+
+// Assignment
+type AsgListCmd struct {
+	User   types.Account
+	Cid    string
+	Status domain.WorkStatus
+}
+
+type AsgWorkDTO struct {
+	Id       string  `json:"id"`
+	Deadline string  `json:"deadline"`
+	Name     string  `json:"name"`
+	Desc     string  `json:"desc"`
+	Score    float32 `json:"score"`
+	Status   string  `json:"status"`
+}
+
+func toAsgWorkDTO(
+	c *domain.Assignment, score float32, status string, dto *AsgWorkDTO,
+) {
+	*dto = AsgWorkDTO{
+		Id:       c.Id,
+		Deadline: c.DeadLine.AsgDeadLine(),
+		Name:     c.Name.AsgName(),
+		Desc:     c.Desc.AsgDesc(),
+		Score:    score,
+		Status:   status,
+	}
+}

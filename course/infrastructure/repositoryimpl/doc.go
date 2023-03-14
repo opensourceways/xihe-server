@@ -8,6 +8,7 @@ const (
 	fieldType     = "type"
 	fieldVersion  = "version"
 	fieldRepo     = "repo"
+	fieldAsgId    = "asg_id"
 )
 
 // Course
@@ -68,4 +69,14 @@ type DCoursePlayer struct {
 	CreatedAt int64  `bson:"created_at" json:"created_at"`
 	Repo      string `bson:"repo"       json:"repo"`
 	Version   int    `bson:"version"    json:"-"`
+}
+
+type DCourseWork struct {
+	Id       string  `bson:"id"         json:"id"`
+	CourseId string  `bson:"course_id"  json:"course_id"`
+	Account  string  `bson:"account"    json:"account"`
+	AsgId    string  `bson:"asg_id"     json:"asg_id"`
+	Score    float32 `bson:"score"      json:"score"`
+	Status   string  `bson:"status"     json:"status"`
+	Version  int     `bson:"version"    json:"-"`
 }

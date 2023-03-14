@@ -22,6 +22,9 @@ const (
 	courseStatusOver       = "over"
 	courseStatusPreparing  = "preparing"
 	courseStatusInProgress = "in-progress"
+
+	workStatusFinish    = "finish"
+	workStatusNotFinish = "not-finish"
 )
 
 // StudentName
@@ -470,11 +473,59 @@ func NewCourseTime(v int64) (CourseTime, error) {
 		return nil, errors.New("empty value")
 	}
 
-	return coursetime(v), nil
+	return courseTime(v), nil
 }
 
-type coursetime int64
+type courseTime int64
 
-func (r coursetime) CourseTime() int64 {
+func (r courseTime) CourseTime() int64 {
 	return int64(r)
+}
+
+// Work Score
+type WorkScore interface {
+	WorkScore() float32
+}
+
+func NewWorkScore(v float32) (WorkScore, error) {
+	if v == 0. {
+		return nil, errors.New("empty value")
+	}
+
+	return workScore(v), nil
+}
+
+type workScore float32
+
+func (r workScore) WorkScore() float32 {
+	return float32(r)
+}
+
+// Work Status
+type WorkStatus interface {
+	WorkStatus() string
+	IsFinished() bool
+}
+
+func NewWorkStatus(v string) (WorkStatus, error) {
+	b := v == workStatusFinish ||
+		v == workStatusNotFinish ||
+		v == ""
+
+	if b {
+		return workStatus(v), nil
+
+	}
+
+	return nil, errors.New("invalid work status")
+}
+
+type workStatus string
+
+func (r workStatus) WorkStatus() string {
+	return string(r)
+}
+
+func (r workStatus) IsFinished() bool {
+	return string(r) == workStatusFinish
 }

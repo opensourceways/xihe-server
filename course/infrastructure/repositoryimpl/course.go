@@ -81,3 +81,30 @@ func (impl *courseRepoImpl) FindCourses(opt *repository.CourseListOption) (
 
 	return r, nil
 }
+
+func (impl *courseRepoImpl) FindAssignments(cid string) (
+	[]domain.Assignment, error) {
+	var v []DCourse
+
+	f := func(ctx context.Context) error {
+		filter := impl.docFilter(cid)
+
+		return impl.cli.GetDocs(ctx, filter, nil, &v)
+	}
+
+	if err := withContext(f); err != nil {
+		if impl.cli.IsDocNotExists(err) {
+			err = repoerr.NewErrorResourceNotExists(err)
+		}
+
+		return nil, err
+	}
+	a := v[0].Assignments
+	r := make([]domain.Assignment, len(a))
+	for i := range a {
+		if err := a[i].toAssignment(&r[i]); err != nil {
+			return nil, err
+		}
+	}
+	return r, nil
+}

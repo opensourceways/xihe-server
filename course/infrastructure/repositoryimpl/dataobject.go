@@ -142,6 +142,26 @@ func (doc *dPoint) toPoint(p *domain.Point) (err error) {
 	return
 }
 
+// Assignments
+
+func (doc *dAssignments) toAssignment(c *domain.Assignment) (err error) {
+	c.Id = doc.Id
+
+	if c.Name, err = domain.NewAsgName(doc.Name); err != nil {
+		return
+	}
+
+	if c.Desc, err = domain.NewAsgDesc(doc.Desc); err != nil {
+		return
+	}
+
+	if c.DeadLine, err = domain.NewAsgDeadLine(doc.DeadLine); err != nil {
+		return
+	}
+
+	return
+}
+
 // player
 func (doc *DCoursePlayer) toPlayerNoStudent(p *repository.PlayerVersion) (err error) {
 	p.Player.Id = doc.Id
@@ -151,6 +171,18 @@ func (doc *DCoursePlayer) toPlayerNoStudent(p *repository.PlayerVersion) (err er
 	if p.CreatedAt, err = domain.NewCourseTime(doc.CreatedAt); err != nil {
 		return
 	}
+
+	return
+}
+
+// work
+func (doc *DCourseWork) toCourseWork(w *domain.Work) (err error) {
+	w.Score = doc.Score
+	w.AsgId = doc.AsgId
+	w.CourseId = doc.CourseId
+	w.PlayerId = doc.Account
+	w.Status = doc.Status
+	w.Version = doc.Version
 
 	return
 }

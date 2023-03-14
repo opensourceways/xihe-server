@@ -154,6 +154,7 @@ type MongodbCollections struct {
 	CompetitionPlayer string `json:"competition_player"     required:"true"`
 	Course            string `json:"course"                 required:"true"`
 	CoursePlayer      string `json:"course_player"          required:"true"`
+	CourseWork        string `json:"course_work"            required:"true"`
 }
 
 type MQ struct {
