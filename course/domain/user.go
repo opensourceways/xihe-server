@@ -20,9 +20,10 @@ type Student struct {
 type Player struct {
 	Student
 
-	Id        string
-	CourseId  string
-	CreatedAt CourseTime
+	Id             string
+	CourseId       string
+	CreatedAt      CourseTime
+	RelatedProject string
 }
 
 func (p *Player) CreateToday() (err error) {

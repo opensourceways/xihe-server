@@ -4,7 +4,9 @@ import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/course/domain"
+	projdomain "github.com/opensourceways/xihe-server/domain"
 	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 // player
@@ -224,6 +226,12 @@ type AsgListCmd struct {
 	Status domain.WorkStatus
 }
 
+type GetSubmissionCmd struct {
+	User   types.Account
+	Cid    string
+	Status domain.WorkStatus
+}
+
 type AsgWorkDTO struct {
 	Id       string  `json:"id"`
 	Deadline string  `json:"deadline"`
@@ -243,5 +251,27 @@ func toAsgWorkDTO(
 		Desc:     c.Desc.AsgDesc(),
 		Score:    score,
 		Status:   status,
+	}
+}
+
+type RelateProjectDTO struct {
+	Owner         string
+	Name          string
+	CoverId       string
+	CreatedAt     string
+	LikeCount     int
+	ForkCount     int
+	DownloadCount int
+}
+
+func toRelateProjectDTO(p *projdomain.Project, dto *RelateProjectDTO) {
+	*dto = RelateProjectDTO{
+		Owner:         p.Owner.Account(),
+		Name:          p.Name.ResourceName(),
+		CoverId:       p.CoverId.CoverId(),
+		CreatedAt:     utils.ToDate(p.CreatedAt),
+		LikeCount:     p.LikeCount,
+		ForkCount:     p.ForkCount,
+		DownloadCount: p.DownloadCount,
 	}
 }

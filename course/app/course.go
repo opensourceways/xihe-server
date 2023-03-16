@@ -1,8 +1,12 @@
 package app
 
 import (
+	"strings"
+
 	"github.com/opensourceways/xihe-server/course/domain/repository"
 	"github.com/opensourceways/xihe-server/course/domain/user"
+	projdomain "github.com/opensourceways/xihe-server/domain"
+	projectrepo "github.com/opensourceways/xihe-server/domain/repository"
 )
 
 type CourseService interface {
@@ -14,17 +18,21 @@ type CourseService interface {
 	Get(*CourseGetCmd) (CourseDTO, error)
 	AddReleatedProject(*CourseAddReleatedProjectCmd) (string, error)
 	ListAssignments(*AsgListCmd) ([]AsgWorkDTO, error)
+	GetSubmissions(*GetSubmissionCmd) (RelateProjectDTO, error)
 }
 
 func NewCourseService(
 	userCli user.User,
+	projectRepo projectrepo.Project,
 
 	courseRepo repository.Course,
 	playerRepo repository.Player,
 	workRepo repository.Work,
 ) *courseService {
 	return &courseService{
-		userCli:    userCli,
+		userCli:     userCli,
+		projectRepo: projectRepo,
+
 		courseRepo: courseRepo,
 		playerRepo: playerRepo,
 		workRepo:   workRepo,
@@ -32,7 +40,8 @@ func NewCourseService(
 }
 
 type courseService struct {
-	userCli user.User
+	userCli     user.User
+	projectRepo projectrepo.Project
 
 	courseRepo repository.Course
 	playerRepo repository.Player
@@ -97,7 +106,6 @@ func (s *courseService) Get(cmd *CourseGetCmd) (dto CourseDTO, err error) {
 	return
 }
 
-// List Assignments
 func (s *courseService) ListAssignments(cmd *AsgListCmd) (
 	dtos []AsgWorkDTO, err error,
 ) {
@@ -123,9 +131,39 @@ func (s *courseService) ListAssignments(cmd *AsgListCmd) (
 			continue
 
 		}
+
 		toAsgWorkDTO(&a[i], score, status, &dtos[j])
 		j++
 	}
 	return dtos[:j], err
 
+}
+
+func (s *courseService) GetSubmissions(cmd *GetSubmissionCmd) (
+	dtos RelateProjectDTO, err error,
+) {
+
+	p, err := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
+	if err != nil {
+		return
+	}
+
+	repo := p.Player.RelatedProject
+	if repo == "" {
+		return
+	}
+	name := strings.Split(repo, "/")
+
+	resorce, err := projdomain.NewResourceName(name[1])
+	if err != nil {
+		return
+	}
+
+	project, err := s.projectRepo.GetByName(cmd.User, resorce)
+	if err != nil {
+		return
+	}
+
+	toRelateProjectDTO(&project, &dtos)
+	return
 }

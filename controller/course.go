@@ -11,6 +11,7 @@ import (
 
 func AddRouterForCourseController(
 	rg *gin.RouterGroup,
+
 	s app.CourseService,
 	project repository.Project,
 ) {
@@ -23,7 +24,8 @@ func AddRouterForCourseController(
 	rg.GET("/v1/course", ctl.List)
 	rg.GET("/v1/course/:id", ctl.Get)
 	rg.PUT("/v1/course/:id/realted_project", ctl.AddCourseRelatedProject)
-	rg.GET("/v1/course/:id/asg", ctl.ListAssignments)
+	rg.GET("/v1/course/:id/asg/list", ctl.ListAssignments)
+	rg.GET("/v1/course/:id/asg/result", ctl.GetSubmissions)
 }
 
 type CourseController struct {
@@ -209,7 +211,7 @@ func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 // @Accept json
 // @Success 201
 // @Failure 500 system_error        system error
-// @Router /v1/course/{id}/asg [get]
+// @Router /v1/course/{id}/asg/list [get]
 func (ctl *CourseController) ListAssignments(ctx *gin.Context) {
 
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, false)
@@ -236,6 +238,35 @@ func (ctl *CourseController) ListAssignments(ctx *gin.Context) {
 	cmd.Cid = ctx.Param("id")
 
 	if data, err := ctl.s.ListAssignments(&cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, data)
+	}
+}
+
+// @Summary GetSubmissions
+// @Description get submissions
+// @Tags  Course
+// @Param	id	path	string					true	"course id"
+// @Accept json
+// @Success 200
+// @Failure 500 system_error        system error
+// @Router /v1/course/{id}/asg/result [get]
+func (ctl *CourseController) GetSubmissions(ctx *gin.Context) {
+
+	pl, visitor, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	var cmd app.GetSubmissionCmd
+
+	if !visitor {
+		cmd.User = pl.DomainAccount()
+	}
+	cmd.Cid = ctx.Param("id")
+
+	if data, err := ctl.s.GetSubmissions(&cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, data)

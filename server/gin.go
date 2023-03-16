@@ -172,6 +172,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	courseAppService := courseapp.NewCourseService(
 		usercli.NewUserCli(userAppService),
+		proj,
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),

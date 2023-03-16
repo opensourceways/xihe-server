@@ -167,6 +167,7 @@ func (doc *DCoursePlayer) toPlayerNoStudent(p *repository.PlayerVersion) (err er
 	p.Player.Id = doc.Id
 
 	p.Player.CourseId = doc.CourseId
+	p.Player.RelatedProject = doc.Repo
 
 	if p.CreatedAt, err = domain.NewCourseTime(doc.CreatedAt); err != nil {
 		return
