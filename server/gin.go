@@ -256,6 +256,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 			v1, courseAppService, proj,
 		)
 
+		controller.AddRouterForHomeController(
+			v1, courseAppService, competitionAppService,
+		)
+
 	}
 
 	engine.UseRawPath = true
