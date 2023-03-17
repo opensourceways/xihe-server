@@ -255,13 +255,13 @@ func toAsgWorkDTO(
 }
 
 type RelateProjectDTO struct {
-	Owner         string
-	Name          string
-	CoverId       string
-	CreatedAt     string
-	LikeCount     int
-	ForkCount     int
-	DownloadCount int
+	Owner         string `json:"owner"`
+	Name          string `json:"name"`
+	CoverId       string `json:"cover_id"`
+	CreatedAt     string `json:"create_at"`
+	LikeCount     int    `json:"like_count"`
+	ForkCount     int    `json:"fork_count"`
+	DownloadCount int    `json:"download_count"`
 }
 
 func toRelateProjectDTO(p *projdomain.Project, dto *RelateProjectDTO) {
