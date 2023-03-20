@@ -248,20 +248,20 @@ func toAsgWorkDTO(
 		Id:       c.Id,
 		Deadline: c.DeadLine.AsgDeadLine(),
 		Name:     c.Name.AsgName(),
-		Desc:     c.Desc.AsgDesc(),
+		Desc:     c.Desc.URL(),
 		Score:    score,
 		Status:   status,
 	}
 }
 
 type RelateProjectDTO struct {
-	Owner         string
-	Name          string
-	CoverId       string
-	CreatedAt     string
-	LikeCount     int
-	ForkCount     int
-	DownloadCount int
+	Owner         string `json:"owner"`
+	Name          string `json:"name"`
+	CoverId       string `json:"cover_id"`
+	CreatedAt     string `json:"create_at"`
+	LikeCount     int    `json:"like_count"`
+	ForkCount     int    `json:"fork_count"`
+	DownloadCount int    `json:"download_count"`
 }
 
 func toRelateProjectDTO(p *projdomain.Project, dto *RelateProjectDTO) {
@@ -273,5 +273,21 @@ func toRelateProjectDTO(p *projdomain.Project, dto *RelateProjectDTO) {
 		LikeCount:     p.LikeCount,
 		ForkCount:     p.ForkCount,
 		DownloadCount: p.DownloadCount,
+	}
+}
+
+type CertInfoDTO struct {
+	Owner  string `json:"owner"`
+	Name   string `json:"name"`
+	Cert   string `json:"cert"`
+	IsPass bool   `json:"is_pass"`
+}
+
+func toCertInfoDTO(user types.Account, c *domain.Course, pass bool, dto *CertInfoDTO) {
+	*dto = CertInfoDTO{
+		Owner:  user.Account(),
+		Name:   c.Name.CourseName(),
+		Cert:   c.Cert.URL(),
+		IsPass: pass,
 	}
 }

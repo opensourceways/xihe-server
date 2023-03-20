@@ -151,7 +151,7 @@ func (doc *dAssignments) toAssignment(c *domain.Assignment) (err error) {
 		return
 	}
 
-	if c.Desc, err = domain.NewAsgDesc(doc.Desc); err != nil {
+	if c.Desc, err = domain.NewURL(doc.Desc); err != nil {
 		return
 	}
 

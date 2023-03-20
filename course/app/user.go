@@ -80,3 +80,36 @@ func (s *courseService) AddReleatedProject(cmd *CourseAddReleatedProjectCmd) (
 
 	return
 }
+
+func (s *courseService) GetCertification(cmd *CourseGetCmd) (dto CertInfoDTO, err error) {
+	p, err := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
+	if err != nil {
+		return
+	}
+	c, err := s.courseRepo.FindCourse(cmd.Cid)
+	if err != nil {
+		return
+	}
+	if !c.IsApplyed(&p.Player) {
+		return
+	}
+
+	asg, err := s.courseRepo.FindAssignments(cmd.Cid)
+	if err != nil {
+		return
+	}
+
+	var score float32
+	for i := range asg {
+		w, _ := s.workRepo.GetWork(cmd.Cid, cmd.User, asg[i].Id, nil)
+		score += w.Score
+	}
+	var pass bool
+	if score >= c.PassScore.CoursePassScore() {
+		pass = true
+	}
+
+	toCertInfoDTO(cmd.User, &c, pass, &dto)
+
+	return
+}

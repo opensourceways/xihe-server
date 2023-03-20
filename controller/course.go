@@ -26,6 +26,7 @@ func AddRouterForCourseController(
 	rg.PUT("/v1/course/:id/realted_project", ctl.AddCourseRelatedProject)
 	rg.GET("/v1/course/:id/asg/list", ctl.ListAssignments)
 	rg.GET("/v1/course/:id/asg/result", ctl.GetSubmissions)
+	rg.GET("/v1/course/:id/cert", ctl.GetCertification)
 }
 
 type CourseController struct {
@@ -267,6 +268,35 @@ func (ctl *CourseController) GetSubmissions(ctx *gin.Context) {
 	cmd.Cid = ctx.Param("id")
 
 	if data, err := ctl.s.GetSubmissions(&cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, data)
+	}
+}
+
+// @Summary GetCertification
+// @Description get certification
+// @Tags  Course
+// @Param	id	path	string					true	"course id"
+// @Accept json
+// @Success 200
+// @Failure 500 system_error        system error
+// @Router /v1/course/{id}/cert [get]
+func (ctl *CourseController) GetCertification(ctx *gin.Context) {
+
+	pl, visitor, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	var cmd app.CourseGetCmd
+
+	if !visitor {
+		cmd.User = pl.DomainAccount()
+	}
+	cmd.Cid = ctx.Param("id")
+
+	if data, err := ctl.s.GetCertification(&cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, data)

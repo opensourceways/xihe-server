@@ -244,10 +244,10 @@ func (r courseHours) CourseHours() int {
 
 // CoursePassScore
 type CoursePassScore interface {
-	CoursePassScore() int
+	CoursePassScore() float32
 }
 
-func NewCoursePassScore(v int) (CoursePassScore, error) {
+func NewCoursePassScore(v float32) (CoursePassScore, error) {
 	if v == 0 {
 		return nil, errors.New("zero value")
 	}
@@ -255,10 +255,10 @@ func NewCoursePassScore(v int) (CoursePassScore, error) {
 	return coursePassScore(v), nil
 }
 
-type coursePassScore int
+type coursePassScore float32
 
-func (r coursePassScore) CoursePassScore() int {
-	return int(r)
+func (r coursePassScore) CoursePassScore() float32 {
+	return float32(r)
 }
 
 // CourseStatus

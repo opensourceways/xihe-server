@@ -13,20 +13,20 @@ const (
 
 // Course
 type DCourse struct {
-	Id        string `bson:"id"              json:"id"`
-	Name      string `bson:"name"            json:"name"`
-	Teacher   string `bson:"teacher"         json:"teacher"`
-	Desc      string `bson:"desc"            json:"desc"`
-	Host      string `bson:"host"            json:"host"`
-	Type      string `bson:"type"            json:"type"`
-	PassScore int    `bson:"pass_score"      json:"pass_score"`
-	Status    string `bson:"status"          json:"status"`
-	Duration  string `bson:"duration"        json:"duration"`
-	Hours     int    `bson:"hours"           json:"hours"`
-	Doc       string `bson:"doc"             json:"doc"`
-	Forum     string `bson:"forum"           json:"forum"`
-	Poster    string `bson:"poster"          json:"poster"`
-	Cert      string `bson:"cert"            json:"cert"`
+	Id        string  `bson:"id"              json:"id"`
+	Name      string  `bson:"name"            json:"name"`
+	Teacher   string  `bson:"teacher"         json:"teacher"`
+	Desc      string  `bson:"desc"            json:"desc"`
+	Host      string  `bson:"host"            json:"host"`
+	Type      string  `bson:"type"            json:"type"`
+	PassScore float32 `bson:"pass_score"      json:"pass_score"`
+	Status    string  `bson:"status"          json:"status"`
+	Duration  string  `bson:"duration"        json:"duration"`
+	Hours     int     `bson:"hours"           json:"hours"`
+	Doc       string  `bson:"doc"             json:"doc"`
+	Forum     string  `bson:"forum"           json:"forum"`
+	Poster    string  `bson:"poster"          json:"poster"`
+	Cert      string  `bson:"cert"            json:"cert"`
 
 	Assignments []dAssignments `bson:"assignments"  json:"-"`
 	Sections    []dSection     `bson:"sections"     json:"-"`

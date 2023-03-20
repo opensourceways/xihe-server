@@ -19,6 +19,7 @@ type CourseService interface {
 	AddReleatedProject(*CourseAddReleatedProjectCmd) (string, error)
 	ListAssignments(*AsgListCmd) ([]AsgWorkDTO, error)
 	GetSubmissions(*GetSubmissionCmd) (RelateProjectDTO, error)
+	GetCertification(*CourseGetCmd) (CertInfoDTO, error)
 }
 
 func NewCourseService(

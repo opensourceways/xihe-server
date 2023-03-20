@@ -46,7 +46,7 @@ func NewCourseProject(owner types.Account, r string) CourseProject {
 type Assignment struct {
 	Id       string
 	Name     AsgName
-	Desc     AsgDesc
+	Desc     URL
 	DeadLine AsgDeadLine
 }
 
