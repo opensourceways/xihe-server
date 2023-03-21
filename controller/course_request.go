@@ -74,3 +74,9 @@ func toGetCmd(cid string, user types.Account) (cmd app.CourseGetCmd) {
 
 	return
 }
+
+type submissionDetail struct {
+	AvatarId string `json:"avatar_id"`
+
+	*app.RelateProjectDTO
+}

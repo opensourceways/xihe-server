@@ -49,6 +49,10 @@ func (s *courseService) AddReleatedProject(cmd *CourseAddReleatedProjectCmd) (
 ) {
 	// check phase
 	course, err := s.courseRepo.FindCourse(cmd.Cid)
+	if err != nil {
+		return
+	}
+
 	if course.IsOver() {
 		err = errors.New("course is over")
 
@@ -101,9 +105,13 @@ func (s *courseService) GetCertification(cmd *CourseGetCmd) (dto CertInfoDTO, er
 
 	var score float32
 	for i := range asg {
-		w, _ := s.workRepo.GetWork(cmd.Cid, cmd.User, asg[i].Id, nil)
+		w, err := s.workRepo.GetWork(cmd.Cid, cmd.User, asg[i].Id, nil)
+		if err != nil {
+			break
+		}
 		score += w.Score
 	}
+
 	var pass bool
 	if score >= c.PassScore.CoursePassScore() {
 		pass = true

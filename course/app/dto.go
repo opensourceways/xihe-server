@@ -254,7 +254,7 @@ func toAsgWorkDTO(
 	}
 }
 
-type RelateProjectDTO struct {
+type ProjectSummuryDTO struct {
 	Owner         string `json:"owner"`
 	Name          string `json:"name"`
 	CoverId       string `json:"cover_id"`
@@ -263,9 +263,12 @@ type RelateProjectDTO struct {
 	ForkCount     int    `json:"fork_count"`
 	DownloadCount int    `json:"download_count"`
 }
+type RelateProjectDTO struct {
+	RelatedProject []ProjectSummuryDTO `json:"related_project"`
+}
 
-func toRelateProjectDTO(p *projdomain.Project, dto *RelateProjectDTO) {
-	*dto = RelateProjectDTO{
+func toProjectSummuryDTO(p *projdomain.Project, dto *ProjectSummuryDTO) {
+	*dto = ProjectSummuryDTO{
 		Owner:         p.Owner.Account(),
 		Name:          p.Name.ResourceName(),
 		CoverId:       p.CoverId.CoverId(),

@@ -14,10 +14,12 @@ func AddRouterForCourseController(
 
 	s app.CourseService,
 	project repository.Project,
+	user repository.User,
 ) {
 	ctl := CourseController{
 		s:       s,
 		project: project,
+		user:    user,
 	}
 
 	rg.POST("/v1/course/:id/player", ctl.Apply)
@@ -34,6 +36,7 @@ type CourseController struct {
 
 	s       app.CourseService
 	project repository.Project
+	user    repository.User
 }
 
 // @Summary Apply
@@ -255,23 +258,37 @@ func (ctl *CourseController) ListAssignments(ctx *gin.Context) {
 // @Router /v1/course/{id}/asg/result [get]
 func (ctl *CourseController) GetSubmissions(ctx *gin.Context) {
 
-	pl, visitor, ok := ctl.checkUserApiToken(ctx, false)
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
 
 	var cmd app.GetSubmissionCmd
-
-	if !visitor {
-		cmd.User = pl.DomainAccount()
-	}
+	cmd.User = pl.DomainAccount()
 	cmd.Cid = ctx.Param("id")
 
-	if data, err := ctl.s.GetSubmissions(&cmd); err != nil {
+	avatar, err := ctl.user.GetUserAvatarId(pl.DomainAccount())
+	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-	} else {
-		ctl.sendRespOfGet(ctx, data)
+		return
 	}
+
+	data, err := ctl.s.GetSubmissions(&cmd)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+
+	detail := submissionDetail{
+		RelateProjectDTO: &data,
+	}
+
+	if avatar != nil {
+		detail.AvatarId = avatar.AvatarId()
+	}
+
+	ctl.sendRespOfGet(ctx, detail)
+
 }
 
 // @Summary GetCertification

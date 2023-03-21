@@ -155,16 +155,27 @@ func (s *courseService) GetSubmissions(cmd *GetSubmissionCmd) (
 	}
 	name := strings.Split(repo, "/")
 
-	resorce, err := projdomain.NewResourceName(name[1])
+	resource, err := projdomain.NewResourceName(name[1])
 	if err != nil {
 		return
 	}
 
-	project, err := s.projectRepo.GetByName(cmd.User, resorce)
+	project, err := s.projectRepo.GetByName(cmd.User, resource)
 	if err != nil {
 		return
 	}
+	dtos.RelatedProject, err = s.listRelatedProject(project, 1)
 
-	toRelateProjectDTO(&project, &dtos)
+	return
+}
+
+func (s *courseService) listRelatedProject(project projdomain.Project, count int) (
+	dtos []ProjectSummuryDTO, err error,
+) {
+	dtos = make([]ProjectSummuryDTO, count)
+	for i := range dtos {
+		toProjectSummuryDTO(&project, &dtos[i])
+	}
+
 	return
 }
