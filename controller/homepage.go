@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	compapp "github.com/opensourceways/xihe-server/competition/app"
 	"github.com/opensourceways/xihe-server/course/app"
@@ -19,7 +17,6 @@ func AddRouterForHomeController(
 		course: course,
 		comp:   comp,
 	}
-	fmt.Println("sdfsafae")
 	rg.GET("/v1/homepage", ctl.ListAll)
 }
 
