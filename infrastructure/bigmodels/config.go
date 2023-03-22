@@ -21,11 +21,11 @@ func (cfg *Config) SetDefault() {
 	cfg.WuKong.setDefault()
 
 	if cfg.MaxPictureSizeToDescribe <= 0 {
-		cfg.MaxPictureSizeToDescribe = 200 << 10
+		cfg.MaxPictureSizeToDescribe = 2 << 20
 	}
 
 	if cfg.MaxPictureSizeToVQA <= 0 {
-		cfg.MaxPictureSizeToVQA = 200 << 10
+		cfg.MaxPictureSizeToVQA = 2 << 20
 	}
 }
 
