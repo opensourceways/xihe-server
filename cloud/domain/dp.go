@@ -172,7 +172,7 @@ type PodStatus interface {
 	PodStatus() string
 	IsStarting() bool
 	IsCreating() bool
-	IsError() bool
+	IsFailed() bool
 	IsRunning() bool
 	IsTerminated() bool
 }
@@ -199,7 +199,7 @@ func (r podStatus) IsCreating() bool {
 	return r.PodStatus() == cloudPodStatusCreating
 }
 
-func (r podStatus) IsError() bool {
+func (r podStatus) IsFailed() bool {
 	return r.PodStatus() == cloudPodStatusFailed
 }
 

@@ -12,7 +12,7 @@ type SubscribeCloudCmd struct {
 	CloudId string
 }
 
-type PodInfoCmd domain.PodInfo
+type PodInfoCmd SubscribeCloudCmd
 
 type RelasePodCmd struct {
 	User  types.Account
@@ -41,14 +41,14 @@ type CloudDTO struct {
 }
 
 type PodInfoDTO struct {
-	Id         string `json:"id"`
-	CloudId    string `json:"cloud_id"`
-	Owner      string `json:"owner"`
-	Status     string `json:"status"`
-	ExpiryDate string `json:"expiry_date"`
-	Error      string `json:"error"`
-	AccessURL  string `json:"access_url"`
-	CreatedAt  string `json:"created_at"`
+	Id        string `json:"id"`
+	CloudId   string `json:"cloud_id"`
+	Owner     string `json:"owner"`
+	Status    string `json:"status"`
+	Expiry    int64  `json:"expiry"`
+	Error     string `json:"error"`
+	AccessURL string `json:"access_url"`
+	CreatedAt int64  `json:"created_at"`
 }
 
 func (cmd *SubscribeCloudCmd) Validate() error {
@@ -63,7 +63,7 @@ func (cmd *SubscribeCloudCmd) Validate() error {
 }
 
 func (cmd *PodInfoCmd) Validate() error {
-	b := cmd.Owner.Account() != "" &&
+	b := cmd.User.Account() != "" &&
 		cmd.CloudId != ""
 
 	if !b {
@@ -111,7 +111,7 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	}
 
 	if p.Expiry != nil {
-		r.ExpiryDate = p.Expiry.PodExpiryDate()
+		r.Expiry = p.Expiry.PodExpiry()
 	}
 
 	if p.Error != nil {
@@ -123,6 +123,6 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	}
 
 	if p.CreatedAt != nil {
-		r.CreatedAt = p.CreatedAt.TimeDate()
+		r.CreatedAt = p.CreatedAt.Time()
 	}
 }

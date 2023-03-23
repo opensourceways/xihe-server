@@ -17,6 +17,6 @@ type Cloud struct {
 	Remain CloudRemain
 }
 
-func (c *Cloud) HasFree() bool {
+func (c *Cloud) HasIdle() bool {
 	return c.Remain.CloudRemain() > 0
 }

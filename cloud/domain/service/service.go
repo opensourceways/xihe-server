@@ -25,7 +25,14 @@ func NewCloudService(
 func (r *CloudService) caculateRemain(
 	c *domain.Cloud, p *repository.PodInfoList,
 ) (err error) {
-	remain := c.CloudConf.Limited.CloudLimited() - len(p.PodInfos)
+	// caculate running and not expiry pod
+	var count int
+	for i := range p.PodInfos {
+		if !p.PodInfos[i].IsExpiried() {
+			count++
+		}
+	}
+	remain := c.CloudConf.Limited.CloudLimited() - count
 	if remain < 0 {
 		remain = 0
 	}
@@ -67,6 +74,25 @@ func (r *CloudService) SubscribeCloud(
 	msg.ToMsgCloudConf(c, u, pid)
 
 	return r.sender.SubscribeCloud(msg)
+}
+
+func (r *CloudService) CheckUserCanSubsribe(user types.Account, cid string) (
+	p domain.PodInfo, ok bool, err error,
+) {
+	p, err = r.podRepo.GetUserCloudIdLastPod(user, cid)
+	if err != nil {
+		if repository.IsErrorResourceNotFound(err) {
+			return p, true, nil
+		}
+
+		return
+	}
+
+	if p.IsExpiried() || p.IsFailedOrTerminated() {
+		return p, true, err
+	}
+
+	return p, false, err
 }
 
 func (r *CloudService) ReleasePod(p *domain.Pod) error {
