@@ -205,6 +205,6 @@ func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 	if dto, err := ctl.s.Get(&cmd); err != nil {
 		ctl.sendBadRequestParam(ctx, err)
 	} else {
-		ctl.sendRespOfGet(ctx, newResponseData(dto))
+		ctl.sendRespOfGet(ctx, dto)
 	}
 }

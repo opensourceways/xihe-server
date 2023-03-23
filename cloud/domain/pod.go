@@ -30,6 +30,14 @@ func (p *PodInfo) CanRelease() bool {
 	return p.Status.IsRunning()
 }
 
+func (p *PodInfo) IsExpiried() bool {
+	return utils.Now() > p.Expiry.PodExpiry()
+}
+
+func (p *PodInfo) IsRunningButExpired() bool {
+	return p.IsExpiried() && p.Status.IsRunning()
+}
+
 func (p *PodInfo) CheckGoodAndSet() bool {
 	if !p.Error.IsGood() {
 		p.Status, _ = NewPodStatus(cloudPodStatusFailed)
@@ -45,6 +53,18 @@ func (p *PodInfo) StatusSetCreating() {
 
 func (p *PodInfo) StatusSetRunning() {
 	p.Status, _ = NewPodStatus(cloudPodStatusRunning)
+}
+
+func (p *PodInfo) StatusSetFailed() {
+	p.Status, _ = NewPodStatus(cloudPodStatusFailed)
+}
+
+func (p *PodInfo) SetStatus() {
+	if p.AccessURL.AccessURL() != "" {
+		p.StatusSetRunning()
+	}
+
+	p.StatusSetFailed()
 }
 
 func (p *PodInfo) SetDefaultExpiry() (err error) {

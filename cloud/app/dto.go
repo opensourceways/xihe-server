@@ -26,6 +26,7 @@ type UpdatePodInternalCmd struct {
 }
 
 type CloudConfDTO struct {
+	Id        string `json:"id"`
 	Spec      string `json:"spec"`
 	Name      string `json:"name"`
 	Image     string `json:"image"`
@@ -36,7 +37,7 @@ type CloudConfDTO struct {
 type CloudDTO struct {
 	CloudConfDTO
 
-	IsFree bool `json:"is_free"`
+	IsIdle bool `json:"is_idle"`
 }
 
 type PodInfoDTO struct {
@@ -82,6 +83,7 @@ func (r *UpdatePodInternalCmd) toPodInfo(p *domain.PodInfo) (err error) {
 
 func (r *CloudConfDTO) toCloudConfDTO(c *domain.CloudConf) {
 	*r = CloudConfDTO{
+		Id:        c.Id,
 		Spec:      c.Spec.CloudSpec(),
 		Name:      c.Name.CloudName(),
 		Image:     c.Image.CloudImage(),
@@ -90,10 +92,10 @@ func (r *CloudConfDTO) toCloudConfDTO(c *domain.CloudConf) {
 	}
 }
 
-func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isFree bool) {
+func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isIdle bool) {
 	r.CloudConfDTO.toCloudConfDTO(&c.CloudConf)
 
-	r.IsFree = isFree
+	r.IsIdle = isIdle
 }
 
 func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {

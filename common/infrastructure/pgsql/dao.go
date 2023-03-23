@@ -103,6 +103,16 @@ func (t dbTable) First(filter, result interface{}) error {
 		Error
 }
 
+func (t dbTable) GetOrderOneRecord(filter, order, result interface{}) error {
+	err := db.Table(t.name).Where(filter).Order(order).Limit(1).First(result).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return errRowNotFound
+	}
+
+	return nil
+}
+
 func (t dbTable) GetRecord(filter, result interface{}) error {
 	err := db.Table(t.name).Where(filter).First(result).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
