@@ -60,13 +60,26 @@ func (s *cloudService) ListCloud() (dto []CloudDTO, err error) {
 	// to dto
 	dto = make([]CloudDTO, len(c))
 	for i := range c {
-		dto[i].toCloudDTO(&c[i], c[i].HasFree())
+		dto[i].toCloudDTO(&c[i], c[i].HasIdle())
 	}
 
 	return
 }
 
 func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err error) {
+	// check
+	_, ok, err := s.cloudService.CheckUserCanSubsribe(cmd.User, cmd.CloudId)
+	if err != nil {
+		return
+	}
+
+	if !ok {
+		code = errorNotAllowed
+		err = errors.New("starting or running pod exist")
+
+		return
+	}
+
 	// get cloud conf
 	c := new(domain.Cloud)
 	c.CloudConf, err = s.cloudRepo.GetCloudConf(cmd.CloudId)
@@ -79,9 +92,9 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 		return
 	}
 
-	if !c.HasFree() {
+	if !c.HasIdle() {
 		code = errorResourceBusy
-		err = errors.New("no free resource remain")
+		err = errors.New("no idle resource remain")
 
 		return
 	}

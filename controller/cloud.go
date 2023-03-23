@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/opensourceways/xihe-server/cloud/app"
-	"github.com/opensourceways/xihe-server/cloud/domain"
 )
 
 func AddRouterForCloudController(
@@ -132,10 +131,8 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 	defer ws.Close()
 
 	cmd := app.PodInfoCmd{
-		Pod: domain.Pod{
-			Owner:   pl.DomainAccount(),
-			CloudId: ctx.Param("cid"),
-		},
+		User:    pl.DomainAccount(),
+		CloudId: ctx.Param("cid"),
 	}
 	if err := cmd.Validate(); err != nil {
 		ws.WriteJSON(
@@ -191,10 +188,8 @@ func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 	}
 
 	cmd := app.PodInfoCmd{
-		Pod: domain.Pod{
-			Owner:   pl.DomainAccount(),
-			CloudId: ctx.Param("cid"),
-		},
+		User:    pl.DomainAccount(),
+		CloudId: ctx.Param("cid"),
 	}
 	if err := cmd.Validate(); err != nil {
 		ctl.sendBadRequestBody(ctx)

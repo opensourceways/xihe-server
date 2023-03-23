@@ -34,6 +34,10 @@ func (p *PodInfo) IsExpiried() bool {
 	return utils.Now() > p.Expiry.PodExpiry()
 }
 
+func (p *PodInfo) IsFailedOrTerminated() bool {
+	return p.Status.IsFailed() || p.Status.IsTerminated()
+}
+
 func (p *PodInfo) IsRunningButExpired() bool {
 	return p.IsExpiried() && p.Status.IsRunning()
 }
@@ -62,9 +66,9 @@ func (p *PodInfo) StatusSetFailed() {
 func (p *PodInfo) SetStatus() {
 	if p.AccessURL.AccessURL() != "" {
 		p.StatusSetRunning()
+	} else {
+		p.StatusSetFailed()
 	}
-
-	p.StatusSetFailed()
 }
 
 func (p *PodInfo) SetDefaultExpiry() (err error) {
