@@ -1,6 +1,10 @@
 package app
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/opensourceways/xihe-server/cloud/domain/repository"
+)
 
 func (s *cloudService) ReleasePod(cmd *RelasePodCmd) (code string, err error) {
 	// get pod
@@ -32,12 +36,20 @@ func (s *cloudService) ReleasePod(cmd *RelasePodCmd) (code string, err error) {
 }
 
 func (s *cloudService) Get(cmd *PodInfoCmd) (dto PodInfoDTO, err error) {
-	p, err := s.podRepo.GetUserCloudIdPod(cmd.Owner, cmd.CloudId)
+	p, err := s.podRepo.GetUserCloudIdLastPod(cmd.Owner, cmd.CloudId)
 	if err != nil {
+		if repository.IsErrorResourceNotFound(err) {
+			return dto, nil
+		}
+
 		return
 	}
 
-	dto.toPodInfoDTO(&p.PodInfos[0])
+	if p.IsRunningButExpired() {
+		return
+	}
+
+	dto.toPodInfoDTO(&p)
 
 	return
 }
