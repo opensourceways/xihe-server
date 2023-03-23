@@ -317,6 +317,7 @@ func (h *handler) HandleEventCreateEvaluate(info *message.EvaluateInfo) error {
 
 func (h *handler) HandleEventPodSubscribe(info *cloudtypes.PodInfo) error {
 	return h.do(func(bool) error {
+		fmt.Printf("info: %+v\n", info)
 		if err := h.cloud.CreatePodInstance(info); err != nil {
 			if err != nil {
 				h.log.Error(err)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -271,6 +272,8 @@ type cloudServer struct {
 }
 
 func (t cloudServer) SetPodInfo(c *cloud.CloudPod, info *cloud.PodInfo) (err error) {
+	fmt.Printf("c: %+v\n", c)
+	fmt.Printf("info: %+v\n", info)
 	cmd := new(cloudapp.UpdatePodInternalCmd)
 
 	cmd.PodId = c.Id
