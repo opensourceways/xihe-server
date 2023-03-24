@@ -14,6 +14,11 @@ type SubscribeCloudCmd struct {
 
 type PodInfoCmd SubscribeCloudCmd
 
+type GetCloudConfCmd struct {
+	IsVisitor bool
+	User      types.Account
+}
+
 type RelasePodCmd struct {
 	User  types.Account
 	PodId string
@@ -32,12 +37,14 @@ type CloudConfDTO struct {
 	Image     string `json:"image"`
 	Feature   string `json:"feature"`
 	Processor string `json:"processor"`
+	Credit    int64  `json:"credit"`
 }
 
 type CloudDTO struct {
 	CloudConfDTO
 
-	IsIdle bool `json:"is_idle"`
+	IsIdle     bool `json:"is_idle"`
+	HasHolding bool `json:"has_holding"`
 }
 
 type PodInfoDTO struct {
@@ -73,6 +80,13 @@ func (cmd *PodInfoCmd) Validate() error {
 	return nil
 }
 
+func (cmd *GetCloudConfCmd) ToCmd(user types.Account, visitor bool) {
+	*cmd = GetCloudConfCmd{
+		IsVisitor: visitor,
+		User:      user,
+	}
+}
+
 func (r *UpdatePodInternalCmd) toPodInfo(p *domain.PodInfo) (err error) {
 	p.Id = r.PodId
 	p.Error = r.PodError
@@ -89,13 +103,15 @@ func (r *CloudConfDTO) toCloudConfDTO(c *domain.CloudConf) {
 		Image:     c.Image.CloudImage(),
 		Feature:   c.Feature.CloudFeature(),
 		Processor: c.Processor.CloudProcessor(),
+		Credit:    c.Credit.Credit(),
 	}
 }
 
-func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isIdle bool) {
+func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isIdle bool, hasHolding bool) {
 	r.CloudConfDTO.toCloudConfDTO(&c.CloudConf)
 
 	r.IsIdle = isIdle
+	r.HasHolding = hasHolding
 }
 
 func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {

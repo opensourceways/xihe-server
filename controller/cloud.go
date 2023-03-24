@@ -38,12 +38,19 @@ type CloudController struct {
 // @Failure 500 system_error        system error
 // @Router /v1/cloud [get]
 func (ctl *CloudController) List(ctx *gin.Context) {
-	_, _, ok := ctl.checkUserApiToken(ctx, true)
+	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
 
-	data, err := ctl.s.ListCloud()
+	cmd := new(app.GetCloudConfCmd)
+	if visitor {
+		cmd.ToCmd(nil, visitor)
+	} else {
+		cmd.ToCmd(pl.DomainAccount(), visitor)
+	}
+
+	data, err := ctl.s.ListCloud(cmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {

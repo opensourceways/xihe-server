@@ -95,6 +95,23 @@ func (r *CloudService) CheckUserCanSubsribe(user types.Account, cid string) (
 	return p, false, err
 }
 
+func (r *CloudService) HasHolding(user types.Account, c *domain.CloudConf) (bool, error) {
+	p, err := r.podRepo.GetUserCloudIdLastPod(user, c.Id)
+	if err != nil {
+		if repository.IsErrorResourceNotFound(err) {
+			return false, err
+		}
+
+		return false, err
+	}
+
+	if p.IsHoldingAndNotExpiried() {
+		return true, nil
+	}
+
+	return false, nil
+}
+
 func (r *CloudService) ReleasePod(p *domain.Pod) error {
 	msg := new(message.MsgPod)
 	msg.ToMsgPod(p)

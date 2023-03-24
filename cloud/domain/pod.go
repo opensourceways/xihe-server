@@ -38,8 +38,12 @@ func (p *PodInfo) IsFailedOrTerminated() bool {
 	return p.Status.IsFailed() || p.Status.IsTerminated()
 }
 
-func (p *PodInfo) IsRunningButExpired() bool {
-	return p.IsExpiried() && p.Status.IsRunning()
+func (p *PodInfo) IsHoldingAndNotExpiried() bool {
+	if p.IsExpiried() {
+		return false
+	}
+
+	return p.Status.IsCreating() || p.Status.IsStarting() || p.Status.IsRunning()
 }
 
 func (p *PodInfo) CheckGoodAndSet() bool {
