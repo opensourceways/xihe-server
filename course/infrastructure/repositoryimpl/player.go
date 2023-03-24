@@ -91,8 +91,12 @@ func (impl *playerRepoImpl) PlayerCount(cid string) (int, error) {
 	f := func(ctx context.Context) error {
 
 		pipeline := bson.A{
-			bson.M{"$match": bson.M{fieldCourseId: bson.M{"$eq": cid}}},
-			bson.M{"$count": "total"},
+			bson.M{
+				mongoCmdMatch: bson.M{
+					fieldCourseId: bson.M{mongoCmdEqual: cid},
+				},
+			},
+			bson.M{mongoCmdCount: "total"},
 		}
 
 		cursor, err := impl.cli.Collection().Aggregate(ctx, pipeline)
@@ -137,4 +141,31 @@ func (impl *playerRepoImpl) SaveRepo(course_id string, a *domain.CourseProject, 
 	}
 
 	return err
+}
+
+func (impl *playerRepoImpl) docFilter(account string) bson.M {
+	return bson.M{
+		fieldAccount: account,
+	}
+}
+
+func (impl *playerRepoImpl) FindCoursesUserApplied(u types.Account) (
+	cs []string, err error) {
+	var v []DCoursePlayer
+
+	f := func(ctx context.Context) error {
+		filter := impl.docFilter(u.Account())
+		return impl.cli.GetDocs(ctx, filter, nil, &v)
+	}
+
+	if err = withContext(f); err != nil || len(v) == 0 {
+		return
+	}
+
+	cs = make([]string, len(v))
+	for i := range v {
+		cs[i] = v[i].CourseId
+	}
+
+	return
 }

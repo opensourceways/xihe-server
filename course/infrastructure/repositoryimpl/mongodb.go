@@ -10,8 +10,12 @@ import (
 )
 
 const (
-	mongoCmdSet  = "$set"
-	mongoCmdPush = "$push"
+	mongoCmdSet       = "$set"
+	mongoCmdPush      = "$push"
+	mongoCmdElemMatch = "$elemMatch"
+	mongoCmdMatch     = "$match"
+	mongoCmdEqual     = "$eq"
+	mongoCmdCount     = "$count"
 )
 
 type mongodbClient interface {

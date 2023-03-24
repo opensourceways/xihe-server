@@ -9,6 +9,7 @@ const (
 	fieldVersion  = "version"
 	fieldRepo     = "repo"
 	fieldAsgId    = "asg_id"
+	fieldAsgs     = "assignments"
 )
 
 // Course

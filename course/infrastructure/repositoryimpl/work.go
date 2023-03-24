@@ -6,6 +6,8 @@ import (
 	"github.com/opensourceways/xihe-server/course/domain"
 	"github.com/opensourceways/xihe-server/course/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
+	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -35,7 +37,11 @@ func (impl *workRepoImpl) GetWork(cid string, user types.Account, asgId string, 
 		return impl.cli.GetDocs(ctx, filter, nil, &v)
 	}
 
-	if err = withContext(f); err != nil || len(v) == 0 {
+	if err = withContext(f); err != nil {
+		return
+	}
+	if len(v) == 0 {
+		err = repoerr.NewErrorResourceNotExists(err)
 		return
 	}
 

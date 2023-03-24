@@ -261,7 +261,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForCourseController(
-			v1, courseAppService, proj, user,
+			v1, courseAppService, userAppService, proj, user,
 		)
 
 		controller.AddRouterForHomeController(

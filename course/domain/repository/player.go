@@ -15,4 +15,5 @@ type Player interface {
 	SavePlayer(*domain.Player) error
 	PlayerCount(cid string) (int, error)
 	SaveRepo(course_id string, a *domain.CourseProject, version int) error
+	FindCoursesUserApplied(types.Account) ([]string, error)
 }

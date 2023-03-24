@@ -8,6 +8,7 @@ type Course interface {
 	FindCourse(cid string) (domain.Course, error)
 	FindCourses(*CourseListOption) ([]domain.CourseSummary, error)
 	FindAssignments(cid string) ([]domain.Assignment, error)
+	FindAssignment(cid string, asgId string) (domain.Assignment, error)
 }
 
 type CourseSummary struct {
@@ -16,6 +17,7 @@ type CourseSummary struct {
 }
 
 type CourseListOption struct {
-	Status domain.CourseStatus
-	Type   domain.CourseType
+	CourseIds []string
+	Status    domain.CourseStatus
+	Type      domain.CourseType
 }

@@ -20,6 +20,7 @@ type CourseService interface {
 	ListAssignments(*AsgListCmd) ([]AsgWorkDTO, error)
 	GetSubmissions(*GetSubmissionCmd) (RelateProjectDTO, error)
 	GetCertification(*CourseGetCmd) (CertInfoDTO, error)
+	GetAssignment(*AsgGetCmd) (AsgDTO, error)
 }
 
 func NewCourseService(
@@ -53,6 +54,10 @@ type courseService struct {
 func (s *courseService) List(cmd *CourseListCmd) (
 	dtos []CourseSummaryDTO, err error,
 ) {
+	if cmd.User != nil {
+		return s.getCoursesUserApplied(cmd)
+	}
+
 	return s.listCourses(&repository.CourseListOption{
 		Status: cmd.Status,
 		Type:   cmd.Type,
@@ -79,6 +84,20 @@ func (s *courseService) listCourses(opt *repository.CourseListOption) (
 	}
 
 	return
+}
+
+func (s *courseService) getCoursesUserApplied(cmd *CourseListCmd) (
+	dtos []CourseSummaryDTO, err error,
+) {
+	cs, err := s.playerRepo.FindCoursesUserApplied(cmd.User)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.listCourses(&repository.CourseListOption{
+		Status:    cmd.Status,
+		CourseIds: cs,
+	})
 }
 
 func (s *courseService) Get(cmd *CourseGetCmd) (dto CourseDTO, err error) {
@@ -118,26 +137,37 @@ func (s *courseService) ListAssignments(cmd *AsgListCmd) (
 	}
 
 	dtos = make([]AsgWorkDTO, len(a))
+
 	j := 0
 	for i := 0; i < len(a); i++ {
-
-		w, err := s.workRepo.GetWork(cmd.Cid, cmd.User, a[i].Id, cmd.Status)
-		status := w.Status
-		score := w.Score
-		if err != nil {
-			return nil, err
-		}
-
-		if cmd.Status != nil && cmd.Status.WorkStatus() != status {
-			continue
-
+		status := "not-finish"
+		score := float32(0)
+		if cmd.Status == nil {
+			w, err := s.workRepo.GetWork(cmd.Cid, cmd.User, a[i].Id, nil)
+			if err == nil {
+				score = w.Score
+				status = w.Status
+			}
+		} else if cmd.Status.IsFinished() {
+			w, err := s.workRepo.GetWork(cmd.Cid, cmd.User, a[i].Id, cmd.Status)
+			if err != nil {
+				continue
+			}
+			score = w.Score
+			status = w.Status
+		} else {
+			w, err := s.workRepo.GetWork(cmd.Cid, cmd.User, a[i].Id, nil)
+			if err == nil {
+				if w.Status != cmd.Status.WorkStatus() {
+					continue
+				}
+			}
 		}
 
 		toAsgWorkDTO(&a[i], score, status, &dtos[j])
 		j++
 	}
 	return dtos[:j], err
-
 }
 
 func (s *courseService) GetSubmissions(cmd *GetSubmissionCmd) (
@@ -176,6 +206,33 @@ func (s *courseService) listRelatedProject(project projdomain.Project, count int
 	for i := range dtos {
 		toProjectSummuryDTO(&project, &dtos[i])
 	}
+
+	return
+}
+
+func (s *courseService) GetAssignment(cmd *AsgGetCmd) (
+	dto AsgDTO, err error,
+) {
+	p, err := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
+	if err != nil {
+		return
+	}
+
+	c, err := s.courseRepo.FindCourse(cmd.Cid)
+	if err != nil {
+		return
+	}
+
+	if !c.IsApplyed(&p.Player) {
+		return
+	}
+
+	asg, err := s.courseRepo.FindAssignment(cmd.Cid, cmd.AsgId)
+	if err != nil {
+		return
+	}
+
+	toAsgDTO(&asg, &c, &dto)
 
 	return
 }
