@@ -5,6 +5,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/sirupsen/logrus"
 )
 
 func NewPodRepo(cfg *Config) repository.Pod {
@@ -121,6 +122,11 @@ func (impl *podRepoImpl) AddStartingPod(p *domain.PodInfo) (pid string, err erro
 func (impl *podRepoImpl) UpdatePod(p *domain.PodInfo) error {
 	pod := new(TPod)
 	pod.toTPod(p)
+
+	logrus.Debugf(
+		"update pod(%s/%s) to %v",
+		p.Pod.Id, p.Pod.CloudId, p.AccessURL,
+	)
 
 	filter := map[string]interface{}{
 		fieldId: pod.Id,

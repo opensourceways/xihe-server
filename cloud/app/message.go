@@ -30,12 +30,16 @@ type cloudMessageService struct {
 
 func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
 	// create pod instance by SDK
-	c.manager.Create(
+	err := c.manager.Create(
 		&cloud.CloudPodCreateInfo{
 			PodId:        p.Id,
 			SurvivalTime: c.survivalTimeForPod,
 		},
 	)
+
+	if err != nil {
+		return err
+	}
 
 	// update pod status in DB
 	p.StatusSetCreating()
