@@ -166,6 +166,7 @@ type MongodbCollections struct {
 	Course            string `json:"course"                 required:"true"`
 	CoursePlayer      string `json:"course_player"          required:"true"`
 	CourseWork        string `json:"course_work"            required:"true"`
+	CourseRecord      string `json:"course_record"          required:"true"`
 	CloudConf         string `json:"cloud_conf"             required:"true"`
 }
 

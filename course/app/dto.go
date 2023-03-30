@@ -238,6 +238,12 @@ type GetSubmissionCmd struct {
 	Status domain.WorkStatus
 }
 
+type RecordAddCmd domain.Record
+
+func (cmd *RecordAddCmd) toRecord() (p domain.Record) {
+	return *(*domain.Record)(cmd)
+}
+
 type AsgDTO struct {
 	AsgId      string `json:"asg_id"`
 	CourseName string `json:"course_name"`

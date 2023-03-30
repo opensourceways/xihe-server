@@ -34,6 +34,7 @@ func AddRouterForCourseController(
 	rg.GET("/v1/course/:id/cert", ctl.GetCertification)
 	rg.GET("/v1/course/reginfo", ctl.GetRegisterInfo)
 	rg.GET("/v1/course/:id/asg/:asgid", ctl.GetAssignment)
+	rg.PUT("/v1/course/:id/record", ctl.AddPlayRecord)
 }
 
 type CourseController struct {
@@ -372,5 +373,46 @@ func (ctl *CourseController) GetAssignment(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, data)
+	}
+}
+
+// @Summary AddPlayRecord
+// @Description add play record
+// @Tags  Course
+// @Param	id	path	string					true	"course id"
+// @Param	body	body	PlayRecordRequest	true	"record info"
+// @Accept json
+// @Success 202
+// @Failure 500 system_error        system error
+// @Router /v1/course/{id}/record [put]
+func (ctl *CourseController) AddPlayRecord(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := PlayRecordRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody,
+			"can't fetch request body",
+		))
+
+		return
+	}
+
+	cmd, err := req.toRecordCmd(ctx.Param("id"), pl.DomainAccount())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	if code, err := ctl.s.AddPlayRecord(&cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
 	}
 }

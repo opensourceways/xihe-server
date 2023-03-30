@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/course/domain/user"
 	projdomain "github.com/opensourceways/xihe-server/domain"
 	projectrepo "github.com/opensourceways/xihe-server/domain/repository"
+	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 )
 
 type CourseService interface {
@@ -21,6 +22,7 @@ type CourseService interface {
 	GetSubmissions(*GetSubmissionCmd) (RelateProjectDTO, error)
 	GetCertification(*CourseGetCmd) (CertInfoDTO, error)
 	GetAssignment(*AsgGetCmd) (AsgDTO, error)
+	AddPlayRecord(*RecordAddCmd) (string, error)
 }
 
 func NewCourseService(
@@ -30,6 +32,7 @@ func NewCourseService(
 	courseRepo repository.Course,
 	playerRepo repository.Player,
 	workRepo repository.Work,
+	recordRepo repository.Record,
 ) *courseService {
 	return &courseService{
 		userCli:     userCli,
@@ -38,6 +41,7 @@ func NewCourseService(
 		courseRepo: courseRepo,
 		playerRepo: playerRepo,
 		workRepo:   workRepo,
+		recordRepo: recordRepo,
 	}
 }
 
@@ -48,6 +52,7 @@ type courseService struct {
 	courseRepo repository.Course
 	playerRepo repository.Player
 	workRepo   repository.Work
+	recordRepo repository.Record
 }
 
 // List
@@ -233,6 +238,45 @@ func (s *courseService) GetAssignment(cmd *AsgGetCmd) (
 	}
 
 	toAsgDTO(&asg, &c, &dto)
+
+	return
+}
+
+func (s *courseService) AddPlayRecord(cmd *RecordAddCmd) (
+	code string, err error,
+) {
+	// check phase
+	course, err := s.courseRepo.FindCourse(cmd.Cid)
+	if err != nil {
+		return
+	}
+
+	// check permission
+	player, err := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
+
+	if !course.IsApplyed(&player.Player) {
+		code = errorNoPermission
+		return
+	}
+	r := cmd.toRecord()
+	if _, err = s.recordRepo.FindPlayRecord(&r); err != nil {
+		if repoerr.IsErrorResourceNotExists(err) {
+			err = s.recordRepo.AddPlayRecord(&r)
+			if err != nil {
+				return
+			}
+		}
+	}
+
+	a, err := s.recordRepo.FindPlayRecord(&r)
+	if err != nil {
+		return
+	}
+
+	err = s.recordRepo.UpdatePlayRecord(&r, a.Version)
+	if err != nil {
+		return
+	}
 
 	return
 }
