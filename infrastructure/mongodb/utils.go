@@ -172,7 +172,7 @@ func (cli *client) updateIncDoc(
 	filterOfDoc, update bson.M, version int,
 ) error {
 	filterOfDoc[fieldVersion] = version
-	update[fieldVersion] = version
+	update[fieldVersion] = 1
 	r, err := cli.collection(collection).UpdateOne(
 		ctx, filterOfDoc,
 		bson.M{
