@@ -126,19 +126,21 @@ func (impl *courseRepoImpl) FindAssignment(cid string, aid string) (
 		return impl.cli.GetDoc(ctx, filter, nil, &v)
 	}
 
-	if err := withContext(f); err != nil {
-		if impl.cli.IsDocNotExists(err) {
-			err = repoerr.NewErrorResourceNotExists(err)
-		}
+	if err = withContext(f); err != nil {
+		return
 	}
 
 	if v.Assignments == nil || len(v.Assignments) == 0 {
 		err = repoerr.NewErrorResourceNotExists(err)
 		return
 	}
-
-	if err = v.Assignments[0].toAssignment(&a); err != nil {
-		return
+	for i := range v.Assignments {
+		if v.Assignments[i].Id == aid {
+			if err = v.Assignments[i].toAssignment(&a); err != nil {
+				return
+			}
+			return
+		}
 	}
 
 	return

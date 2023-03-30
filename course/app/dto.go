@@ -250,7 +250,6 @@ type AsgDTO struct {
 	Deadline   string `json:"deadline"`
 	AsgName    string `json:"asg_name"`
 	Desc       string `json:"desc"`
-	IsApply    bool   `json:"is_apply"`
 }
 
 func toAsgDTO(
