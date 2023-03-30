@@ -95,7 +95,7 @@ func (s *courseService) getCoursesUserApplied(cmd *CourseListCmd) (
 	dtos []CourseSummaryDTO, err error,
 ) {
 	cs, err := s.playerRepo.FindCoursesUserApplied(cmd.User)
-	if err != nil {
+	if err != nil || len(cs) == 0 {
 		return nil, err
 	}
 
