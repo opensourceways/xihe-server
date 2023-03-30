@@ -83,7 +83,7 @@ func (impl *userRepoImpl) GetUserRegInfo(user types.Account) (u domain.UserRegIn
 
 	if err = withContext(f); err != nil {
 		if impl.cli.IsDocNotExists(err) {
-			err = repoerr.NewErrorResourceNotExists(err)
+			err = nil
 		}
 
 		return
