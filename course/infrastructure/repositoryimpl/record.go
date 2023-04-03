@@ -53,13 +53,11 @@ func (impl *recordRepoImpl) AddPlayRecord(r *domain.Record) (err error) {
 	f := func(ctx context.Context) error {
 		_, err := impl.cli.NewDocIfNotExist(
 			ctx, bson.M{
-				fieldAccount:     r.User.Account(),
-				fieldCourseId:    r.Cid,
-				fieldSectionId:   r.SectionId,
-				fieldLessonId:    r.LessonId,
-				fieldPointId:     r.PointId,
-				fieldPlayCount:   0,
-				fieldFinishCount: 0,
+				fieldAccount:   r.User.Account(),
+				fieldCourseId:  r.Cid,
+				fieldSectionId: r.SectionId,
+				fieldLessonId:  r.LessonId,
+				fieldPointId:   r.PointId,
 			}, doc,
 		)
 		return err
@@ -82,8 +80,8 @@ func (impl *recordRepoImpl) genRecordDoc(p *domain.Record) (bson.M, error) {
 		SectionId:   p.SectionId.SectionId(),
 		LessonId:    p.LessonId.LessonId(),
 		PointId:     p.PointId,
-		PlayCount:   p.PlayCount,
-		FinishCount: p.FinishCount,
+		PlayCount:   0,
+		FinishCount: 0,
 	}
 
 	return genDoc(obj)
