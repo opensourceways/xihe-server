@@ -101,6 +101,7 @@ func (s *courseService) getCoursesUserApplied(cmd *CourseListCmd) (
 
 	return s.listCourses(&repository.CourseListOption{
 		Status:    cmd.Status,
+		Type:      cmd.Type,
 		CourseIds: cs,
 	})
 }
