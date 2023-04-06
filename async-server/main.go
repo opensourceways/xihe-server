@@ -4,20 +4,20 @@ import (
 	"flag"
 	"os"
 
-	"github.com/opensourceways/community-robot-lib/logrusutil"
 	liboptions "github.com/opensourceways/community-robot-lib/options"
+	"github.com/opensourceways/server-common-lib/logrusutil"
 	"github.com/sirupsen/logrus"
 
+	"github.com/opensourceways/xihe-server/async-server/app"
+	"github.com/opensourceways/xihe-server/async-server/config"
+	"github.com/opensourceways/xihe-server/async-server/infrastructure/bigmodelimpl"
+	"github.com/opensourceways/xihe-server/async-server/infrastructure/poolimpl"
+	"github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/async-server/infrastructure/watchimpl"
+	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
-	"github.com/opensourceways/xihe-server/config"
-	"github.com/opensourceways/xihe-server/controller"
-	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
-	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
-	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
-	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
-	"github.com/opensourceways/xihe-server/server"
 )
 
 type options struct {
@@ -44,7 +44,7 @@ func gatherOptions(fs *flag.FlagSet, args ...string) options {
 }
 
 func main() {
-	logrusutil.ComponentInit("xihe")
+	logrusutil.ComponentInit("xihe-async-server")
 	log := logrus.NewEntry(logrus.StandardLogger())
 
 	o := gatherOptions(
@@ -71,28 +71,6 @@ func main() {
 		logrus.Fatalf("initialize big model failed, err:%s", err.Error())
 	}
 
-	// gitlab
-	if err := gitlab.Init(&cfg.Gitlab); err != nil {
-		logrus.Fatalf("initialize gitlab failed, err:%s", err.Error())
-	}
-
-	// competition
-	if err := competitionimpl.Init(&cfg.Competition); err != nil {
-		logrus.Fatalf("initialize competition failed, err:%s", err.Error())
-	}
-
-	// authing
-	authingimpl.Init(&cfg.Authing)
-
-	// controller
-	api := &cfg.API
-	api.MaxPictureSizeToVQA = cfg.BigModel.MaxPictureSizeToVQA
-	api.MaxPictureSizeToDescribe = cfg.BigModel.MaxPictureSizeToDescribe
-
-	if err := controller.Init(api, log); err != nil {
-		logrus.Fatalf("initialize api controller failed, err:%s", err.Error())
-	}
-
 	// mq
 	if err := messages.Init(cfg.GetMQConfig(), log, cfg.MQ.Topics); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
@@ -100,23 +78,38 @@ func main() {
 
 	defer messages.Exit(log)
 
-	// mongo
-	m := &cfg.Mongodb
-	if err := mongodb.Initialize(m.DBConn, m.DBName); err != nil {
-		logrus.Fatalf("initialize mongodb failed, err:%s", err.Error())
-	}
-
-	defer mongodb.Close()
-
 	// postgresql
 	if err := pgsql.Init(&cfg.Postgresql.DB); err != nil {
 		logrus.Fatalf("init db, err:%s", err.Error())
 	}
 
-	// cfg
-	cfg.InitDomainConfig()
-	cfg.InitAppConfig()
+	// pool
+	if err := poolimpl.Init(&cfg.Pool); err != nil {
+		logrus.Fatalf("init pool, err:%s", err.Error())
+	}
 
-	// run
-	server.StartWebServer(o.service.Port, o.service.GracePeriod, cfg)
+	// bigmodel & sender
+	bm := bigmodels.NewBigModelService()
+	sender := messages.NewMessageSender()
+
+	// aysnc.bigmodel.bigmodel
+	bigmodel := bigmodelimpl.NewBigModelImpl(
+		bigmodelapp.NewAsyncBigModelService(bm, sender),
+	)
+
+	// repository
+	asyncWuKongRepo := repositoryimpl.NewWuKongRequestRepo(&cfg.Postgresql.Config)
+
+	// async app
+	asyncAppService := app.NewAsyncService(bigmodel, nil, asyncWuKongRepo)
+
+	// watch
+	w := watchimpl.NewWather(
+		asyncWuKongRepo,
+		map[string]func() error{
+			"wukong": asyncAppService.AsyncWuKong,
+		},
+	)
+
+	w.Run()
 }

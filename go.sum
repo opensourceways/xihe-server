@@ -316,6 +316,8 @@ github.com/onsi/gomega v1.10.1/go.mod h1:iN09h71vgCQne3DLsj+A5owkum+a2tYe+TOCB1y
 github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb h1:+G1/sm5wGn4nJS4yri3T3jujcty7PDuBjiIh2CP5k5c=
 github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb/go.mod h1:aeTHmjsRPhPpRuUDT95A5YFEFhGzc2OM7OL9HHjsmYM=
 github.com/opensourceways/go-gitee v0.0.0-20220714075315-cb246f1dfb96/go.mod h1:yvVsEMhp7frMblzN1sco4C7cRlnlpqkkn3O2JQNdRu0=
+github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db h1:syzeracFtgfmSWpKvhhvx46RcjsZSjdubbVWO83eDA8=
+github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db/go.mod h1:dQQwRnyuxQIF+E2471Qx6OpMiuTMRO9NGhV4Azduwc8=
 github.com/opensourceways/xihe-finetune v0.0.0-20230106042033-e2993e0d37f8 h1:GFt2A0JEBF4OyrhVGHHZKyXTeSEk04TQR4hej9iiDVk=
 github.com/opensourceways/xihe-finetune v0.0.0-20230106042033-e2993e0d37f8/go.mod h1:x0VCIwxcLTVYLQx1/dtCFcwWEbNIug37BhCb3T4jJ7Q=
 github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26 h1:63pThXt1AFaPtN5UOwtl1VLbNrMEbES+MqLaD9CS2DQ=
@@ -329,6 +331,8 @@ github.com/otiai10/curr v0.0.0-20150429015615-9b4961190c95/go.mod h1:9qAhocn7zKJ
 github.com/otiai10/curr v1.0.0/go.mod h1:LskTG5wDwr8Rs+nNQ+1LlxRjAtTZZjtJW4rMXl6j4vs=
 github.com/otiai10/mint v1.3.0/go.mod h1:F5AjcsTsWUqX+Na9fpHb52P8pcRX2CI6A3ctIT91xUo=
 github.com/otiai10/mint v1.3.3/go.mod h1:/yxELlJQ0ufhjUwhshSj+wFjZ78CnZ48/1wtmBH1OTc=
+github.com/panjf2000/ants v1.2.1 h1:IlhLREssFi+YFOITnHdH3FHhulY6WDS0OB9e7+3fMHk=
+github.com/panjf2000/ants v1.2.1/go.mod h1:AaACblRPzq35m1g3enqYcxspbbiOJJYaxU2wMpm1cXY=
 github.com/pelletier/go-toml/v2 v2.0.1/go.mod h1:r9LEWfGN8R5k0VXJ+0BkIe7MYkRdwZOjgMj2KwnJFUo=
 github.com/pelletier/go-toml/v2 v2.0.7 h1:muncTPStnKRos5dpVKULv2FVd4bMOhNePj9CjgDb8Us=
 github.com/pelletier/go-toml/v2 v2.0.7/go.mod h1:eumQOmlWiOPt5WriQQqoM5y18pDHwha2N+QD+EUNTek=
@@ -582,8 +586,8 @@ golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.2.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.5.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.6.0 h1:MVltZSvRTcU2ljQOhs94SXPftV6DCNnZViHeQps87pQ=
-golang.org/x/sys v0.6.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.7.0 h1:3jlCCIQZPdOYu1h8BkNvLz8Kgwtae2cagcG/VamtZRU=
+golang.org/x/sys v0.7.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/term v0.0.0-20210927222741-03fcf44c2211/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
 golang.org/x/term v0.2.0/go.mod h1:TVmDHMZPmdnySmBfhjOoOdhjzdE1h4u1VwSiw2l1Nuc=

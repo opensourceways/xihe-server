@@ -11,6 +11,9 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
+	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
@@ -23,7 +26,6 @@ import (
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
-	"github.com/opensourceways/xihe-server/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
@@ -137,18 +139,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		),
 	)
 
-	luojia := repositories.NewLuoJiaRepository(
-		mongodb.NewLuoJiaMapper(collections.LuoJia),
-	)
-
-	wukong := repositories.NewWuKongRepository(
-		mongodb.NewWuKongMapper(collections.WuKong),
-	)
-
-	wukongPicture := repositories.NewWuKongPictureRepository(
-		mongodb.NewWuKongPictureMapper(collections.WuKongPicture),
-	)
-
 	bigmodel := bigmodels.NewBigModelService()
 	gitlabUser := gitlab.NewUserSerivce()
 	gitlabRepo := gitlab.NewRepoFile()
@@ -185,6 +175,13 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
 		cloudrepo.NewPodRepo(&cfg.Postgresql.Config),
 		sender,
+	)
+
+	bigmodelAppService := bigmodelapp.NewBigModelService(
+		bigmodel, user,
+		bigmodelrepo.NewLuoJiaRepo(mongodb.NewCollection(collections.LuoJia)),
+		bigmodelrepo.NewWuKongRepo(mongodb.NewCollection(collections.WuKong)),
+		bigmodelrepo.NewWuKongPictureRepo(mongodb.NewCollection(collections.WuKongPicture)), sender,
 	)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
@@ -226,7 +223,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForBigModelController(
-			v1, user, bigmodel, luojia, wukong, wukongPicture, sender,
+			v1, bigmodelAppService,
 		)
 
 		controller.AddRouterForTrainingController(

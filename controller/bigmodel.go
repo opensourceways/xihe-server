@@ -8,24 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"github.com/opensourceways/xihe-server/app"
-	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/bigmodel"
-	"github.com/opensourceways/xihe-server/domain/message"
-	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/bigmodel/app"
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
 )
 
 func AddRouterForBigModelController(
 	rg *gin.RouterGroup,
-	user repository.User,
-	bm bigmodel.BigModel,
-	luojia repository.LuoJia,
-	wukong repository.WuKong,
-	wukongPicture repository.WuKongPicture,
-	sender message.Sender,
+	s app.BigModelService,
 ) {
 	ctl := BigModelController{
-		s: app.NewBigModelService(bm, user, luojia, wukong, wukongPicture, sender),
+		s: s,
 	}
 
 	rg.POST("/v1/bigmodel/describe_picture", ctl.DescribePicture)

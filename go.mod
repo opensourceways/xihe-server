@@ -9,10 +9,12 @@ require (
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.21.12+incompatible
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.11
 	github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb
+	github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db
 	github.com/opensourceways/xihe-finetune v0.0.0-20230106042033-e2993e0d37f8
 	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26
 	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20230320085555-183262889af1
 	github.com/opensourceways/xihe-training-center v0.0.0-20230112032258-ab5e153148d2
+	github.com/panjf2000/ants v1.2.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/swaggo/files v1.0.0
 	github.com/swaggo/gin-swagger v1.5.3
@@ -87,7 +89,7 @@ require (
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect

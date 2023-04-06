@@ -14,7 +14,7 @@ import (
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
-	"github.com/opensourceways/xihe-server/infrastructure/bigmodels"
+	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"

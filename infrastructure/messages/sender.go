@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 
 	"github.com/opensourceways/xihe-server/domain"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -195,9 +196,7 @@ func (s sender) AddOperateLogForNewUser(u domain.Account) error {
 	return s.sendOperateLog(u, "user", nil)
 }
 
-func (s sender) AddOperateLogForAccessBigModel(
-	u domain.Account, t domain.BigmodelType,
-) error {
+func (s sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldomain.BigmodelType) error  {
 	return s.sendOperateLog(u, "bigmodel", map[string]string{
 		"bigmodel": string(t),
 	})

@@ -1,6 +1,7 @@
 package message
 
 import (
+	bmdomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/domain"
 )
 
@@ -30,7 +31,7 @@ type RepoFile struct {
 type Sender interface {
 	AddOperateLogForNewUser(domain.Account) error
 	AddOperateLogForCreateTraining(domain.TrainingIndex) error
-	AddOperateLogForAccessBigModel(domain.Account, domain.BigmodelType) error
+	AddOperateLogForAccessBigModel(domain.Account, bmdomain.BigmodelType) error
 	AddOperateLogForCreateResource(domain.ResourceObject, domain.ResourceName) error
 	AddOperateLogForDownloadFile(domain.Account, RepoFile) error
 
