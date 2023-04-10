@@ -7,9 +7,11 @@ import (
 )
 
 type WuKongRequest struct {
-	Id        string
+	Id        uint64
 	User      types.Account
 	Style     string
 	Desc      bigmodeldomain.WuKongPictureDesc
 	CreatedAt commondomain.Time
 }
+
+

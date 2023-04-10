@@ -1,14 +1,13 @@
 package app
 
 import (
-	"github.com/opensourceways/xihe-server/async-server/domain"
 	"github.com/opensourceways/xihe-server/async-server/domain/bigmodel"
 	"github.com/opensourceways/xihe-server/async-server/domain/pool"
 	"github.com/opensourceways/xihe-server/async-server/domain/repository"
 )
 
 type AsyncService interface {
-	AsyncWuKong() error
+	AsyncWuKong(time int64) error
 }
 
 func NewAsyncService(
@@ -29,10 +28,10 @@ type asyncService struct {
 	repo     repository.WuKongRequest
 }
 
-func (s *asyncService) AsyncWuKong() (err error) {
-	// 1. get waiting tasks
-	var reqs []domain.WuKongRequest
-	if reqs, err = s.repo.GetMultipleWuKongRequest(8); err != nil || len(reqs) == 0 { // TODO config
+func (s *asyncService) AsyncWuKong(time int64) (err error) {
+	// 1. get waiting tasks before oder time
+	var reqs []repository.WuKongTask
+	if reqs, err = s.repo.GetNewRequest(time); err != nil || len(reqs) == 0 { // TODO config
 		return
 	}
 

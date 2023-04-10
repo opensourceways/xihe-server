@@ -1,8 +1,12 @@
 package repositoryimpl
 
-import "github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+import (
+	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+	"gorm.io/gorm"
+)
 
 type pgsqlClient interface {
+	DB() *gorm.DB
 	Create(result interface{}) error
 	Updates(filter, result interface{}) error
 	Count(filter interface{}) (int, error)

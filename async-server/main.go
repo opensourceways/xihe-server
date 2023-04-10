@@ -97,16 +97,20 @@ func main() {
 		bigmodelapp.NewAsyncBigModelService(bm, sender),
 	)
 
-	// repository
+	// repo
 	asyncWuKongRepo := repositoryimpl.NewWuKongRequestRepo(&cfg.Postgresql.Config)
 
 	// async app
-	asyncAppService := app.NewAsyncService(bigmodel, nil, asyncWuKongRepo)
+	asyncAppService := app.NewAsyncService(
+		bigmodel,
+		poolimpl.NewPoolImpl(),
+		asyncWuKongRepo,
+	)
 
 	// watch
 	w := watchimpl.NewWather(
 		asyncWuKongRepo,
-		map[string]func() error{
+		map[string]func(int64) error{
 			"wukong": asyncAppService.AsyncWuKong,
 		},
 	)

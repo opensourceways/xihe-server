@@ -23,10 +23,10 @@ func (impl *bigmodelImpl) GetIdleEndpoint(bid string) (
 }
 
 func (impl *bigmodelImpl) WuKong(d *domain.WuKongRequest) (err error) {
-	cmd := bigmodelapp.WuKongCmd {
+	cmd := bigmodelapp.WuKongCmd{
 		Style: d.Style,
-		Desc: d.Desc,
+		Desc:  d.Desc,
 	}
 
-	return impl.srv.WuKong(d.User, &cmd)
+	return impl.srv.WuKong(d.Id, d.User, &cmd)
 }

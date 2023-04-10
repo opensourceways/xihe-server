@@ -1,7 +1,6 @@
 package repositoryimpl
 
 import (
-	"github.com/opensourceways/xihe-server/async-server/domain"
 	"github.com/opensourceways/xihe-server/async-server/domain/repository"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 )
@@ -16,14 +15,19 @@ type wukongRequestRepoImpl struct {
 	cli pgsqlClient
 }
 
-func (impl *wukongRequestRepoImpl) HasNewRequest(time int64) (
-	b bool, err error,
+func (impl *wukongRequestRepoImpl) GetNewRequest(time int64) (
+	d []repository.WuKongTask, err error,
 ) {
-	return
-}
+	var twukong []TWukongTask
 
-func (impl *wukongRequestRepoImpl) GetMultipleWuKongRequest(num int) (
-	d []domain.WuKongRequest, err error,
-) {
+	impl.cli.DB().
+		Where("created_at > ? AND status = ?", time, "waiting").
+		Find(&twukong)
+
+	d = make([]repository.WuKongTask, len(twukong))
+	for i := range twukong {
+		twukong[i].toWuKongTask(&d[i])
+	}
+
 	return
 }

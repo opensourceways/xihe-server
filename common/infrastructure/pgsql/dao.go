@@ -48,6 +48,10 @@ func NewDBTable(name string) dbTable {
 	return dbTable{name: name}
 }
 
+func (t dbTable) DB() *gorm.DB {
+	return db
+}
+
 func (t dbTable) Create(result interface{}) error {
 	return db.Table(t.name).
 		Create(result).

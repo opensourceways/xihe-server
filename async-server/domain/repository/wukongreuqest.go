@@ -4,7 +4,12 @@ import (
 	"github.com/opensourceways/xihe-server/async-server/domain"
 )
 
+type WuKongTask struct {
+	domain.WuKongRequest
+
+	Status domain.TaskStatus
+}
+
 type WuKongRequest interface {
-	HasNewRequest(time int64) (bool, error)
-	GetMultipleWuKongRequest(num int) ([]domain.WuKongRequest, error)
+	GetNewRequest(time int64) ([]WuKongTask, error)
 }
