@@ -116,4 +116,5 @@ func main() {
 	)
 
 	w.Run()
+	defer w.Exit()
 }

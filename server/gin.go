@@ -173,7 +173,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	cloudAppService := cloudapp.NewCloudService(
 		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
-		cloudrepo.NewPodRepo(&cfg.Postgresql.Config),
+		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
 		sender,
 	)
 
@@ -181,7 +181,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		bigmodel, user,
 		bigmodelrepo.NewLuoJiaRepo(mongodb.NewCollection(collections.LuoJia)),
 		bigmodelrepo.NewWuKongRepo(mongodb.NewCollection(collections.WuKong)),
-		bigmodelrepo.NewWuKongPictureRepo(mongodb.NewCollection(collections.WuKongPicture)), sender,
+		bigmodelrepo.NewWuKongPictureRepo(mongodb.NewCollection(collections.WuKongPicture)),
+		bigmodelrepo.NewWuKongAsyncRepo(&cfg.Postgresql.Bigmodel),
+		sender,
 	)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)

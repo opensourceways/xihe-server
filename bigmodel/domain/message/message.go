@@ -1,15 +1,33 @@
 package message
 
-import "github.com/opensourceways/xihe-server/domain/message"
+import (
+	"github.com/opensourceways/xihe-server/domain/message"
+)
 
-type MsgWuKongLinks struct {
-	Type   string            `json:"type"`
-	TaskId uint64            `json:"task_id"`
-	User   string            `json:"user"`
-	Links  map[string]string `json:"links"`
+type MsgTask struct {
+	Type    string            `json:"type"`
+	TaskId  uint64            `json:"task_id"`
+	User    string            `json:"user"`
+	Status  string            `json:"status"`
+	Details map[string]string `json:"details"`
 }
 
 type AsyncMessageProducer interface {
 	message.Sender
-	UpdateWuKongTask(*MsgWuKongLinks) error
+
+	CreateWuKongTask(*MsgTask) error
+
+	UpdateWuKongTask(*MsgTask) error
+}
+
+func (msg *MsgTask) ToMsgTask(user, desc, style string) {
+	*msg = MsgTask{
+		Type:   "wukong_request",
+		User:   user,
+		Status: "waiting",
+		Details: map[string]string{
+			"style": style,
+			"desc":  desc,
+		},
+	}
 }

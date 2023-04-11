@@ -9,6 +9,9 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/sirupsen/logrus"
 
+	asynctypes "github.com/opensourceways/xihe-server/async-server/domain"
+	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
@@ -116,6 +119,15 @@ func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) erro
 	if err != nil {
 		return err
 	}
+	if s != nil {
+		subscribers[s.Topic()] = s
+	}
+
+	// async
+	if s, err = registerHandlerForAsync(handler); err != nil {
+		return err
+	}
+
 	if s != nil {
 		subscribers[s.Topic()] = s
 	}
@@ -471,5 +483,76 @@ func registerHandlerForCloud(handler interface{}) (mq.Subscriber, error) {
 		v.SetDefaultExpiry()
 
 		return h.HandleEventPodSubscribe(&v)
+	})
+}
+
+func registerHandlerForAsync(handler interface{}) (mq.Subscriber, error) {
+
+	return kafka.Subscribe(topics.Async, func(e mq.Event) (err error) {
+
+		msg := e.Message()
+		if msg == nil {
+			return
+		}
+
+		body := msgAsync{}
+		if err = json.Unmarshal(msg.Body, &body); err != nil {
+			return
+		}
+
+		switch body.Type {
+		case "wukong_update":
+			h, ok := handler.(AsyncUpdateWuKongTaskMessageHandler)
+			if !ok {
+				return
+			}
+
+			status, err := asynctypes.NewTaskStatus(body.Status)
+			if err != nil {
+				return err
+			}
+
+			v := asyncrepo.WuKongResp{
+				WuKongTask: asyncrepo.WuKongTask{
+					Id:     body.TaskId,
+					Status: status,
+				},
+			}
+
+			if body.Details != nil {
+				if v.Links, err = asynctypes.NewLinksFromMap(body.Details); err != nil {
+					return err
+				}
+			}
+
+			return h.HandleEventAsyncTaskWuKongUpdate(&v)
+
+		case "wukong_request":
+			h, ok := handler.(AsyncCreateWuKongTaskMessageHandler)
+			if !ok {
+				return
+			}
+
+			user, err := domain.NewAccount(body.User)
+			if err != nil {
+				return err
+			}
+
+			desc, err := bigmodeldomain.NewWuKongPictureDesc(body.Details["desc"])
+			if err != nil {
+				return err
+			}
+
+			v := asynctypes.WuKongRequest{
+				User:  user,
+				Style: body.Details["style"],
+				Desc:  desc,
+			}
+
+			return h.HandleEventAsyncCreateWuKongTask(&v)
+		}
+
+		return
+
 	})
 }

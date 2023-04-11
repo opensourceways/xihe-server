@@ -1,13 +1,18 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 const (
 	taskStatusWaiting  = "waiting"
+	taskStatusRunning  = "running"
 	taskStatusFinished = "finished"
 	taskStatusError    = "error"
 )
 
+// taskStatus
 type TaskStatus interface {
 	TaskStatus() string
 	IsWaiting() bool
@@ -17,6 +22,7 @@ type TaskStatus interface {
 
 func NewTaskStatus(v string) (TaskStatus, error) {
 	b := v == taskStatusWaiting ||
+		v == taskStatusRunning ||
 		v == taskStatusFinished ||
 		v == taskStatusError
 
@@ -43,4 +49,49 @@ func (r dptaskstatus) IsFinished() bool {
 
 func (r dptaskstatus) IsError() bool {
 	return r.TaskStatus() == taskStatusError
+}
+
+// Links
+type Links interface {
+	Links() []string
+	StringLinks() string
+}
+
+func NewLinks(v string) (Links, error) {
+	if v == "" {
+		return nil, errors.New("invalid value")
+	}
+
+	return dplinks(strings.Split(v, ",")), nil
+}
+
+func NewLinksFromMap(v map[string]string) (Links, error) {
+	if len(v) == 0 {
+		return nil, errors.New("invalid value")
+	}
+
+	a := make([]string, len(v))
+	var i int
+	for _, val := range v {
+		a[i] = val
+		i++
+	}
+
+	return dplinks(a), nil
+}
+
+type dplinks []string
+
+func (r dplinks) Links() []string {
+	return ([]string)(r)
+}
+
+func (r dplinks) StringLinks() string {
+	s := ""
+
+	for _, v := range r.Links() {
+		s += v + ","
+	}
+
+	return strings.TrimRight(s, ",")
 }

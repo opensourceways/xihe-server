@@ -31,6 +31,9 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/codegeex", ctl.CodeGeex)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
 	rg.POST("/v1/bigmodel/wukong_icbc", ctl.WuKongICBC)
+	rg.POST("/v1/bigmodel/wukong_async", ctl.WuKongAsync)
+	rg.GET("/v1/bigmodel/wukong/rank", ctl.WuKongRank)
+	rg.GET("/v1/bigmodel/wukong/task", ctl.WuKongLastFinisedTask)
 	rg.POST("/v1/bigmodel/wukong/like", ctl.AddLike)
 	rg.POST("/v1/bigmodel/wukong/public", ctl.AddPublic)
 	rg.GET("/v1/bigmodel/wukong/public", ctl.ListPublic)
@@ -496,6 +499,83 @@ func (ctl *BigModelController) WuKongICBC(ctx *gin.Context) {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, wukongPicturesGenerateResp{v})
+	}
+}
+
+// @Title WuKong
+// @Description send async wukong request task
+// @Tags  BigModel
+// @Param	body	body 	wukongRequest	true	"body of wukong"
+// @Accept json
+// @Success 201 {object} wukongPicturesGenerateResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong_async [post]
+func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := wukongRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if err := ctl.s.WuKongInferenceAsync(pl.DomainAccount(), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPost(ctx, "")
+	}
+}
+
+// @Title WuKongRank
+// @Description get wukong rank
+// @Tags  BigModel
+// @Accept json
+// @Success 200 {object} app.WuKongRankDTO
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/rank [get]
+func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	v, err := ctl.s.GetWuKongWaitingTaskRank(pl.DomainAccount())
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfGet(ctx, v)
+	}
+}
+
+// @Title WuKongRank
+// @Description get last finished task
+// @Tags  BigModel
+// @Accept json
+// @Success 200 {object} app.WuKongRankDTO
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/task [get]
+func (ctl *BigModelController) WuKongLastFinisedTask(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	v, err := ctl.s.GetWuKongLastTaskResp(pl.DomainAccount())
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfGet(ctx, v)
 	}
 }
 

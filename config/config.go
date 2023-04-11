@@ -9,12 +9,13 @@ import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	"github.com/opensourceways/xihe-server/app"
+	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	bigmodelrepoimpl "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
-	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
@@ -87,7 +88,8 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.Domain,
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
-		&cfg.Postgresql.Config,
+		&cfg.Postgresql.Cloud,
+		&cfg.Postgresql.Bigmodel,
 		&cfg.Gitlab,
 		&cfg.App,
 		&cfg.API,
@@ -138,7 +140,8 @@ type Mongodb struct {
 type PostgresqlConfig struct {
 	DB pgsql.Config `json:"db" required:"true"`
 
-	cloudrepoimpl.Config
+	Cloud    cloudrepoimpl.Config
+	Bigmodel bigmodelrepoimpl.Config
 }
 
 type MongodbCollections struct {

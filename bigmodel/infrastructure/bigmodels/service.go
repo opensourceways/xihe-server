@@ -132,14 +132,10 @@ func (s *service) doIfFree(
 }
 
 func (s *service) GetIdleEndpoint(bid string) (c int, err error) {
-	
-	f := func (c chan string) int {
-		return cap(c) - len(c)
-	}
 
-	switch bid{
+	switch bid {
 	case "wukong":
-		c = f(s.wukongInfo.endpoints)
+		c = len(s.wukongInfo.endpoints)
 
 		return
 	default:

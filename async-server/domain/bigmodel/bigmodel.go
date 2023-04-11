@@ -1,8 +1,10 @@
 package bigmodel
 
-import "github.com/opensourceways/xihe-server/async-server/domain"
+import (
+	"github.com/opensourceways/xihe-server/async-server/domain/repository"
+)
 
 type BigModel interface {
 	GetIdleEndpoint(bid string) (int, error)
-	WuKong(*domain.WuKongRequest) error
+	WuKong(*repository.WuKongTask) error
 }

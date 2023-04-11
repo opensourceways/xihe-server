@@ -4,7 +4,10 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/opensourceways/community-robot-lib/utils"
 
+	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
+	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
@@ -21,10 +24,18 @@ type configuration struct {
 	Evaluate   evaluateConfig          `json:"evaluate"     required:"true"`
 	Cloud      cloudConfig             `json:"cloud"        required:"true"`
 	Mongodb    config.Mongodb          `json:"mongodb"      required:"true"`
-	Postgresql config.PostgresqlConfig `json:"postgresql"   required:"true"`
+	Postgresql PostgresqlConfig `json:"postgresql"   required:"true"`
 	Domain     domain.Config           `json:"domain"       required:"true"`
 	MQ         config.MQ               `json:"mq"           required:"true"`
 }
+
+type PostgresqlConfig struct {
+	DB pgsql.Config `json:"db" required:"true"`
+
+	cloudconf cloudrepoimpl.Config
+	asyncconf asyncrepoimpl.Config
+}
+
 
 func (cfg *configuration) getMQConfig() mq.MQConfig {
 	return mq.MQConfig{
@@ -38,7 +49,8 @@ func (cfg *configuration) configItems() []interface{} {
 		&cfg.Evaluate,
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
-		&cfg.Postgresql.Config,
+		&cfg.Postgresql.cloudconf,
+		&cfg.Postgresql.asyncconf,
 		&cfg.Domain,
 		&cfg.MQ,
 	}

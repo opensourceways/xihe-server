@@ -8,6 +8,9 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
+	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
+	asyncdomain "github.com/opensourceways/xihe-server/async-server/domain"
+	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/domain"
@@ -45,6 +48,7 @@ type handler struct {
 	evaluate  app.EvaluateMessageService
 	inference app.InferenceMessageService
 	cloud     cloudapp.CloudMessageService
+	async     asyncapp.AsyncMessageService
 }
 
 func (h *handler) HandleEventAddRelatedResource(info *message.RelatedResource) error {
@@ -318,6 +322,30 @@ func (h *handler) HandleEventCreateEvaluate(info *message.EvaluateInfo) error {
 func (h *handler) HandleEventPodSubscribe(info *cloudtypes.PodInfo) error {
 	return h.do(func(bool) error {
 		if err := h.cloud.CreatePodInstance(info); err != nil {
+			if err != nil {
+				h.log.Error(err)
+			}
+		}
+
+		return nil
+	})
+}
+
+func (h *handler) HandleEventAsyncTaskWuKongUpdate(info *asyncrepo.WuKongResp) error {
+	return h.do(func(bool) error {
+		if err := h.async.UpdateWuKongTask(info); err != nil {
+			if err != nil {
+				h.log.Error(err)
+			}
+		}
+
+		return nil
+	})
+}
+
+func (h *handler) HandleEventAsyncCreateWuKongTask(info *asyncdomain.WuKongRequest) error {
+	return h.do(func(bool) error {
+		if err := h.async.CreateWuKongTask(info); err != nil {
 			if err != nil {
 				h.log.Error(err)
 			}

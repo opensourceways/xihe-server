@@ -14,7 +14,7 @@ type ErrorResourceNotFound struct {
 	error
 }
 
-func NewErrorResourceNotFound(err error) ErrorResourceNotFound {
+func NewErrorResourceNotFound(err error) ErrorResourceNotFound {	// TODO function name error, transfer to NotExsits
 	return ErrorResourceNotFound{err}
 }
 

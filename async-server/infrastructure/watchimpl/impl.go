@@ -13,6 +13,7 @@ type Watcher struct {
 	repo repository.WuKongRequest
 
 	handles map[string]func(int64) error
+	timer   *time.Ticker
 	wg      sync.WaitGroup
 }
 
@@ -20,8 +21,10 @@ func NewWather(
 	repo repository.WuKongRequest,
 	handles map[string]func(int64) error,
 ) *Watcher {
+
 	return &Watcher{
 		repo:    repo,
+		timer:   time.NewTicker(time.Second * 30), // TODO config
 		handles: handles,
 	}
 }
@@ -29,17 +32,13 @@ func NewWather(
 func (w *Watcher) watchRequset() (err error) {
 	logrus.Debug("start watching request")
 
-	const swapTime = time.Second * 30
-
-	t := time.NewTicker(swapTime)
-	defer t.Stop()
-
-	for now := range t.C {
+	for now := range w.timer.C {
 
 		for bname := range w.handles {
 			w.wg.Add(1)
-			go w.work(bname, now.Unix() - int64(swapTime))
+			go w.work(bname, now.Add(-300*time.Second).Unix()) // only select 300s task before now
 		}
+
 	}
 
 	return
@@ -61,4 +60,10 @@ func (w *Watcher) Run() {
 
 	w.watchRequset()
 
+}
+
+func (w *Watcher) Exit() {
+	w.timer.Stop()
+
+	w.wg.Wait()
 }

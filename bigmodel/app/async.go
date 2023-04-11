@@ -6,7 +6,6 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/message"
-	bigmodelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	types "github.com/opensourceways/xihe-server/domain"
 )
 
@@ -34,6 +33,12 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 	// 1. inference
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
+	s.sender.UpdateWuKongTask(&message.MsgTask{
+		Type:   "wukong_update",
+		TaskId: tid,
+		Status: "running",
+	})
+
 	links, err := s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd))
 	if err != nil {
 		err = errors.New("access overload, please try again later")
@@ -42,11 +47,12 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 	}
 
 	// 2. send msg
-	return s.sender.UpdateWuKongTask(&bigmodelmsg.MsgWuKongLinks{
-		Type:   "wukong",
-		TaskId: tid,
-		User:   user.Account(),
-		Links:  links,
+	return s.sender.UpdateWuKongTask(&message.MsgTask{
+		Type:    "wukong_update",
+		TaskId:  tid,
+		User:    user.Account(),
+		Status:  "finished",
+		Details: links,
 	})
 }
 

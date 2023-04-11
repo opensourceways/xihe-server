@@ -1,7 +1,6 @@
 package pool
 
 import (
-	"github.com/opensourceways/xihe-server/async-server/domain"
 	"github.com/opensourceways/xihe-server/async-server/domain/repository"
 )
 
@@ -12,12 +11,12 @@ type Pool interface {
 	DoTasks(TaskList) error
 }
 
-func (r *TaskList) InitTaskList(reqs []repository.WuKongTask, f func(*domain.WuKongRequest) error) {
+func (r *TaskList) InitTaskList(reqs []repository.WuKongTask, f func(*repository.WuKongTask) error) {
 	*r = make(TaskList, len(reqs))
 
 	for i := range reqs {
 		([]func())(*r)[i] = func() {
-			f(&reqs[i].WuKongRequest)
+			f(&reqs[i])
 		}
 	}
 }

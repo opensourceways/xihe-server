@@ -195,3 +195,11 @@ type msgPodCreate struct {
 	CloudId   string `json:"cloud_id"`
 	CloudName string `json:"cloud_name"`
 }
+
+type msgAsync struct {
+	Type    string            `json:"type"`
+	TaskId  uint64            `json:"task_id"`
+	User    string            `json:"user"`
+	Status  string            `json:"status"`
+	Details map[string]string `json:"details"`
+}

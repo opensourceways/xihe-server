@@ -149,3 +149,11 @@ type WuKongPublicGlobalDTO struct {
 	Pictures []WuKongPublicDTO `json:"pictures"`
 	Total    int               `json:"total"`
 }
+
+type WuKongLinksDTO struct {
+	Pictures []string `json:"pictures"`
+}
+
+type WuKongRankDTO struct {
+	Rank int `json:"rank"`
+}

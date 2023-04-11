@@ -1,8 +1,8 @@
 package bigmodelimpl
 
 import (
-	"github.com/opensourceways/xihe-server/async-server/domain"
 	"github.com/opensourceways/xihe-server/async-server/domain/bigmodel"
+	"github.com/opensourceways/xihe-server/async-server/domain/repository"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 )
 
@@ -22,7 +22,7 @@ func (impl *bigmodelImpl) GetIdleEndpoint(bid string) (
 	return impl.srv.GetIdleEndpoint(bid)
 }
 
-func (impl *bigmodelImpl) WuKong(d *domain.WuKongRequest) (err error) {
+func (impl *bigmodelImpl) WuKong(d *repository.WuKongTask) (err error) {
 	cmd := bigmodelapp.WuKongCmd{
 		Style: d.Style,
 		Desc:  d.Desc,
