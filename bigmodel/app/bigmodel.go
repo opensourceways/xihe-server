@@ -12,6 +12,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/repository"
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
 	corepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
@@ -39,9 +40,9 @@ type BigModelService interface {
 	// wukong
 	GenWuKongSamples(int) ([]string, error)
 	WuKong(types.Account, *WuKongCmd) (map[string]string, string, error)
-	WuKongInferenceAsync(types.Account, *WuKongCmd) error
+	WuKongInferenceAsync(types.Account, *WuKongCmd) (string, error)
 	GetWuKongWaitingTaskRank(types.Account) (WuKongRankDTO, error)
-	GetWuKongLastTaskResp(types.Account) (WuKongLinksDTO, error)
+	GetWuKongLastTaskResp(types.Account) (WuKongLinksDTO, string, error)
 	AddLikeFromTempPicture(*WuKongAddLikeFromTempCmd) (string, string, error)
 	AddLikeFromPublicPicture(*WuKongAddLikeFromPublicCmd) (string, string, error)
 	AddPublicFromTempPicture(*WuKongAddPublicFromTempCmd) (string, string, error)
@@ -125,11 +126,18 @@ func (s bigModelService) WuKong(
 	return
 }
 
-func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd) error {
+func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd) (code string, err error) {
+	// content audit
+	if err = s.fm.CheckText(cmd.Desc.WuKongPictureDesc()); err != nil {
+		code = ErrorBigModelSensitiveInfo
+
+		return
+	}
+
 	msg := new(message.MsgTask)
 	msg.ToMsgTask(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style)
 
-	return s.sender.CreateWuKongTask(msg)
+	return "", s.sender.CreateWuKongTask(msg)
 }
 
 func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account) (dto WuKongRankDTO, err error) {
@@ -137,7 +145,7 @@ func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account) (dto WuKon
 
 	var rank int
 	if rank, err = s.wukongAsyncRepo.GetWaitingTaskRank(user, t); err != nil {
-		if !repository.IsErrorResourceNotExists(err) {
+		if !commonrepo.IsErrorResourceNotExists(err) {
 			return
 		}
 	}
@@ -149,9 +157,33 @@ func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account) (dto WuKon
 	return
 }
 
-func (s bigModelService) GetWuKongLastTaskResp(user types.Account) (dto WuKongLinksDTO, err error) {
+func (s bigModelService) GetWuKongLastTaskResp(user types.Account) (dto WuKongLinksDTO, code string, err error) {
 	p, err := s.wukongAsyncRepo.GetLastFinishedTask(user)
 	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			code = ErrorWuKongNoPicture
+			err = errors.New("wukong picture record not found")
+		}
+
+		return
+	}
+
+	if p.Status.IsError() {
+		err = errors.New(p.Links.StringLinks())
+
+		if bigmodel.IsErrorSensitiveInfo(err) {
+			code = ErrorBigModelSensitiveInfo
+		} else {
+			code = ErrorCodeSytem
+		}
+
+		return
+	}
+
+	if p.Status.IsRunning() {
+		code = ErrorCodeSytem
+		err = errors.New("task is running, please try it later")
+
 		return
 	}
 
@@ -264,7 +296,7 @@ func (s bigModelService) AddLikeFromPublicPicture(
 func (s bigModelService) CancelLike(user types.Account, pid string) (err error) {
 	v, err := s.wukongPicture.GetLikeByUserName(user, pid)
 	if err != nil {
-		if repository.IsErrorResourceNotExists(err) {
+		if commonrepo.IsErrorResourceNotExists(err) {
 			err = nil
 		}
 

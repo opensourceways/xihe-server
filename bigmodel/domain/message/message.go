@@ -31,3 +31,15 @@ func (msg *MsgTask) ToMsgTask(user, desc, style string) {
 		},
 	}
 }
+
+func (msg *MsgTask) SetErrorMsgTask(tid uint64, user, errMsg string) {
+	*msg = MsgTask{
+		Type:   "wukong_update",
+		TaskId: tid,
+		User:   user,
+		Status: "error",
+		Details: map[string]string{
+			"error": errMsg,
+		},
+	}
+}

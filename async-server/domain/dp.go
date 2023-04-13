@@ -16,6 +16,7 @@ const (
 type TaskStatus interface {
 	TaskStatus() string
 	IsWaiting() bool
+	IsRunning() bool
 	IsFinished() bool
 	IsError() bool
 }
@@ -43,6 +44,10 @@ func (r dptaskstatus) IsWaiting() bool {
 	return r.TaskStatus() == taskStatusWaiting
 }
 
+func (r dptaskstatus) IsRunning() bool {
+	return r.TaskStatus() == taskStatusRunning
+}
+
 func (r dptaskstatus) IsFinished() bool {
 	return r.TaskStatus() == taskStatusFinished
 }
@@ -58,10 +63,6 @@ type Links interface {
 }
 
 func NewLinks(v string) (Links, error) {
-	if v == "" {
-		return nil, errors.New("invalid value")
-	}
-
 	return dplinks(strings.Split(v, ",")), nil
 }
 

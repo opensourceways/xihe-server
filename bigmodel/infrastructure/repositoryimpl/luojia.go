@@ -6,6 +6,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/repository"
+	commoninfra "github.com/opensourceways/xihe-server/common/infrastructure"
 	types "github.com/opensourceways/xihe-server/domain"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -29,14 +30,14 @@ func (impl luojiaRepoImpl) Save(ur *domain.UserLuoJiaRecord) (r domain.LuoJiaRec
 
 	luojiaDoc, err := impl.genLuoJiaDoc(ur)
 	if err != nil {
-		err = convertError(err)
+		err = commoninfra.ConvertError(err)
 
 		return
 	}
 
 	luojiaItemDoc, err := impl.genLuoJiaItemDoc(&ur.LuoJiaRecord)
 	if err != nil {
-		err = convertError(err)
+		err = commoninfra.ConvertError(err)
 
 		return
 	}

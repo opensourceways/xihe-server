@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
 )
 
@@ -81,7 +82,7 @@ func (r *CloudService) CheckUserCanSubsribe(user types.Account, cid string) (
 ) {
 	p, err = r.podRepo.GetUserCloudIdLastPod(user, cid)
 	if err != nil {
-		if repository.IsErrorResourceNotFound(err) {
+		if commonrepo.IsErrorResourceNotExists(err) {
 			return p, true, nil
 		}
 
@@ -98,7 +99,7 @@ func (r *CloudService) CheckUserCanSubsribe(user types.Account, cid string) (
 func (r *CloudService) HasHolding(user types.Account, c *domain.CloudConf) (bool, error) {
 	p, err := r.podRepo.GetUserCloudIdLastPod(user, c.Id)
 	if err != nil {
-		if repository.IsErrorResourceNotFound(err) {
+		if commonrepo.IsErrorResourceNotExists(err) {
 			return false, err
 		}
 

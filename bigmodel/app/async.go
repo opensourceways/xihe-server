@@ -41,12 +41,19 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 
 	links, err := s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd))
 	if err != nil {
-		err = errors.New("access overload, please try again later")
+		if !bigmodel.IsErrorSensitiveInfo(err) {
+			err = errors.New("internal error")
+		}
+
+		msg := new(message.MsgTask)
+		msg.SetErrorMsgTask(tid, user.Account(), err.Error())
+
+		s.sender.UpdateWuKongTask(msg)
 
 		return
 	}
 
-	// 2. send msg
+	// 3. send msg
 	return s.sender.UpdateWuKongTask(&message.MsgTask{
 		Type:    "wukong_update",
 		TaskId:  tid,

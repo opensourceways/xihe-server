@@ -13,19 +13,22 @@ type Watcher struct {
 	repo repository.WuKongRequest
 
 	handles map[string]func(int64) error
+	cfg     Config
 	timer   *time.Ticker
 	wg      sync.WaitGroup
 }
 
 func NewWather(
+	cfg Config,
 	repo repository.WuKongRequest,
 	handles map[string]func(int64) error,
 ) *Watcher {
 
 	return &Watcher{
 		repo:    repo,
-		timer:   time.NewTicker(time.Second * 30), // TODO config
+		timer:   time.NewTicker(time.Duration(cfg.Time.TriggerTime) * time.Second),
 		handles: handles,
+		cfg:     cfg,
 	}
 }
 
@@ -36,7 +39,7 @@ func (w *Watcher) watchRequset() (err error) {
 
 		for bname := range w.handles {
 			w.wg.Add(1)
-			go w.work(bname, now.Add(-300*time.Second).Unix()) // only select 300s task before now
+			go w.work(bname, now.Add(-time.Duration(w.cfg.Time.ScanTime)*time.Second).Unix())
 		}
 
 	}

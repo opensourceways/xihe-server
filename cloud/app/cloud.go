@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/cloud/domain"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
 	"github.com/opensourceways/xihe-server/cloud/domain/service"
@@ -73,7 +74,7 @@ func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err erro
 	for i := range c {
 		var b bool
 		if b, err = s.cloudService.HasHolding(types.Account(cmd.User), &c[i].CloudConf); err != nil {
-			if !repository.IsErrorResourceNotFound(err) {
+			if !commonrepo.IsErrorResourceNotExists(err) {
 				return
 			}
 

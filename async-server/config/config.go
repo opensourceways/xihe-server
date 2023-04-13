@@ -7,6 +7,7 @@ import (
 
 	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/opensourceways/community-robot-lib/utils"
+	"github.com/opensourceways/xihe-server/async-server/infrastructure/watchimpl"
 
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/poolimpl"
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
@@ -50,6 +51,7 @@ type Config struct {
 	Postgresql PostgresqlConfig `json:"postgresql"   required:"true"`
 	MQ         MQ               `json:"mq"           required:"true"`
 	Pool       poolimpl.Config  `json:"pool"         required:"true"`
+	Watcher    watchimpl.Config `json:"watcher"      required:"true"`
 }
 
 func (cfg *Config) GetMQConfig() mq.MQConfig {

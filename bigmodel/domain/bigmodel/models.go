@@ -18,15 +18,12 @@ type CodeGeexResp struct {
 }
 
 type BigModel interface {
-	DescribePicture(io.Reader, string, int64) (string, error)
-	GenPicture(types.Account, string) (string, error)
-	GenPictures(types.Account, string) ([]string, error)
-	Ask(domain.Question, string) (string, error)
-	VQAUploadPicture(f io.Reader, u types.Account, fileName string) error
-	LuoJiaUploadPicture(f io.Reader, u types.Account) error
-	PanGu(string) (string, error)
-	LuoJia(string) (string, error)
-	CodeGeex(*CodeGeexReq) (CodeGeexResp, error)
+	// common
+	GetIdleEndpoint(bid string) (c int, err error)
+	CheckText(content string) error
+	CheckImages(urls []string) error
+
+	// wukong
 	GetWuKongSampleId() string
 	GenWuKongSampleNums(int) []int
 	GenPicturesByWuKong(types.Account, *domain.WuKongPictureMeta) (map[string]string, error)
@@ -37,5 +34,21 @@ type BigModel interface {
 	CheckWuKongPictureTempToLike(types.Account, string) (domain.WuKongPictureMeta, string, error)
 	CheckWuKongPicturePublicToLike(types.Account, string) (string, error)
 	CheckWuKongPictureToPublic(types.Account, string) (domain.WuKongPictureMeta, string, error)
-	GetIdleEndpoint(bid string) (c int, err error)
+
+	// taichu
+	DescribePicture(io.Reader, string, int64) (string, error)
+	GenPicture(types.Account, string) (string, error)
+	GenPictures(types.Account, string) ([]string, error)
+	Ask(domain.Question, string) (string, error)
+	VQAUploadPicture(f io.Reader, u types.Account, fileName string) error
+
+	// luojia
+	LuoJiaUploadPicture(f io.Reader, u types.Account) error
+	LuoJia(string) (string, error)
+
+	// pangu
+	PanGu(string) (string, error)
+
+	// codegeex
+	CodeGeex(*CodeGeexReq) (CodeGeexResp, error)
 }

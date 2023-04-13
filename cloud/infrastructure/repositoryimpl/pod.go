@@ -3,6 +3,7 @@ package repositoryimpl
 import (
 	"github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/sirupsen/logrus"
@@ -56,7 +57,7 @@ func (impl *podRepoImpl) getOrderOnePod(filter, order interface{}) (
 	var tpod TPod
 	if err = impl.cli.GetOrderOneRecord(filter, order, &tpod); err != nil {
 		if impl.cli.IsRowNotFound(err) {
-			err = repository.NewErrorResourceNotFound(err)
+			err = commonrepo.NewErrorResourceNotExists(err)
 		}
 	} else {
 		if err = tpod.toPodInfo(&pod); err != nil {

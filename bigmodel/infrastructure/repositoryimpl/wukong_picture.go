@@ -6,6 +6,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/repository"
+	commoninfra "github.com/opensourceways/xihe-server/common/infrastructure"
 	types "github.com/opensourceways/xihe-server/domain"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -106,7 +107,7 @@ func (impl *wukongPictureRepoImpl) SaveLike(user types.Account, p *domain.WuKong
 
 	v, err := impl.insertIntoFieldName(user.Account(), p, version, fieldLikes)
 	if err != nil {
-		return "", convertError(err)
+		return "", commoninfra.ConvertError(err)
 	}
 
 	return v, nil
@@ -121,7 +122,7 @@ func (impl *wukongPictureRepoImpl) SavePublic(p *domain.WuKongPicture, version i
 
 	v, err := impl.insertIntoFieldName(p.Owner.Account(), p, version, fieldPublics)
 	if err != nil {
-		return "", convertError(err)
+		return "", commoninfra.ConvertError(err)
 	}
 
 	return v, nil
@@ -205,7 +206,7 @@ func (impl *wukongPictureRepoImpl) insert(
 
 func (impl *wukongPictureRepoImpl) DeleteLike(user types.Account, pid string) error {
 	if err := impl.deleteFieldName(user.Account(), pid, fieldLikes); err != nil {
-		return convertError(err)
+		return commoninfra.ConvertError(err)
 	}
 
 	return nil
@@ -213,7 +214,7 @@ func (impl *wukongPictureRepoImpl) DeleteLike(user types.Account, pid string) er
 
 func (impl *wukongPictureRepoImpl) DeletePublic(user types.Account, pid string) error {
 	if err := impl.deleteFieldName(user.Account(), pid, fieldPublics); err != nil {
-		return convertError(err)
+		return commoninfra.ConvertError(err)
 	}
 
 	return nil
@@ -235,7 +236,7 @@ func (impl *wukongPictureRepoImpl) GetLikeByUserName(user types.Account, pid str
 	p domain.WuKongPicture, err error,
 ) {
 	if p, err = impl.getByUserName(user.Account(), pid, fieldLikes); err != nil {
-		err = convertError(err)
+		err = commoninfra.ConvertError(err)
 
 		return
 	}
@@ -247,7 +248,7 @@ func (impl *wukongPictureRepoImpl) GetPublicByUserName(user types.Account, pid s
 	p domain.WuKongPicture, err error,
 ) {
 	if p, err = impl.getByUserName(user.Account(), pid, fieldPublics); err != nil {
-		err = convertError(err)
+		err = commoninfra.ConvertError(err)
 
 		return
 	}
@@ -282,7 +283,7 @@ func (impl *wukongPictureRepoImpl) getByUserName(user, pid, field string) (
 	}
 
 	if len(v) == 0 || len(l) == 0 {
-		err = NewErrorDataNotExists(errDocNotExists)
+		err = commoninfra.NewErrorDataNotExists(errDocNotExists)
 
 		return
 	}
@@ -375,7 +376,7 @@ func (impl *wukongPictureRepoImpl) UpdatePublicPicture(
 	}
 
 	if !updated {
-		return NewErrorConcurrentUpdating(errDocNoUpdate)
+		return commoninfra.NewErrorConcurrentUpdating(errDocNoUpdate)
 	}
 
 	return

@@ -3,6 +3,7 @@ package repositoryimpl
 import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain/repository"
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	types "github.com/opensourceways/xihe-server/domain"
 )
@@ -22,11 +23,11 @@ func (impl *wukongAsyncRepoImpl) GetWaitingTaskRank(user types.Account, t common
 
 	// 1. get all task before t
 	err = impl.cli.DB().
-		Where("created_at > ? and status = ?", t.Time(), "waiting").
+		Where("created_at > ? and status IN ?", t.Time(), []string{"waiting", "running"}).
 		Find(&twukong).Error
 	if err != nil {
 		if impl.cli.IsRowNotFound(err) {
-			err = repository.NewErrorResourceNotExists(err)
+			err = commonrepo.NewErrorResourceNotExists(err)
 
 			return
 		}
@@ -76,7 +77,7 @@ func (impl *wukongAsyncRepoImpl) GetLastFinishedTask(user types.Account) (resp r
 
 	if err = impl.cli.GetOrderOneRecord(filter, order, &twukong); err != nil {
 		if impl.cli.IsRowNotFound(err) {
-			err = repository.NewErrorResourceNotExists(err)
+			err = commonrepo.NewErrorResourceNotExists(err)
 
 			return
 		}

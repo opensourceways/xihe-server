@@ -530,8 +530,8 @@ func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctl.s.WuKongInferenceAsync(pl.DomainAccount(), &cmd); err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+	if code, err := ctl.s.WuKongInferenceAsync(pl.DomainAccount(), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, "")
 	}
@@ -571,9 +571,9 @@ func (ctl *BigModelController) WuKongLastFinisedTask(ctx *gin.Context) {
 		return
 	}
 
-	v, err := ctl.s.GetWuKongLastTaskResp(pl.DomainAccount())
+	v, code, err := ctl.s.GetWuKongLastTaskResp(pl.DomainAccount())
 	if err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfGet(ctx, v)
 	}

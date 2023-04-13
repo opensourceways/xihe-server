@@ -1,6 +1,6 @@
-package repositoryimpl
+package infrastructure
 
-import "github.com/opensourceways/xihe-server/bigmodel/domain/repository"
+import "github.com/opensourceways/xihe-server/common/domain/repository"
 
 // errorDuplicateCreating
 type errorDuplicateCreating struct {
@@ -20,7 +20,7 @@ func NewErrorDataNotExists(err error) errorDataNotExists {
 	return errorDataNotExists{err}
 }
 
-func isErrorDataNotExists(err error) bool {
+func IsErrorDataNotExists(err error) bool {
 	_, ok := err.(errorDataNotExists)
 
 	return ok
@@ -36,7 +36,7 @@ func NewErrorConcurrentUpdating(err error) errorConcurrentUpdating {
 }
 
 // convertError
-func convertError(err error) (out error) {
+func ConvertError(err error) (out error) {
 	switch err.(type) {
 	case errorDuplicateCreating:
 		out = repository.NewErrorDuplicateCreating(err)

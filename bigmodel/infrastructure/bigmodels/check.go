@@ -49,6 +49,14 @@ type textCheckService struct {
 	cliv2 *moderationv2.ModerationClient
 }
 
+func (s *service) CheckText(content string) error {
+	return s.check.check(content)
+}
+
+func (s *service) CheckImages(urls []string) error {
+	return s.check.checkImages(urls)
+}
+
 func (s *textCheckService) check(content string) error {
 	request := &model.RunTextModerationRequest{
 		Body: &model.TextDetectionReq{

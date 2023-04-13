@@ -44,7 +44,7 @@ func gatherOptions(fs *flag.FlagSet, args ...string) options {
 }
 
 func main() {
-	logrusutil.ComponentInit("xihe-async-server")
+	logrusutil.ComponentInit("xihe")
 	log := logrus.NewEntry(logrus.StandardLogger())
 
 	o := gatherOptions(
@@ -109,6 +109,7 @@ func main() {
 
 	// watch
 	w := watchimpl.NewWather(
+		cfg.Watcher,
 		asyncWuKongRepo,
 		map[string]func(int64) error{
 			"wukong": asyncAppService.AsyncWuKong,
