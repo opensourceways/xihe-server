@@ -54,8 +54,8 @@ type msgInference struct {
 }
 
 type msgCreateInference struct {
-	ProjectName string   `json:"name"`
-	ProjectTags []string `json:"tags"`
+	ProjectName   string `json:"name"`
+	ResourceLevel string `json:"level"`
 }
 
 type msgExtendInference struct {

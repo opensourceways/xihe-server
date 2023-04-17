@@ -32,10 +32,8 @@ type inferenceImpl struct {
 }
 
 func (impl *inferenceImpl) GetSurvivalTime(info *domain.InferenceInfo) int {
-	for _, item := range info.ProjectTags {
-		if impl.projectTagsForOfficial[item] {
-			return impl.survivalTimeForOfficial
-		}
+	if impl.projectTagsForOfficial[info.ResourceLevel] {
+		return impl.survivalTimeForOfficial
 	}
 
 	return impl.survivalTimeForNormal

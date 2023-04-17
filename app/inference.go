@@ -16,10 +16,10 @@ type InferenceIndex = domain.InferenceIndex
 type InferenceDetail = domain.InferenceDetail
 
 type InferenceCreateCmd struct {
-	ProjectId    string
-	ProjectName  domain.ResourceName
-	ProjectOwner domain.Account
-	ProjectTags  []string
+	ProjectId     string
+	ProjectName   domain.ResourceName
+	ProjectOwner  domain.Account
+	ResourceLevel string
 
 	InferenceDir domain.Directory
 	BootFile     domain.FilePath
@@ -43,7 +43,7 @@ func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit strin
 	v.Project.Id = cmd.ProjectId
 	v.LastCommit = lastCommit
 	v.ProjectName = cmd.ProjectName
-	v.ProjectTags = cmd.ProjectTags
+	v.ResourceLevel = cmd.ResourceLevel
 	v.Project.Owner = cmd.ProjectOwner
 }
 
