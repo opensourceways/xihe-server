@@ -134,6 +134,25 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		return
 	}
 
+	// get resourcelevel
+	resources, err := ctl.project.FindUserProjects(
+		[]repository.UserResourceListOption{
+			{
+				Owner: owner,
+				Ids: []string{
+					projectId,
+				},
+			},
+		},
+	)
+	if err != nil || len(resources) < 1 {
+		ws.WriteJSON(newResponseError(err))
+
+		log.Errorf("inference failed: get reource, err:%s", err.Error())
+
+		return
+	}
+
 	u := platform.UserInfo{}
 	if viewOther {
 		u.User = owner
@@ -142,12 +161,12 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	}
 
 	cmd := app.InferenceCreateCmd{
-		ProjectId:    v.Id,
-		ProjectName:  v.Name.(domain.ResourceName),
-		ProjectOwner: owner,
-		ProjectTags:  v.Tags,
-		InferenceDir: ctl.inferenceDir,
-		BootFile:     ctl.inferenceBootFile,
+		ProjectId:     v.Id,
+		ProjectName:   v.Name.(domain.ResourceName),
+		ProjectOwner:  owner,
+		ResourceLevel: resources[0].Level.ResourceLevel(),
+		InferenceDir:  ctl.inferenceDir,
+		BootFile:      ctl.inferenceBootFile,
 	}
 
 	dto, lastCommit, err := ctl.s.Create(&u, &cmd)

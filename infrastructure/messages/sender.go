@@ -98,7 +98,7 @@ func (s sender) CreateInference(info *domain.InferenceInfo) error {
 	v := s.toInferenceMsg(&info.InferenceIndex)
 	v.Action = actionCreate
 	v.ProjectName = info.ProjectName.ResourceName()
-	v.ProjectTags = info.ProjectTags
+	v.ResourceLevel = info.ResourceLevel
 
 	return s.send(topics.Inference, &v)
 
@@ -109,7 +109,7 @@ func (s sender) ExtendInferenceSurvivalTime(info *message.InferenceExtendInfo) e
 	v.Action = actionExtend
 	v.Expiry = info.Expiry
 	v.ProjectName = info.ProjectName.ResourceName()
-	v.ProjectTags = info.ProjectTags
+	v.ResourceLevel = info.ResourceLevel
 
 	return s.send(topics.Inference, &v)
 }

@@ -399,7 +399,7 @@ func registerHandlerForInference(handler interface{}) (mq.Subscriber, error) {
 			return
 		}
 
-		info.ProjectTags = body.ProjectTags
+		info.ResourceLevel = body.ResourceLevel
 
 		switch body.Action {
 		case actionCreate:
