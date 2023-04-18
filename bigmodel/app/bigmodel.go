@@ -335,7 +335,13 @@ func (s bigModelService) ListLikes(user types.Account) (
 			return
 		}
 
+		avatar, err := s.user.GetUserAvatarId(item.Owner)
+		if err != nil {
+			return nil, err
+		}
+
 		dto.Owner = item.Owner.Account()
+		dto.Avatar = avatar.AvatarId()
 		dto.Id = item.Id
 		dto.Desc = item.Desc.WuKongPictureDesc()
 		dto.Style = item.Style

@@ -103,7 +103,8 @@ type WuKongPictureBaseDTO struct {
 }
 
 type WuKongLikeDTO struct { // like
-	IsPublic bool `json:"is_public"`
+	IsPublic bool   `json:"is_public"`
+	Avatar   string `json:"avatar"`
 
 	WuKongPictureBaseDTO
 }
