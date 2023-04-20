@@ -8,6 +8,6 @@ RUN cd /go/src/github.com/opensourceways/xihe-server/async-server && GO111MODULE
 FROM alpine:latest
 WORKDIR /opt/app/
 
-COPY  --from=BUILDER /go/src/github.com/opensourceways/xihe-server/xihe-server /opt/app
+COPY  --from=BUILDER /go/src/github.com/opensourceways/xihe-server/async-server/async-server /opt/app
 
 ENTRYPOINT ["/opt/app/async-server"]
