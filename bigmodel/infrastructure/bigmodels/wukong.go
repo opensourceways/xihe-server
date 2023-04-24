@@ -99,9 +99,9 @@ func (s *service) GenPicturesByWuKong(
 	// select endpoints
 	var es chan string
 	switch estype {
-	case "wukong":
+	case string(domain.BigmodelWuKong):
 		es = s.wukongInfo.endpoints
-	case "wukong_hf":
+	case string(domain.BigmodelWuKongHF):
 		es = s.wukongInfo.endpointsHF
 	}
 

@@ -118,7 +118,7 @@ func (s bigModelService) WuKong(
 ) (links map[string]string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
-	links, err = s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd), "wukong")
+	links, err = s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd), string(domain.BigmodelWuKong))
 	if err != nil {
 		code = s.setCode(err)
 	}
@@ -131,7 +131,7 @@ func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
 ) {
 	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelWuKong)
 
-	links, err = s.fm.GenPicturesByWuKong(cmd.User, (*domain.WuKongPictureMeta)(&cmd.WuKongCmd), "wukong_hf")
+	links, err = s.fm.GenPicturesByWuKong(cmd.User, (*domain.WuKongPictureMeta)(&cmd.WuKongCmd), string(domain.BigmodelWuKongHF))
 	if err != nil {
 		code = s.setCode(err)
 	}

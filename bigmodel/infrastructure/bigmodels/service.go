@@ -127,7 +127,7 @@ func (s *service) doIfFree(
 		return err
 
 	default:
-		return bigmodel.NewErrorBusySource(errors.New("busy computation resource"))
+		return bigmodel.NewErrorBusySource(errors.New("access overload, please try again later"))
 	}
 }
 

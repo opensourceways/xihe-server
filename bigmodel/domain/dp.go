@@ -12,6 +12,7 @@ const (
 	bigmodelPanGu       = "pangu"
 	bigmodelLuoJia      = "luojia"
 	bigmodelWuKong      = "wukong"
+	bigmodelWuKongHF    = "wukong_hf"
 	bigmodelCodeGeex    = "codegeex"
 	bigmodelGenPicture  = "gen_picture"
 	bigmodelDescPicture = "desc_picture"
@@ -22,6 +23,7 @@ var (
 	BigmodelPanGu       = BigmodelType(bigmodelPanGu)
 	BigmodelLuoJia      = BigmodelType(bigmodelLuoJia)
 	BigmodelWuKong      = BigmodelType(bigmodelWuKong)
+	BigmodelWuKongHF    = BigmodelType(bigmodelWuKongHF)
 	BigmodelCodeGeex    = BigmodelType(bigmodelCodeGeex)
 	BigmodelGenPicture  = BigmodelType(bigmodelGenPicture)
 	BigmodelDescPicture = BigmodelType(bigmodelDescPicture)
