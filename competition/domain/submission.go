@@ -7,6 +7,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/competition/domain/uploader"
 	"github.com/opensourceways/xihe-server/utils"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // SubmissionUpdatingInfo
@@ -72,6 +73,7 @@ func (s *SubmissionService) Submit(
 
 	return PhaseSubmission{
 		Submission: Submission{
+			Id:       primitive.NewObjectID().Hex(),
 			SubmitAt: now,
 			OBSPath:  obspath,
 			Status:   "calculating",
