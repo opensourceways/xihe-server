@@ -4,9 +4,11 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/gorilla/websocket"
 
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
@@ -545,16 +547,63 @@ func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
 // @Failure 500 system_error        system error
 // @Router /v1/bigmodel/wukong/rank [get]
 func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
-	if !ok {
+	token := ctx.GetHeader(headerSecWebsocket)
+	if token == "" {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, "no token",
+		))
+
 		return
 	}
 
-	v, err := ctl.s.GetWuKongWaitingTaskRank(pl.DomainAccount())
+	pl := oldUserTokenPayload{}
+	if ok := ctl.checkApiToken(ctx, token, &pl, false); !ok {
+		return
+	}
+
+	// setup websocket
+	upgrader := websocket.Upgrader{
+		Subprotocols: []string{token},
+		CheckOrigin: func(r *http.Request) bool {
+			return r.Header.Get(headerSecWebsocket) == token
+		},
+	}
+
+	ws, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
 	if err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
-	} else {
-		ctl.sendRespOfGet(ctx, v)
+		//TODO delete
+		log.Errorf("update ws failed, err:%s", err.Error())
+
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+
+	defer ws.Close()
+
+	for i := 0; i < apiConfig.PodTimeout; i++ {
+		dto, err := ctl.s.GetWuKongWaitingTaskRank(pl.DomainAccount())
+		if err != nil {
+			ws.WriteJSON(newResponseError(err))
+
+			log.Errorf("get rank failed: get status, err:%s", err.Error())
+
+			return
+		} else {
+			ws.WriteJSON(newResponseData(dto))
+		}
+
+		log.Debugf("info dto:%v", dto)
+
+		if dto.Rank == 0 {
+			ws.WriteJSON(newResponseData(dto))
+
+			log.Debug("task done")
+
+			return
+		}
+
+		time.Sleep(time.Second)
 	}
 }
 
