@@ -63,6 +63,7 @@ type Endpoints struct {
 	Pangu            string `json:"pangu"              required:"true"`
 	LuoJia           string `json:"luojia"             required:"true"`
 	WuKong           string `json:"wukong"             required:"true"`
+	WuKongHF         string `json:"wukong_hf"          required:"true"`
 	CodeGeex         string `json:"codegeex"           required:"true"`
 	DescPicture      string `json:"desc_picture"       required:"true"`
 	SinglePicture    string `json:"signle_picture"     required:"true"`
@@ -83,6 +84,10 @@ func (e *Endpoints) validate() (err error) {
 	}
 
 	if _, err = e.parse(e.WuKong); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.WuKongHF); err != nil {
 		return
 	}
 

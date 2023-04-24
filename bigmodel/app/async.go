@@ -39,7 +39,7 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 		Status: "running",
 	})
 
-	links, err := s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd))
+	links, err := s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd), "wukong")
 	if err != nil {
 		if !bigmodel.IsErrorSensitiveInfo(err) {
 			err = errors.New("internal error")

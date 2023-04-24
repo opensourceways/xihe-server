@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	temp_account = "wukong_icbc"
+	temp_account    = "wukong_icbc"
+	temp_account_hf = "wukong_hf"
 )
 
 type describePictureResp struct {
@@ -121,6 +122,27 @@ type wukongICBCRequest struct {
 
 func (req *wukongICBCRequest) toCmd() (cmd app.WuKongICBCCmd, err error) {
 	if cmd.User, err = types.NewAccount(temp_account); err != nil {
+		return
+	}
+
+	cmd.Style = req.Style
+
+	if cmd.Desc, err = domain.NewWuKongPictureDesc(req.Desc); err != nil {
+		return
+	}
+
+	err = cmd.Validate()
+
+	return
+}
+
+type wukongHFRequest struct {
+	Desc  string `json:"desc"`
+	Style string `json:"style"`
+}
+
+func (req *wukongHFRequest) toCmd() (cmd app.WuKongHFCmd, err error) {
+	if cmd.User, err = types.NewAccount(temp_account_hf); err != nil {
 		return
 	}
 

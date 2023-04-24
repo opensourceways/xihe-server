@@ -26,7 +26,7 @@ type BigModel interface {
 	// wukong
 	GetWuKongSampleId() string
 	GenWuKongSampleNums(int) []int
-	GenPicturesByWuKong(types.Account, *domain.WuKongPictureMeta) (map[string]string, error)
+	GenPicturesByWuKong(types.Account, *domain.WuKongPictureMeta, string) (map[string]string, error)
 	DeleteWuKongPicture(string) error
 	GenWuKongPictureLink(p string) (string, error)
 	MoveWuKongPictureToDir(string, string) error

@@ -40,6 +40,7 @@ type BigModelService interface {
 	// wukong
 	GenWuKongSamples(int) ([]string, error)
 	WuKong(types.Account, *WuKongCmd) (map[string]string, string, error)
+	WuKongHF(*WuKongHFCmd) (map[string]string, string, error)
 	WuKongInferenceAsync(types.Account, *WuKongCmd) (string, error)
 	GetWuKongWaitingTaskRank(types.Account) (WuKongRankDTO, error)
 	GetWuKongLastTaskResp(types.Account) (WuKongLinksDTO, string, error)
@@ -117,10 +118,22 @@ func (s bigModelService) WuKong(
 ) (links map[string]string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
-	links, err = s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd))
+	links, err = s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd), "wukong")
 	if err != nil {
 		code = s.setCode(err)
-		err = errors.New("access overload, please try again later")
+	}
+
+	return
+}
+
+func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
+	links map[string]string, code string, err error,
+) {
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelWuKong)
+
+	links, err = s.fm.GenPicturesByWuKong(cmd.User, (*domain.WuKongPictureMeta)(&cmd.WuKongCmd), "wukong_hf")
+	if err != nil {
+		code = s.setCode(err)
 	}
 
 	return

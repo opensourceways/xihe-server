@@ -18,10 +18,11 @@ import (
 var reTimestamp = regexp.MustCompile("/[1-9][0-9]{9,}/")
 
 type wukongInfo struct {
-	cli       obsService
-	cfg       WuKong
-	maxBatch  int
-	endpoints chan string
+	cli         obsService
+	cfg         WuKong
+	maxBatch    int
+	endpoints   chan string
+	endpointsHF chan string
 }
 
 func newWuKongInfo(cfg *Config) (wukongInfo, error) {
@@ -40,10 +41,18 @@ func newWuKongInfo(cfg *Config) (wukongInfo, error) {
 
 	ce := &cfg.Endpoints
 	es, _ := ce.parse(ce.WuKong)
+	eshf, _ := ce.parse(ce.WuKongHF)
 
+	// init endpoints
 	info.endpoints = make(chan string, len(es))
 	for _, e := range es {
 		info.endpoints <- e
+	}
+
+	// init endpoints_hf
+	info.endpointsHF = make(chan string, len(eshf))
+	for _, e := range eshf {
+		info.endpointsHF <- e
 	}
 
 	return info, nil
@@ -73,7 +82,7 @@ func (s *service) GetWuKongSampleId() string {
 }
 
 func (s *service) GenPicturesByWuKong(
-	user types.Account, desc *domain.WuKongPictureMeta,
+	user types.Account, desc *domain.WuKongPictureMeta, estype string,
 ) (map[string]string, error) {
 	if err := s.check.check(desc.Desc.WuKongPictureDesc()); err != nil {
 		return nil, err
@@ -87,7 +96,16 @@ func (s *service) GenPicturesByWuKong(
 		return
 	}
 
-	if err := s.doIfFree(s.wukongInfo.endpoints, f); err != nil {
+	// select endpoints
+	var es chan string
+	switch estype {
+	case "wukong":
+		es = s.wukongInfo.endpoints
+	case "wukong_hf":
+		es = s.wukongInfo.endpointsHF
+	}
+
+	if err := s.doIfFree(es, f); err != nil {
 		return nil, err
 	}
 
@@ -152,10 +170,20 @@ func (s *service) genPicturesByWuKong(
 	}
 
 	if r.Status == 200 {
-		return r.Output, nil
+		return wukongLinksAC(r.Output), nil
 	}
 
 	return nil, errors.New(r.Msg)
+}
+
+func wukongLinksAC(v []string) []string {
+	for i := range v {
+		if strings.HasPrefix(v[i], "https") {
+			v[i] = strings.Split(v[i], ".com/")[1]
+		}
+	}
+
+	return v
 }
 
 func (s *service) MoveWuKongPictureToDir(dst, src string) error {

@@ -30,6 +30,7 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
 	rg.POST("/v1/bigmodel/codegeex", ctl.CodeGeex)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
+	rg.POST("/v1/bigmodel/wukong_hf", ctl.WuKongHF)
 	rg.POST("/v1/bigmodel/wukong_icbc", ctl.WuKongICBC)
 	rg.POST("/v1/bigmodel/wukong_async", ctl.WuKongAsync)
 	rg.GET("/v1/bigmodel/wukong/rank", ctl.WuKongRank)
@@ -460,6 +461,42 @@ func (ctl *BigModelController) WuKong(ctx *gin.Context) {
 	}
 
 	if v, code, err := ctl.s.WuKong(pl.DomainAccount(), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPost(ctx, wukongPicturesGenerateResp{v})
+	}
+}
+
+// @Title WuKong
+// @Description generates pictures by WuKong-hf
+// @Tags  BigModel
+// @Param	body	body 	wukongHFRequest	true	"body of wukong"
+// @Accept json
+// @Success 201 {object} wukongPicturesGenerateResp
+// @Failure 500 system_error        system error
+// @Failure 404 bigmodel_sensitive_info		picture error
+// @Router /v1/bigmodel/wukong_hf [post]
+func (ctl *BigModelController) WuKongHF(ctx *gin.Context) {
+	_, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
+	req := wukongHFRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if v, code, err := ctl.s.WuKongHF(&cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, wukongPicturesGenerateResp{v})

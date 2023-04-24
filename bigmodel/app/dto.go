@@ -65,6 +65,25 @@ type WuKongICBCCmd struct {
 	User types.Account
 }
 
+type WuKongHFCmd struct {
+	WuKongCmd
+
+	EndPointType string
+	User         types.Account
+}
+
+func (cmd *WuKongHFCmd) Validate() error {
+	b := cmd.User == nil ||
+		cmd.User.Account() != "wukong_hf" ||
+		cmd.Desc == nil
+
+	if b {
+		return errors.New("invalid cmd")
+	}
+
+	return nil
+}
+
 type WuKongPicturesListCmd = repository.WuKongPictureListOption
 
 type WuKongAddLikeFromTempCmd struct {
