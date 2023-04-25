@@ -36,26 +36,27 @@ func (impl *wukongAsyncRepoImpl) GetWaitingTaskRank(user types.Account, t common
 	}
 
 	// 2. is user in task
-	f1 := func(v []TWukongTask) bool {
+	f1 := func(v []TWukongTask) (ok bool, t TWukongTask) {
 		for i := range twukong {
 			if twukong[i].User == user.Account() {
-				return true
+				return true, twukong[i]
 			}
 		}
 
-		return false
+		return
 	}
 
-	if !f1(twukong) {
+	ok, task := f1(twukong)
+	if !ok {
 		return 0, nil
 	}
 
 	// 2. caculate rank
-	f2 := func(v []TWukongTask) int {
+	f2 := func(v []TWukongTask, task TWukongTask) int {
 		i := 1
 
 		for j := range v {
-			if v[j].CreatedAt <= t.Time() {
+			if v[j].CreatedAt < task.CreatedAt {
 				i++
 			}
 		}
@@ -63,7 +64,7 @@ func (impl *wukongAsyncRepoImpl) GetWaitingTaskRank(user types.Account, t common
 		return i
 	}
 
-	return f2(twukong), nil
+	return f2(twukong, task), nil
 }
 
 func (impl *wukongAsyncRepoImpl) GetLastFinishedTask(user types.Account) (resp repository.WuKongTaskResp, err error) {

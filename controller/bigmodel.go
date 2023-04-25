@@ -576,7 +576,7 @@ func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKongRank
+// @Title WuKong
 // @Description get wukong rank
 // @Tags  BigModel
 // @Accept json
@@ -633,8 +633,6 @@ func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 		log.Debugf("info dto:%v", dto)
 
 		if dto.Rank == 0 {
-			ws.WriteJSON(newResponseData(dto))
-
 			log.Debug("task done")
 
 			return
@@ -644,7 +642,7 @@ func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKongRank
+// @Title WuKong
 // @Description get last finished task
 // @Tags  BigModel
 // @Accept json
