@@ -66,6 +66,7 @@ type Endpoints struct {
 	WuKongHF         string `json:"wukong_hf"          required:"true"`
 	CodeGeex         string `json:"codegeex"           required:"true"`
 	DescPicture      string `json:"desc_picture"       required:"true"`
+	DescPictureHF    string `json:"desc_picture_hf"    required:"true"`
 	SinglePicture    string `json:"signle_picture"     required:"true"`
 	MultiplePictures string `json:"multiple_pictures"  required:"true"`
 }
@@ -92,6 +93,10 @@ func (e *Endpoints) validate() (err error) {
 	}
 
 	if _, err = e.parse(e.DescPicture); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.DescPictureHF); err != nil {
 		return
 	}
 

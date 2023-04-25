@@ -36,7 +36,7 @@ type BigModel interface {
 	CheckWuKongPictureToPublic(types.Account, string) (domain.WuKongPictureMeta, string, error)
 
 	// taichu
-	DescribePicture(io.Reader, string, int64) (string, error)
+	DescribePicture(io.Reader, string, int64, string) (string, error)
 	GenPicture(types.Account, string) (string, error)
 	GenPictures(types.Account, string) ([]string, error)
 	Ask(domain.Question, string) (string, error)

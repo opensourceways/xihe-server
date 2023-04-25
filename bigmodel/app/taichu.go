@@ -12,7 +12,15 @@ func (s bigModelService) DescribePicture(
 ) (string, error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelDescPicture)
 
-	return s.fm.DescribePicture(picture, name, length)
+	return s.fm.DescribePicture(picture, name, length, string(domain.BigmodelDescPicture))
+}
+
+func (s bigModelService) DescribePictureHF(
+	cmd *DescribePictureCmd,
+) (string, error) {
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelDescPicture)
+
+	return s.fm.DescribePicture(cmd.Picture, cmd.Name, cmd.Length, string(domain.BigmodelDescPictureHF))
 }
 
 func (s bigModelService) GenPicture(

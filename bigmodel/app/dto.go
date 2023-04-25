@@ -2,12 +2,20 @@ package app
 
 import (
 	"errors"
+	"io"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 )
+
+type DescribePictureCmd struct {
+	User    types.Account
+	Picture io.Reader
+	Name    string
+	Length  int64
+}
 
 type CodeGeexDTO = bigmodel.CodeGeexResp
 

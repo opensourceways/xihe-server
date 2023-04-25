@@ -6,19 +6,24 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
 )
 
 type pictureDescInfo struct {
-	endpoint string
+	endpoint   string
+	endpointhf string
 }
 
 func newPictureDescInfo(cfg *Config) pictureDescInfo {
 	ce := &cfg.Endpoints
 
 	es, _ := ce.parse(ce.DescPicture)
+	eshf, _ := ce.parse(ce.DescPictureHF)
 
 	return pictureDescInfo{
-		endpoint: es[0],
+		endpoint:   es[0],
+		endpointhf: eshf[0],
 	}
 }
 
@@ -31,7 +36,8 @@ type descOfPicture struct {
 }
 
 func (s *service) DescribePicture(
-	picture io.Reader, name string, length int64,
+	picture io.Reader, name string,
+	length int64, estype string,
 ) (string, error) {
 	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
@@ -50,8 +56,16 @@ func (s *service) DescribePicture(
 
 	writer.Close()
 
+	var es string
+	switch estype {
+	case string(domain.BigmodelDescPicture):
+		es = s.pictureDescInfo.endpoint
+	case string(domain.BigmodelDescPictureHF):
+		es = s.pictureDescInfo.endpointhf
+	}
+
 	req, err := http.NewRequest(
-		http.MethodPost, s.pictureDescInfo.endpoint, buf,
+		http.MethodPost, es, buf,
 	)
 	if err != nil {
 		return "", err

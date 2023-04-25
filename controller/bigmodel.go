@@ -23,6 +23,7 @@ func AddRouterForBigModelController(
 	}
 
 	rg.POST("/v1/bigmodel/describe_picture", ctl.DescribePicture)
+	rg.POST("/v1/bigmodel/describe_picture_hf", ctl.DescribePictureHF)
 	rg.POST("/v1/bigmodel/single_picture", ctl.GenSinglePicture)
 	rg.POST("/v1/bigmodel/multiple_pictures", ctl.GenMultiplePictures)
 	rg.POST("/v1/bigmodel/vqa_upload_picture", ctl.VQAUploadPicture)
@@ -94,6 +95,57 @@ func (ctl *BigModelController) DescribePicture(ctx *gin.Context) {
 	defer p.Close()
 
 	v, err := ctl.s.DescribePicture(pl.DomainAccount(), p, f.Filename, f.Size)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPost(ctx, describePictureResp{v})
+	}
+}
+
+// @Title DescribePicture
+// @Description describe a picture for hf
+// @Tags  BigModel
+// @Param	picture		formData 	file	true	"picture"
+// @Accept json
+// @Success 201 {object} describePictureResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/describe_picture_hf [post]
+func (ctl *BigModelController) DescribePictureHF(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	f, err := ctx.FormFile("picture")
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if f.Size > apiConfig.MaxPictureSizeToDescribe {
+		ctl.sendBadRequestParamWithMsg(ctx, "too big picture")
+
+		return
+	}
+
+	p, err := f.Open()
+	if err != nil {
+		ctl.sendBadRequestParamWithMsg(ctx, "can't get picture")
+
+		return
+	}
+
+	defer p.Close()
+
+	cmd := app.DescribePictureCmd{
+		User:    pl.DomainAccount(),
+		Picture: p,
+		Name:    f.Filename,
+		Length:  f.Size,
+	}
+
+	v, err := ctl.s.DescribePictureHF(&cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {

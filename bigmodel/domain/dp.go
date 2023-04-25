@@ -8,25 +8,27 @@ import (
 )
 
 const (
-	bigmodelVQA         = "vqa"
-	bigmodelPanGu       = "pangu"
-	bigmodelLuoJia      = "luojia"
-	bigmodelWuKong      = "wukong"
-	bigmodelWuKongHF    = "wukong_hf"
-	bigmodelCodeGeex    = "codegeex"
-	bigmodelGenPicture  = "gen_picture"
-	bigmodelDescPicture = "desc_picture"
+	bigmodelVQA           = "vqa"
+	bigmodelPanGu         = "pangu"
+	bigmodelLuoJia        = "luojia"
+	bigmodelWuKong        = "wukong"
+	bigmodelWuKongHF      = "wukong_hf"
+	bigmodelCodeGeex      = "codegeex"
+	bigmodelGenPicture    = "gen_picture"
+	bigmodelDescPicture   = "desc_picture"
+	bigmodelDescPictureHF = "desc_picture_hf"
 )
 
 var (
-	BigmodelVQA         = BigmodelType(bigmodelVQA)
-	BigmodelPanGu       = BigmodelType(bigmodelPanGu)
-	BigmodelLuoJia      = BigmodelType(bigmodelLuoJia)
-	BigmodelWuKong      = BigmodelType(bigmodelWuKong)
-	BigmodelWuKongHF    = BigmodelType(bigmodelWuKongHF)
-	BigmodelCodeGeex    = BigmodelType(bigmodelCodeGeex)
-	BigmodelGenPicture  = BigmodelType(bigmodelGenPicture)
-	BigmodelDescPicture = BigmodelType(bigmodelDescPicture)
+	BigmodelVQA           = BigmodelType(bigmodelVQA)
+	BigmodelPanGu         = BigmodelType(bigmodelPanGu)
+	BigmodelLuoJia        = BigmodelType(bigmodelLuoJia)
+	BigmodelWuKong        = BigmodelType(bigmodelWuKong)
+	BigmodelWuKongHF      = BigmodelType(bigmodelWuKongHF)
+	BigmodelCodeGeex      = BigmodelType(bigmodelCodeGeex)
+	BigmodelGenPicture    = BigmodelType(bigmodelGenPicture)
+	BigmodelDescPicture   = BigmodelType(bigmodelDescPicture)
+	BigmodelDescPictureHF = BigmodelType(bigmodelDescPictureHF)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
