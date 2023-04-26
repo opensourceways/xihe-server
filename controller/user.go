@@ -36,6 +36,8 @@ func AddRouterForUserController(
 
 	rg.GET("/v1/user/follower/:account", ctl.ListFollower)
 	rg.GET("/v1/user/:account/gitlab", ctl.GitlabToken)
+
+	rg.GET("/v1/user/check_email", checkUserEmailMiddleware(&ctl.baseController))
 }
 
 type UserController struct {
@@ -269,4 +271,15 @@ func (ctl *UserController) GitlabToken(ctx *gin.Context) {
 
 type platformInfo struct {
 	Token string `json:"token"`
+}
+
+// @Title CheckEmail
+// @Description check user email
+// @Tags  User
+// @Accept json
+// @Success 200
+// @Failure 400 no email   this api need email of user"
+// @Router /v1/user/check_email[get]
+func (ctl *UserController) CheckEmail(ctx *gin.Context) {
+	ctl.sendRespOfGet(ctx, "")
 }

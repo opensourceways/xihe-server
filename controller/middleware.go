@@ -10,7 +10,7 @@ func checkUserEmailMiddleware(ctl *baseController) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pl, _, _ := ctl.checkUserApiToken(ctx, false)
 
-		if pl.hasEmail() {
+		if !pl.hasEmail() {
 			ctl.sendCodeMessage(
 				ctx, "no email",
 				errors.New("this api need email of user"),
