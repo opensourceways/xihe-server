@@ -22,6 +22,7 @@ type wukongInfo struct {
 	cfg         WuKong
 	maxBatch    int
 	endpoints   chan string
+	endpoints4  chan string
 	endpointsHF chan string
 }
 
@@ -41,12 +42,19 @@ func newWuKongInfo(cfg *Config) (wukongInfo, error) {
 
 	ce := &cfg.Endpoints
 	es, _ := ce.parse(ce.WuKong)
+	es4, _ := ce.parse(ce.WuKong4IMG)
 	eshf, _ := ce.parse(ce.WuKongHF)
 
 	// init endpoints
 	info.endpoints = make(chan string, len(es))
 	for _, e := range es {
 		info.endpoints <- e
+	}
+
+	// init endpoints4
+	info.endpoints4 = make(chan string, len(es4))
+	for _, e := range es4 {
+		info.endpoints4 <- e
 	}
 
 	// init endpoints_hf
@@ -101,6 +109,8 @@ func (s *service) GenPicturesByWuKong(
 	switch estype {
 	case string(domain.BigmodelWuKong):
 		es = s.wukongInfo.endpoints
+	case string(domain.BigmodelWuKong4Img):
+		es = s.wukongInfo.endpoints4
 	case string(domain.BigmodelWuKongHF):
 		es = s.wukongInfo.endpointsHF
 	}

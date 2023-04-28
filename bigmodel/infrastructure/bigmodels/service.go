@@ -138,6 +138,10 @@ func (s *service) GetIdleEndpoint(bid string) (c int, err error) {
 		c = len(s.wukongInfo.endpoints)
 
 		return
+	case "wukong_4img":
+		c = len(s.wukongInfo.endpoints4)
+
+		return
 	default:
 		err = errors.New("internal error, cannot found this bigmodel")
 	}

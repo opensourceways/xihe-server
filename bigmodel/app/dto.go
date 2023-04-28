@@ -57,11 +57,19 @@ func (cmd *WuKongListPublicGlobalCmd) Validate() error {
 	return nil
 }
 
-type WuKongCmd domain.WuKongPictureMeta
+type WuKongCmd struct {
+	domain.WuKongPictureMeta
+
+	ImgQuantity int
+}
 
 func (cmd *WuKongCmd) Validate() error {
 	if cmd.Desc == nil {
 		return errors.New("invalid cmd")
+	}
+
+	if cmd.ImgQuantity != 2 && cmd.ImgQuantity != 4 {
+		return errors.New("inalid cmd")
 	}
 
 	return nil

@@ -119,7 +119,15 @@ func (s bigModelService) WuKong(
 ) (links map[string]string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
-	links, err = s.fm.GenPicturesByWuKong(user, (*domain.WuKongPictureMeta)(cmd), string(domain.BigmodelWuKong))
+	var estype string
+	switch cmd.ImgQuantity {
+	case 2:
+		estype = string(domain.BigmodelWuKong)
+	case 4:
+		estype = string(domain.BigmodelWuKong4Img)
+	}
+
+	links, err = s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, estype)
 	if err != nil {
 		code = s.setCode(err)
 	}
@@ -132,7 +140,7 @@ func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
 ) {
 	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelWuKong)
 
-	links, err = s.fm.GenPicturesByWuKong(cmd.User, (*domain.WuKongPictureMeta)(&cmd.WuKongCmd), string(domain.BigmodelWuKongHF))
+	links, err = s.fm.GenPicturesByWuKong(cmd.User, &cmd.WuKongPictureMeta, string(domain.BigmodelWuKongHF))
 	if err != nil {
 		code = s.setCode(err)
 	}

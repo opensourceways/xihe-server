@@ -99,8 +99,9 @@ func (req *CodeGeexRequest) toCmd() (
 }
 
 type wukongRequest struct {
-	Desc  string `json:"desc"`
-	Style string `json:"style"`
+	Desc        string `json:"desc"`
+	Style       string `json:"style"`
+	ImgQuantity int    `json:"img_quantity"`
 }
 
 func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
@@ -108,6 +109,10 @@ func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
 
 	if cmd.Desc, err = domain.NewWuKongPictureDesc(req.Desc); err != nil {
 		return
+	}
+
+	if req.ImgQuantity == 0 {
+		cmd.ImgQuantity = 2
 	}
 
 	err = cmd.Validate()
