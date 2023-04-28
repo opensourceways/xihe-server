@@ -33,13 +33,11 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 	// 1. inference
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
-	s.sender.UpdateWuKongTask(&message.MsgTask{
-		Type:   "wukong_update",
-		TaskId: tid,
-		Status: "running",
-	})
+	msg := new(message.MsgTask)
+	msg.WuKongAsyncInferenceStart(tid, user.Account())
+	s.sender.SendBigModelMsg(msg)
 
-	// chose 
+	// chose
 	var estype string
 	switch cmd.ImgQuantity {
 	case 2:
@@ -54,22 +52,18 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 			err = errors.New("internal error")
 		}
 
-		msg := new(message.MsgTask)
-		msg.SetErrorMsgTask(tid, user.Account(), err.Error())
-
-		s.sender.UpdateWuKongTask(msg)
+		msg_error := new(message.MsgTask)
+		msg_error.WuKongInferenceError(tid, user.Account(), err.Error())
+		s.sender.SendBigModelMsg(msg_error)
 
 		return
 	}
 
 	// 3. send msg
-	return s.sender.UpdateWuKongTask(&message.MsgTask{
-		Type:    "wukong_update",
-		TaskId:  tid,
-		User:    user.Account(),
-		Status:  "finished",
-		Details: links,
-	})
+	msg_finish := new(message.MsgTask)
+	msg_finish.WuKongAsyncInferenceFinish(tid, user.Account(), links)
+
+	return s.sender.SendBigModelMsg(msg_finish)
 }
 
 func (s *asyncBigModelService) GetIdleEndpoint(bid string) (c int, err error) {

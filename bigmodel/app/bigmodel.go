@@ -157,9 +157,9 @@ func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd
 	}
 
 	msg := new(message.MsgTask)
-	msg.ToMsgTask(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style)
+	msg.WuKongInferenceStart(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style)
 
-	return "", s.sender.CreateWuKongTask(msg)
+	return "", s.sender.SendBigModelMsg(msg)
 }
 
 func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account) (dto WuKongRankDTO, err error) {

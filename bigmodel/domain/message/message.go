@@ -1,45 +1,76 @@
 package message
 
 import (
+	"strconv"
+	"strings"
+
+	comsg "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain/message"
 )
 
-type MsgTask struct {
-	Type    string            `json:"type"`
-	TaskId  uint64            `json:"task_id"`
-	User    string            `json:"user"`
-	Status  string            `json:"status"`
-	Details map[string]string `json:"details"`
-}
+const (
+	MsgTypeWuKongInferenceStart       = "msg_type_wukong_inference_start"
+	MsgTypeWuKongInferenceError       = "msg_type_wukong_inference_error"
+	MsgTypeWuKongAsyncInferenceStart  = "msg_type_wukong_async_inference_start"
+	MsgTypeWuKongAsyncInferenceFinish = "msg_type_wukong_async_inference_finish"
+)
+
+type MsgTask comsg.MsgNormal
 
 type AsyncMessageProducer interface {
 	message.Sender
 
-	CreateWuKongTask(*MsgTask) error
-
-	UpdateWuKongTask(*MsgTask) error
+	SendBigModelMsg(*MsgTask) error
 }
 
-func (msg *MsgTask) ToMsgTask(user, desc, style string) {
+func (msg *MsgTask) WuKongInferenceStart(user, desc, style string) {
 	*msg = MsgTask{
-		Type:   "wukong_request",
-		User:   user,
-		Status: "waiting",
+		Type: MsgTypeWuKongInferenceStart,
+		User: user,
 		Details: map[string]string{
-			"style": style,
-			"desc":  desc,
+			"status": "waiting",
+			"style":  style,
+			"desc":   desc,
 		},
 	}
 }
 
-func (msg *MsgTask) SetErrorMsgTask(tid uint64, user, errMsg string) {
+func (msg *MsgTask) WuKongInferenceError(tid uint64, user, errMsg string) {
 	*msg = MsgTask{
-		Type:   "wukong_update",
-		TaskId: tid,
-		User:   user,
-		Status: "error",
+		Type: MsgTypeWuKongInferenceError,
+		User: user,
 		Details: map[string]string{
-			"error": errMsg,
+			"task_id": strconv.Itoa(int(tid)),
+			"status":  "error",
+			"error":   errMsg,
+		},
+	}
+}
+
+func (msg *MsgTask) WuKongAsyncInferenceStart(tid uint64, user string) {
+	*msg = MsgTask{
+		Type: MsgTypeWuKongAsyncInferenceStart,
+		User: user,
+		Details: map[string]string{
+			"task_id": strconv.Itoa(int(tid)),
+			"status":  "running",
+		},
+	}
+}
+
+func (msg *MsgTask) WuKongAsyncInferenceFinish(tid uint64, user string, links map[string]string) {
+	var ls string
+	for k := range links { // TODO: Move it into domain.service
+		ls += links[k] + ","
+	}
+
+	*msg = MsgTask{
+		Type: MsgTypeWuKongAsyncInferenceFinish,
+		User: user,
+		Details: map[string]string{
+			"task_id": strconv.Itoa(int(tid)),
+			"status":  "finished",
+			"links":   strings.TrimRight(ls, ","),
 		},
 	}
 }
