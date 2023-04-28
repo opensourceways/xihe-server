@@ -11,7 +11,7 @@ type AsyncMessageService interface {
 }
 
 func NewAsyncMessageService(
-	repo repository.WuKongRequest,
+	repo repository.AsyncTask,
 ) AsyncMessageService {
 	return &asyncMessageService{
 		repo: repo,
@@ -19,7 +19,7 @@ func NewAsyncMessageService(
 }
 
 type asyncMessageService struct {
-	repo repository.WuKongRequest
+	repo repository.AsyncTask
 }
 
 func (s *asyncMessageService) CreateWuKongTask(d *domain.WuKongRequest) error {

@@ -10,9 +10,9 @@ import (
 )
 
 type Watcher struct {
-	repo repository.WuKongRequest
+	repo repository.AsyncTask
 
-	handles map[string]func(int64) error
+	handles map[string]func(string, int64) error
 	cfg     Config
 	timer   *time.Ticker
 	wg      sync.WaitGroup
@@ -20,8 +20,8 @@ type Watcher struct {
 
 func NewWather(
 	cfg Config,
-	repo repository.WuKongRequest,
-	handles map[string]func(int64) error,
+	repo repository.AsyncTask,
+	handles map[string]func(string, int64) error,
 ) *Watcher {
 
 	return &Watcher{
@@ -53,7 +53,7 @@ func (w *Watcher) work(bname string, time int64) (err error) {
 	if v, ok := w.handles[bname]; !ok {
 		return fmt.Errorf("internal error, cannot found the bigmodel name:%s", bname)
 	} else {
-		v(time)
+		v(bname, time)
 	}
 
 	return nil

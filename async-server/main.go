@@ -111,8 +111,9 @@ func main() {
 	w := watchimpl.NewWather(
 		cfg.Watcher,
 		asyncWuKongRepo,
-		map[string]func(int64) error{
-			"wukong": asyncAppService.AsyncWuKong,
+		map[string]func(string, int64) error{
+			"wukong":      asyncAppService.AsyncWuKong,
+			"wukong_4img": asyncAppService.AsyncWuKong4Img,
 		},
 	)
 

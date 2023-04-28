@@ -17,8 +17,8 @@ type WuKongResp struct {
 	Links domain.Links
 }
 
-type WuKongRequest interface {
-	GetNewTask(time int64) ([]WuKongTask, error)
+type AsyncTask interface {
+	GetNewTask(taskType string, time int64) ([]WuKongTask, error)
 	UpdateTask(*WuKongResp) error
 	InsertTask(*domain.WuKongRequest) error
 }

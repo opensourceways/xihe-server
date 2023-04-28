@@ -35,3 +35,16 @@ func (impl *bigmodelImpl) WuKong(d *repository.WuKongTask) (err error) {
 
 	return impl.srv.WuKong(d.Id, d.User, &cmd)
 }
+
+func (impl *bigmodelImpl) WuKong4Img(d *repository.WuKongTask) (err error) {
+	cmd := bigmodelapp.WuKongCmd{
+		WuKongPictureMeta: domain.WuKongPictureMeta{
+			Style: d.Style,
+			Desc:  d.Desc,
+		},
+
+		ImgQuantity: 4,
+	}
+
+	return impl.srv.WuKong(d.Id, d.User, &cmd)
+}

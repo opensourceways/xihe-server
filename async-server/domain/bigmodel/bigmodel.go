@@ -7,4 +7,5 @@ import (
 type BigModel interface {
 	GetIdleEndpoint(bid string) (int, error)
 	WuKong(*repository.WuKongTask) error
+	WuKong4Img(*repository.WuKongTask) error
 }

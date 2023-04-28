@@ -6,23 +6,23 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 )
 
-func NewWuKongRequestRepo(cfg *Config) repository.WuKongRequest {
-	return &wukongRequestRepoImpl{
+func NewWuKongRequestRepo(cfg *Config) repository.AsyncTask {
+	return &asyncTaskRepoImpl{
 		cli: pgsql.NewDBTable(cfg.Table.AsyncTask),
 	}
 }
 
-type wukongRequestRepoImpl struct {
+type asyncTaskRepoImpl struct {
 	cli pgsqlClient
 }
 
-func (impl *wukongRequestRepoImpl) GetNewTask(time int64) (
+func (impl *asyncTaskRepoImpl) GetNewTask(taskType string, time int64) (
 	d []repository.WuKongTask, err error,
 ) {
 	var twukong []TAsyncTask
 
 	impl.cli.DB().
-		Where("created_at > ? AND status = ?", time, "waiting").
+		Where("task_type = ? AND created_at > ? AND status = ?", taskType, time, "waiting").
 		Find(&twukong)
 
 	d = make([]repository.WuKongTask, len(twukong))
@@ -33,7 +33,7 @@ func (impl *wukongRequestRepoImpl) GetNewTask(time int64) (
 	return
 }
 
-func (impl *wukongRequestRepoImpl) UpdateTask(resp *repository.WuKongResp) (err error) {
+func (impl *asyncTaskRepoImpl) UpdateTask(resp *repository.WuKongResp) (err error) {
 
 	var v TAsyncTask
 	v.toTAsyncTask(resp)
@@ -45,7 +45,7 @@ func (impl *wukongRequestRepoImpl) UpdateTask(resp *repository.WuKongResp) (err 
 	return impl.cli.UpdateRecord(filter, v)
 }
 
-func (impl *wukongRequestRepoImpl) InsertTask(req *domain.WuKongRequest) error {
+func (impl *asyncTaskRepoImpl) InsertTask(req *domain.WuKongRequest) error {
 
 	v := new(TAsyncTask)
 	v.toTWuKongTaskFromWuKongRequest(req)
