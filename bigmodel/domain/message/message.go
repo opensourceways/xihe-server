@@ -23,14 +23,15 @@ type AsyncMessageProducer interface {
 	SendBigModelMsg(*MsgTask) error
 }
 
-func (msg *MsgTask) WuKongInferenceStart(user, desc, style string) {
+func (msg *MsgTask) WuKongInferenceStart(user, desc, style, taskType string) {
 	*msg = MsgTask{
 		Type: MsgTypeWuKongInferenceStart,
 		User: user,
 		Details: map[string]string{
-			"status": "waiting",
-			"style":  style,
-			"desc":   desc,
+			"status":    "waiting",
+			"task_type": taskType,
+			"style":     style,
+			"desc":      desc,
 		},
 	}
 }

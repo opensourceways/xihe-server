@@ -54,6 +54,10 @@ func (table *TAsyncTask) toTAsyncTaskFromWuKongTask(task *repository.WuKongTask)
 		table.User = task.User.Account()
 	}
 
+	if task.TaskType != "" {
+		table.TaskType = task.TaskType
+	}
+
 	if task.Style != "" {
 		table.MetaData["style"] = task.Style
 	}

@@ -18,7 +18,7 @@ type WuKongResp struct {
 }
 
 type AsyncTask interface {
-	GetNewTask(taskType string, time int64) ([]WuKongTask, error)
+	GetNewTask(taskType string, time int64) ([]WuKongTask, error) // TODO: async task not wukong task
 	UpdateTask(*WuKongResp) error
 	InsertTask(*domain.WuKongRequest) error
 }

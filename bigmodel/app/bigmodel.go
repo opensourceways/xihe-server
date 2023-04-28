@@ -156,8 +156,17 @@ func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd
 		return
 	}
 
+	// chose wukong endpoint type
+	var estype string
+	switch cmd.ImgQuantity {
+	case 2:
+		estype = string(domain.BigmodelWuKong)
+	case 4:
+		estype = string(domain.BigmodelWuKong4Img)
+	}
+
 	msg := new(message.MsgTask)
-	msg.WuKongInferenceStart(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style)
+	msg.WuKongInferenceStart(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style, estype)
 
 	return "", s.sender.SendBigModelMsg(msg)
 }

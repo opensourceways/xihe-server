@@ -347,9 +347,10 @@ func (h *handler) HandleEventBigModelWuKongInferenceStart(msg *bigmodelmessage.M
 	}
 
 	v := asyncdomain.WuKongRequest{
-		User:  user,
-		Style: msg.Details["style"],
-		Desc:  desc,
+		User:     user,
+		TaskType: msg.Details["task_type"],
+		Style:    msg.Details["style"],
+		Desc:     desc,
 	}
 
 	return h.do(func(bool) error {
