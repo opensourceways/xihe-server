@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	MsgTypeWuKongInferenceStart       = "msg_type_wukong_inference_start"
-	MsgTypeWuKongInferenceError       = "msg_type_wukong_inference_error"
-	MsgTypeWuKongAsyncInferenceStart  = "msg_type_wukong_async_inference_start"
-	MsgTypeWuKongAsyncInferenceFinish = "msg_type_wukong_async_inference_finish"
+	MsgTypeWuKongInferenceStart  = "msg_type_wukong_inference_start"
+	MsgTypeWuKongInferenceError  = "msg_type_wukong_inference_error"
+	MsgTypeWuKongAsyncTaskStart  = "msg_type_wukong_async_task_start"
+	MsgTypeWuKongAsyncTaskFinish = "msg_type_wukong_async_task_finish"
 )
 
 type MsgTask comsg.MsgNormal
@@ -47,9 +47,9 @@ func (msg *MsgTask) WuKongInferenceError(tid uint64, user, errMsg string) {
 	}
 }
 
-func (msg *MsgTask) WuKongAsyncInferenceStart(tid uint64, user string) {
+func (msg *MsgTask) WuKongAsyncTaskStart(tid uint64, user string) {
 	*msg = MsgTask{
-		Type: MsgTypeWuKongAsyncInferenceStart,
+		Type: MsgTypeWuKongAsyncTaskStart,
 		User: user,
 		Details: map[string]string{
 			"task_id": strconv.Itoa(int(tid)),
@@ -65,7 +65,7 @@ func (msg *MsgTask) WuKongAsyncInferenceFinish(tid uint64, user string, links ma
 	}
 
 	*msg = MsgTask{
-		Type: MsgTypeWuKongAsyncInferenceFinish,
+		Type: MsgTypeWuKongAsyncTaskFinish,
 		User: user,
 		Details: map[string]string{
 			"task_id": strconv.Itoa(int(tid)),

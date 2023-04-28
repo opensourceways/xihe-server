@@ -34,7 +34,7 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
 	msg := new(message.MsgTask)
-	msg.WuKongAsyncInferenceStart(tid, user.Account())
+	msg.WuKongAsyncTaskStart(tid, user.Account())
 	s.sender.SendBigModelMsg(msg)
 
 	// chose

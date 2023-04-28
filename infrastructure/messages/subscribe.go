@@ -483,77 +483,6 @@ func registerHandlerForCloud(handler interface{}) (mq.Subscriber, error) {
 	})
 }
 
-// func registerHandlerForAsync(handler interface{}) (mq.Subscriber, error) {
-
-// 	return kafka.Subscribe(topics.Async, func(e mq.Event) (err error) {
-
-// 		msg := e.Message()
-// 		if msg == nil {
-// 			return
-// 		}
-
-// 		body := msgAsync{}
-// 		if err = json.Unmarshal(msg.Body, &body); err != nil {
-// 			return
-// 		}
-
-// 		switch body.Type {
-// 		case "wukong_update":
-// 			h, ok := handler.(AsyncUpdateWuKongTaskMessageHandler)
-// 			if !ok {
-// 				return
-// 			}
-
-// 			status, err := asynctypes.NewTaskStatus(body.Status)
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			v := asyncrepo.WuKongResp{
-// 				WuKongTask: asyncrepo.WuKongTask{
-// 					Id:     body.TaskId,
-// 					Status: status,
-// 				},
-// 			}
-
-// 			if body.Details != nil {
-// 				if v.Links, err = asynctypes.NewLinksFromMap(body.Details); err != nil {
-// 					return err
-// 				}
-// 			}
-
-// 			return h.HandleEventAsyncTaskWuKongUpdate(&v)
-
-// 		case "wukong_request":
-// 			h, ok := handler.(AsyncCreateWuKongTaskMessageHandler)
-// 			if !ok {
-// 				return
-// 			}
-
-// 			user, err := domain.NewAccount(body.User)
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			desc, err := bigmodeldomain.NewWuKongPictureDesc(body.Details["desc"])
-// 			if err != nil {
-// 				return err
-// 			}
-
-// 			v := asynctypes.WuKongRequest{
-// 				User:  user,
-// 				Style: body.Details["style"],
-// 				Desc:  desc,
-// 			}
-
-// 			return h.HandleEventAsyncCreateWuKongTask(&v)
-// 		}
-
-// 		return
-
-// 	})
-// }
-
 func registerHandlerForBigModel(handler interface{}) (mq.Subscriber, error) {
 
 	return kafka.Subscribe(topics.Async, func(e mq.Event) (err error) {
@@ -574,17 +503,17 @@ func registerHandlerForBigModel(handler interface{}) (mq.Subscriber, error) {
 		}
 
 		switch body.Type {
-		case bigmoddelmsg.MsgTypeWuKongAsyncInferenceFinish:
+		case bigmoddelmsg.MsgTypeWuKongAsyncTaskFinish:
 
-			return h.HandleEventBigModelWuKongAsyncInferenceFinish(&body)
+			return h.HandleEventBigModelWuKongAsyncTaskFinish(&body)
 
-		case bigmoddelmsg.MsgTypeWuKongAsyncInferenceStart:
+		case bigmoddelmsg.MsgTypeWuKongAsyncTaskStart:
 
-			return h.HandleEventBigModelWuKongAsyncInferenceStart(&body)
+			return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
 
 		case bigmoddelmsg.MsgTypeWuKongInferenceStart:
 
-			return h.HandleEventBigModelWuKongAsyncInferenceStart(&body)
+			return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
 
 		case bigmoddelmsg.MsgTypeWuKongInferenceError:
 

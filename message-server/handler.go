@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -11,6 +12,8 @@ import (
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncdomain "github.com/opensourceways/xihe-server/async-server/domain"
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
+	bigmodelmessage "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/domain"
@@ -331,9 +334,26 @@ func (h *handler) HandleEventPodSubscribe(info *cloudtypes.PodInfo) error {
 	})
 }
 
-func (h *handler) HandleEventAsyncTaskWuKongUpdate(info *asyncrepo.WuKongResp) error {
+// bigmodel
+func (h *handler) HandleEventBigModelWuKongInferenceStart(msg *bigmodelmessage.MsgTask) error {
+	user, err := domain.NewAccount(msg.User)
+	if err != nil {
+		return err
+	}
+
+	desc, err := bigmodeldomain.NewWuKongPictureDesc(msg.Details["desc"])
+	if err != nil {
+		return err
+	}
+
+	v := asyncdomain.WuKongRequest{
+		User:  user,
+		Style: msg.Details["style"],
+		Desc:  desc,
+	}
+
 	return h.do(func(bool) error {
-		if err := h.async.UpdateWuKongTask(info); err != nil {
+		if err := h.async.CreateWuKongTask(&v); err != nil {
 			if err != nil {
 				h.log.Error(err)
 			}
@@ -341,11 +361,89 @@ func (h *handler) HandleEventAsyncTaskWuKongUpdate(info *asyncrepo.WuKongResp) e
 
 		return nil
 	})
+
 }
 
-func (h *handler) HandleEventAsyncCreateWuKongTask(info *asyncdomain.WuKongRequest) error {
+func (h *handler) HandleEventBigModelWuKongInferenceError(msg *bigmodelmessage.MsgTask) error {
+	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
+	if err != nil {
+		return err
+	}
+
+	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	v := asyncrepo.WuKongResp{
+		WuKongTask: asyncrepo.WuKongTask{
+			Id:     uint64(task_id),
+			Status: status,
+		},
+	}
+
+	if msg.Details != nil {
+		if v.Links, err = asyncdomain.NewLinks(msg.Details["error"]); err != nil { // TODO do't use links to save error
+			return err
+		}
+	}
+
 	return h.do(func(bool) error {
-		if err := h.async.CreateWuKongTask(info); err != nil {
+		if err := h.async.UpdateWuKongTask(&v); err != nil {
+			if err != nil {
+				h.log.Error(err)
+			}
+		}
+
+		return nil
+	})
+
+}
+
+func (h *handler) HandleEventBigModelWuKongAsyncTaskStart(msg *bigmodelmessage.MsgTask) error {
+	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
+	if err != nil {
+		return err
+	}
+
+	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	v := asyncrepo.WuKongResp{
+		WuKongTask: asyncrepo.WuKongTask{
+			Id:     uint64(task_id),
+			Status: status,
+		},
+	}
+
+	return h.do(func(bool) error {
+		if err := h.async.UpdateWuKongTask(&v); err != nil {
+			if err != nil {
+				h.log.Error(err)
+			}
+		}
+
+		return nil
+	})
+
+}
+
+func (h *handler) HandleEventBigModelWuKongAsyncTaskFinish(msg *bigmodelmessage.MsgTask) error {
+	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
+	if err != nil {
+		return err
+	}
+
+	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	v := asyncrepo.WuKongResp{
+		WuKongTask: asyncrepo.WuKongTask{
+			Id:     uint64(task_id),
+			Status: status,
+		},
+	}
+
+	if msg.Details != nil {
+		if v.Links, err = asyncdomain.NewLinks(msg.Details["links"]); err != nil {
+			return err
+		}
+	}
+
+	return h.do(func(bool) error {
+		if err := h.async.UpdateWuKongTask(&v); err != nil {
 			if err != nil {
 				h.log.Error(err)
 			}
