@@ -12,13 +12,13 @@ const (
 	fieldId = "id"
 )
 
-func (table *TWukongTask) toWuKongTask(p *repository.WuKongTask) (err error) {
+func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 
 	if p.User, err = types.NewAccount(table.User); err != nil {
 		return
 	}
 
-	if p.Desc, err = bigmodeldomain.NewWuKongPictureDesc(table.Desc); err != nil {
+	if p.Desc, err = bigmodeldomain.NewWuKongPictureDesc(table.MetaData["desc"].(string)); err != nil {
 		return
 	}
 
@@ -31,22 +31,22 @@ func (table *TWukongTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 	}
 
 	p.Id = table.Id
-	p.Style = table.Style
+	p.Style = table.MetaData["style"].(string)
 
 	return
 }
 
-func (table *TWukongTask) toTWuKongTaskFromWuKongRequest(req *domain.WuKongRequest) {
+func (table *TAsyncTask) toTWuKongTaskFromWuKongRequest(req *domain.WuKongRequest) {
 
 	task := new(repository.WuKongTask)
 	task.SetDefaultStatusWuKongTask(req)
 
-	table.toTWuKongTaskFromWuKongTask(task)
+	table.toTAsyncTaskFromWuKongTask(task)
 }
 
-func (table *TWukongTask) toTWuKongTaskFromWuKongTask(task *repository.WuKongTask) {
+func (table *TAsyncTask) toTAsyncTaskFromWuKongTask(task *repository.WuKongTask) {
 
-	*table = TWukongTask{
+	*table = TAsyncTask{
 		Id: task.Id,
 	}
 
@@ -55,11 +55,11 @@ func (table *TWukongTask) toTWuKongTaskFromWuKongTask(task *repository.WuKongTas
 	}
 
 	if task.Style != "" {
-		table.Style = task.Style
+		table.MetaData["style"] = task.Style
 	}
 
 	if task.Desc != nil {
-		table.Desc = task.Desc.WuKongPictureDesc()
+		table.MetaData["desc"] = task.Desc.WuKongPictureDesc()
 	}
 
 	if task.Status != nil {
@@ -72,12 +72,12 @@ func (table *TWukongTask) toTWuKongTaskFromWuKongTask(task *repository.WuKongTas
 
 }
 
-func (table *TWukongTask) toTWuKongTask(resp *repository.WuKongResp) {
+func (table *TAsyncTask) toTAsyncTask(resp *repository.WuKongResp) {
 
-	table.toTWuKongTaskFromWuKongTask(&resp.WuKongTask)
+	table.toTAsyncTaskFromWuKongTask(&resp.WuKongTask)
 
 	if resp.Links != nil {
-		table.Links = resp.Links.StringLinks()
+		table.MetaData["links"] = resp.Links.StringLinks()
 	}
 
 }

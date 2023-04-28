@@ -8,7 +8,7 @@ import (
 
 func NewWuKongRequestRepo(cfg *Config) repository.WuKongRequest {
 	return &wukongRequestRepoImpl{
-		cli: pgsql.NewDBTable(cfg.Table.WukongRequest),
+		cli: pgsql.NewDBTable(cfg.Table.AsyncTask),
 	}
 }
 
@@ -16,10 +16,10 @@ type wukongRequestRepoImpl struct {
 	cli pgsqlClient
 }
 
-func (impl *wukongRequestRepoImpl) GetNewRequest(time int64) (
+func (impl *wukongRequestRepoImpl) GetNewTask(time int64) (
 	d []repository.WuKongTask, err error,
 ) {
-	var twukong []TWukongTask
+	var twukong []TAsyncTask
 
 	impl.cli.DB().
 		Where("created_at > ? AND status = ?", time, "waiting").
@@ -35,8 +35,8 @@ func (impl *wukongRequestRepoImpl) GetNewRequest(time int64) (
 
 func (impl *wukongRequestRepoImpl) UpdateTask(resp *repository.WuKongResp) (err error) {
 
-	var v TWukongTask
-	v.toTWuKongTask(resp)
+	var v TAsyncTask
+	v.toTAsyncTask(resp)
 
 	filter := map[string]interface{}{
 		fieldId: resp.WuKongTask.Id,
@@ -47,7 +47,7 @@ func (impl *wukongRequestRepoImpl) UpdateTask(resp *repository.WuKongResp) (err 
 
 func (impl *wukongRequestRepoImpl) InsertTask(req *domain.WuKongRequest) error {
 
-	v := new(TWukongTask)
+	v := new(TAsyncTask)
 	v.toTWuKongTaskFromWuKongRequest(req)
 
 	return impl.cli.Create(v)

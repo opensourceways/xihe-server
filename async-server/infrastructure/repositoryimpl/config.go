@@ -5,5 +5,5 @@ type Config struct {
 }
 
 type Table struct {
-	WukongRequest string `json:"wukong_task" required:"true"`
+	AsyncTask string `json:"async_task" required:"true"`
 }

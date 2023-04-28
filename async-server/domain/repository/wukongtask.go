@@ -18,7 +18,7 @@ type WuKongResp struct {
 }
 
 type WuKongRequest interface {
-	GetNewRequest(time int64) ([]WuKongTask, error)
+	GetNewTask(time int64) ([]WuKongTask, error)
 	UpdateTask(*WuKongResp) error
 	InsertTask(*domain.WuKongRequest) error
 }
