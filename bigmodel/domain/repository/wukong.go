@@ -36,7 +36,3 @@ type WuKongPicture interface {
 	UpdatePublicPicture(types.Account, string, int, *domain.WuKongPicture) error
 }
 
-type WuKongAsyncTask interface {
-	GetWaitingTaskRank(types.Account, commondomain.Time) (int, error)
-	GetLastFinishedTask(types.Account) (WuKongTaskResp, error)
-}
