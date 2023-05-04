@@ -98,7 +98,7 @@ func main() {
 	)
 
 	// repo
-	asyncWuKongRepo := repositoryimpl.NewWuKongRequestRepo(&cfg.Postgresql.Config)
+	asyncWuKongRepo := repositoryimpl.NewAsyncTaskRepo(&cfg.Postgresql.Config)
 
 	// async app
 	asyncAppService := app.NewAsyncService(

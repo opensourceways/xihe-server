@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
+	"github.com/opensourceways/xihe-server/bigmodel/domain/async"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/repository"
@@ -43,8 +44,8 @@ type BigModelService interface {
 	WuKong(types.Account, *WuKongCmd) (map[string]string, string, error)
 	WuKongHF(*WuKongHFCmd) (map[string]string, string, error)
 	WuKongInferenceAsync(types.Account, *WuKongCmd) (string, error)
-	GetWuKongWaitingTaskRank(types.Account) (WuKongRankDTO, error)
-	GetWuKongLastTaskResp(types.Account) (WuKongLinksDTO, string, error)
+	GetWuKongWaitingTaskRank(types.Account, string) (WuKongRankDTO, error)
+	GetWuKongLastTaskResp(types.Account, string) (WuKongLinksDTO, string, error)
 	AddLikeFromTempPicture(*WuKongAddLikeFromTempCmd) (string, string, error)
 	AddLikeFromPublicPicture(*WuKongAddLikeFromPublicCmd) (string, string, error)
 	AddPublicFromTempPicture(*WuKongAddPublicFromTempCmd) (string, string, error)
@@ -65,30 +66,30 @@ func NewBigModelService(
 	luojia repository.LuoJia,
 	wukong repository.WuKong,
 	wukongPicture repository.WuKongPicture,
-	wukongAsyncRepo repository.WuKongAsyncTask,
+	asynccli async.AsyncTask,
 	sender message.AsyncMessageProducer,
 ) BigModelService {
 	return bigModelService{
-		fm:              fm,
-		user:            user,
-		sender:          sender,
-		luojia:          luojia,
-		wukong:          wukong,
-		wukongPicture:   wukongPicture,
-		wukongAsyncRepo: wukongAsyncRepo,
-		wukongSampleId:  fm.GetWuKongSampleId(),
+		fm:             fm,
+		user:           user,
+		sender:         sender,
+		luojia:         luojia,
+		wukong:         wukong,
+		wukongPicture:  wukongPicture,
+		asynccli:       asynccli,
+		wukongSampleId: fm.GetWuKongSampleId(),
 	}
 }
 
 type bigModelService struct {
 	fm bigmodel.BigModel
 
-	sender          message.AsyncMessageProducer
-	user            corepo.User
-	luojia          repository.LuoJia
-	wukong          repository.WuKong
-	wukongPicture   repository.WuKongPicture
-	wukongAsyncRepo repository.WuKongAsyncTask
+	sender        message.AsyncMessageProducer
+	user          corepo.User
+	luojia        repository.LuoJia
+	wukong        repository.WuKong
+	wukongPicture repository.WuKongPicture
+	asynccli      async.AsyncTask
 
 	wukongSampleId string
 }
@@ -171,11 +172,11 @@ func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd
 	return "", s.sender.SendBigModelMsg(msg)
 }
 
-func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account) (dto WuKongRankDTO, err error) {
+func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account, taskType string) (dto WuKongRankDTO, err error) {
 	t, _ := commondomain.NewTime(time.Now().Add(-300 * time.Second).Unix()) // TODO config
 
 	var rank int
-	if rank, err = s.wukongAsyncRepo.GetWaitingTaskRank(user, t); err != nil {
+	if rank, err = s.asynccli.GetWaitingTaskRank(user, t, taskType); err != nil {
 		if !commonrepo.IsErrorResourceNotExists(err) {
 			return
 		}
@@ -188,8 +189,8 @@ func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account) (dto WuKon
 	return
 }
 
-func (s bigModelService) GetWuKongLastTaskResp(user types.Account) (dto WuKongLinksDTO, code string, err error) {
-	p, err := s.wukongAsyncRepo.GetLastFinishedTask(user)
+func (s bigModelService) GetWuKongLastTaskResp(user types.Account, taskType string) (dto WuKongLinksDTO, code string, err error) {
+	p, err := s.asynccli.GetLastFinishedTask(user, taskType)
 	if err != nil {
 		if commonrepo.IsErrorResourceNotExists(err) {
 			code = ErrorWuKongNoPicture

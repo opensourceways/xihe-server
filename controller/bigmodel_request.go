@@ -111,7 +111,8 @@ func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
 		return
 	}
 
-	if req.ImgQuantity == 0 {
+	cmd.ImgQuantity = req.ImgQuantity
+	if cmd.ImgQuantity == 0 {
 		cmd.ImgQuantity = 2
 	}
 

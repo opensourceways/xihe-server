@@ -69,7 +69,7 @@ func (cmd *WuKongCmd) Validate() error {
 	}
 
 	if cmd.ImgQuantity != 2 && cmd.ImgQuantity != 4 {
-		return errors.New("inalid cmd")
+		return errors.New("invalid cmd")
 	}
 
 	return nil

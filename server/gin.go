@@ -11,7 +11,10 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
+	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
+	bigmodelasynccli "github.com/opensourceways/xihe-server/bigmodel/infrastructure/asynccli"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
@@ -155,6 +158,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		),
 	)
 
+	asyncAppService := asyncapp.NewTaskService(asyncrepoimpl.NewAsyncTaskRepo(&cfg.Postgresql.Async))
+
 	competitionAppService := competitionapp.NewCompetitionService(
 		competitionrepo.NewCompetitionRepo(mongodb.NewCollection(collections.Competition)),
 		competitionrepo.NewWorkRepo(mongodb.NewCollection(collections.CompetitionWork)),
@@ -182,7 +187,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		bigmodelrepo.NewLuoJiaRepo(mongodb.NewCollection(collections.LuoJia)),
 		bigmodelrepo.NewWuKongRepo(mongodb.NewCollection(collections.WuKong)),
 		bigmodelrepo.NewWuKongPictureRepo(mongodb.NewCollection(collections.WuKongPicture)),
-		bigmodelrepo.NewWuKongAsyncRepo(&cfg.Postgresql.Bigmodel),
+		bigmodelasynccli.NewAsyncCli(asyncAppService),
 		sender,
 	)
 

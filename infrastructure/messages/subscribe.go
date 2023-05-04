@@ -513,7 +513,7 @@ func registerHandlerForBigModel(handler interface{}) (mq.Subscriber, error) {
 
 		case bigmoddelmsg.MsgTypeWuKongInferenceStart:
 
-			return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
+			return h.HandleEventBigModelWuKongInferenceStart(&body)
 
 		case bigmoddelmsg.MsgTypeWuKongInferenceError:
 

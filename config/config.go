@@ -10,8 +10,8 @@ import (
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
-	bigmodelrepoimpl "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	asyncrepoimol "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/domain"
@@ -89,7 +89,6 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
 		&cfg.Postgresql.Cloud,
-		&cfg.Postgresql.Bigmodel,
 		&cfg.Gitlab,
 		&cfg.App,
 		&cfg.API,
@@ -140,8 +139,8 @@ type Mongodb struct {
 type PostgresqlConfig struct {
 	DB pgsql.Config `json:"db" required:"true"`
 
-	Cloud    cloudrepoimpl.Config
-	Bigmodel bigmodelrepoimpl.Config
+	Cloud cloudrepoimpl.Config
+	Async asyncrepoimol.Config
 }
 
 type MongodbCollections struct {

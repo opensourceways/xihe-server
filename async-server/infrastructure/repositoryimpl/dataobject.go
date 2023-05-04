@@ -9,7 +9,9 @@ import (
 )
 
 const (
-	fieldId = "id"
+	fieldId       = "id"
+	fieldUserName = "username"
+	fieldTaskType = "task_type"
 )
 
 func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
@@ -38,6 +40,18 @@ func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 
 	p.TaskType = table.TaskType
 	p.Id = table.Id
+
+	return
+}
+
+func (table *TAsyncTask) toWuKongTaskResp(p *repository.WuKongResp) (err error) {
+	table.toWuKongTask(&p.WuKongTask)
+
+	if table.MetaData["links"] != nil {
+		if p.Links, err = domain.NewLinks(table.MetaData["links"].(string)); err != nil {
+			return
+		}
+	}
 
 	return
 }

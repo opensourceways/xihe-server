@@ -166,7 +166,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 		),
 
 		async: asyncapp.NewAsyncMessageService(
-			asyncrepo.NewWuKongRequestRepo(&cfg.Postgresql.asyncconf),
+			asyncrepo.NewAsyncTaskRepo(&cfg.Postgresql.asyncconf),
 		),
 	}
 
