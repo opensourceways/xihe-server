@@ -18,8 +18,10 @@ func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 		return
 	}
 
-	if p.Desc, err = bigmodeldomain.NewWuKongPictureDesc(table.MetaData["desc"].(string)); err != nil {
-		return
+	if table.MetaData["desc"] != nil {
+		if p.Desc, err = bigmodeldomain.NewWuKongPictureDesc(table.MetaData["desc"].(string)); err != nil {
+			return
+		}
 	}
 
 	if p.CreatedAt, err = commondomain.NewTime(table.CreatedAt); err != nil {
@@ -30,8 +32,12 @@ func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 		return
 	}
 
+	if table.MetaData["style"] != nil {
+		p.Style = table.MetaData["style"].(string)
+	}
+
+	p.TaskType = table.TaskType
 	p.Id = table.Id
-	p.Style = table.MetaData["style"].(string)
 
 	return
 }
@@ -45,10 +51,6 @@ func (table *TAsyncTask) toTWuKongTaskFromWuKongRequest(req *domain.WuKongReques
 }
 
 func (table *TAsyncTask) toTAsyncTaskFromWuKongTask(task *repository.WuKongTask) {
-
-	*table = TAsyncTask{
-		Id: task.Id,
-	}
 
 	if task.User != nil {
 		table.User = task.User.Account()
@@ -73,6 +75,8 @@ func (table *TAsyncTask) toTAsyncTaskFromWuKongTask(task *repository.WuKongTask)
 	if task.CreatedAt != nil {
 		table.CreatedAt = task.CreatedAt.Time()
 	}
+
+	table.Id = task.Id
 
 }
 

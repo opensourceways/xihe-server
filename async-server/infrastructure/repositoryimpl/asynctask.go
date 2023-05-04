@@ -35,7 +35,7 @@ func (impl *asyncTaskRepoImpl) GetNewTask(taskType string, time int64) (
 
 func (impl *asyncTaskRepoImpl) UpdateTask(resp *repository.WuKongResp) (err error) {
 
-	var v TAsyncTask
+	v := NewTAsyncTask()
 	v.toTAsyncTask(resp)
 
 	filter := map[string]interface{}{
@@ -47,7 +47,7 @@ func (impl *asyncTaskRepoImpl) UpdateTask(resp *repository.WuKongResp) (err erro
 
 func (impl *asyncTaskRepoImpl) InsertTask(req *domain.WuKongRequest) error {
 
-	v := new(TAsyncTask)
+	v := NewTAsyncTask()
 	v.toTWuKongTaskFromWuKongRequest(req)
 
 	return impl.cli.Create(v)

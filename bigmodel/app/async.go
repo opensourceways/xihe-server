@@ -52,18 +52,18 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 			err = errors.New("internal error")
 		}
 
-		msg_error := new(message.MsgTask)
-		msg_error.WuKongInferenceError(tid, user.Account(), err.Error())
-		s.sender.SendBigModelMsg(msg_error)
+		msgError := new(message.MsgTask)
+		msgError.WuKongInferenceError(tid, user.Account(), err.Error())
+		s.sender.SendBigModelMsg(msgError)
 
 		return
 	}
 
 	// 3. send msg
-	msg_finish := new(message.MsgTask)
-	msg_finish.WuKongAsyncInferenceFinish(tid, user.Account(), links)
+	msgFinish := new(message.MsgTask)
+	msgFinish.WuKongAsyncInferenceFinish(tid, user.Account(), links)
 
-	return s.sender.SendBigModelMsg(msg_finish)
+	return s.sender.SendBigModelMsg(msgFinish)
 }
 
 func (s *asyncBigModelService) GetIdleEndpoint(bid string) (c int, err error) {

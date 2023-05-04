@@ -485,7 +485,7 @@ func registerHandlerForCloud(handler interface{}) (mq.Subscriber, error) {
 
 func registerHandlerForBigModel(handler interface{}) (mq.Subscriber, error) {
 
-	return kafka.Subscribe(topics.Async, func(e mq.Event) (err error) {
+	return kafka.Subscribe(topics.BigModel, func(e mq.Event) (err error) {
 
 		msg := e.Message()
 		if msg == nil {

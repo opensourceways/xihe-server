@@ -20,13 +20,13 @@ type configuration struct {
 	TrainingEndpoint string `json:"training_endpoint"  required:"true"`
 	FinetuneEndpoint string `json:"finetune_endpoint"  required:"true"`
 
-	Inference  inferenceimpl.Config    `json:"inference"    required:"true"`
-	Evaluate   evaluateConfig          `json:"evaluate"     required:"true"`
-	Cloud      cloudConfig             `json:"cloud"        required:"true"`
-	Mongodb    config.Mongodb          `json:"mongodb"      required:"true"`
-	Postgresql PostgresqlConfig `json:"postgresql"   required:"true"`
-	Domain     domain.Config           `json:"domain"       required:"true"`
-	MQ         config.MQ               `json:"mq"           required:"true"`
+	Inference  inferenceimpl.Config `json:"inference"    required:"true"`
+	Evaluate   evaluateConfig       `json:"evaluate"     required:"true"`
+	Cloud      cloudConfig          `json:"cloud"        required:"true"`
+	Mongodb    config.Mongodb       `json:"mongodb"      required:"true"`
+	Postgresql PostgresqlConfig     `json:"postgresql"   required:"true"`
+	Domain     domain.Config        `json:"domain"       required:"true"`
+	MQ         config.MQ            `json:"mq"           required:"true"`
 }
 
 type PostgresqlConfig struct {
@@ -35,7 +35,6 @@ type PostgresqlConfig struct {
 	cloudconf cloudrepoimpl.Config
 	asyncconf asyncrepoimpl.Config
 }
-
 
 func (cfg *configuration) getMQConfig() mq.MQConfig {
 	return mq.MQConfig{
