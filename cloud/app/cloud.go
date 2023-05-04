@@ -4,10 +4,10 @@ import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/cloud/domain"
-	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
 	"github.com/opensourceways/xihe-server/cloud/domain/service"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
 )
 

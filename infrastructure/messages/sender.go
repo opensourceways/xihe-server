@@ -6,8 +6,8 @@ import (
 	"github.com/opensourceways/community-robot-lib/kafka"
 	"github.com/opensourceways/community-robot-lib/mq"
 
-	"github.com/opensourceways/xihe-server/domain"
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
+	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -196,7 +196,7 @@ func (s sender) AddOperateLogForNewUser(u domain.Account) error {
 	return s.sendOperateLog(u, "user", nil)
 }
 
-func (s sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldomain.BigmodelType) error  {
+func (s sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldomain.BigmodelType) error {
 	return s.sendOperateLog(u, "bigmodel", map[string]string{
 		"bigmodel": string(t),
 	})
@@ -224,6 +224,12 @@ func (s sender) AddOperateLogForDownloadFile(u domain.Account, repo message.Repo
 		"user": repo.User.Account(),
 		"repo": repo.Name.ResourceName(),
 		"path": repo.Path.FilePath(),
+	})
+}
+
+func (s sender) AddOperateLogForCloudSubscribe(u domain.Account, cloudId string) error {
+	return s.sendOperateLog(u, "cloud", map[string]string{
+		"cloud_id": cloudId,
 	})
 }
 

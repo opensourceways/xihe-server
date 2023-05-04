@@ -70,6 +70,9 @@ func (r *CloudService) SubscribeCloud(
 		return
 	}
 
+	// add operate log
+	r.sender.AddOperateLogForCloudSubscribe(u, p.CloudId)
+
 	// send msg to call pod instance api
 	msg := new(message.MsgCloudConf)
 	msg.ToMsgCloudConf(c, u, pid)
