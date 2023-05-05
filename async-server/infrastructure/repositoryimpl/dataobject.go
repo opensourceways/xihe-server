@@ -34,11 +34,16 @@ func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 		return
 	}
 
+	if table.TaskType != "" {
+		if p.TaskType, err = domain.NewTaskType(table.TaskType); err != nil {
+			return
+		}
+	}
+
 	if table.MetaData["style"] != nil {
 		p.Style = table.MetaData["style"].(string)
 	}
 
-	p.TaskType = table.TaskType
 	p.Id = table.Id
 
 	return
@@ -70,8 +75,8 @@ func (table *TAsyncTask) toTAsyncTaskFromWuKongTask(task *repository.WuKongTask)
 		table.User = task.User.Account()
 	}
 
-	if task.TaskType != "" {
-		table.TaskType = task.TaskType
+	if task.TaskType != nil {
+		table.TaskType = task.TaskType.TaskType()
 	}
 
 	if task.Style != "" {

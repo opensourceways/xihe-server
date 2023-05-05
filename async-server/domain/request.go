@@ -8,7 +8,7 @@ import (
 
 type WuKongRequest struct {
 	User      types.Account
-	TaskType  string
+	TaskType  TaskType
 	Style     string
 	Desc      bigmodeldomain.WuKongPictureDesc
 	CreatedAt commondomain.Time

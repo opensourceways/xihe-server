@@ -346,9 +346,14 @@ func (h *handler) HandleEventBigModelWuKongInferenceStart(msg *bigmodelmessage.M
 		return err
 	}
 
+	tt, err := asyncdomain.NewTaskType(msg.Details["task_type"])
+	if err != nil {
+		return err
+	}
+
 	v := asyncdomain.WuKongRequest{
 		User:     user,
-		TaskType: msg.Details["task_type"],
+		TaskType: tt,
 		Style:    msg.Details["style"],
 		Desc:     desc,
 	}

@@ -120,15 +120,7 @@ func (s bigModelService) WuKong(
 ) (links map[string]string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
-	var estype string
-	switch cmd.ImgQuantity {
-	case 2:
-		estype = string(domain.BigmodelWuKong)
-	case 4:
-		estype = string(domain.BigmodelWuKong4Img)
-	}
-
-	links, err = s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, estype)
+	links, err = s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, cmd.EsType)
 	if err != nil {
 		code = s.setCode(err)
 	}
@@ -157,17 +149,8 @@ func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd
 		return
 	}
 
-	// chose wukong endpoint type
-	var estype string
-	switch cmd.ImgQuantity {
-	case 2:
-		estype = string(domain.BigmodelWuKong)
-	case 4:
-		estype = string(domain.BigmodelWuKong4Img)
-	}
-
 	msg := new(message.MsgTask)
-	msg.WuKongInferenceStart(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style, estype)
+	msg.WuKongInferenceStart(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style, cmd.EsType)
 
 	return "", s.sender.SendBigModelMsg(msg)
 }

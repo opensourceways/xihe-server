@@ -30,7 +30,7 @@ func (impl *bigmodelImpl) WuKong(d *repository.WuKongTask) (err error) {
 			Desc:  d.Desc,
 		},
 
-		ImgQuantity: 2,
+		EsType: d.TaskType.TaskType(),
 	}
 
 	return impl.srv.WuKong(d.Id, d.User, &cmd)
@@ -43,7 +43,7 @@ func (impl *bigmodelImpl) WuKong4Img(d *repository.WuKongTask) (err error) {
 			Desc:  d.Desc,
 		},
 
-		ImgQuantity: 4,
+		EsType: d.TaskType.TaskType(),
 	}
 
 	return impl.srv.WuKong(d.Id, d.User, &cmd)

@@ -111,9 +111,11 @@ func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
 		return
 	}
 
-	cmd.ImgQuantity = req.ImgQuantity
-	if cmd.ImgQuantity == 0 {
-		cmd.ImgQuantity = 2
+	switch req.ImgQuantity {
+	case 4:
+		cmd.EsType = string(domain.BigmodelWuKong4Img)
+	default:
+		cmd.EsType = string(domain.BigmodelWuKong)
 	}
 
 	err = cmd.Validate()

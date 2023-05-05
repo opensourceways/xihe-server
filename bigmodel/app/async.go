@@ -37,16 +37,7 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 	msg.WuKongAsyncTaskStart(tid, user.Account())
 	s.sender.SendBigModelMsg(msg)
 
-	// chose
-	var estype string
-	switch cmd.ImgQuantity {
-	case 2:
-		estype = string(domain.BigmodelWuKong)
-	case 4:
-		estype = string(domain.BigmodelWuKong4Img)
-	}
-
-	links, err := s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, estype)
+	links, err := s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, cmd.EsType)
 	if err != nil {
 		if !bigmodel.IsErrorSensitiveInfo(err) {
 			err = errors.New("internal error")

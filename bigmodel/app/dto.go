@@ -60,15 +60,11 @@ func (cmd *WuKongListPublicGlobalCmd) Validate() error {
 type WuKongCmd struct {
 	domain.WuKongPictureMeta
 
-	ImgQuantity int
+	EsType string
 }
 
 func (cmd *WuKongCmd) Validate() error {
 	if cmd.Desc == nil {
-		return errors.New("invalid cmd")
-	}
-
-	if cmd.ImgQuantity != 2 && cmd.ImgQuantity != 4 {
 		return errors.New("invalid cmd")
 	}
 

@@ -10,6 +10,9 @@ const (
 	taskStatusRunning  = "running"
 	taskStatusFinished = "finished"
 	taskStatusError    = "error"
+
+	taskTypeWuKong     = "wukong"
+	taskTypeWuKong4Img = "wukong_4img"
 )
 
 // taskStatus
@@ -54,6 +57,38 @@ func (r dptaskstatus) IsFinished() bool {
 
 func (r dptaskstatus) IsError() bool {
 	return r.TaskStatus() == taskStatusError
+}
+
+// Task Type
+type TaskType interface {
+	TaskType() string
+	IsWuKong() bool
+	IsWuKong4Img() bool
+}
+
+type dptasktype string
+
+func NewTaskType(v string) (TaskType, error) {
+	b := v == taskTypeWuKong ||
+		v == taskTypeWuKong4Img
+
+	if !b {
+		return nil, errors.New("invalid value")
+	}
+
+	return dptasktype(v), nil
+}
+
+func (r dptasktype) TaskType() string {
+	return string(r)
+}
+
+func (r dptasktype) IsWuKong() bool {
+	return r.TaskType() == taskTypeWuKong
+}
+
+func (r dptasktype) IsWuKong4Img() bool {
+	return r.TaskType() == taskTypeWuKong4Img
 }
 
 // Links
