@@ -12,6 +12,7 @@ const (
 	fieldId       = "id"
 	fieldUserName = "username"
 	fieldTaskType = "task_type"
+	fieldStatus   = "status"
 )
 
 func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {

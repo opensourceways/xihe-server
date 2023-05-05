@@ -114,6 +114,7 @@ func (impl *asyncTaskRepoImpl) GetLastFinishedTask(user types.Account, taskType 
 	filter := map[string]interface{}{
 		fieldUserName: user.Account(),
 		fieldTaskType: taskType,
+		fieldStatus:   "finished",
 	}
 
 	order := "created_at DESC"
