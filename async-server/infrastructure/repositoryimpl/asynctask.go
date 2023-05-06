@@ -1,8 +1,6 @@
 package repositoryimpl
 
 import (
-	"fmt"
-
 	"github.com/opensourceways/xihe-server/async-server/domain"
 	"github.com/opensourceways/xihe-server/async-server/domain/repository"
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
@@ -55,8 +53,6 @@ func (impl *asyncTaskRepoImpl) InsertTask(req *domain.WuKongRequest) error {
 	v := NewTAsyncTask()
 	v.toTWuKongTaskFromWuKongRequest(req)
 
-	fmt.Printf("req: %+v\n", req)
-
 	return impl.cli.Create(v)
 }
 
@@ -94,10 +90,10 @@ func (impl *asyncTaskRepoImpl) GetWaitingTaskRank(user types.Account, t commondo
 
 	// 2. caculate rank
 	f2 := func(v []TAsyncTask) int {
-		i := 1
+		i := 0
 
 		for j := range v {
-			if v[j].CreatedAt <= t.Time() {
+			if v[j].CreatedAt >= t.Time() {
 				i++
 			}
 		}

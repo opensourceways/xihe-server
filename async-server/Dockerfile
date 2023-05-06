@@ -8,6 +8,8 @@ RUN cd /go/src/github.com/opensourceways/xihe-server/async-server && GO111MODULE
 FROM alpine:latest
 WORKDIR /opt/app/
 
+ENV BIGMODEL_WUKONGHF="test"
+
 COPY  --from=BUILDER /go/src/github.com/opensourceways/xihe-server/async-server/async-server /opt/app
 
 ENTRYPOINT ["/opt/app/async-server"]
