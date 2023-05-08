@@ -46,7 +46,7 @@ type BigModelService interface {
 	WuKongHF(*WuKongHFCmd) (map[string]string, string, error)
 	WuKongInferenceAsync(types.Account, *WuKongCmd) (string, error)
 	GetWuKongWaitingTaskRank(types.Account, string) (WuKongRankDTO, error)
-	GetWuKongLastTaskResp(types.Account, string) (WuKongLinksDTO, string, error)
+	GetWuKongLastTaskResp(types.Account, string) ([]wukongPictureDTO, string, error)
 	AddLikeFromTempPicture(*WuKongAddLikeFromTempCmd) (string, string, error)
 	AddLikeFromPublicPicture(*WuKongAddLikeFromPublicCmd) (string, string, error)
 	AddPublicFromTempPicture(*WuKongAddPublicFromTempCmd) (string, string, error)
@@ -176,7 +176,7 @@ func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account, taskType s
 	return
 }
 
-func (s bigModelService) GetWuKongLastTaskResp(user types.Account, taskType string) (dto WuKongLinksDTO, code string, err error) {
+func (s bigModelService) GetWuKongLastTaskResp(user types.Account, taskType string) (dtos []wukongPictureDTO, code string, err error) {
 	p, err := s.asynccli.GetLastFinishedTask(user, taskType)
 	if err != nil {
 		if commonrepo.IsErrorResourceNotExists(err) {
@@ -206,8 +206,24 @@ func (s bigModelService) GetWuKongLastTaskResp(user types.Account, taskType stri
 		return
 	}
 
-	dto = WuKongLinksDTO{
-		Pictures: p.Links.Links(),
+	dtos = make([]wukongPictureDTO, len(p.Links.Links()))
+	for i := range p.Links.Links() {
+		var (
+			isLike, isPublic bool
+			likeID           string
+		)
+
+		isLike, likeID, isPublic, err = s.bigmodelService.LinkLikePublic(p.Links.Links()[i], user)
+		if err != nil {
+			return
+		}
+
+		dtos[i] = wukongPictureDTO{
+			Link:     p.Links.Links()[i],
+			IsPublic: isPublic,
+			IsLike:   isLike,
+			LikeID:   likeID,
+		}
 	}
 
 	return

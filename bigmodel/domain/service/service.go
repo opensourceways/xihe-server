@@ -1,6 +1,9 @@
 package service
 
 import (
+	"net/url"
+	"strings"
+
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/repository"
@@ -11,6 +14,7 @@ type BigModelService interface {
 	IsLike(*domain.WuKongPicture, types.Account) (bool, string, error)
 	IsPublic(*domain.WuKongPicture) (bool, error)
 	IsDigg(types.Account, []string) bool
+	LinkLikePublic(string, types.Account) (bool, string, bool, error)
 }
 
 type bigModelService struct {
@@ -85,4 +89,34 @@ func (s *bigModelService) IsDigg(
 	}
 
 	return false
+}
+
+func (s *bigModelService) LinkLikePublic(link string, user types.Account) (
+	isLike bool, likeId string, isPublic bool, err error,
+) {
+	obspath := toOBSPath(link)
+
+	p := domain.WuKongPicture{
+		OBSPath: obspath,
+		Owner:   user,
+	}
+
+	if isLike, likeId, err = s.IsLike(&p, user); err != nil {
+		return
+	}
+
+	if isPublic, err = s.IsPublic(&p); err != nil {
+		return
+	}
+
+	return
+}
+
+func toOBSPath(link string) (obspath string) {
+	u, _ := url.QueryUnescape(link)
+
+	t := strings.Split(u, ".ovaijisuan.com:443/")[1]
+	obspath = strings.Split(t, "?AWSAccessKeyId")[0]
+
+	return
 }

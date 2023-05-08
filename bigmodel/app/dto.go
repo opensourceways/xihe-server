@@ -182,8 +182,11 @@ type WuKongPublicGlobalDTO struct {
 	Total    int               `json:"total"`
 }
 
-type WuKongLinksDTO struct {
-	Pictures []string `json:"pictures"`
+type wukongPictureDTO struct {
+	Link     string `json:"link"`
+	IsPublic bool   `json:"is_public"`
+	IsLike   bool   `json:"is_like"`
+	LikeID   string `json:"like_id"`
 }
 
 type WuKongRankDTO struct {
