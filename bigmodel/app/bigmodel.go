@@ -12,6 +12,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/repository"
+	"github.com/opensourceways/xihe-server/bigmodel/domain/service"
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
@@ -70,14 +71,15 @@ func NewBigModelService(
 	sender message.AsyncMessageProducer,
 ) BigModelService {
 	return bigModelService{
-		fm:             fm,
-		user:           user,
-		sender:         sender,
-		luojia:         luojia,
-		wukong:         wukong,
-		wukongPicture:  wukongPicture,
-		asynccli:       asynccli,
-		wukongSampleId: fm.GetWuKongSampleId(),
+		fm:              fm,
+		user:            user,
+		sender:          sender,
+		luojia:          luojia,
+		wukong:          wukong,
+		wukongPicture:   wukongPicture,
+		asynccli:        asynccli,
+		wukongSampleId:  fm.GetWuKongSampleId(),
+		bigmodelService: service.NewBigModelService(fm, wukongPicture),
 	}
 }
 
@@ -90,6 +92,8 @@ type bigModelService struct {
 	wukong        repository.WuKong
 	wukongPicture repository.WuKongPicture
 	asynccli      async.AsyncTask
+
+	bigmodelService service.BigModelService
 
 	wukongSampleId string
 }
@@ -345,7 +349,7 @@ func (s bigModelService) ListLikes(user types.Account) (
 			return
 		}
 
-		dto.IsPublic, err = s.isPublic(item)
+		dto.IsPublic, err = s.bigmodelService.IsPublic(item)
 		if err != nil {
 			return
 		}
@@ -511,14 +515,15 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 		avatarId, _ := s.user.GetUserAvatarId(item.Owner)
 
 		var (
-			a       string
-			isDigg  bool
-			LikeDto WuKongIsLikeDTO
+			a      string
+			isDigg bool
+			isLike bool
+			likeID string
 		)
 
 		if cmd.User != nil {
-			LikeDto, _ = s.isLike(item, cmd.User)
-			isDigg = s.isDigg(cmd.User, item.Diggs)
+			isLike, likeID, _ = s.bigmodelService.IsLike(item, cmd.User)
+			isDigg = s.bigmodelService.IsDigg(cmd.User, item.Diggs)
 		} else {
 			isDigg = false
 		}
@@ -529,7 +534,7 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 			a = ""
 		}
 
-		d[i].toWuKongPublicDTO(item, a, LikeDto.IsLike, LikeDto.LikeID, isDigg, link)
+		d[i].toWuKongPublicDTO(item, a, isLike, likeID, isDigg, link)
 	}
 
 	r = WuKongPublicGlobalDTO{
@@ -554,10 +559,10 @@ func (s bigModelService) ListPublics(user types.Account) (
 		dto := &r[i]
 
 		link := s.fm.GenWuKongLinkFromOBSPath(item.OBSPath)
-		likeDto, _ := s.isLike(item, user)
-		isDigg := s.isDigg(user, item.Diggs)
+		isLike, likeID, _ := s.bigmodelService.IsLike(item, user)
+		isDigg := s.bigmodelService.IsDigg(user, item.Diggs)
 
-		dto.toWuKongPublicDTO(item, "", likeDto.IsLike, likeDto.LikeID, isDigg, link)
+		dto.toWuKongPublicDTO(item, "", isLike, likeID, isDigg, link)
 	}
 
 	return
@@ -625,67 +630,6 @@ func (s bigModelService) CancelDiggPicture(cmd *WuKongCancelDiggCmd) (count int,
 
 	count = p.DiggCount
 	return
-}
-
-func (s bigModelService) isLike(
-	p *domain.WuKongPicture,
-	user types.Account,
-) (WuKongIsLikeDTO, error) {
-	pics, _, err := s.wukongPicture.ListLikesByUserName(user)
-	if err != nil {
-		return WuKongIsLikeDTO{}, err
-	}
-
-	for _, pic := range pics {
-		likePath, err := s.fm.CheckWuKongPicturePublicToLike(user, p.OBSPath)
-		if err != nil {
-			return WuKongIsLikeDTO{}, err
-		}
-
-		if pic.OBSPath == likePath {
-			return WuKongIsLikeDTO{
-				IsLike: true,
-				LikeID: pic.Id,
-			}, nil
-		}
-	}
-
-	return WuKongIsLikeDTO{}, nil
-}
-
-func (s bigModelService) isPublic(
-	p *domain.WuKongPicture,
-) (bool, error) {
-	pics, _, err := s.wukongPicture.ListPublicsByUserName(p.Owner)
-	if err != nil {
-		return false, err
-	}
-
-	for _, pic := range pics {
-		_, publicPath, err := s.fm.CheckWuKongPictureToPublic(p.Owner, p.OBSPath)
-		if err != nil {
-			return false, err
-		}
-
-		if pic.OBSPath == publicPath {
-			return true, nil
-		}
-	}
-
-	return false, nil
-}
-
-func (s bigModelService) isDigg(
-	user types.Account,
-	diggs []string,
-) bool {
-	for _, username := range diggs {
-		if user.Account() == username {
-			return true
-		}
-	}
-
-	return false
 }
 
 func (s bigModelService) ReGenerateDownloadURL(
