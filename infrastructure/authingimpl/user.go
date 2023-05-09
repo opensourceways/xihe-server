@@ -94,6 +94,7 @@ func (impl *user) GetByCode(code, redirectURI string) (login authing.Login, err 
 	if err == nil {
 		login.IDToken = v.IdToken
 		login.UserInfo = info
+		login.AccessToken = v.AccessToken
 	}
 
 	return
