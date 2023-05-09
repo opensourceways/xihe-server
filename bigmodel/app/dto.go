@@ -185,6 +185,7 @@ type WuKongPublicGlobalDTO struct {
 type wukongPictureDTO struct {
 	Link     string `json:"link"`
 	IsPublic bool   `json:"is_public"`
+	PublicID string `json:"public_id"`
 	IsLike   bool   `json:"is_like"`
 	LikeID   string `json:"like_id"`
 }

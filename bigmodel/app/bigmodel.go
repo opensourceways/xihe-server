@@ -208,21 +208,17 @@ func (s bigModelService) GetWuKongLastTaskResp(user types.Account, taskType stri
 
 	dtos = make([]wukongPictureDTO, len(p.Links.Links()))
 	for i := range p.Links.Links() {
-		var (
-			isLike, isPublic bool
-			likeID           string
-		)
-
-		isLike, likeID, isPublic, err = s.bigmodelService.LinkLikePublic(p.Links.Links()[i], user)
+		opt, err := s.bigmodelService.LinkLikePublic(p.Links.Links()[i], user)
 		if err != nil {
-			return
+			return nil, "", err
 		}
 
 		dtos[i] = wukongPictureDTO{
 			Link:     p.Links.Links()[i],
-			IsPublic: isPublic,
-			IsLike:   isLike,
-			LikeID:   likeID,
+			IsPublic: opt.IsPublic,
+			PublicID: opt.PublicId,
+			IsLike:   opt.IsLike,
+			LikeID:   opt.LikeId,
 		}
 	}
 
@@ -365,7 +361,7 @@ func (s bigModelService) ListLikes(user types.Account) (
 			return
 		}
 
-		dto.IsPublic, err = s.bigmodelService.IsPublic(item)
+		dto.IsPublic, _, err = s.bigmodelService.IsPublic(item)
 		if err != nil {
 			return
 		}
