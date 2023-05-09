@@ -21,7 +21,7 @@ type LuoJiaRecordIndex struct {
 type WuKongPicture struct {
 	Id        string
 	Owner     types.Account
-	OBSPath   string
+	OBSPath   OBSPath
 	Level     WuKongPictureLevel
 	Diggs     []string
 	DiggCount int
