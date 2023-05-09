@@ -391,9 +391,12 @@ func (r *pictureItem) toWuKongPicture(d *domain.WuKongPicture) (err error) {
 		return
 	}
 
+	if d.OBSPath, err = domain.NewOBSPath(r.OBSPath); err != nil {
+		return
+	}
+
 	d.Level = domain.NewWuKongPictureLevelByNum(r.Level)
 	d.Id = r.Id
-	d.OBSPath = r.OBSPath
 	d.Diggs = r.Diggs
 	d.DiggCount = r.DiggCount
 	d.Version = r.Version
@@ -425,7 +428,6 @@ func toPictureItemDoc(d *domain.WuKongPicture) (bson.M, error) {
 	p := pictureItem{
 		Id:        d.Id,
 		Style:     d.Style,
-		OBSPath:   d.OBSPath,
 		Diggs:     d.Diggs,
 		DiggCount: d.DiggCount,
 		Version:   d.Version,
@@ -442,6 +444,10 @@ func toPictureItemDoc(d *domain.WuKongPicture) (bson.M, error) {
 
 	if d.Level != nil {
 		p.Level = d.Level.Int()
+	}
+
+	if d.OBSPath != nil {
+		p.OBSPath = d.OBSPath.OBSPath()
 	}
 
 	return genDoc(p)

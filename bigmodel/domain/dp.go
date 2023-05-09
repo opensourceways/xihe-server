@@ -3,6 +3,7 @@ package domain
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -138,4 +139,24 @@ func (r wukongPictureLevel) Int() int {
 
 func (r wukongPictureLevel) IsOfficial() bool {
 	return r.WuKongPictureLevel() == "official"
+}
+
+// obspath
+type OBSPath interface {
+	OBSPath() string
+	IsTempPath() bool
+}
+
+func NewOBSPath(v string) (OBSPath, error) {
+	return obspath(v), nil
+}
+
+type obspath string
+
+func (r obspath) OBSPath() string {
+	return string(r)
+}
+
+func (r obspath) IsTempPath() bool {
+	return strings.Contains(r.OBSPath(), "generate/")
 }
