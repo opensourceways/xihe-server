@@ -12,9 +12,9 @@ import (
 
 type BigModelService interface {
 	IsLike(*domain.WuKongPicture, types.Account) (bool, string, error)
-	IsPublic(*domain.WuKongPicture) (bool, error)
+	IsPublic(*domain.WuKongPicture) (bool, string, error)
 	IsDigg(types.Account, []string) bool
-	LinkLikePublic(string, types.Account) (bool, string, bool, error)
+	LinkLikePublic(string, types.Account) (LinkLikePublicOpt, error)
 }
 
 type bigModelService struct {
@@ -58,24 +58,28 @@ func (s *bigModelService) IsLike(
 
 func (s *bigModelService) IsPublic(
 	p *domain.WuKongPicture,
-) (bool, error) {
+) (isPublic bool, publicId string, err error) {
 	pics, _, err := s.wukongPicture.ListPublicsByUserName(p.Owner)
 	if err != nil {
-		return false, err
+		return
 	}
 
 	for _, pic := range pics {
-		_, publicPath, err := s.fm.CheckWuKongPictureToPublic(p.Owner, p.OBSPath)
+		var publicPath string
+		_, publicPath, err = s.fm.CheckWuKongPictureToPublic(p.Owner, p.OBSPath)
 		if err != nil {
-			return false, err
+			return
 		}
 
 		if pic.OBSPath == publicPath {
-			return true, nil
+			isPublic = true
+			publicId = pic.Id
+
+			return
 		}
 	}
 
-	return false, nil
+	return
 }
 
 func (s *bigModelService) IsDigg(
@@ -92,7 +96,7 @@ func (s *bigModelService) IsDigg(
 }
 
 func (s *bigModelService) LinkLikePublic(link string, user types.Account) (
-	isLike bool, likeId string, isPublic bool, err error,
+	opt LinkLikePublicOpt, err error,
 ) {
 	obspath := toOBSPath(link)
 
@@ -101,11 +105,11 @@ func (s *bigModelService) LinkLikePublic(link string, user types.Account) (
 		Owner:   user,
 	}
 
-	if isLike, likeId, err = s.IsLike(&p, user); err != nil {
+	if opt.IsLike, opt.LikeId, err = s.IsLike(&p, user); err != nil {
 		return
 	}
 
-	if isPublic, err = s.IsPublic(&p); err != nil {
+	if opt.IsPublic, opt.PublicId, err = s.IsPublic(&p); err != nil {
 		return
 	}
 
