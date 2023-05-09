@@ -334,8 +334,10 @@ func (s bigModelService) CancelLike(user types.Account, pid string) (err error) 
 		return
 	}
 
-	if err = s.fm.DeleteWuKongPicture(v.OBSPath.OBSPath()); err != nil {
-		return
+	if !v.OBSPath.IsTempPath() {
+		if err = s.fm.DeleteWuKongPicture(v.OBSPath.OBSPath()); err != nil {
+			return
+		}
 	}
 
 	err = s.wukongPicture.DeleteLike(user, pid)
