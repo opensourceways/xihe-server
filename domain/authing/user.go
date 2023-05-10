@@ -14,11 +14,15 @@ type UserInfo struct {
 type Login struct {
 	UserInfo
 
-	IDToken string
+	IDToken     string
 	AccessToken string
 }
 
 type User interface {
 	GetByCode(code, redirectURI string) (Login, error)
 	GetByAccessToken(accessToken string) (UserInfo, error)
+
+	// email
+	SendBindEmail(accessToken string) (err error)
+	VerifyBindEmail(accessToken, passCode string) (err error)
 }

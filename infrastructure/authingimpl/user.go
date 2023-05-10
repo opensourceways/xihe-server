@@ -16,16 +16,19 @@ import (
 var userInstance *user
 
 type Config struct {
-	APPId    string `json:"app_id"    required:"true"`
-	Secret   string `json:"secret"    required:"true"`
-	Endpoint string `json:"endpoint"  required:"true"`
+	APPId        string `json:"app_id"        required:"true"`
+	Secret       string `json:"secret"        required:"true"`
+	Endpoint     string `json:"endpoint"      required:"true"`
+	CertEndpoint string `json:"cert_endpoint" required:"true"`
 }
 
 func Init(v *Config) {
 	userInstance = &user{
-		cfg:         *v,
-		tokenURL:    v.Endpoint + "/token",
-		userInfoURL: v.Endpoint + "/user",
+		cfg:          *v,
+		tokenURL:     v.Endpoint + "/token",
+		userInfoURL:  v.Endpoint + "/user",
+		sendEmailURL: v.CertEndpoint + "/api/v3/send-email",
+		BindEmailURL: v.CertEndpoint + "/api/v3/bind-email",
 	}
 }
 
@@ -34,9 +37,11 @@ func NewAuthingUser() *user {
 }
 
 type user struct {
-	cfg         Config
-	tokenURL    string
-	userInfoURL string
+	cfg          Config
+	tokenURL     string
+	userInfoURL  string
+	sendEmailURL string
+	BindEmailURL string
 }
 
 func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInfo, err error) {
