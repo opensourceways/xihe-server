@@ -11,9 +11,9 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"github.com/opensourceways/xihe-server/app"
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
-	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 	bigmodelasynccli "github.com/opensourceways/xihe-server/bigmodel/infrastructure/asynccli"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
@@ -39,6 +39,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
@@ -161,6 +162,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		),
 	)
 
+	loginService := app.NewLoginService(login)
+
 	asyncAppService := asyncapp.NewTaskService(asyncrepoimpl.NewAsyncTaskRepo(&cfg.Postgresql.Async))
 
 	competitionAppService := competitionapp.NewCompetitionService(
@@ -213,7 +216,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 		controller.AddRouterForUserController(
 			v1, user, gitlabUser,
-			authingUser, sender,
+			authingUser, loginService, sender,
 		)
 
 		controller.AddRouterForLoginController(

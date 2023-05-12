@@ -69,3 +69,7 @@ type userDetail struct {
 
 	IsFollower bool `json:"is_follower"`
 }
+
+type emailCode struct {
+	Code string `json:"code"`
+}

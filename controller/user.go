@@ -5,12 +5,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	userapp "github.com/opensourceways/xihe-server/user/app"
+	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
+	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
 )
 
 func AddRouterForUserController(
@@ -18,12 +20,16 @@ func AddRouterForUserController(
 	repo userrepo.User,
 	ps platform.User,
 	auth authing.User,
+	login app.LoginService,
 	sender message.Sender,
 ) {
 	ctl := UserController{
 		auth: auth,
 		repo: repo,
 		s:    userapp.NewUserService(repo, ps, sender),
+		email: userapp.NewEmailService(
+			auth, userlogincli.NewLoginCli(login),
+		),
 	}
 
 	rg.POST("/v1/user", ctl.Create) // TODO: delete
@@ -37,15 +43,19 @@ func AddRouterForUserController(
 	rg.GET("/v1/user/follower/:account", ctl.ListFollower)
 	rg.GET("/v1/user/:account/gitlab", ctl.GitlabToken)
 
+	// email
 	rg.GET("/v1/user/check_email", checkUserEmailMiddleware(&ctl.baseController))
+	rg.POST("/v1/user/email/sendbind", ctl.SendBindEmail)
+	rg.POST("/v1/user/email/bind", ctl.BindEmail)
 }
 
 type UserController struct {
 	baseController
 
-	repo userrepo.User
-	auth authing.User
-	s    userapp.UserService
+	repo  userrepo.User
+	auth  authing.User
+	s     userapp.UserService
+	email userapp.EmailService
 }
 
 // @Summary Create
@@ -282,4 +292,68 @@ type platformInfo struct {
 // @Router /v1/user/check_email[get]
 func (ctl *UserController) CheckEmail(ctx *gin.Context) {
 	ctl.sendRespOfGet(ctx, "")
+}
+
+// @Summary SendBindEmail
+// @Description send code to user
+// @Tags  User
+// @Accept json
+// @Success 201 {object} app.UserDTO
+// @Failure 500 system_error        system error
+// @Failure 500 duplicate_creating  create user repeatedly
+// @Router /v1/user/email/sendbind [post]
+func (ctl *UserController) SendBindEmail(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	if err := ctl.email.SendBindEmail(pl.DomainAccount()); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPost(ctx, "success")
+	}
+}
+
+// @Summary BindEmail
+// @Description bind email according the code
+// @Tags  User
+// @Param	body	body 	userCreateRequest	true	"body of creating user"
+// @Accept json
+// @Success 201 {object} app.UserDTO
+// @Failure 400 bad_request_body    can't parse request body
+// @Failure 400 bad_request_param   some parameter of body is invalid
+// @Failure 500 system_error        system error
+// @Failure 500 duplicate_creating  create user repeatedly
+// @Router /v1/user/email/bind [post]
+func (ctl *UserController) BindEmail(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := emailCode{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody,
+			"can't fetch request body",
+		))
+
+		return
+	}
+
+	if req.Code == "" {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody,
+			"code cannot be empty",
+		))
+
+		return
+	}
+
+	if err := ctl.email.VerifyBindEmail(pl.DomainAccount(), req.Code); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPost(ctx, "success")
+	}
 }
