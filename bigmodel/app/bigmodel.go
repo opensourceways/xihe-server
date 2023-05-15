@@ -46,8 +46,8 @@ type BigModelService interface {
 	WuKong(types.Account, *WuKongCmd) (map[string]string, string, error)
 	WuKongHF(*WuKongHFCmd) (map[string]string, string, error)
 	WuKongInferenceAsync(types.Account, *WuKongCmd) (string, error)
-	GetWuKongWaitingTaskRank(types.Account, string) (WuKongRankDTO, error)
-	GetWuKongLastTaskResp(types.Account, string) ([]wukongPictureDTO, string, error)
+	GetWuKongWaitingTaskRank(types.Account) (WuKongRankDTO, error)
+	GetWuKongLastTaskResp(types.Account) ([]wukongPictureDTO, string, error)
 	AddLikeFromTempPicture(*WuKongAddLikeFromTempCmd) (string, string, error)
 	AddLikeFromPublicPicture(*WuKongAddLikeFromPublicCmd) (string, string, error)
 	AddPublicFromTempPicture(*WuKongAddPublicFromTempCmd) (string, string, error)
@@ -160,11 +160,11 @@ func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd
 	return "", s.sender.SendBigModelMsg(msg)
 }
 
-func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account, taskType string) (dto WuKongRankDTO, err error) {
+func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account) (dto WuKongRankDTO, err error) {
 	t, _ := commondomain.NewTime(time.Now().Add(-300 * time.Second).Unix()) // TODO config
 
 	var rank int
-	if rank, err = s.asynccli.GetWaitingTaskRank(user, t, taskType); err != nil {
+	if rank, err = s.asynccli.GetWaitingTaskRank(user, t, []string{"wukong", "wukong_4img"}); err != nil {
 		if !commonrepo.IsErrorResourceNotExists(err) {
 			return
 		}
@@ -177,8 +177,8 @@ func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account, taskType s
 	return
 }
 
-func (s bigModelService) GetWuKongLastTaskResp(user types.Account, taskType string) (dtos []wukongPictureDTO, code string, err error) {
-	p, err := s.asynccli.GetLastFinishedTask(user, taskType)
+func (s bigModelService) GetWuKongLastTaskResp(user types.Account) (dtos []wukongPictureDTO, code string, err error) {
+	p, err := s.asynccli.GetLastFinishedTask(user, []string{"wukong", "wukong_4img"})
 	if err != nil {
 		if commonrepo.IsErrorResourceNotExists(err) {
 			code = ErrorWuKongNoPicture

@@ -16,10 +16,10 @@ type asyncImpl struct {
 	srv asyncapp.TaskService
 }
 
-func (impl *asyncImpl) GetWaitingTaskRank(user types.Account, time commondomain.Time, taskType string) (rank int, err error) {
+func (impl *asyncImpl) GetWaitingTaskRank(user types.Account, time commondomain.Time, taskType []string) (rank int, err error) {
 	return impl.srv.GetWaitingTaskRank(user, time, taskType)
 }
 
-func (impl *asyncImpl) GetLastFinishedTask(user types.Account, taskType string) (resp asyncrepo.WuKongResp, err error) {
+func (impl *asyncImpl) GetLastFinishedTask(user types.Account, taskType []string) (resp asyncrepo.WuKongResp, err error) {
 	return impl.srv.GetLastFinishedTask(user, taskType)
 }

@@ -7,6 +7,6 @@ import (
 )
 
 type AsyncTask interface {
-	GetWaitingTaskRank(types.Account, commondomain.Time, string) (int, error)
-	GetLastFinishedTask(types.Account, string) (asyncrepo.WuKongResp, error)
+	GetWaitingTaskRank(types.Account, commondomain.Time, []string) (int, error)
+	GetLastFinishedTask(types.Account, []string) (asyncrepo.WuKongResp, error)
 }

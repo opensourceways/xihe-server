@@ -25,8 +25,8 @@ type AsyncTask interface {
 	UpdateTask(*WuKongResp) error
 	InsertTask(*domain.WuKongRequest) error
 
-	GetWaitingTaskRank(types.Account, commondomain.Time, string) (int, error)
-	GetLastFinishedTask(types.Account, string) (WuKongResp, error)
+	GetWaitingTaskRank(types.Account, commondomain.Time, []string) (int, error)
+	GetLastFinishedTask(types.Account, []string) (WuKongResp, error)
 }
 
 func (r *WuKongTask) SetDefaultStatusWuKongTask(req *domain.WuKongRequest) {

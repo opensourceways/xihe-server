@@ -37,8 +37,8 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/wukong_hf", ctl.WuKongHF)
 	rg.POST("/v1/bigmodel/wukong_icbc", ctl.WuKongICBC)
 	rg.POST("/v1/bigmodel/wukong_async", ctl.WuKongAsync)
-	rg.GET("/v1/bigmodel/wukong/rank/:task_type", ctl.WuKongRank)
-	rg.GET("/v1/bigmodel/wukong/task/:task_type", ctl.WuKongLastFinisedTask)
+	rg.GET("/v1/bigmodel/wukong/rank", ctl.WuKongRank)
+	rg.GET("/v1/bigmodel/wukong/task", ctl.WuKongLastFinisedTask)
 	rg.POST("/v1/bigmodel/wukong/like", ctl.AddLike)
 	rg.POST("/v1/bigmodel/wukong/public", ctl.AddPublic)
 	rg.GET("/v1/bigmodel/wukong/public", ctl.ListPublic)
@@ -694,7 +694,7 @@ func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
 // @Accept json
 // @Success 200 {object} app.WuKongRankDTO
 // @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/rank/{task_type} [get]
+// @Router /v1/bigmodel/wukong/rank [get]
 func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 	token := ctx.GetHeader(headerSecWebsocket)
 	if token == "" {
@@ -707,16 +707,6 @@ func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 
 	pl := oldUserTokenPayload{}
 	if ok := ctl.checkApiToken(ctx, token, &pl, false); !ok {
-		return
-	}
-
-	// get task type
-	taskType := ctx.Param("task_type")
-	if taskType == "" {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorBadRequestParam, "no task_type",
-		))
-
 		return
 	}
 
@@ -741,7 +731,7 @@ func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 	defer ws.Close()
 
 	for i := 0; i < apiConfig.PodTimeout; i++ {
-		dto, err := ctl.s.GetWuKongWaitingTaskRank(pl.DomainAccount(), taskType)
+		dto, err := ctl.s.GetWuKongWaitingTaskRank(pl.DomainAccount())
 		if err != nil {
 			ws.WriteJSON(newResponseError(err))
 
@@ -770,25 +760,14 @@ func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 // @Accept json
 // @Success 200 {object} app.WuKongRankDTO
 // @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/task/{task_type} [get]
+// @Router /v1/bigmodel/wukong/task [get]
 func (ctl *BigModelController) WuKongLastFinisedTask(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
 
-	taskType := ctx.Param("task_type")
-	if taskType == "" {
-		if taskType == "" {
-			ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-				errorBadRequestParam, "no task_type",
-			))
-
-			return
-		}
-	}
-
-	v, code, err := ctl.s.GetWuKongLastTaskResp(pl.DomainAccount(), taskType)
+	v, code, err := ctl.s.GetWuKongLastTaskResp(pl.DomainAccount())
 	if err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
