@@ -1,14 +1,15 @@
 package app
 
 import (
+	"errors"
+
 	"github.com/opensourceways/xihe-server/domain/authing"
-	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/login"
 )
 
 type EmailService interface {
-	SendBindEmail(domain.Account) error
-	VerifyBindEmail(domain.Account, string) error
+	SendBindEmail(*SendBindEmailCmd) (string, error)
+	VerifyBindEmail(*BindEmailCmd) (string, error)
 }
 
 func NewEmailService(
@@ -26,20 +27,34 @@ type emailService struct {
 	login login.Login
 }
 
-func (s emailService) SendBindEmail(u domain.Account) (err error) {
-	info, err := s.login.GetAccessAndIdToken(u)
+func (s emailService) SendBindEmail(cmd *SendBindEmailCmd) (code string, err error) {
+	info, err := s.login.GetAccessAndIdToken(cmd.User)
 	if err != nil {
 		return
 	}
 
-	return s.auth.SendBindEmail(info.AccessToken)
+	if info.AccessToken == "" {
+		code = errorNoAccessToken
+		err = errors.New("cannot read access token")
+
+		return
+	}
+
+	return "", s.auth.SendBindEmail(info.AccessToken, cmd.Email.Email())
 }
 
-func (s emailService) VerifyBindEmail(u domain.Account, code string) (err error) {
-	info, err := s.login.GetAccessAndIdToken(u)
+func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error) {
+	info, err := s.login.GetAccessAndIdToken(cmd.User)
 	if err != nil {
 		return
 	}
 
-	return s.auth.VerifyBindEmail(info.AccessToken, code)
+	if info.AccessToken == "" {
+		code = errorNoAccessToken
+		err = errors.New("cannot read access token")
+
+		return
+	}
+
+	return "", s.auth.VerifyBindEmail(info.AccessToken, cmd.Email.Email(), cmd.PassCode)
 }

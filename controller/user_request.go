@@ -70,6 +70,32 @@ type userDetail struct {
 	IsFollower bool `json:"is_follower"`
 }
 
-type emailCode struct {
-	Code string `json:"code"`
+type EmailCode struct {
+	Email string `json:"email"`
+	Code  string `json:"code"`
+}
+
+func (req *EmailCode) toCmd(user domain.Account) (cmd app.BindEmailCmd, err error) {
+	if cmd.Email, err = domain.NewEmail(req.Email); err != nil {
+		return
+	}
+
+	cmd.PassCode = req.Code
+	cmd.User = user
+
+	return
+}
+
+type EmailSend struct {
+	Email string `json:"email"`
+}
+
+func (req *EmailSend) toCmd(user domain.Account) (cmd app.SendBindEmailCmd, err error) {
+	if cmd.Email, err = domain.NewEmail(req.Email); err != nil {
+		return
+	}
+
+	cmd.User = user
+
+	return
 }

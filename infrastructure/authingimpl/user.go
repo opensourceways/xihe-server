@@ -146,6 +146,7 @@ func (impl *user) getUserInfoByAccessToken(accessToken string, result interface{
 func sendHttpRequest(req *http.Request, result interface{}) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "xihe-server-authing")
+	req.Header.Add("content-type", "application/json")
 
 	hc := utils.NewHttpClient(3)
 

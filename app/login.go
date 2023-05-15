@@ -69,4 +69,5 @@ func (s loginService) Get(account domain.Account) (dto LoginDTO, err error) {
 
 func (s loginService) toLoginDTO(u *domain.Login, dto *LoginDTO) {
 	dto.Info = u.Info
+	dto.AccessToken = u.AccessToken
 }

@@ -308,8 +308,25 @@ func (ctl *UserController) SendBindEmail(ctx *gin.Context) {
 		return
 	}
 
-	if err := ctl.email.SendBindEmail(pl.DomainAccount()); err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+	req := EmailSend{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody,
+			"can't fetch request body",
+		))
+
+		return
+	}
+
+	cmd, err := req.toCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	if code, err := ctl.email.SendBindEmail(&cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, "success")
 	}
@@ -332,7 +349,7 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 		return
 	}
 
-	req := emailCode{}
+	req := EmailCode{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorBadRequestBody,
@@ -342,17 +359,15 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 		return
 	}
 
-	if req.Code == "" {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorBadRequestBody,
-			"code cannot be empty",
-		))
+	cmd, err := req.toCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestBody(ctx)
 
 		return
 	}
 
-	if err := ctl.email.VerifyBindEmail(pl.DomainAccount(), req.Code); err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+	if code, err := ctl.email.VerifyBindEmail(&cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, "success")
 	}

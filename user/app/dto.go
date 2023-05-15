@@ -112,3 +112,14 @@ type UserRegisterInfoDTO domain.UserRegInfo
 func (dto *UserRegisterInfoDTO) toUserRegInfoDTO(r *domain.UserRegInfo) {
 	*dto = *(*UserRegisterInfoDTO)(r)
 }
+
+type SendBindEmailCmd struct {
+	User  domain.Account
+	Email domain.Email
+}
+
+type BindEmailCmd struct {
+	User     domain.Account
+	Email    domain.Email
+	PassCode string
+}
