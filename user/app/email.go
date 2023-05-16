@@ -15,16 +15,19 @@ type EmailService interface {
 func NewEmailService(
 	auth authing.User,
 	login login.Login,
+	us UserService,
 ) EmailService {
 	return &emailService{
 		auth:  auth,
 		login: login,
+		us:    us,
 	}
 }
 
 type emailService struct {
 	auth  authing.User
 	login login.Login
+	us    UserService
 }
 
 func (s emailService) SendBindEmail(cmd *SendBindEmailCmd) (code string, err error) {
@@ -44,5 +47,20 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 		return
 	}
 
-	return "", s.auth.VerifyBindEmail(cmd.Email.Email(), cmd.PassCode, info.UserId)
+	if err = s.auth.VerifyBindEmail(cmd.Email.Email(), cmd.PassCode, info.UserId); err != nil {
+		return
+	}
+
+	// create platform account
+	pfcmd := &CreatePlatformAccountCmd{
+		email:    cmd.Email,
+		account:  cmd.User,
+		password: cmd.PassWord,
+	}
+
+	if err = s.us.CreatePlatformAccount(pfcmd); err != nil {
+		return
+	}
+
+	return
 }

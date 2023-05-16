@@ -10,6 +10,7 @@ import (
 type UserService interface {
 	// user
 	Create(*UserCreateCmd) (UserDTO, error)
+	CreatePlatformAccount(cmd *CreatePlatformAccountCmd) error
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
 
 	GetByAccount(domain.Account) (UserDTO, error)
@@ -48,26 +49,6 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 
 	v := cmd.toUser()
 
-	// new code platform user
-	pu, err := s.ps.New(platform.UserOption{
-		Email:    v.Email,
-		Name:     v.Account,
-		Password: cmd.Password,
-	})
-	if err != nil {
-		return
-	}
-
-	v.PlatformUser = pu
-
-	// apply token
-	token, err := s.ps.NewToken(pu)
-	if err != nil {
-		return
-	}
-
-	v.PlatformToken = token
-
 	// update user
 	u, err := s.repo.Save(&v)
 	if err != nil {
@@ -101,6 +82,41 @@ func (s userService) GetByFollower(owner, follower domain.Account) (
 	}
 
 	s.toUserDTO(&v, &dto)
+
+	return
+}
+
+func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (err error) {
+	// 1. get userinfo
+	u, err := s.repo.GetByAccount(cmd.account)
+	if err != nil {
+		return
+	}
+
+	// 2. create platform account
+	pu, err := s.ps.New(platform.UserOption{
+		Email:    cmd.email,
+		Name:     cmd.account,
+		Password: cmd.password,
+	})
+	if err != nil {
+		return
+	}
+
+	u.PlatformUser = pu
+
+	// apply token
+	token, err := s.ps.NewToken(pu)
+	if err != nil {
+		return
+	}
+
+	u.PlatformToken = token
+
+	// 3. update userinfo
+	if _, err = s.repo.Save(&u); err != nil {
+		return
+	}
 
 	return
 }

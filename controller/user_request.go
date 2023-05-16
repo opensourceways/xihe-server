@@ -83,6 +83,10 @@ func (req *EmailCode) toCmd(user domain.Account) (cmd app.BindEmailCmd, err erro
 	cmd.PassCode = req.Code
 	cmd.User = user
 
+	if cmd.PassWord, err = domain.NewPassword(apiConfig.DefaultPassword); err != nil {
+		return
+	}
+
 	return
 }
 

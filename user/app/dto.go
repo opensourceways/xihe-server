@@ -123,4 +123,11 @@ type BindEmailCmd struct {
 	User     domain.Account
 	Email    domain.Email
 	PassCode string
+	PassWord domain.Password
+}
+
+type CreatePlatformAccountCmd struct {
+	email    domain.Email
+	account  domain.Account
+	password domain.Password
 }

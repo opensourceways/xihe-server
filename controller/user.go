@@ -23,12 +23,16 @@ func AddRouterForUserController(
 	login app.LoginService,
 	sender message.Sender,
 ) {
+
+	us := userapp.NewUserService(repo, ps, sender)
+
 	ctl := UserController{
 		auth: auth,
 		repo: repo,
-		s:    userapp.NewUserService(repo, ps, sender),
+		s:    us,
 		email: userapp.NewEmailService(
 			auth, userlogincli.NewLoginCli(login),
+			us,
 		),
 	}
 

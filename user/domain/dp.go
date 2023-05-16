@@ -137,7 +137,7 @@ type Email interface {
 }
 
 func NewEmail(v string) (Email, error) {
-	if v == "" || !libutil.IsValidEmail(v) {
+	if v != "" && !libutil.IsValidEmail(v) {
 		return nil, errors.New("invalid email")
 	}
 
