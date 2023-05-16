@@ -24,11 +24,12 @@ type Config struct {
 
 func Init(v *Config) {
 	userInstance = &user{
-		cfg:          *v,
-		tokenURL:     v.Endpoint + "/token",
-		userInfoURL:  v.Endpoint + "/user",
-		sendEmailURL: v.CertEndpoint + "/api/v3/send-email",
-		BindEmailURL: v.CertEndpoint + "/api/v3/bind-email",
+		cfg:                *v,
+		tokenURL:           v.Endpoint + "/oidc/token",
+		userInfoURL:        v.Endpoint + "/oidc/user",
+		getManagerTokenURL: v.Endpoint + "/manager/token",
+		sendEmailURL:       v.CertEndpoint + "/manager/sendcode",
+		bindEmailURL:       v.CertEndpoint + "/manager/bind/account",
 	}
 }
 
@@ -37,11 +38,12 @@ func NewAuthingUser() *user {
 }
 
 type user struct {
-	cfg          Config
-	tokenURL     string
-	userInfoURL  string
-	sendEmailURL string
-	BindEmailURL string
+	cfg                Config
+	tokenURL           string
+	userInfoURL        string
+	getManagerTokenURL string
+	sendEmailURL       string
+	bindEmailURL       string
 }
 
 func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInfo, err error) {

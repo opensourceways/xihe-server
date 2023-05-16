@@ -28,19 +28,7 @@ type emailService struct {
 }
 
 func (s emailService) SendBindEmail(cmd *SendBindEmailCmd) (code string, err error) {
-	info, err := s.login.GetAccessAndIdToken(cmd.User)
-	if err != nil {
-		return
-	}
-
-	if info.AccessToken == "" {
-		code = errorNoAccessToken
-		err = errors.New("cannot read access token")
-
-		return
-	}
-
-	return "", s.auth.SendBindEmail(info.AccessToken, cmd.Email.Email())
+	return "", s.auth.SendBindEmail(cmd.Email.Email(), cmd.Capt)
 }
 
 func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error) {
@@ -56,5 +44,5 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 		return
 	}
 
-	return "", s.auth.VerifyBindEmail(info.AccessToken, cmd.Email.Email(), cmd.PassCode)
+	return "", s.auth.VerifyBindEmail(cmd.Email.Email(), cmd.PassCode, info.UserId)
 }

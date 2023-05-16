@@ -88,6 +88,7 @@ func (req *EmailCode) toCmd(user domain.Account) (cmd app.BindEmailCmd, err erro
 
 type EmailSend struct {
 	Email string `json:"email"`
+	Capt  string `json:"capt"`
 }
 
 func (req *EmailSend) toCmd(user domain.Account) (cmd app.SendBindEmailCmd, err error) {
@@ -96,6 +97,7 @@ func (req *EmailSend) toCmd(user domain.Account) (cmd app.SendBindEmailCmd, err 
 	}
 
 	cmd.User = user
+	cmd.Capt = req.Capt
 
 	return
 }
