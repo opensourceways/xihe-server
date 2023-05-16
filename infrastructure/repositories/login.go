@@ -45,6 +45,7 @@ func (impl login) toLoginDO(u *domain.Login) LoginDO {
 		Account:     u.Account.Account(),
 		Info:        u.Info,
 		AccessToken: u.AccessToken,
+		UserId:      u.UserId,
 	}
 }
 
@@ -52,6 +53,7 @@ type LoginDO struct {
 	Account     string
 	Info        string
 	AccessToken string
+	UserId      string
 }
 
 func (do *LoginDO) toLogin(r *domain.Login) (err error) {
@@ -61,6 +63,7 @@ func (do *LoginDO) toLogin(r *domain.Login) (err error) {
 
 	r.Info = do.Info
 	r.AccessToken = do.AccessToken
+	r.UserId = do.UserId
 
 	return
 }

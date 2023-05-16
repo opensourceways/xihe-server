@@ -6,12 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/opensourceways/xihe-server/app"
-	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
@@ -172,6 +172,7 @@ func (ctl *LoginController) newLogin(ctx *gin.Context, info authing.Login) (err 
 		Account:     info.Name,
 		Info:        idToken,
 		AccessToken: accessToken,
+		UserId:      info.UserId,
 	})
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

@@ -4,4 +4,5 @@ type Login struct {
 	Account     Account
 	Info        string
 	AccessToken string
+	UserId      string
 }

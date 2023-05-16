@@ -55,6 +55,7 @@ func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInf
 		Name    string `json:"username,omitempty"`
 		Picture string `json:"picture,omitempty"`
 		Email   string `json:"email,omitempty"`
+		Sub     string `json:"sub,omitempty"`
 	}
 
 	if err = impl.getUserInfoByAccessToken(accessToken, &v); err != nil {
@@ -75,6 +76,8 @@ func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInf
 	if userInfo.AvatarId, err = domain.NewAvatarId(v.Picture); err != nil {
 		return
 	}
+
+	userInfo.UserId = v.Sub
 
 	return
 }

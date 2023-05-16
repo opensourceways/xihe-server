@@ -67,6 +67,7 @@ func (col login) toLoginDoc(do *repositories.LoginDO) (bson.M, error) {
 		Account:     do.Account,
 		Info:        do.Info,
 		AccessToken: do.AccessToken,
+		UserId:      do.UserId,
 	}
 
 	return genDoc(docObj)
@@ -77,5 +78,6 @@ func (col login) toLoginDO(u *dLogin, do *repositories.LoginDO) {
 		Account:     u.Account,
 		Info:        u.Info,
 		AccessToken: u.AccessToken,
+		UserId:      u.UserId,
 	}
 }

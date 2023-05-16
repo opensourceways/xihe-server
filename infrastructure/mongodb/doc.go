@@ -230,6 +230,7 @@ type dLogin struct {
 	Account     string `bson:"account"   json:"account"`
 	Info        string `bson:"info"      json:"info"`
 	AccessToken string `bson:"access"    json:"access"`
+	UserId      string `bson:"user_id"   json:"user_id"`
 }
 
 type dLike struct {

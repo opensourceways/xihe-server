@@ -11,10 +11,11 @@ type LoginCreateCmd struct {
 	Account     domain.Account
 	Info        string
 	AccessToken string
+	UserId      string
 }
 
 func (cmd *LoginCreateCmd) Validate() error {
-	if b := cmd.Account != nil && cmd.Info != "" && cmd.AccessToken != ""; !b {
+	if b := cmd.Account != nil && cmd.Info != "" && cmd.AccessToken != "" && cmd.UserId != ""; !b {
 		return errors.New("invalid cmd of creating login")
 	}
 
@@ -26,12 +27,14 @@ func (cmd *LoginCreateCmd) toLogin() domain.Login {
 		Account:     cmd.Account,
 		Info:        cmd.Info,
 		AccessToken: cmd.AccessToken,
+		UserId:      cmd.UserId,
 	}
 }
 
 type LoginDTO struct {
 	Info        string `json:"info"`
 	AccessToken string `json:"access"`
+	UserId      string `json:"user_id"`
 }
 
 type LoginService interface {
@@ -70,4 +73,5 @@ func (s loginService) Get(account domain.Account) (dto LoginDTO, err error) {
 func (s loginService) toLoginDTO(u *domain.Login, dto *LoginDTO) {
 	dto.Info = u.Info
 	dto.AccessToken = u.AccessToken
+	dto.UserId = u.UserId
 }
