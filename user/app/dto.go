@@ -131,3 +131,14 @@ type CreatePlatformAccountCmd struct {
 	account  domain.Account
 	password domain.Password
 }
+
+type PlatformInfoDTO struct {
+	PlatformUser  domain.PlatformUser
+	PlatformToken string
+}
+
+type UpdatePlateformInfoCmd struct {
+	PlatformInfoDTO
+
+	User domain.Account
+}

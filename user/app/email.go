@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/domain/authing"
+	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain/login"
 )
 
@@ -40,9 +41,9 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 		return
 	}
 
-	if info.AccessToken == "" {
-		code = errorNoAccessToken
-		err = errors.New("cannot read access token")
+	if info.UserId == "" {
+		code = errorNoUserId
+		err = errors.New("cannot read user id")
 
 		return
 	}
@@ -58,8 +59,25 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 		password: cmd.PassWord,
 	}
 
-	if err = s.us.CreatePlatformAccount(pfcmd); err != nil {
+	dto, err := s.us.CreatePlatformAccount(pfcmd)
+	if err != nil {
 		return
+	}
+
+	// update user information
+	updatecmd := &UpdatePlateformInfoCmd{
+		PlatformInfoDTO: dto,
+		User:            cmd.User,
+	}
+
+	for i := 0; i <= 5; i++ {
+		if err = s.us.UpdatePlateformInfo(updatecmd); err != nil {
+			if !repository.IsErrorConcurrentUpdating(err) {
+				return
+			}
+		} else {
+			break
+		}
 	}
 
 	return

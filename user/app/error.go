@@ -1,5 +1,5 @@
 package app
 
 const (
-	errorNoAccessToken = "user_no_accesstoken"
+	errorNoUserId = "user_no_userid"
 )

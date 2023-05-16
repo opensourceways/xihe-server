@@ -10,7 +10,8 @@ import (
 type UserService interface {
 	// user
 	Create(*UserCreateCmd) (UserDTO, error)
-	CreatePlatformAccount(cmd *CreatePlatformAccountCmd) error
+	CreatePlatformAccount(*CreatePlatformAccountCmd) (PlatformInfoDTO, error)
+	UpdatePlateformInfo(*UpdatePlateformInfoCmd) error
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
 
 	GetByAccount(domain.Account) (UserDTO, error)
@@ -86,14 +87,8 @@ func (s userService) GetByFollower(owner, follower domain.Account) (
 	return
 }
 
-func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (err error) {
-	// 1. get userinfo
-	u, err := s.repo.GetByAccount(cmd.account)
-	if err != nil {
-		return
-	}
-
-	// 2. create platform account
+func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (dto PlatformInfoDTO, err error) {
+	// create platform account
 	pu, err := s.ps.New(platform.UserOption{
 		Email:    cmd.email,
 		Name:     cmd.account,
@@ -103,7 +98,7 @@ func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (err e
 		return
 	}
 
-	u.PlatformUser = pu
+	dto.PlatformUser = pu
 
 	// apply token
 	token, err := s.ps.NewToken(pu)
@@ -111,9 +106,23 @@ func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (err e
 		return
 	}
 
-	u.PlatformToken = token
+	dto.PlatformToken = token
 
-	// 3. update userinfo
+	return
+}
+
+func (s userService) UpdatePlateformInfo(cmd *UpdatePlateformInfoCmd) (err error) {
+	// get userinfo
+	u, err := s.repo.GetByAccount(cmd.User)
+	if err != nil {
+		return
+	}
+
+	// update some data
+	u.PlatformUser = cmd.PlatformUser
+	u.PlatformToken = cmd.PlatformToken
+
+	// update userinfo
 	if _, err = s.repo.Save(&u); err != nil {
 		return
 	}
