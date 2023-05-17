@@ -45,7 +45,7 @@ func AddRouterForUserController(
 	rg.GET("/v1/user/following/:account", ctl.ListFollowing)
 
 	rg.GET("/v1/user/follower/:account", ctl.ListFollower)
-	rg.GET("/v1/user/:account/gitlab", ctl.GitlabToken)
+	rg.GET("/v1/user/:account/gitlab", checkUserEmailMiddleware(&ctl.baseController), ctl.GitlabToken)
 
 	// email
 	rg.GET("/v1/user/check_email", checkUserEmailMiddleware(&ctl.baseController))
@@ -370,9 +370,36 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 		return
 	}
 
+	// create new token
+	f := func() (token string) {
+		user, err := ctl.s.GetByAccount(pl.DomainAccount())
+		if err != nil {
+			return
+		}
+
+		payload := oldUserTokenPayload{
+			Account:                 user.Account,
+			Email:                   user.Email,
+			PlatformToken:           user.Platform.Token,
+			PlatformUserNamespaceId: user.Platform.NamespaceId,
+		}
+
+		token, err = ctl.newApiToken(ctx, payload)
+		if err != nil {
+			return
+		}
+
+		return
+	}
+
 	if code, err := ctl.email.VerifyBindEmail(&cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
+		token := f()
+		if token != "" {
+			ctl.setRespToken(ctx, token)
+		}
+
 		ctl.sendRespOfPost(ctx, "success")
 	}
 }

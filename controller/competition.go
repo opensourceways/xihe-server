@@ -31,7 +31,7 @@ func AddRouterForCompetitionController(
 	rg.POST("/v1/competition/:id/submissions", ctl.Submit)
 	rg.POST("/v1/competition/:id/competitor", ctl.Apply)
 	rg.PUT("/v1/competition/:id/team", ctl.JoinTeam)
-	rg.PUT("/v1/competition/:id/realted_project", ctl.AddRelatedProject)
+	rg.PUT("/v1/competition/:id/realted_project", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedProject)
 	rg.PUT("/v1/competition/:id/team/action/change_name", ctl.ChangeName)
 	rg.PUT("/v1/competition/:id/team/action/transfer_leader", ctl.TransferLeader)
 	rg.PUT("/v1/competition/:id/team/action/quit", ctl.QuitTeam)

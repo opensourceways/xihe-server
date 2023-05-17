@@ -29,7 +29,7 @@ func AddRouterForCourseController(
 	rg.POST("/v1/course/:id/player", ctl.Apply)
 	rg.GET("/v1/course", ctl.List)
 	rg.GET("/v1/course/:id", ctl.Get)
-	rg.PUT("/v1/course/:id/realted_project", ctl.AddCourseRelatedProject)
+	rg.PUT("/v1/course/:id/realted_project", checkUserEmailMiddleware(&ctl.baseController), ctl.AddCourseRelatedProject)
 	rg.GET("/v1/course/:id/asg/list", ctl.ListAssignments)
 	rg.GET("/v1/course/:id/asg/result", ctl.GetSubmissions)
 	rg.GET("/v1/course/:id/cert", ctl.GetCertification)

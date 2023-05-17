@@ -34,15 +34,15 @@ func AddRouterForDatasetController(
 		newPlatformRepository: newPlatformRepository,
 	}
 
-	rg.POST("/v1/dataset", ctl.Create)
-	rg.PUT("/v1/dataset/:owner/:id", ctl.Update)
-	rg.DELETE("/v1/dataset/:owner/:name", ctl.Delete)
+	rg.POST("/v1/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
+	rg.PUT("/v1/dataset/:owner/:id", checkUserEmailMiddleware(&ctl.baseController), ctl.Update)
+	rg.DELETE("/v1/dataset/:owner/:name", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
 	rg.GET("/v1/dataset/:owner/:name/check", ctl.Check)
 	rg.GET("/v1/dataset/:owner/:name", ctl.Get)
 	rg.GET("/v1/dataset/:owner", ctl.List)
 	rg.GET("/v1/dataset", ctl.ListGlobal)
 
-	rg.PUT("/v1/dataset/:owner/:id/tags", ctl.SetTags)
+	rg.PUT("/v1/dataset/:owner/:id/tags", checkUserEmailMiddleware(&ctl.baseController), ctl.SetTags)
 }
 
 type DatasetController struct {

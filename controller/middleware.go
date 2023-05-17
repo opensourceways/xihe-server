@@ -12,8 +12,8 @@ func checkUserEmailMiddleware(ctl *baseController) gin.HandlerFunc {
 
 		if !pl.hasEmail() {
 			ctl.sendCodeMessage(
-				ctx, "no email",
-				errors.New("this api need email of user"),
+				ctx, "user_no_email",
+				errors.New("this interface requires the users email"),
 			)
 
 			ctx.Abort()

@@ -33,10 +33,10 @@ func AddRouterForRepoFileController(
 	rg.GET("/v1/repo/:type/:user/:name/files", ctl.List)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path", ctl.Download)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path/preview", ctl.Preview)
-	rg.PUT("/v1/repo/:type/:name/file/:path", ctl.Update)
-	rg.POST("/v1/repo/:type/:name/file/:path", ctl.Create)
-	rg.DELETE("/v1/repo/:type/:name/file/:path", ctl.Delete)
-	rg.DELETE("/v1/repo/:type/:name/dir/:path", ctl.DeleteDir)
+	rg.PUT("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Update)
+	rg.POST("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
+	rg.DELETE("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
+	rg.DELETE("/v1/repo/:type/:name/dir/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.DeleteDir)
 }
 
 type RepoFileController struct {

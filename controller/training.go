@@ -32,13 +32,13 @@ func AddRouterForTrainingController(
 		dataset: dataset,
 	}
 
-	rg.POST("/v1/train/project/:pid/training", ctl.Create)
+	rg.POST("/v1/train/project/:pid/training", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.POST("/v1/train/project/:pid/training/:id", ctl.Recreate)
 	rg.PUT("/v1/train/project/:pid/training/:id", ctl.Terminate)
-	rg.GET("/v1/train/project/:pid/training", ctl.List)
+	rg.GET("/v1/train/project/:pid/training", checkUserEmailMiddleware(&ctl.baseController), ctl.List)
 	rg.GET("/v1/train/project/:pid/training/ws", ctl.ListByWS)
 	rg.GET(
-		"/v1/train/project/:pid/training/:id/result/:type",
+		"/v1/train/project/:pid/training/:id/result/:type", checkUserEmailMiddleware(&ctl.baseController), 
 		ctl.GetResultDownloadURL,
 	)
 	rg.GET("/v1/train/project/:pid/training/:id", ctl.Get)

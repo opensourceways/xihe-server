@@ -39,23 +39,23 @@ func AddRouterForProjectController(
 		newPlatformRepository: newPlatformRepository,
 	}
 
-	rg.POST("/v1/project", ctl.Create)
-	rg.PUT("/v1/project/:owner/:id", ctl.Update)
-	rg.DELETE("/v1/project/:owner/:name", ctl.Delete)
+	rg.POST("/v1/project", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
+	rg.PUT("/v1/project/:owner/:id", checkUserEmailMiddleware(&ctl.baseController), ctl.Update)
+	rg.DELETE("/v1/project/:owner/:name", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
 	rg.GET("/v1/project/:owner/:name", ctl.Get)
 	rg.GET("/v1/project/:owner/:name/check", ctl.Check)
 	rg.GET("/v1/project/:owner", ctl.List)
 	rg.GET("/v1/project", ctl.ListGlobal)
 
-	rg.POST("/v1/project/:owner/:id", ctl.Fork)
+	rg.POST("/v1/project/:owner/:id", checkUserEmailMiddleware(&ctl.baseController), ctl.Fork)
 
-	rg.PUT("/v1/project/relation/:owner/:id/model", ctl.AddRelatedModel)
-	rg.DELETE("/v1/project/relation/:owner/:id/model", ctl.RemoveRelatedModel)
+	rg.PUT("/v1/project/relation/:owner/:id/model", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedModel)
+	rg.DELETE("/v1/project/relation/:owner/:id/model", checkUserEmailMiddleware(&ctl.baseController), ctl.RemoveRelatedModel)
 
-	rg.PUT("/v1/project/relation/:owner/:id/dataset", ctl.AddRelatedDataset)
-	rg.DELETE("/v1/project/relation/:owner/:id/dataset", ctl.RemoveRelatedDataset)
+	rg.PUT("/v1/project/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedDataset)
+	rg.DELETE("/v1/project/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.RemoveRelatedDataset)
 
-	rg.PUT("/v1/project/:owner/:id/tags", ctl.SetTags)
+	rg.PUT("/v1/project/:owner/:id/tags", checkUserEmailMiddleware(&ctl.baseController), ctl.SetTags)
 }
 
 type ProjectController struct {

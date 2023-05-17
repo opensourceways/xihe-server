@@ -26,7 +26,7 @@ func AddRouterForEvaluateController(
 		train: train,
 	}
 
-	rg.POST("/v1/evaluate/project/:pid/training/:tid/evaluate", ctl.Create)
+	rg.POST("/v1/evaluate/project/:pid/training/:tid/evaluate", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.GET("/v1/evaluate/project/:pid/training/:tid/evaluate/:id", ctl.Watch)
 }
 

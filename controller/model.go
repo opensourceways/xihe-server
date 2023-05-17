@@ -35,18 +35,18 @@ func AddRouterForModelController(
 		newPlatformRepository: newPlatformRepository,
 	}
 
-	rg.POST("/v1/model", ctl.Create)
-	rg.PUT("/v1/model/:owner/:id", ctl.Update)
-	rg.DELETE("/v1/model/:owner/:name", ctl.Delete)
+	rg.POST("/v1/model", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
+	rg.PUT("/v1/model/:owner/:id", checkUserEmailMiddleware(&ctl.baseController), ctl.Update)
+	rg.DELETE("/v1/model/:owner/:name", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
 	rg.GET("/v1/model/:owner/:name/check", ctl.Check)
 	rg.GET("/v1/model/:owner/:name", ctl.Get)
 	rg.GET("/v1/model/:owner", ctl.List)
 	rg.GET("/v1/model", ctl.ListGlobal)
 
-	rg.PUT("/v1/model/relation/:owner/:id/dataset", ctl.AddRelatedDataset)
-	rg.DELETE("/v1/model/relation/:owner/:id/dataset", ctl.RemoveRelatedDataset)
+	rg.PUT("/v1/model/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedDataset)
+	rg.DELETE("/v1/model/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.RemoveRelatedDataset)
 
-	rg.PUT("/v1/model/:owner/:id/tags", ctl.SetTags)
+	rg.PUT("/v1/model/:owner/:id/tags", checkUserEmailMiddleware(&ctl.baseController), ctl.SetTags)
 }
 
 type ModelController struct {
