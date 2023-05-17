@@ -1,6 +1,8 @@
 package app
 
-import "errors"
+import (
+	"errors"
+)
 
 func (s *cloudService) ReleasePod(cmd *RelasePodCmd) (code string, err error) {
 	// get pod
@@ -32,12 +34,12 @@ func (s *cloudService) ReleasePod(cmd *RelasePodCmd) (code string, err error) {
 }
 
 func (s *cloudService) Get(cmd *PodInfoCmd) (dto PodInfoDTO, err error) {
-	p, err := s.podRepo.GetUserCloudIdPod(cmd.Owner, cmd.CloudId)
+	p, _, err := s.cloudService.CheckUserCanSubsribe(cmd.User, cmd.CloudId)
 	if err != nil {
-		return
+		return dto, err
 	}
 
-	dto.toPodInfoDTO(&p.PodInfos[0])
+	dto.toPodInfoDTO(&p)
 
 	return
 }

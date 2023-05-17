@@ -223,6 +223,12 @@ func (impl project) doList(
 	return
 }
 
+type ProjectResourceSummaryDO struct {
+	ResourceSummaryDO
+
+	Tags []string
+}
+
 type ProjectSummaryDO struct {
 	Id            string
 	Owner         string

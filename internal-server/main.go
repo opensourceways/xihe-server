@@ -130,7 +130,7 @@ func main() {
 
 	// cloud
 	cloudService := cloudapp.NewCloudInternalService(
-		cloudrepo.NewPodRepo(&cfg.Postgresql.Config),
+		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
 	)
 
 	// competition

@@ -167,6 +167,30 @@ func (cli *client) updateDoc(
 	return nil
 }
 
+func (cli *client) updateIncDoc(
+	ctx context.Context, collection string,
+	filterOfDoc, update bson.M, version int,
+) error {
+	filterOfDoc[fieldVersion] = version
+	update[fieldVersion] = 1
+	r, err := cli.collection(collection).UpdateOne(
+		ctx, filterOfDoc,
+		bson.M{
+			mongoCmdInc: update,
+		},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if r.MatchedCount == 0 {
+		return errDocNotExists
+	}
+
+	return nil
+}
+
 func (cli *client) getDoc(
 	ctx context.Context, collection string,
 	filterOfDoc, project bson.M, result interface{},

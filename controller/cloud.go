@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/opensourceways/xihe-server/cloud/app"
-	"github.com/opensourceways/xihe-server/cloud/domain"
 )
 
 func AddRouterForCloudController(
@@ -35,16 +34,23 @@ type CloudController struct {
 // @Description list cloud config
 // @Tags  Cloud
 // @Accept json
-// @Success 200 {object} app.UserCompetitionDTO
+// @Success 200 {object} []app.CloudDTO
 // @Failure 500 system_error        system error
 // @Router /v1/cloud [get]
 func (ctl *CloudController) List(ctx *gin.Context) {
-	_, _, ok := ctl.checkUserApiToken(ctx, true)
+	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
 
-	data, err := ctl.s.ListCloud()
+	cmd := new(app.GetCloudConfCmd)
+	if visitor {
+		cmd.ToCmd(nil, visitor)
+	} else {
+		cmd.ToCmd(pl.DomainAccount(), visitor)
+	}
+
+	data, err := ctl.s.ListCloud(cmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
@@ -132,10 +138,8 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 	defer ws.Close()
 
 	cmd := app.PodInfoCmd{
-		Pod: domain.Pod{
-			Owner:   pl.DomainAccount(),
-			CloudId: ctx.Param("cid"),
-		},
+		User:    pl.DomainAccount(),
+		CloudId: ctx.Param("cid"),
 	}
 	if err := cmd.Validate(); err != nil {
 		ws.WriteJSON(
@@ -191,10 +195,8 @@ func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 	}
 
 	cmd := app.PodInfoCmd{
-		Pod: domain.Pod{
-			Owner:   pl.DomainAccount(),
-			CloudId: ctx.Param("cid"),
-		},
+		User:    pl.DomainAccount(),
+		CloudId: ctx.Param("cid"),
 	}
 	if err := cmd.Validate(); err != nil {
 		ctl.sendBadRequestBody(ctx)
@@ -205,6 +207,6 @@ func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 	if dto, err := ctl.s.Get(&cmd); err != nil {
 		ctl.sendBadRequestParam(ctx, err)
 	} else {
-		ctl.sendRespOfGet(ctx, newResponseData(dto))
+		ctl.sendRespOfGet(ctx, dto)
 	}
 }

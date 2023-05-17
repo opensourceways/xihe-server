@@ -11,6 +11,12 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
+	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
+	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
+	bigmodelasynccli "github.com/opensourceways/xihe-server/bigmodel/infrastructure/asynccli"
+	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
@@ -23,7 +29,6 @@ import (
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
-	"github.com/opensourceways/xihe-server/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
@@ -137,18 +142,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		),
 	)
 
-	luojia := repositories.NewLuoJiaRepository(
-		mongodb.NewLuoJiaMapper(collections.LuoJia),
-	)
-
-	wukong := repositories.NewWuKongRepository(
-		mongodb.NewWuKongMapper(collections.WuKong),
-	)
-
-	wukongPicture := repositories.NewWuKongPictureRepository(
-		mongodb.NewWuKongPictureMapper(collections.WuKongPicture),
-	)
-
 	bigmodel := bigmodels.NewBigModelService()
 	gitlabUser := gitlab.NewUserSerivce()
 	gitlabRepo := gitlab.NewRepoFile()
@@ -165,6 +158,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		),
 	)
 
+	asyncAppService := asyncapp.NewTaskService(asyncrepoimpl.NewAsyncTaskRepo(&cfg.Postgresql.Async))
+
 	competitionAppService := competitionapp.NewCompetitionService(
 		competitionrepo.NewCompetitionRepo(mongodb.NewCollection(collections.Competition)),
 		competitionrepo.NewWorkRepo(mongodb.NewCollection(collections.CompetitionWork)),
@@ -178,11 +173,21 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
+		courserepo.NewRecordRepo(mongodb.NewCollection(collections.CourseRecord)),
 	)
 
 	cloudAppService := cloudapp.NewCloudService(
 		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
-		cloudrepo.NewPodRepo(&cfg.Postgresql.Config),
+		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
+		sender,
+	)
+
+	bigmodelAppService := bigmodelapp.NewBigModelService(
+		bigmodel, user,
+		bigmodelrepo.NewLuoJiaRepo(mongodb.NewCollection(collections.LuoJia)),
+		bigmodelrepo.NewWuKongRepo(mongodb.NewCollection(collections.WuKong)),
+		bigmodelrepo.NewWuKongPictureRepo(mongodb.NewCollection(collections.WuKongPicture)),
+		bigmodelasynccli.NewAsyncCli(asyncAppService),
 		sender,
 	)
 
@@ -225,7 +230,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForBigModelController(
-			v1, user, bigmodel, luojia, wukong, wukongPicture, sender,
+			v1, bigmodelAppService,
 		)
 
 		controller.AddRouterForTrainingController(
@@ -261,7 +266,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForCourseController(
-			v1, courseAppService, proj, user,
+			v1, courseAppService, userAppService, proj, user,
 		)
 
 		controller.AddRouterForHomeController(

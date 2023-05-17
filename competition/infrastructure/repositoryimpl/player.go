@@ -195,7 +195,7 @@ func (impl playerRepoImpl) FindCompetitionsUserApplied(a types.Account) (
 
 	r = make([]string, len(v))
 	for i := range v {
-		r[i] = v[i].Id.Hex()
+		r[i] = v[i].CompetitionId
 	}
 
 	return

@@ -207,9 +207,38 @@ func (s *competitionService) DeleteMember(cid string, cmd *CmdToDeleteTeamMember
 		return err
 	}
 
-	if err = s.playerRepo.SavePlayer(&p, version); err != nil {
+	if err = s.playerRepo.ResumePlayer(cid, cmd.User); err != nil {
 		return err
 	}
 
-	return s.playerRepo.ResumePlayer(cid, cmd.User)
+	return s.playerRepo.SavePlayer(&p, version)
+}
+
+func (s *competitionService) DissolveTeam(cid string, leader types.Account) error {
+	p, version, err := s.playerRepo.FindPlayer(cid, leader)
+	if err != nil {
+		return err
+	}
+
+	for _, m := range p.Members() {
+		if err = p.Delete(m.Account); err != nil {
+			return err
+		}
+
+		if err = s.playerRepo.ResumePlayer(cid, m.Account); err != nil {
+			return err
+		}
+
+		if err = s.playerRepo.SavePlayer(&p, version); err != nil {
+			return err
+		}
+
+		version++
+	}
+
+	if err = s.playerRepo.ResumePlayer(cid, leader); err != nil {
+		return err
+	}
+
+	return s.playerRepo.DeletePlayer(&p, version)
 }

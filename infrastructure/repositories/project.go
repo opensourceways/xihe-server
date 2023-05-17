@@ -12,7 +12,7 @@ type ProjectMapper interface {
 	Delete(*ResourceIndexDO) error
 	Get(string, string) (ProjectDO, error)
 	GetByName(string, string) (ProjectDO, error)
-	GetSummary(string, string) (ResourceSummaryDO, error)
+	GetSummary(string, string) (ProjectResourceSummaryDO, error)
 	GetSummaryByName(string, string) (ResourceSummaryDO, error)
 
 	ListUsersProjects(map[string][]string) ([]ProjectSummaryDO, error)
@@ -126,14 +126,20 @@ func (impl project) FindUserProjects(opts []repository.UserResourceListOption) (
 }
 
 func (impl project) GetSummary(owner domain.Account, projectId string) (
-	domain.ResourceSummary, error,
+	r repository.ProjectSummary, err error,
 ) {
 	v, err := impl.mapper.GetSummary(owner.Account(), projectId)
 	if err != nil {
-		return domain.ResourceSummary{}, convertError(err)
+		err = convertError(err)
+
+		return
 	}
 
-	return v.toProject()
+	if r.ResourceSummary, err = v.toProject(); err == nil {
+		r.Tags = v.Tags
+	}
+
+	return
 }
 
 func (impl project) GetSummaryByName(owner domain.Account, name domain.ResourceName) (

@@ -48,6 +48,10 @@ func NewDBTable(name string) dbTable {
 	return dbTable{name: name}
 }
 
+func (t dbTable) DB() *gorm.DB {
+	return db
+}
+
 func (t dbTable) Create(result interface{}) error {
 	return db.Table(t.name).
 		Create(result).
@@ -101,6 +105,16 @@ func (t dbTable) First(filter, result interface{}) error {
 	return db.Table(t.name).
 		First(result, filter).
 		Error
+}
+
+func (t dbTable) GetOrderOneRecord(filter, order, result interface{}) error {
+	err := db.Table(t.name).Where(filter).Order(order).Limit(1).First(result).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return errRowNotFound
+	}
+
+	return nil
 }
 
 func (t dbTable) GetRecord(filter, result interface{}) error {

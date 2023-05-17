@@ -49,6 +49,14 @@ func (c collection) GetDocs(
 	return cli.getDocs(ctx, c.name, filterOfDoc, project, result)
 }
 
+func (c collection) GetArrayElem(
+	ctx context.Context, array string,
+	filterOfDoc, filterOfArray bson.M,
+	project bson.M, result interface{},
+) error {
+	return cli.getArrayElem(ctx, c.name, array, filterOfDoc, filterOfArray, project, result)
+}
+
 func (c collection) NewDocIfNotExist(
 	ctx context.Context, filterOfDoc, docInfo bson.M,
 ) (string, error) {
@@ -60,6 +68,20 @@ func (c collection) PushArrayElem(
 	filterOfDoc, value bson.M,
 ) error {
 	return cli.pushArrayElem(ctx, c.name, array, filterOfDoc, value)
+}
+
+func (c collection) PushElemToLimitedArray(
+	ctx context.Context, array string,
+	keep int, filterOfDoc, value bson.M,
+) error {
+	return cli.pushElemToLimitedArray(ctx, c.name, array, keep, filterOfDoc, value)
+}
+
+func (c collection) PullArrayElem(
+	ctx context.Context, array string,
+	filterOfDoc, filterOfArray bson.M,
+) error {
+	return cli.pullArrayElem(ctx, c.name, array, filterOfDoc, filterOfArray)
 }
 
 func (c collection) UpdateArrayElem(
@@ -79,6 +101,12 @@ func (c collection) UpdateDoc(
 	return cli.updateDoc(ctx, c.name, filterOfDoc, update, op, version)
 }
 
+func (c collection) UpdateIncDoc(
+	ctx context.Context, filterOfDoc, update bson.M, version int,
+) error {
+	return cli.updateIncDoc(ctx, c.name, filterOfDoc, update, version)
+}
+
 func (c collection) ModifyArrayElem(
 	ctx context.Context, array string,
 	filterOfDoc, filterOfArray, updateCmd bson.M, op string,
@@ -86,4 +114,8 @@ func (c collection) ModifyArrayElem(
 	return cli.modifyArrayElemWithoutVersion(ctx, c.name, array,
 		filterOfDoc, filterOfArray, updateCmd, op,
 	)
+}
+
+func (c collection) InCondForArrayElem(key string, value interface{}) bson.M {
+	return bson.M{"$in": bson.A{condFieldOfArrayElem(key), value}}
 }

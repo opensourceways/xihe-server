@@ -65,12 +65,17 @@ type ResourceSearchResult struct {
 	Total int
 }
 
+type ProjectSummary struct {
+	domain.ResourceSummary
+	Tags []string
+}
+
 type Project interface {
 	Save(*domain.Project) (domain.Project, error)
 	Delete(*domain.ResourceIndex) error
 	Get(domain.Account, string) (domain.Project, error)
 	GetByName(domain.Account, domain.ResourceName) (domain.Project, error)
-	GetSummary(domain.Account, string) (domain.ResourceSummary, error)
+	GetSummary(domain.Account, string) (ProjectSummary, error)
 	GetSummaryByName(domain.Account, domain.ResourceName) (domain.ResourceSummary, error)
 
 	FindUserProjects([]UserResourceListOption) ([]domain.ProjectSummary, error)

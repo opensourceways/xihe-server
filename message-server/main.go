@@ -13,6 +13,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
+	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
+	asyncrepo "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
@@ -146,8 +148,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 				mongodb.NewInferenceMapper(collections.Inference),
 			),
 			userRepo,
-			inferenceimpl.NewInference(&cfg.Inference.Config),
-			cfg.Inference.SurvivalTime,
+			inferenceimpl.NewInference(&cfg.Inference),
 		),
 
 		evaluate: app.NewEvaluateMessageService(
@@ -159,9 +160,13 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 		),
 
 		cloud: cloudapp.NewCloudMessageService(
-			cloudrepo.NewPodRepo(&cfg.Postgresql.Config),
+			cloudrepo.NewPodRepo(&cfg.Postgresql.cloudconf),
 			cloudimpl.NewCloud(&cfg.Cloud.Config),
 			int64(cfg.Cloud.SurvivalTime),
+		),
+
+		async: asyncapp.NewAsyncMessageService(
+			asyncrepo.NewAsyncTaskRepo(&cfg.Postgresql.asyncconf),
 		),
 	}
 

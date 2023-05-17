@@ -544,7 +544,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -659,7 +659,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -715,7 +715,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -878,7 +878,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -904,6 +904,110 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/app.ChallengeRankingDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cloud": {
+            "get": {
+                "description": "list cloud config",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "List",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/app.CloudDTO"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cloud/subscribe": {
+            "post": {
+                "description": "subscribe cloud",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "Subscribe",
+                "parameters": [
+                    {
+                        "description": "body of subscribe cloud",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.cloudSubscribeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cloud/{cid}": {
+            "get": {
+                "description": "get cloud pod",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "GetHttp",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "cloud config id",
+                        "name": "cid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/app.InferenceDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_body"
                         }
                     },
                     "500": {
@@ -943,7 +1047,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.CompetitionSummaryDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO"
                         }
                     },
                     "500": {
@@ -978,7 +1082,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.UserCompetitionDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.UserCompetitionDTO"
                         }
                     },
                     "500": {
@@ -1020,7 +1124,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1096,7 +1200,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1130,7 +1234,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.CompetitionSubmissionsDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionsDTO"
                         }
                     },
                     "500": {
@@ -1170,7 +1274,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/app.CompetitionSubmissionDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO"
                         }
                     },
                     "500": {
@@ -1205,7 +1309,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.CompetitionTeamDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionTeamDTO"
                         }
                     },
                     "500": {
@@ -1245,7 +1349,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1284,7 +1388,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1325,7 +1429,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1366,7 +1470,39 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/competition/{id}/team/action/dissolve": {
+            "put": {
+                "description": "dissolve a team",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Competition"
+                ],
+                "summary": "Dissolve",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "competition id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1398,7 +1534,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1439,7 +1575,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1482,7 +1618,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1514,7 +1650,109 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/course/{id}/asg/list": {
+            "get": {
+                "description": "list assignments",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "ListAssignments",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "assignments status, such as finish",
+                        "name": "status",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/course/{id}/asg/result": {
+            "get": {
+                "description": "get submissions",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "GetSubmissions",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/course/{id}/cert": {
+            "get": {
+                "description": "get certification",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "GetCertification",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1555,7 +1793,48 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/course/{id}/realted_project": {
+            "put": {
+                "description": "add related project",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "AddCourseRelatedProject",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "project info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.AddCourseRelatedProjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1807,7 +2086,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     }
                 }
             }
@@ -1880,7 +2159,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     }
                 }
             }
@@ -2156,7 +2435,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2186,7 +2465,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2257,6 +2536,29 @@
                         "schema": {
                             "$ref": "#/definitions/controller.finetuneLog"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/homepage": {
+            "get": {
+                "description": "list the courses and competitions",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "HomePage"
+                ],
+                "summary": "ListAll",
+                "responses": {
+                    "200": {
+                        "description": "OK"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2509,7 +2811,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     }
                 }
             }
@@ -2647,7 +2949,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     }
                 }
             }
@@ -2720,7 +3022,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     }
                 }
             }
@@ -2936,7 +3238,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     }
                 }
             }
@@ -3021,7 +3323,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     }
                 }
             }
@@ -3205,7 +3507,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     }
                 }
             }
@@ -3278,7 +3580,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     }
                 }
             }
@@ -3350,7 +3652,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -3404,7 +3706,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -3462,7 +3764,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -3511,7 +3813,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -3556,7 +3858,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -3663,7 +3965,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -3986,7 +4288,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": ""
+                        "description": "Accepted"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -4075,7 +4377,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -4337,7 +4639,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4430,7 +4732,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4475,7 +4777,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": ""
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4536,7 +4838,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": ""
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4777,6 +5079,29 @@
                 }
             }
         },
+        "app.CloudDTO": {
+            "type": "object",
+            "properties": {
+                "feature": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "is_free": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "processor": {
+                    "type": "string"
+                },
+                "spec": {
+                    "type": "string"
+                }
+            }
+        },
         "app.CodeGeexDTO": {
             "type": "object",
             "properties": {
@@ -4788,113 +5113,19 @@
                 }
             }
         },
-        "app.CompetitionSubmissionDTO": {
-            "type": "object",
-            "properties": {
-                "file_name": {
-                    "type": "string"
-                },
-                "score": {
-                    "type": "number"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "submit_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.CompetitionSubmissionsDTO": {
-            "type": "object",
-            "properties": {
-                "details": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app.CompetitionSubmissionDTO"
-                    }
-                },
-                "project": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.CompetitionSummaryDTO": {
-            "type": "object",
-            "properties": {
-                "bonus": {
-                    "type": "integer"
-                },
-                "count": {
-                    "type": "integer"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "string"
-                },
-                "host": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "poster": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.CompetitionTeamDTO": {
-            "type": "object",
-            "properties": {
-                "members": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app.CompetitionTeamMemberDTO"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.CompetitionTeamMemberDTO": {
-            "type": "object",
-            "properties": {
-                "account": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                }
-            }
-        },
         "app.CompetitonRankingDTO": {
             "type": "object",
             "properties": {
                 "final": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/app.RankingDTO"
+                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.RankingDTO"
                     }
                 },
                 "preliminary": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/app.RankingDTO"
+                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.RankingDTO"
                     }
                 }
             }
@@ -5405,20 +5636,6 @@
                 }
             }
         },
-        "app.RankingDTO": {
-            "type": "object",
-            "properties": {
-                "score": {
-                    "type": "number"
-                },
-                "submit_at": {
-                    "type": "string"
-                },
-                "team_name": {
-                    "type": "string"
-                }
-            }
-        },
         "app.RepoFileDownloadDTO": {
             "type": "object",
             "properties": {
@@ -5561,71 +5778,6 @@
                 }
             }
         },
-        "app.UserCompetitionDTO": {
-            "type": "object",
-            "properties": {
-                "bonus": {
-                    "type": "integer"
-                },
-                "count": {
-                    "type": "integer"
-                },
-                "dataset_doc": {
-                    "type": "string"
-                },
-                "dataset_url": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "doc": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "string"
-                },
-                "forum": {
-                    "type": "string"
-                },
-                "host": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_competitor": {
-                    "type": "boolean"
-                },
-                "is_finalist": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phase": {
-                    "type": "string"
-                },
-                "poster": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "team_id": {
-                    "type": "string"
-                },
-                "team_role": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "winners": {
-                    "type": "string"
-                }
-            }
-        },
         "app.UserDTO": {
             "type": "object",
             "properties": {
@@ -5742,6 +5894,17 @@
                     "type": "string"
                 },
                 "style": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.AddCourseRelatedProjectRequest": {
+            "type": "object",
+            "properties": {
+                "owner": {
+                    "type": "string"
+                },
+                "project_name": {
                     "type": "string"
                 }
             }
@@ -6056,6 +6219,14 @@
             "properties": {
                 "can_apply": {
                     "type": "boolean"
+                }
+            }
+        },
+        "controller.cloudSubscribeRequest": {
+            "type": "object",
+            "properties": {
+                "cloud_id": {
+                    "type": "string"
                 }
             }
         },
@@ -6859,6 +7030,179 @@
                     }
                 },
                 "kind": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO": {
+            "type": "object",
+            "properties": {
+                "file_name": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "submit_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionsDTO": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO"
+                    }
+                },
+                "project": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO": {
+            "type": "object",
+            "properties": {
+                "bonus": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "poster": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_competition_app.CompetitionTeamDTO": {
+            "type": "object",
+            "properties": {
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionTeamMemberDTO"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_competition_app.CompetitionTeamMemberDTO": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_competition_app.RankingDTO": {
+            "type": "object",
+            "properties": {
+                "score": {
+                    "type": "number"
+                },
+                "submit_at": {
+                    "type": "string"
+                },
+                "team_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_competition_app.UserCompetitionDTO": {
+            "type": "object",
+            "properties": {
+                "bonus": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "dataset_doc": {
+                    "type": "string"
+                },
+                "dataset_url": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "doc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "forum": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_competitor": {
+                    "type": "boolean"
+                },
+                "is_finalist": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phase": {
+                    "type": "string"
+                },
+                "poster": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "team_role": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "winners": {
                     "type": "string"
                 }
             }

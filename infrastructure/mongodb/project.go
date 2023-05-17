@@ -133,7 +133,7 @@ func (col project) GetByName(owner, name string) (do repositories.ProjectDO, err
 }
 
 func (col project) GetSummary(owner string, projectId string) (
-	do repositories.ResourceSummaryDO, err error,
+	do repositories.ProjectResourceSummaryDO, err error,
 ) {
 	var v []dProject
 
@@ -154,6 +154,7 @@ func (col project) GetSummary(owner string, projectId string) (
 	do.Owner = owner
 	do.RepoId = item.RepoId
 	do.RepoType = item.RepoType
+	do.Tags = item.Tags
 
 	return
 }

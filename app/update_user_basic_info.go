@@ -5,8 +5,9 @@ import (
 )
 
 type UpdateUserBasicInfoCmd struct {
-	AvatarId domain.AvatarId
 	Bio      domain.Bio
+	Email    domain.Email
+	AvatarId domain.AvatarId
 }
 
 func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
@@ -17,6 +18,11 @@ func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 
 	if cmd.Bio != nil && !domain.IsSameDomainValue(cmd.Bio, u.Bio) {
 		u.Bio = cmd.Bio
+		changed = true
+	}
+
+	if cmd.Email != nil && u.Email.Email() != cmd.Email.Email() {
+		u.Email = cmd.Email
 		changed = true
 	}
 

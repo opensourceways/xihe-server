@@ -3,12 +3,14 @@ package controller
 import (
 	"errors"
 
-	"github.com/opensourceways/xihe-server/app"
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/bigmodel/app"
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
+	types "github.com/opensourceways/xihe-server/domain"
 )
 
 const (
-	temp_account = "wukong_icbc"
+	temp_account    = "wukong_icbc"
+	temp_account_hf = "wukong_hf"
 )
 
 type describePictureResp struct {
@@ -97,8 +99,9 @@ func (req *CodeGeexRequest) toCmd() (
 }
 
 type wukongRequest struct {
-	Desc  string `json:"desc"`
-	Style string `json:"style"`
+	Desc        string `json:"desc"`
+	Style       string `json:"style"`
+	ImgQuantity int    `json:"img_quantity"`
 }
 
 func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
@@ -106,6 +109,13 @@ func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
 
 	if cmd.Desc, err = domain.NewWuKongPictureDesc(req.Desc); err != nil {
 		return
+	}
+
+	switch req.ImgQuantity {
+	case 4:
+		cmd.EsType = string(domain.BigmodelWuKong4Img)
+	default:
+		cmd.EsType = string(domain.BigmodelWuKong)
 	}
 
 	err = cmd.Validate()
@@ -119,7 +129,28 @@ type wukongICBCRequest struct {
 }
 
 func (req *wukongICBCRequest) toCmd() (cmd app.WuKongICBCCmd, err error) {
-	if cmd.User, err = domain.NewAccount(temp_account); err != nil {
+	if cmd.User, err = types.NewAccount(temp_account); err != nil {
+		return
+	}
+
+	cmd.Style = req.Style
+
+	if cmd.Desc, err = domain.NewWuKongPictureDesc(req.Desc); err != nil {
+		return
+	}
+
+	err = cmd.Validate()
+
+	return
+}
+
+type wukongHFRequest struct {
+	Desc  string `json:"desc"`
+	Style string `json:"style"`
+}
+
+func (req *wukongHFRequest) toCmd() (cmd app.WuKongHFCmd, err error) {
+	if cmd.User, err = types.NewAccount(temp_account_hf); err != nil {
 		return
 	}
 
@@ -142,7 +173,7 @@ type wukongAddLikeFromTempRequest struct {
 	OBSPath string `json:"obspath" binding:"required"`
 }
 
-func (req *wukongAddLikeFromTempRequest) toCmd(user domain.Account) app.WuKongAddLikeFromTempCmd {
+func (req *wukongAddLikeFromTempRequest) toCmd(user types.Account) app.WuKongAddLikeFromTempCmd {
 	return app.WuKongAddLikeFromTempCmd{
 		User:    user,
 		OBSPath: req.OBSPath,
@@ -154,8 +185,8 @@ type wukongAddLikeFromPublicRequest struct {
 	Id    string `json:"id" binding:"required"`
 }
 
-func (req *wukongAddLikeFromPublicRequest) toCmd(user domain.Account) app.WuKongAddLikeFromPublicCmd {
-	owner, _ := domain.NewAccount(req.Owner)
+func (req *wukongAddLikeFromPublicRequest) toCmd(user types.Account) app.WuKongAddLikeFromPublicCmd {
+	owner, _ := types.NewAccount(req.Owner)
 	return app.WuKongAddLikeFromPublicCmd{
 		Owner: owner,
 		User:  user,
@@ -165,7 +196,7 @@ func (req *wukongAddLikeFromPublicRequest) toCmd(user domain.Account) app.WuKong
 
 type wukongAddPublicFromTempRequest wukongAddLikeFromTempRequest
 
-func (req *wukongAddPublicFromTempRequest) toCmd(user domain.Account) app.WuKongAddPublicFromTempCmd {
+func (req *wukongAddPublicFromTempRequest) toCmd(user types.Account) app.WuKongAddPublicFromTempCmd {
 	return app.WuKongAddPublicFromTempCmd{
 		User:    user,
 		OBSPath: req.OBSPath,
@@ -176,7 +207,7 @@ type wukongAddPublicFromLikeRequest struct {
 	Id string `json:"id" binding:"required"`
 }
 
-func (req *wukongAddPublicFromLikeRequest) toCmd(user domain.Account) app.WuKongAddPublicFromLikeCmd {
+func (req *wukongAddPublicFromLikeRequest) toCmd(user types.Account) app.WuKongAddPublicFromLikeCmd {
 	return app.WuKongAddPublicFromLikeCmd{
 		User: user,
 		Id:   req.Id,
@@ -190,8 +221,8 @@ type wukongAddDiggPublicRequest struct {
 
 type wukongCancelDiggPublicRequest wukongAddDiggPublicRequest
 
-func (req *wukongAddDiggPublicRequest) toCmd(user domain.Account) (cmd app.WuKongAddDiggCmd, err error) {
-	owner, err := domain.NewAccount(req.User)
+func (req *wukongAddDiggPublicRequest) toCmd(user types.Account) (cmd app.WuKongAddDiggCmd, err error) {
+	owner, err := types.NewAccount(req.User)
 	if err != nil {
 		return
 	}
@@ -204,8 +235,8 @@ func (req *wukongAddDiggPublicRequest) toCmd(user domain.Account) (cmd app.WuKon
 	return
 }
 
-func (req *wukongCancelDiggPublicRequest) toCmd(user domain.Account) (cmd app.WuKongCancelDiggCmd, err error) {
-	owner, err := domain.NewAccount(req.User)
+func (req *wukongCancelDiggPublicRequest) toCmd(user types.Account) (cmd app.WuKongCancelDiggCmd, err error) {
+	owner, err := types.NewAccount(req.User)
 	if err != nil {
 		return
 	}

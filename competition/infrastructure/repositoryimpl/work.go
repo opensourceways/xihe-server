@@ -112,8 +112,11 @@ func (impl workRepoImpl) SaveSubmission(
 	w *domain.Work, submission *domain.PhaseSubmission,
 ) error {
 	doc, err := genDoc(dSubmission{
-		Status: submission.Status,
-		Score:  float64(submission.Score),
+		Status:   submission.Status,
+		Score:    float64(submission.Score),
+		SubmitAt: submission.SubmitAt,
+		Id:       submission.Id,
+		OBSPath:  submission.OBSPath,
 	})
 	if err != nil {
 		return err

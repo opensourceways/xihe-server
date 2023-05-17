@@ -42,14 +42,16 @@ func (impl login) Save(u *domain.Login) (err error) {
 
 func (impl login) toLoginDO(u *domain.Login) LoginDO {
 	return LoginDO{
-		Account: u.Account.Account(),
-		Info:    u.Info,
+		Account:     u.Account.Account(),
+		Info:        u.Info,
+		AccessToken: u.AccessToken,
 	}
 }
 
 type LoginDO struct {
-	Account string
-	Info    string
+	Account     string
+	Info        string
+	AccessToken string
 }
 
 func (do *LoginDO) toLogin(r *domain.Login) (err error) {
@@ -58,6 +60,7 @@ func (do *LoginDO) toLogin(r *domain.Login) (err error) {
 	}
 
 	r.Info = do.Info
+	r.AccessToken = do.AccessToken
 
 	return
 }

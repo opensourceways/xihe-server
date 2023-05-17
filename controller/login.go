@@ -44,6 +44,10 @@ func (pl *oldUserTokenPayload) isMyself(a domain.Account) bool {
 	return pl.Account == a.Account()
 }
 
+func (pl *oldUserTokenPayload) hasEmail() bool {
+	return pl.Email != "" && pl.PlatformToken != ""
+}
+
 type newUserTokenPayload struct {
 	AccessToken string `json:"access_token"`
 }
@@ -111,6 +115,12 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		if user, err = ctl.newUser(ctx, info); err != nil {
 			return
 		}
+	} else {
+		if user.Email != info.Email.Email() {
+			ctl.us.UpdateBasicInfo(
+				info.Name, app.UpdateUserBasicInfoCmd{Email: info.Email},
+			)
+		}
 	}
 
 	if err := ctl.newLogin(ctx, info); err != nil {
@@ -138,7 +148,16 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 }
 
 func (ctl *LoginController) newLogin(ctx *gin.Context, info authing.Login) (err error) {
-	token, err := ctl.encryptData(info.IDToken)
+	idToken, err := ctl.encryptData(info.IDToken)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseCodeError(
+			errorSystemError, err,
+		))
+
+		return
+	}
+
+	accessToken, err := ctl.encryptData(info.AccessToken)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseCodeError(
 			errorSystemError, err,
@@ -148,8 +167,9 @@ func (ctl *LoginController) newLogin(ctx *gin.Context, info authing.Login) (err 
 	}
 
 	err = ctl.ls.Create(&app.LoginCreateCmd{
-		Account: info.Name,
-		Info:    token,
+		Account:     info.Name,
+		Info:        idToken,
+		AccessToken: accessToken,
 	})
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

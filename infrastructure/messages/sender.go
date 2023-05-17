@@ -6,6 +6,7 @@ import (
 	"github.com/opensourceways/community-robot-lib/kafka"
 	"github.com/opensourceways/community-robot-lib/mq"
 
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/utils"
@@ -97,6 +98,7 @@ func (s sender) CreateInference(info *domain.InferenceInfo) error {
 	v := s.toInferenceMsg(&info.InferenceIndex)
 	v.Action = actionCreate
 	v.ProjectName = info.ProjectName.ResourceName()
+	v.ResourceLevel = info.ResourceLevel
 
 	return s.send(topics.Inference, &v)
 
@@ -106,6 +108,8 @@ func (s sender) ExtendInferenceSurvivalTime(info *message.InferenceExtendInfo) e
 	v := s.toInferenceMsg(&info.InferenceIndex)
 	v.Action = actionExtend
 	v.Expiry = info.Expiry
+	v.ProjectName = info.ProjectName.ResourceName()
+	v.ResourceLevel = info.ResourceLevel
 
 	return s.send(topics.Inference, &v)
 }
@@ -192,9 +196,7 @@ func (s sender) AddOperateLogForNewUser(u domain.Account) error {
 	return s.sendOperateLog(u, "user", nil)
 }
 
-func (s sender) AddOperateLogForAccessBigModel(
-	u domain.Account, t domain.BigmodelType,
-) error {
+func (s sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldomain.BigmodelType) error {
 	return s.sendOperateLog(u, "bigmodel", map[string]string{
 		"bigmodel": string(t),
 	})
@@ -222,6 +224,12 @@ func (s sender) AddOperateLogForDownloadFile(u domain.Account, repo message.Repo
 		"user": repo.User.Account(),
 		"repo": repo.Name.ResourceName(),
 		"path": repo.Path.FilePath(),
+	})
+}
+
+func (s sender) AddOperateLogForCloudSubscribe(u domain.Account, cloudId string) error {
+	return s.sendOperateLog(u, "cloud", map[string]string{
+		"cloud_id": cloudId,
 	})
 }
 

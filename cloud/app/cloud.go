@@ -7,11 +7,13 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
 	"github.com/opensourceways/xihe-server/cloud/domain/service"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
+	types "github.com/opensourceways/xihe-server/domain"
 )
 
 type CloudService interface {
 	// cloud
-	ListCloud() ([]CloudDTO, error)
+	ListCloud(*GetCloudConfCmd) ([]CloudDTO, error)
 	SubscribeCloud(*SubscribeCloudCmd) (code string, err error)
 
 	// pod
@@ -41,7 +43,7 @@ type cloudService struct {
 	cloudService service.CloudService
 }
 
-func (s *cloudService) ListCloud() (dto []CloudDTO, err error) {
+func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err error) {
 	// list cloud conf
 	confs, err := s.cloudRepo.ListCloudConf()
 	if err != nil {
@@ -57,16 +59,48 @@ func (s *cloudService) ListCloud() (dto []CloudDTO, err error) {
 		}
 	}
 
+	// to dto without holding
+	if cmd.IsVisitor {
+		dto = make([]CloudDTO, len(c))
+		for i := range c {
+			dto[i].toCloudDTO(&c[i], c[i].HasIdle(), false)
+		}
+
+		return
+	}
+
 	// to dto
 	dto = make([]CloudDTO, len(c))
 	for i := range c {
-		dto[i].toCloudDTO(&c[i], c[i].HasFree())
+		var b bool
+		if b, err = s.cloudService.HasHolding(types.Account(cmd.User), &c[i].CloudConf); err != nil {
+			if !commonrepo.IsErrorResourceNotExists(err) {
+				return
+			}
+
+			err = nil
+		}
+
+		dto[i].toCloudDTO(&c[i], c[i].HasIdle(), b)
 	}
 
 	return
 }
 
 func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err error) {
+	// check
+	_, ok, err := s.cloudService.CheckUserCanSubsribe(cmd.User, cmd.CloudId)
+	if err != nil {
+		return
+	}
+
+	if !ok {
+		code = errorNotAllowed
+		err = errors.New("starting or running pod exist")
+
+		return
+	}
+
 	// get cloud conf
 	c := new(domain.Cloud)
 	c.CloudConf, err = s.cloudRepo.GetCloudConf(cmd.CloudId)
@@ -79,9 +113,9 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 		return
 	}
 
-	if !c.HasFree() {
+	if !c.HasIdle() {
 		code = errorResourceBusy
-		err = errors.New("no free resource remain")
+		err = errors.New("no idle resource remain")
 
 		return
 	}

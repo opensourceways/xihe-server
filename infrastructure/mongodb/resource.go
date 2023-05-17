@@ -138,6 +138,7 @@ func getResourceSummary(collection, owner, rId string, result interface{}) error
 				subfieldOfItems(fieldName):     1,
 				subfieldOfItems(fieldRepoId):   1,
 				subfieldOfItems(fieldRepoType): 1,
+				subfieldOfItems(fieldTags):     1,
 			},
 			result,
 		)

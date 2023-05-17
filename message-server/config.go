@@ -4,7 +4,10 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/opensourceways/community-robot-lib/utils"
 
+	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
+	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
@@ -17,13 +20,20 @@ type configuration struct {
 	TrainingEndpoint string `json:"training_endpoint"  required:"true"`
 	FinetuneEndpoint string `json:"finetune_endpoint"  required:"true"`
 
-	Inference  inferenceConfig         `json:"inference"    required:"true"`
-	Evaluate   evaluateConfig          `json:"evaluate"     required:"true"`
-	Cloud      cloudConfig             `json:"cloud"        required:"true"`
-	Mongodb    config.Mongodb          `json:"mongodb"      required:"true"`
-	Postgresql config.PostgresqlConfig `json:"postgresql"   required:"true"`
-	Domain     domain.Config           `json:"domain"       required:"true"`
-	MQ         config.MQ               `json:"mq"           required:"true"`
+	Inference  inferenceimpl.Config `json:"inference"    required:"true"`
+	Evaluate   evaluateConfig       `json:"evaluate"     required:"true"`
+	Cloud      cloudConfig          `json:"cloud"        required:"true"`
+	Mongodb    config.Mongodb       `json:"mongodb"      required:"true"`
+	Postgresql PostgresqlConfig     `json:"postgresql"   required:"true"`
+	Domain     domain.Config        `json:"domain"       required:"true"`
+	MQ         config.MQ            `json:"mq"           required:"true"`
+}
+
+type PostgresqlConfig struct {
+	DB pgsql.Config `json:"db" required:"true"`
+
+	cloudconf cloudrepoimpl.Config
+	asyncconf asyncrepoimpl.Config
 }
 
 func (cfg *configuration) getMQConfig() mq.MQConfig {
@@ -38,7 +48,8 @@ func (cfg *configuration) configItems() []interface{} {
 		&cfg.Evaluate,
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
-		&cfg.Postgresql.Config,
+		&cfg.Postgresql.cloudconf,
+		&cfg.Postgresql.asyncconf,
 		&cfg.Domain,
 		&cfg.MQ,
 	}
@@ -82,36 +93,6 @@ func (cfg *configuration) getFinetuneConfig() finetuneimpl.Config {
 	return finetuneimpl.Config{
 		Endpoint: cfg.FinetuneEndpoint,
 	}
-}
-
-type inferenceConfig struct {
-	SurvivalTime int `json:"survival_time"`
-
-	inferenceimpl.Config
-}
-
-func (cfg *inferenceConfig) SetDefault() {
-	if cfg.SurvivalTime <= 0 {
-		cfg.SurvivalTime = 5 * 3600
-	}
-
-	var i interface{}
-	i = &cfg.Config
-
-	if f, ok := i.(config.ConfigSetDefault); ok {
-		f.SetDefault()
-	}
-}
-
-func (cfg *inferenceConfig) Validate() error {
-	var i interface{}
-	i = &cfg.Config
-
-	if f, ok := i.(config.ConfigValidate); ok {
-		return f.Validate()
-	}
-
-	return nil
 }
 
 // evaluate

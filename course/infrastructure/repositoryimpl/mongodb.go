@@ -10,8 +10,13 @@ import (
 )
 
 const (
-	mongoCmdSet  = "$set"
-	mongoCmdPush = "$push"
+	mongoCmdSet       = "$set"
+	mongoCmdPush      = "$push"
+	mongoCmdElemMatch = "$elemMatch"
+	mongoCmdMatch     = "$match"
+	mongoCmdEqual     = "$eq"
+	mongoCmdCount     = "$count"
+	mongoCmdInc       = "$inc"
 )
 
 type mongodbClient interface {
@@ -23,6 +28,7 @@ type mongodbClient interface {
 	GetDoc(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
 	GetDocs(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
 	UpdateDoc(ctx context.Context, filterOfDoc, update bson.M, op string, version int) error
+	UpdateIncDoc(ctx context.Context, filterOfDoc, update bson.M, version int) error
 }
 
 func withContext(f func(context.Context) error) error {

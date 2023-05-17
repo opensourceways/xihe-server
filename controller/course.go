@@ -7,17 +7,20 @@ import (
 	"github.com/opensourceways/xihe-server/course/app"
 	"github.com/opensourceways/xihe-server/course/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	commonuser "github.com/opensourceways/xihe-server/user/app"
 )
 
 func AddRouterForCourseController(
 	rg *gin.RouterGroup,
 
 	s app.CourseService,
+	us commonuser.UserService,
 	project repository.Project,
 	user repository.User,
 ) {
 	ctl := CourseController{
 		s:       s,
+		us:      us,
 		project: project,
 		user:    user,
 	}
@@ -29,12 +32,16 @@ func AddRouterForCourseController(
 	rg.GET("/v1/course/:id/asg/list", ctl.ListAssignments)
 	rg.GET("/v1/course/:id/asg/result", ctl.GetSubmissions)
 	rg.GET("/v1/course/:id/cert", ctl.GetCertification)
+	rg.GET("/v1/course/reginfo", ctl.GetRegisterInfo)
+	rg.GET("/v1/course/:id/asg/:asgid", ctl.GetAssignment)
+	rg.PUT("/v1/course/:id/record", ctl.AddPlayRecord)
 }
 
 type CourseController struct {
 	baseController
 
 	s       app.CourseService
+	us      commonuser.UserService
 	project repository.Project
 	user    repository.User
 }
@@ -117,7 +124,7 @@ func (ctl *CourseController) List(ctx *gin.Context) {
 		return
 	}
 
-	if !visitor && ctl.getQueryParameter(ctx, "mine") != "" {
+	if !visitor && ctl.getQueryParameter(ctx, "mine") == "true" {
 		cmd.User = pl.DomainAccount()
 	}
 
@@ -317,5 +324,95 @@ func (ctl *CourseController) GetCertification(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, data)
+	}
+}
+
+// @Summary GetRegisterInfo
+// @Description get register info
+// @Tags  Course
+// @Accept json
+// @Success 200
+// @Failure 500 system_error        system error
+// @Router /v1/course/reginfo [get]
+func (ctl *CourseController) GetRegisterInfo(ctx *gin.Context) {
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	if data, err := ctl.us.GetUserRegInfo(pl.DomainAccount()); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, data)
+	}
+}
+
+// @Summary GetAssignment
+// @Description Get assignment
+// @Tags  Course
+// @Param	id	path	string					true	"course id"
+// @Param	asgid	path	string				true	"asg id"
+// @Accept json
+// @Success 200
+// @Failure 500 system_error        system error
+// @Router /v1/course/:id/asg/:asgid [get]
+func (ctl *CourseController) GetAssignment(ctx *gin.Context) {
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	var cmd app.AsgGetCmd
+	cmd.User = pl.DomainAccount()
+	cmd.Cid = ctx.Param("id")
+	cmd.AsgId = ctx.Param("asgid")
+
+	if data, err := ctl.s.GetAssignment(&cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, data)
+	}
+}
+
+// @Summary AddPlayRecord
+// @Description add play record
+// @Tags  Course
+// @Param	id	path	string					true	"course id"
+// @Param	body	body	PlayRecordRequest	true	"record info"
+// @Accept json
+// @Success 202
+// @Failure 500 system_error        system error
+// @Router /v1/course/{id}/record [put]
+func (ctl *CourseController) AddPlayRecord(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := PlayRecordRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody,
+			"can't fetch request body",
+		))
+
+		return
+	}
+
+	cmd, err := req.toRecordCmd(ctx.Param("id"), pl.DomainAccount())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	if code, err := ctl.s.AddPlayRecord(&cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
 	}
 }

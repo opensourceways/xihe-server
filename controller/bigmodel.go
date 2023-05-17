@@ -4,31 +4,26 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/gorilla/websocket"
 
-	"github.com/opensourceways/xihe-server/app"
-	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/bigmodel"
-	"github.com/opensourceways/xihe-server/domain/message"
-	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/bigmodel/app"
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
 )
 
 func AddRouterForBigModelController(
 	rg *gin.RouterGroup,
-	user repository.User,
-	bm bigmodel.BigModel,
-	luojia repository.LuoJia,
-	wukong repository.WuKong,
-	wukongPicture repository.WuKongPicture,
-	sender message.Sender,
+	s app.BigModelService,
 ) {
 	ctl := BigModelController{
-		s: app.NewBigModelService(bm, user, luojia, wukong, wukongPicture, sender),
+		s: s,
 	}
 
 	rg.POST("/v1/bigmodel/describe_picture", ctl.DescribePicture)
+	rg.POST("/v1/bigmodel/describe_picture_hf", ctl.DescribePictureHF)
 	rg.POST("/v1/bigmodel/single_picture", ctl.GenSinglePicture)
 	rg.POST("/v1/bigmodel/multiple_pictures", ctl.GenMultiplePictures)
 	rg.POST("/v1/bigmodel/vqa_upload_picture", ctl.VQAUploadPicture)
@@ -38,7 +33,11 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
 	rg.POST("/v1/bigmodel/codegeex", ctl.CodeGeex)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
+	rg.POST("/v1/bigmodel/wukong_hf", ctl.WuKongHF)
 	rg.POST("/v1/bigmodel/wukong_icbc", ctl.WuKongICBC)
+	rg.POST("/v1/bigmodel/wukong_async", ctl.WuKongAsync)
+	rg.GET("/v1/bigmodel/wukong/rank/:task_type", ctl.WuKongRank)
+	rg.GET("/v1/bigmodel/wukong/task/:task_type", ctl.WuKongLastFinisedTask)
 	rg.POST("/v1/bigmodel/wukong/like", ctl.AddLike)
 	rg.POST("/v1/bigmodel/wukong/public", ctl.AddPublic)
 	rg.GET("/v1/bigmodel/wukong/public", ctl.ListPublic)
@@ -96,6 +95,57 @@ func (ctl *BigModelController) DescribePicture(ctx *gin.Context) {
 	defer p.Close()
 
 	v, err := ctl.s.DescribePicture(pl.DomainAccount(), p, f.Filename, f.Size)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPost(ctx, describePictureResp{v})
+	}
+}
+
+// @Title DescribePicture
+// @Description describe a picture for hf
+// @Tags  BigModel
+// @Param	picture		formData 	file	true	"picture"
+// @Accept json
+// @Success 201 {object} describePictureResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/describe_picture_hf [post]
+func (ctl *BigModelController) DescribePictureHF(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	f, err := ctx.FormFile("picture")
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if f.Size > apiConfig.MaxPictureSizeToDescribe {
+		ctl.sendBadRequestParamWithMsg(ctx, "too big picture")
+
+		return
+	}
+
+	p, err := f.Open()
+	if err != nil {
+		ctl.sendBadRequestParamWithMsg(ctx, "can't get picture")
+
+		return
+	}
+
+	defer p.Close()
+
+	cmd := app.DescribePictureCmd{
+		User:    pl.DomainAccount(),
+		Picture: p,
+		Name:    f.Filename,
+		Length:  f.Size,
+	}
+
+	v, err := ctl.s.DescribePictureHF(&cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
@@ -472,6 +522,42 @@ func (ctl *BigModelController) WuKong(ctx *gin.Context) {
 }
 
 // @Title WuKong
+// @Description generates pictures by WuKong-hf
+// @Tags  BigModel
+// @Param	body	body 	wukongHFRequest	true	"body of wukong"
+// @Accept json
+// @Success 201 {object} wukongPicturesGenerateResp
+// @Failure 500 system_error        system error
+// @Failure 404 bigmodel_sensitive_info		picture error
+// @Router /v1/bigmodel/wukong_hf [post]
+func (ctl *BigModelController) WuKongHF(ctx *gin.Context) {
+	_, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
+	req := wukongHFRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if v, code, err := ctl.s.WuKongHF(&cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPost(ctx, wukongPicturesGenerateResp{v})
+	}
+}
+
+// @Title WuKong
 // @Description generates pictures by WuKong-icbc
 // @Tags  BigModel
 // @Param	body	body 	wukongICBCRequest	true	"body of wukong"
@@ -504,6 +590,149 @@ func (ctl *BigModelController) WuKongICBC(ctx *gin.Context) {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, wukongPicturesGenerateResp{v})
+	}
+}
+
+// @Title WuKong
+// @Description send async wukong request task
+// @Tags  BigModel
+// @Param	body	body 	wukongRequest	true	"body of wukong"
+// @Accept json
+// @Success 201 {object} wukongPicturesGenerateResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong_async [post]
+func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := wukongRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if code, err := ctl.s.WuKongInferenceAsync(pl.DomainAccount(), &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPost(ctx, "")
+	}
+}
+
+// @Title WuKong
+// @Description get wukong rank
+// @Tags  BigModel
+// @Accept json
+// @Success 200 {object} app.WuKongRankDTO
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/rank/{task_type} [get]
+func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
+	token := ctx.GetHeader(headerSecWebsocket)
+	if token == "" {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, "no token",
+		))
+
+		return
+	}
+
+	pl := oldUserTokenPayload{}
+	if ok := ctl.checkApiToken(ctx, token, &pl, false); !ok {
+		return
+	}
+
+	// get task type
+	taskType := ctx.Param("task_type")
+	if taskType == "" {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, "no task_type",
+		))
+
+		return
+	}
+
+	// setup websocket
+	upgrader := websocket.Upgrader{
+		Subprotocols: []string{token},
+		CheckOrigin: func(r *http.Request) bool {
+			return r.Header.Get(headerSecWebsocket) == token
+		},
+	}
+
+	ws, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	if err != nil {
+		//TODO delete
+		log.Errorf("update ws failed, err:%s", err.Error())
+
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+
+	defer ws.Close()
+
+	for i := 0; i < apiConfig.PodTimeout; i++ {
+		dto, err := ctl.s.GetWuKongWaitingTaskRank(pl.DomainAccount(), taskType)
+		if err != nil {
+			ws.WriteJSON(newResponseError(err))
+
+			log.Errorf("get rank failed: get status, err:%s", err.Error())
+
+			return
+		} else {
+			ws.WriteJSON(newResponseData(dto))
+		}
+
+		log.Debugf("info dto:%v", dto)
+
+		if dto.Rank == 0 {
+			log.Debug("task done")
+
+			return
+		}
+
+		time.Sleep(time.Second)
+	}
+}
+
+// @Title WuKong
+// @Description get last finished task
+// @Tags  BigModel
+// @Accept json
+// @Success 200 {object} app.WuKongRankDTO
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/wukong/task/{task_type} [get]
+func (ctl *BigModelController) WuKongLastFinisedTask(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	taskType := ctx.Param("task_type")
+	if taskType == "" {
+		if taskType == "" {
+			ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+				errorBadRequestParam, "no task_type",
+			))
+
+			return
+		}
+	}
+
+	v, code, err := ctl.s.GetWuKongLastTaskResp(pl.DomainAccount(), taskType)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfGet(ctx, v)
 	}
 }
 

@@ -25,7 +25,7 @@ func (s *cloudInternalService) UpdateInfo(cmd *UpdatePodInternalCmd) error {
 	p := new(domain.PodInfo)
 	cmd.toPodInfo(p)
 
-	p.StatusSetRunning()
+	p.SetStatus()
 
 	err := s.repo.UpdatePod(p)
 	return err

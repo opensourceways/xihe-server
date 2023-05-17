@@ -226,10 +226,43 @@ type AsgListCmd struct {
 	Status domain.WorkStatus
 }
 
+type AsgGetCmd struct {
+	User  types.Account
+	Cid   string
+	AsgId string
+}
+
 type GetSubmissionCmd struct {
 	User   types.Account
 	Cid    string
 	Status domain.WorkStatus
+}
+
+type RecordAddCmd domain.Record
+
+func (cmd *RecordAddCmd) toRecord() (p domain.Record) {
+	return *(*domain.Record)(cmd)
+}
+
+type AsgDTO struct {
+	AsgId      string `json:"asg_id"`
+	CourseName string `json:"course_name"`
+	Deadline   string `json:"deadline"`
+	AsgName    string `json:"asg_name"`
+	Desc       string `json:"desc"`
+}
+
+func toAsgDTO(
+	a *domain.Assignment, c *domain.Course, dto *AsgDTO,
+) {
+	*dto = AsgDTO{
+		AsgId:      a.Id,
+		AsgName:    a.Name.AsgName(),
+		CourseName: c.Name.CourseName(),
+		Deadline:   a.DeadLine.AsgDeadLine(),
+		Desc:       a.Desc.URL(),
+	}
+
 }
 
 type AsgWorkDTO struct {

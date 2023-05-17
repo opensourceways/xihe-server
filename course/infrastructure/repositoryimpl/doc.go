@@ -1,14 +1,20 @@
 package repositoryimpl
 
 const (
-	fieldId       = "id"
-	fieldCourseId = "course_id"
-	fieldAccount  = "account"
-	fieldStatus   = "status"
-	fieldType     = "type"
-	fieldVersion  = "version"
-	fieldRepo     = "repo"
-	fieldAsgId    = "asg_id"
+	fieldId          = "id"
+	fieldCourseId    = "course_id"
+	fieldAccount     = "account"
+	fieldStatus      = "status"
+	fieldType        = "type"
+	fieldVersion     = "version"
+	fieldRepo        = "repo"
+	fieldAsgId       = "asg_id"
+	fieldAsgs        = "assignments"
+	fieldSectionId   = "section_id"
+	fieldLessonId    = "lesson_id"
+	fieldPointId     = "point_id"
+	fieldPlayCount   = "play_count"
+	fieldFinishCount = "finish_count"
 )
 
 // Course
@@ -79,4 +85,15 @@ type DCourseWork struct {
 	Score    float32 `bson:"score"      json:"score"`
 	Status   string  `bson:"status"     json:"status"`
 	Version  int     `bson:"version"    json:"-"`
+}
+
+type DCourseRecord struct {
+	CourseId    string `bson:"course_id"     json:"course_id"`
+	Account     string `bson:"account"       json:"account"`
+	SectionId   string `bson:"section_id"    json:"section_id"`
+	LessonId    string `bson:"lesson_id"     json:"lesson_id"`
+	PointId     string `bson:"point_id"      json:"point_id"`
+	PlayCount   int    `bson:"play_count"    json:"play_count"`
+	FinishCount int    `bson:"finish_count"  json:"finish_count"`
+	Version     int    `bson:"version"       json:"-"`
 }

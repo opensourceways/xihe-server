@@ -8,12 +8,13 @@ import (
 )
 
 type LoginCreateCmd struct {
-	Account domain.Account
-	Info    string
+	Account     domain.Account
+	Info        string
+	AccessToken string
 }
 
 func (cmd *LoginCreateCmd) Validate() error {
-	if b := cmd.Account != nil && cmd.Info != ""; !b {
+	if b := cmd.Account != nil && cmd.Info != "" && cmd.AccessToken != ""; !b {
 		return errors.New("invalid cmd of creating login")
 	}
 
@@ -22,13 +23,15 @@ func (cmd *LoginCreateCmd) Validate() error {
 
 func (cmd *LoginCreateCmd) toLogin() domain.Login {
 	return domain.Login{
-		Account: cmd.Account,
-		Info:    cmd.Info,
+		Account:     cmd.Account,
+		Info:        cmd.Info,
+		AccessToken: cmd.AccessToken,
 	}
 }
 
 type LoginDTO struct {
-	Info string `json:"info"`
+	Info        string `json:"info"`
+	AccessToken string `json:"access"`
 }
 
 type LoginService interface {

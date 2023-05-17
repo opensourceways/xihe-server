@@ -12,7 +12,12 @@ type SubscribeCloudCmd struct {
 	CloudId string
 }
 
-type PodInfoCmd domain.PodInfo
+type PodInfoCmd SubscribeCloudCmd
+
+type GetCloudConfCmd struct {
+	IsVisitor bool
+	User      types.Account
+}
 
 type RelasePodCmd struct {
 	User  types.Account
@@ -26,28 +31,31 @@ type UpdatePodInternalCmd struct {
 }
 
 type CloudConfDTO struct {
+	Id        string `json:"id"`
 	Spec      string `json:"spec"`
 	Name      string `json:"name"`
 	Image     string `json:"image"`
 	Feature   string `json:"feature"`
 	Processor string `json:"processor"`
+	Credit    int64  `json:"credit"`
 }
 
 type CloudDTO struct {
 	CloudConfDTO
 
-	IsFree bool `json:"is_free"`
+	IsIdle     bool `json:"is_idle"`
+	HasHolding bool `json:"has_holding"`
 }
 
 type PodInfoDTO struct {
-	Id         string `json:"id"`
-	CloudId    string `json:"cloud_id"`
-	Owner      string `json:"owner"`
-	Status     string `json:"status"`
-	ExpiryDate string `json:"expiry_date"`
-	Error      string `json:"error"`
-	AccessURL  string `json:"access_url"`
-	CreatedAt  string `json:"created_at"`
+	Id        string `json:"id"`
+	CloudId   string `json:"cloud_id"`
+	Owner     string `json:"owner"`
+	Status    string `json:"status"`
+	Expiry    int64  `json:"expiry"`
+	Error     string `json:"error"`
+	AccessURL string `json:"access_url"`
+	CreatedAt int64  `json:"created_at"`
 }
 
 func (cmd *SubscribeCloudCmd) Validate() error {
@@ -62,7 +70,7 @@ func (cmd *SubscribeCloudCmd) Validate() error {
 }
 
 func (cmd *PodInfoCmd) Validate() error {
-	b := cmd.Owner.Account() != "" &&
+	b := cmd.User.Account() != "" &&
 		cmd.CloudId != ""
 
 	if !b {
@@ -70,6 +78,13 @@ func (cmd *PodInfoCmd) Validate() error {
 	}
 
 	return nil
+}
+
+func (cmd *GetCloudConfCmd) ToCmd(user types.Account, visitor bool) {
+	*cmd = GetCloudConfCmd{
+		IsVisitor: visitor,
+		User:      user,
+	}
 }
 
 func (r *UpdatePodInternalCmd) toPodInfo(p *domain.PodInfo) (err error) {
@@ -82,18 +97,21 @@ func (r *UpdatePodInternalCmd) toPodInfo(p *domain.PodInfo) (err error) {
 
 func (r *CloudConfDTO) toCloudConfDTO(c *domain.CloudConf) {
 	*r = CloudConfDTO{
+		Id:        c.Id,
 		Spec:      c.Spec.CloudSpec(),
 		Name:      c.Name.CloudName(),
 		Image:     c.Image.CloudImage(),
 		Feature:   c.Feature.CloudFeature(),
 		Processor: c.Processor.CloudProcessor(),
+		Credit:    c.Credit.Credit(),
 	}
 }
 
-func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isFree bool) {
+func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isIdle bool, hasHolding bool) {
 	r.CloudConfDTO.toCloudConfDTO(&c.CloudConf)
 
-	r.IsFree = isFree
+	r.IsIdle = isIdle
+	r.HasHolding = hasHolding
 }
 
 func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
@@ -109,7 +127,7 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	}
 
 	if p.Expiry != nil {
-		r.ExpiryDate = p.Expiry.PodExpiryDate()
+		r.Expiry = p.Expiry.PodExpiry()
 	}
 
 	if p.Error != nil {
@@ -121,6 +139,6 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	}
 
 	if p.CreatedAt != nil {
-		r.CreatedAt = p.CreatedAt.TimeDate()
+		r.CreatedAt = p.CreatedAt.Time()
 	}
 }

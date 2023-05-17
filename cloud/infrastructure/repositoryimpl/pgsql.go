@@ -8,6 +8,7 @@ type pgsqlClient interface {
 	Count(filter interface{}) (int, error)
 	Filter(filter, result interface{}) error
 	First(filter, result interface{}) error
+	GetOrderOneRecord(filter, order, result interface{}) error
 	GetRecords(filter, result interface{}, p pgsql.Pagination, sort []pgsql.SortByColumn) error
 	GetRecord(filter, result interface{}) error
 	UpdateRecord(filter, update interface{}) error

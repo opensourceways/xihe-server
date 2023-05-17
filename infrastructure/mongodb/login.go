@@ -64,8 +64,9 @@ func (col login) Get(account string) (do repositories.LoginDO, err error) {
 
 func (col login) toLoginDoc(do *repositories.LoginDO) (bson.M, error) {
 	docObj := dLogin{
-		Account: do.Account,
-		Info:    do.Info,
+		Account:     do.Account,
+		Info:        do.Info,
+		AccessToken: do.AccessToken,
 	}
 
 	return genDoc(docObj)
@@ -73,7 +74,8 @@ func (col login) toLoginDoc(do *repositories.LoginDO) (bson.M, error) {
 
 func (col login) toLoginDO(u *dLogin, do *repositories.LoginDO) {
 	*do = repositories.LoginDO{
-		Account: u.Account,
-		Info:    u.Info,
+		Account:     u.Account,
+		Info:        u.Info,
+		AccessToken: u.AccessToken,
 	}
 }

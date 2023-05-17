@@ -15,6 +15,7 @@ type Login struct {
 	UserInfo
 
 	IDToken string
+	AccessToken string
 }
 
 type User interface {

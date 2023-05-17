@@ -529,3 +529,39 @@ func (r workStatus) WorkStatus() string {
 func (r workStatus) IsFinished() bool {
 	return string(r) == workStatusFinish
 }
+
+// SectionId
+type SectionId interface {
+	SectionId() string
+}
+
+func NewSectionId(v string) (SectionId, error) {
+	if v == "" {
+		return nil, errors.New("empty section id")
+	}
+	return sectionId(v), nil
+}
+
+type sectionId string
+
+func (s sectionId) SectionId() string {
+	return string(s)
+}
+
+// LessonId
+type LessonId interface {
+	LessonId() string
+}
+
+func NewLessonId(v string) (LessonId, error) {
+	if v == "" {
+		return nil, errors.New("empty lesson id")
+	}
+	return lessonId(v), nil
+}
+
+type lessonId string
+
+func (s lessonId) LessonId() string {
+	return string(s)
+}

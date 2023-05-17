@@ -9,5 +9,5 @@ func (s sender) SubscribeCloud(v *message.MsgCloudConf) error {
 }
 
 func (s sender) ReleasePod(v *message.MsgPod) error {
-	return s.send(topics.Pod, v)
+	return s.send(topics.Cloud, v)
 }

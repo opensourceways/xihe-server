@@ -21,6 +21,14 @@ type AddCourseRelatedProjectRequest struct {
 	Name  string `json:"project_name"`
 }
 
+type PlayRecordRequest struct {
+	SectionId   string `bson:"section_id"    json:"section_id"`
+	LessonId    string `bson:"lesson_id"     json:"lesson_id"`
+	PointId     string `bson:"point_id"      json:"point_id"`
+	PlayCount   int    `bson:"play_count"    json:"play_count"`
+	FinishCount int    `bson:"finish_count"  json:"finish_count"`
+}
+
 func (req *AddCourseRelatedProjectRequest) ToInfo() (
 	owner types.Account, name types.ResourceName, err error,
 ) {
@@ -71,6 +79,26 @@ func (req *StudentApplyRequest) toCmd(cid string, user types.Account) (cmd app.P
 func toGetCmd(cid string, user types.Account) (cmd app.CourseGetCmd) {
 	cmd.User = user
 	cmd.Cid = cid
+
+	return
+}
+
+func (req *PlayRecordRequest) toRecordCmd(cid string, user types.Account) (
+	cmd app.RecordAddCmd, err error,
+) {
+	cmd.Cid = cid
+	if cmd.SectionId, err = domain.NewSectionId(req.SectionId); err != nil {
+		return
+	}
+	if cmd.LessonId, err = domain.NewLessonId(req.LessonId); err != nil {
+		return
+	}
+
+	cmd.PointId = req.PointId
+	cmd.User = user
+
+	cmd.PlayCount = req.PlayCount
+	cmd.FinishCount = req.FinishCount
 
 	return
 }

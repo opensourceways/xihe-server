@@ -227,8 +227,9 @@ type DUser struct {
 }
 
 type dLogin struct {
-	Account string `bson:"account"   json:"account"`
-	Info    string `bson:"info"      json:"info"`
+	Account     string `bson:"account"   json:"account"`
+	Info        string `bson:"info"      json:"info"`
+	AccessToken string `bson:"access"    json:"access"`
 }
 
 type dLike struct {

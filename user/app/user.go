@@ -40,7 +40,7 @@ func (s *userService) UpsertUserRegInfo(cmd *UserRegisterInfoCmd) (err error) {
 			return err
 		}
 
-		if err = s.userregRepo.UpdateUserRegInfo(&u, u.Version); err != nil {
+		if err = s.userregRepo.UpdateUserRegInfo(r, u.Version); err != nil {
 			return err
 		}
 	}

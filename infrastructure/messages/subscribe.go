@@ -9,6 +9,7 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/sirupsen/logrus"
 
+	bigmoddelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
@@ -114,6 +115,14 @@ func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) erro
 	// cloud
 	s, err = registerHandlerForCloud(handler)
 	if err != nil {
+		return err
+	}
+	if s != nil {
+		subscribers[s.Topic()] = s
+	}
+
+	// bigmodel
+	if s, err = registerHandlerForBigModel(handler); err != nil {
 		return err
 	}
 	if s != nil {
@@ -378,24 +387,26 @@ func registerHandlerForInference(handler interface{}) (mq.Subscriber, error) {
 		v.Project.Id = body.ProjectId
 		v.LastCommit = body.LastCommit
 
+		info := domain.InferenceInfo{
+			InferenceIndex: v,
+		}
+
+		info.ProjectName, err = domain.NewResourceName(body.ProjectName)
+		if err != nil {
+			return
+		}
+
+		info.ResourceLevel = body.ResourceLevel
+
 		switch body.Action {
 		case actionCreate:
-			info := domain.InferenceInfo{
-				InferenceIndex: v,
-			}
-
-			info.ProjectName, err = domain.NewResourceName(body.ProjectName)
-			if err != nil {
-				return
-			}
-
 			return h.HandleEventCreateInference(&info)
 
 		case actionExtend:
 			return h.HandleEventExtendInferenceSurvivalTime(
 				&message.InferenceExtendInfo{
-					InferenceIndex: v,
-					Expiry:         body.Expiry,
+					InferenceInfo: info,
+					Expiry:        body.Expiry,
 				},
 			)
 		}
@@ -469,5 +480,48 @@ func registerHandlerForCloud(handler interface{}) (mq.Subscriber, error) {
 		v.SetDefaultExpiry()
 
 		return h.HandleEventPodSubscribe(&v)
+	})
+}
+
+func registerHandlerForBigModel(handler interface{}) (mq.Subscriber, error) {
+
+	return kafka.Subscribe(topics.BigModel, func(e mq.Event) (err error) {
+
+		msg := e.Message()
+		if msg == nil {
+			return
+		}
+
+		body := bigmoddelmsg.MsgTask{}
+		if err = json.Unmarshal(msg.Body, &body); err != nil {
+			return
+		}
+
+		h, ok := handler.(BigModelMessageHandler)
+		if !ok {
+			return
+		}
+
+		switch body.Type {
+		case bigmoddelmsg.MsgTypeWuKongAsyncTaskFinish:
+
+			return h.HandleEventBigModelWuKongAsyncTaskFinish(&body)
+
+		case bigmoddelmsg.MsgTypeWuKongAsyncTaskStart:
+
+			return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
+
+		case bigmoddelmsg.MsgTypeWuKongInferenceStart:
+
+			return h.HandleEventBigModelWuKongInferenceStart(&body)
+
+		case bigmoddelmsg.MsgTypeWuKongInferenceError:
+
+			return h.HandleEventBigModelWuKongInferenceError(&body)
+
+		}
+
+		return
+
 	})
 }

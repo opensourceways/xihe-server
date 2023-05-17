@@ -3,8 +3,10 @@ package repositoryimpl
 import (
 	"github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/sirupsen/logrus"
 )
 
 func NewPodRepo(cfg *Config) repository.Pod {
@@ -49,6 +51,23 @@ func (impl *podRepoImpl) getFilterPods(filter interface{}) (
 	return
 }
 
+func (impl *podRepoImpl) getOrderOnePod(filter, order interface{}) (
+	pod domain.PodInfo, err error,
+) {
+	var tpod TPod
+	if err = impl.cli.GetOrderOneRecord(filter, order, &tpod); err != nil {
+		if impl.cli.IsRowNotFound(err) {
+			err = commonrepo.NewErrorResourceNotExists(err)
+		}
+	} else {
+		if err = tpod.toPodInfo(&pod); err != nil {
+			return
+		}
+	}
+
+	return
+}
+
 func (impl *podRepoImpl) GetPodInfo(pid string) (
 	pod domain.PodInfo, err error,
 ) {
@@ -78,15 +97,17 @@ func (impl *podRepoImpl) GetUserPod(user types.Account) (
 	return impl.getFilterPods(filter)
 }
 
-func (impl *podRepoImpl) GetUserCloudIdPod(
+func (impl *podRepoImpl) GetUserCloudIdLastPod(
 	user types.Account, cloudId string,
-) (repository.PodInfoList, error) {
+) (domain.PodInfo, error) {
 	filter := map[string]interface{}{
 		fieldOwner:   user.Account(),
 		fieldCloudId: cloudId,
 	}
 
-	return impl.getFilterPods(filter)
+	order := "created_at DESC"
+
+	return impl.getOrderOnePod(filter, order)
 }
 
 func (impl *podRepoImpl) AddStartingPod(p *domain.PodInfo) (pid string, err error) {
@@ -102,6 +123,11 @@ func (impl *podRepoImpl) AddStartingPod(p *domain.PodInfo) (pid string, err erro
 func (impl *podRepoImpl) UpdatePod(p *domain.PodInfo) error {
 	pod := new(TPod)
 	pod.toTPod(p)
+
+	logrus.Debugf(
+		"update pod(%s/%s) to %v",
+		p.Pod.Id, p.Pod.CloudId, p.AccessURL,
+	)
 
 	filter := map[string]interface{}{
 		fieldId: pod.Id,

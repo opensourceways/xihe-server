@@ -187,3 +187,21 @@ func (doc *DCourseWork) toCourseWork(w *domain.Work) (err error) {
 
 	return
 }
+
+// Record
+func (doc *DCourseRecord) toRecord(w *repository.RecordVersion) (err error) {
+
+	w.Record.Cid = doc.CourseId
+	w.Record.PlayCount = doc.PlayCount
+	w.Record.FinishCount = doc.FinishCount
+	if w.Record.SectionId, err = domain.NewSectionId(doc.SectionId); err != nil {
+		return
+	}
+	if w.Record.LessonId, err = domain.NewLessonId(doc.LessonId); err != nil {
+		return
+	}
+	w.Record.PointId = doc.PointId
+	w.Version = doc.Version
+
+	return
+}

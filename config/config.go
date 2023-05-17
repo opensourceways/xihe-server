@@ -9,12 +9,13 @@ import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	"github.com/opensourceways/xihe-server/app"
+	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	asyncrepoimol "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
-	"github.com/opensourceways/xihe-server/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
@@ -87,7 +88,7 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.Domain,
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
-		&cfg.Postgresql.Config,
+		&cfg.Postgresql.Cloud,
 		&cfg.Gitlab,
 		&cfg.App,
 		&cfg.API,
@@ -138,7 +139,8 @@ type Mongodb struct {
 type PostgresqlConfig struct {
 	DB pgsql.Config `json:"db" required:"true"`
 
-	cloudrepoimpl.Config
+	Cloud cloudrepoimpl.Config
+	Async asyncrepoimol.Config
 }
 
 type MongodbCollections struct {
@@ -166,6 +168,7 @@ type MongodbCollections struct {
 	Course            string `json:"course"                 required:"true"`
 	CoursePlayer      string `json:"course_player"          required:"true"`
 	CourseWork        string `json:"course_work"            required:"true"`
+	CourseRecord      string `json:"course_record"          required:"true"`
 	CloudConf         string `json:"cloud_conf"             required:"true"`
 }
 

@@ -6,11 +6,11 @@ import (
 
 type InferenceInfo struct {
 	*domain.InferenceInfo
-	UserToken    string
-	SurvivalTime int
+	UserToken string
 }
 
 type Inference interface {
-	Create(*InferenceInfo) error
+	Create(*InferenceInfo) (int, error)
+	GetSurvivalTime(*domain.InferenceInfo) int
 	ExtendSurvivalTime(index *domain.InferenceIndex, timeToExtend int) error
 }
