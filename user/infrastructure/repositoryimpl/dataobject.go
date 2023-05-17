@@ -65,11 +65,14 @@ func toUserDoc(u domain.User, doc *DUser) {
 	*doc = DUser{
 		Name:                    u.Account.Account(),
 		Email:                   u.Email.Email(),
-		Bio:                     u.Bio.Bio(),
 		AvatarId:                u.AvatarId.AvatarId(),
 		PlatformToken:           u.PlatformToken,
 		PlatformUserId:          u.PlatformUser.Id,
 		PlatformUserNamespaceId: u.PlatformUser.NamespaceId,
+	}
+
+	if u.Bio != nil {
+		doc.Bio = u.Bio.Bio()
 	}
 }
 

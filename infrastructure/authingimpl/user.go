@@ -2,7 +2,6 @@ package authingimpl
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -28,8 +27,8 @@ func Init(v *Config) {
 		tokenURL:           v.Endpoint + "/oidc/token",
 		userInfoURL:        v.Endpoint + "/oidc/user",
 		getManagerTokenURL: v.Endpoint + "/manager/token",
-		sendEmailURL:       v.CertEndpoint + "/manager/sendcode",
-		bindEmailURL:       v.CertEndpoint + "/manager/bind/account",
+		sendEmailURL:       v.Endpoint + "/manager/sendcode",
+		bindEmailURL:       v.Endpoint + "/manager/bind/account",
 	}
 }
 
@@ -63,9 +62,6 @@ func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInf
 	if err = impl.getUserInfoByAccessToken(accessToken, &v); err != nil {
 		return
 	}
-
-	// TODO: delete
-	fmt.Printf("user info = %v\n", v)
 
 	if userInfo.Name, err = domain.NewAccount(v.Name); err != nil {
 		return

@@ -1,6 +1,8 @@
 package infrastructure
 
-import "github.com/opensourceways/xihe-server/common/domain/repository"
+import (
+	"github.com/opensourceways/xihe-server/common/domain/repository"
+)
 
 // errorDuplicateCreating
 type errorDuplicateCreating struct {

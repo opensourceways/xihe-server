@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	libutils "github.com/opensourceways/community-robot-lib/utils"
-
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,6 +19,10 @@ const (
 	unbindEmail   = "CHANNEL_UNBIND_EMAIL"
 
 	accountTypeEmail = "email"
+
+	errorCodeError          = "email_code_error"
+	errorEmailDuplicateBind = "email_email_duplicate_bind"
+	errorUserDuplicateBind  = "email_user_duplicate_bind"
 )
 
 type managerBody struct {
@@ -34,6 +38,7 @@ type managerToken struct {
 }
 
 type normalEmailRes struct {
+	Code   int `json:"code"`
 	Status int `json:"status"`
 }
 
@@ -62,7 +67,7 @@ func (impl *user) getManagerToken() (token string, err error) {
 		return
 	}
 
-	req, err := http.NewRequest(http.MethodPost, impl.sendEmailURL, bytes.NewBuffer(body))
+	req, err := http.NewRequest(http.MethodPost, impl.getManagerTokenURL, bytes.NewBuffer(body))
 	if err != nil {
 		return
 	}
@@ -73,8 +78,7 @@ func (impl *user) getManagerToken() (token string, err error) {
 	}
 
 	if res.Status != 200 {
-		logrus.Fatalf("send email code, err:%s", res.Msg)
-		err = errors.New("send email error")
+		err = errors.New("get token error")
 		return
 	}
 
@@ -83,7 +87,7 @@ func (impl *user) getManagerToken() (token string, err error) {
 	return
 }
 
-func (impl *user) SendBindEmail(email, capt string) (err error) {
+func (impl *user) SendBindEmail(email, capt string) (code string, err error) {
 	token, err := impl.getManagerToken()
 	if err != nil {
 		return
@@ -92,7 +96,7 @@ func (impl *user) SendBindEmail(email, capt string) (err error) {
 	return impl.sendEmail(token, bindEmail, email, capt)
 }
 
-func (impl *user) sendEmail(token, channel, email, capt string) (err error) {
+func (impl *user) sendEmail(token, channel, email, capt string) (code string, err error) {
 
 	send := sendEmail{
 		Account:             email,
@@ -102,29 +106,30 @@ func (impl *user) sendEmail(token, channel, email, capt string) (err error) {
 
 	body, err := libutils.JsonMarshal(&send)
 	if err != nil {
-		return err
+		return
 	}
 
 	req, err := http.NewRequest(http.MethodPost, impl.sendEmailURL, bytes.NewBuffer(body))
 	if err != nil {
-		return err
+		return
 	}
 
 	req.Header.Add("token", token)
 
 	var res normalEmailRes
-	if err = sendHttpRequest(req, &res); err != nil {
-		return
-	}
+	err = sendHttpRequest(req, &res)
 
 	if res.Status != 200 {
-		return errors.New("send email error")
+		code = errorReturn(err)
+		err = errors.New("send email error")
+
+		return
 	}
 
 	return
 }
 
-func (impl *user) VerifyBindEmail(email, passCode, userid string) (err error) {
+func (impl *user) VerifyBindEmail(email, passCode, userid string) (code string, err error) {
 	token, err := impl.getManagerToken()
 	if err != nil {
 		return
@@ -133,7 +138,7 @@ func (impl *user) VerifyBindEmail(email, passCode, userid string) (err error) {
 	return impl.verifyBindEmail(token, email, passCode, userid)
 }
 
-func (impl *user) verifyBindEmail(token, email, passCode, userid string) (err error) {
+func (impl *user) verifyBindEmail(token, email, passCode, userid string) (code string, err error) {
 	veri := veriEmail{
 		Account:     email,
 		Code:        passCode,
@@ -143,23 +148,50 @@ func (impl *user) verifyBindEmail(token, email, passCode, userid string) (err er
 
 	body, err := libutils.JsonMarshal(&veri)
 	if err != nil {
-		return err
+		return
 	}
 
 	req, err := http.NewRequest(http.MethodPost, impl.bindEmailURL, bytes.NewBuffer(body))
 	if err != nil {
-		return err
+		return
 	}
 
 	req.Header.Add("token", token)
 
 	var res normalEmailRes
-	if err = sendHttpRequest(req, &res); err != nil {
+	err = sendHttpRequest(req, &res)
+
+	if res.Code != 200 {
+		code = errorReturn(err)
+		err = fmt.Errorf("bind email error")
+
 		return
 	}
 
-	if res.Status != 200 {
-		return fmt.Errorf("bind email error")
+	return
+}
+
+func errorReturn(err error) (code string) {
+	logrus.Debugf("email error:", err)
+
+	if err == nil {
+		return
+	}
+
+	errinfo := err.Error()
+
+	if strings.Contains(errinfo, "E0002") {
+		code = errorCodeError
+		return
+	}
+
+	if strings.Contains(errinfo, "E0004") {
+		code = errorEmailDuplicateBind
+	}
+
+	if strings.Contains(errinfo, "E00016") {
+		code = errorUserDuplicateBind
+		return
 	}
 
 	return

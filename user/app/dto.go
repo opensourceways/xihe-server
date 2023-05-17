@@ -140,5 +140,6 @@ type PlatformInfoDTO struct {
 type UpdatePlateformInfoCmd struct {
 	PlatformInfoDTO
 
-	User domain.Account
+	User  domain.Account
+	Email domain.Email
 }

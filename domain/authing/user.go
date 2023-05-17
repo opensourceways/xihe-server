@@ -24,6 +24,6 @@ type User interface {
 	GetByAccessToken(accessToken string) (UserInfo, error)
 
 	// email
-	SendBindEmail(email, capt string) (err error)
-	VerifyBindEmail(email, passCode, userid string) (err error)
+	SendBindEmail(email, capt string) (code string, err error)
+	VerifyBindEmail(email, passCode, userid string) (code string, err error)
 }

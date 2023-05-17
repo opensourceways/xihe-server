@@ -32,7 +32,7 @@ type emailService struct {
 }
 
 func (s emailService) SendBindEmail(cmd *SendBindEmailCmd) (code string, err error) {
-	return "", s.auth.SendBindEmail(cmd.Email.Email(), cmd.Capt)
+	return s.auth.SendBindEmail(cmd.Email.Email(), cmd.Capt)
 }
 
 func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error) {
@@ -48,7 +48,7 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 		return
 	}
 
-	if err = s.auth.VerifyBindEmail(cmd.Email.Email(), cmd.PassCode, info.UserId); err != nil {
+	if code, err = s.auth.VerifyBindEmail(cmd.Email.Email(), cmd.PassCode, info.UserId); err != nil {
 		return
 	}
 
@@ -68,6 +68,7 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 	updatecmd := &UpdatePlateformInfoCmd{
 		PlatformInfoDTO: dto,
 		User:            cmd.User,
+		Email:           cmd.Email,
 	}
 
 	for i := 0; i <= 5; i++ {

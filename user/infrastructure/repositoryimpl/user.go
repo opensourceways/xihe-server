@@ -5,9 +5,9 @@ import (
 	"errors"
 	"sort"
 
-	commoninfra "github.com/opensourceways/xihe-server/common/infrastructure"
 	mongo "github.com/opensourceways/xihe-server/common/infrastructure/mongo"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	typesrepo "github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/opensourceways/xihe-server/user/domain"
@@ -25,7 +25,7 @@ type userRepoImpl struct {
 func (impl *userRepoImpl) Save(u *domain.User) (r domain.User, err error) {
 	if u.Id != "" {
 		if err = impl.update(u); err != nil {
-			err = commoninfra.ConvertError(err)
+			err = typesrepo.ConvertError(err)
 		} else {
 			r = *u
 			r.Version += 1
@@ -36,7 +36,7 @@ func (impl *userRepoImpl) Save(u *domain.User) (r domain.User, err error) {
 
 	v, err := impl.insert(u)
 	if err != nil {
-		err = commoninfra.ConvertError(err)
+		err = typesrepo.ConvertError(err)
 	} else {
 		r = *u
 		r.Id = v
@@ -47,7 +47,7 @@ func (impl *userRepoImpl) Save(u *domain.User) (r domain.User, err error) {
 
 func (impl *userRepoImpl) GetByAccount(account domain.Account) (r domain.User, err error) {
 	if r, _, err = impl.GetByFollower(account, nil); err != nil {
-		err = commoninfra.ConvertError(err)
+		err = typesrepo.ConvertError(err)
 
 		return
 	}
@@ -95,7 +95,7 @@ func (impl *userRepoImpl) insert(u *domain.User) (id string, err error) {
 
 	f := func(ctx context.Context) error {
 		v, err := impl.cli.NewDocIfNotExist(
-			ctx, mongo.UserDocFilter(u.Account.Account(), u.Email.Email()), doc,
+			ctx, mongo.UserDocFilterByAccount(u.Account.Account()), doc,
 		)
 
 		id = v
@@ -193,7 +193,7 @@ func (impl *userRepoImpl) FindUsersInfo(accounts []domain.Account) (r []domain.U
 	}
 
 	if err := withContext(f); err != nil {
-		err = commoninfra.ConvertError(err)
+		err = typesrepo.ConvertError(err)
 
 		return nil, err
 	}
@@ -222,7 +222,7 @@ func (impl *userRepoImpl) GetUserAvatarId(account domain.Account) (id domain.Ava
 	}
 
 	if err := withContext(f); err != nil {
-		err = commoninfra.ConvertError(err)
+		err = typesrepo.ConvertError(err)
 
 		return nil, err
 	}
@@ -312,7 +312,7 @@ func (impl *userRepoImpl) Search(opt *repository.UserSearchOption) (
 func (impl *userRepoImpl) AddFollowing(v *domain.FollowerInfo) error {
 	err := impl.addFollow(v.Follower.Account(), v.User.Account(), fieldFollowing)
 	if err != nil {
-		return commoninfra.ConvertError(err)
+		return typesrepo.ConvertError(err)
 	}
 
 	return nil
@@ -321,7 +321,7 @@ func (impl *userRepoImpl) AddFollowing(v *domain.FollowerInfo) error {
 func (impl *userRepoImpl) AddFollower(v *domain.FollowerInfo) error {
 	err := impl.addFollow(v.User.Account(), v.Follower.Account(), fieldFollower)
 	if err != nil {
-		return commoninfra.ConvertError(err)
+		return typesrepo.ConvertError(err)
 	}
 
 	return nil
@@ -349,7 +349,7 @@ func (impl *userRepoImpl) addFollow(user, account, field string) error {
 func (impl *userRepoImpl) RemoveFollowing(v *domain.FollowerInfo) error {
 	err := impl.removeFollow(v.Follower.Account(), v.User.Account(), fieldFollowing)
 	if err != nil {
-		return commoninfra.ConvertError(err)
+		return typesrepo.ConvertError(err)
 	}
 
 	return nil
@@ -358,7 +358,7 @@ func (impl *userRepoImpl) RemoveFollowing(v *domain.FollowerInfo) error {
 func (impl *userRepoImpl) RemoveFollower(v *domain.FollowerInfo) error {
 	err := impl.removeFollow(v.User.Account(), v.Follower.Account(), fieldFollower)
 	if err != nil {
-		return commoninfra.ConvertError(err)
+		return typesrepo.ConvertError(err)
 	}
 
 	return nil
@@ -380,7 +380,7 @@ func (impl *userRepoImpl) FindFollowing(owner domain.Account, option *repository
 ) {
 	v, err := impl.getFollows(owner.Account(), fieldFollowing)
 	if err != nil {
-		err = commoninfra.ConvertError(err)
+		err = typesrepo.ConvertError(err)
 		return
 	}
 
@@ -413,7 +413,7 @@ func (impl *userRepoImpl) FindFollower(owner domain.Account, option *repository.
 ) {
 	v, err := impl.getFollows(owner.Account(), fieldFollowing)
 	if err != nil {
-		err = commoninfra.ConvertError(err)
+		err = typesrepo.ConvertError(err)
 		return
 	}
 

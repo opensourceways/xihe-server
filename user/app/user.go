@@ -121,6 +121,7 @@ func (s userService) UpdatePlateformInfo(cmd *UpdatePlateformInfoCmd) (err error
 	// update some data
 	u.PlatformUser = cmd.PlatformUser
 	u.PlatformToken = cmd.PlatformToken
+	u.Email = cmd.Email
 
 	// update userinfo
 	if _, err = s.repo.Save(&u); err != nil {
