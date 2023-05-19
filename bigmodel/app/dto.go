@@ -17,6 +17,20 @@ type DescribePictureCmd struct {
 	Length  int64
 }
 
+type VQAHFCmd struct {
+	User    types.Account
+	Picture io.Reader
+	Ask     string
+}
+
+func (cmd *VQAHFCmd) Validate() error {
+	if cmd.Picture == nil || cmd.Ask == "" {
+		return errors.New("invalid cmd")
+	}
+
+	return nil
+}
+
 type CodeGeexDTO = bigmodel.CodeGeexResp
 
 type CodeGeexCmd bigmodel.CodeGeexReq

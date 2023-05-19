@@ -29,6 +29,7 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/vqa_upload_picture", ctl.VQAUploadPicture)
 	rg.POST("/v1/bigmodel/luojia_upload_picture", ctl.LuoJiaUploadPicture)
 	rg.POST("/v1/bigmodel/ask", ctl.Ask)
+	rg.POST("/v1/bigmodel/ask_hf", ctl.AskHF)
 	rg.POST("/v1/bigmodel/pangu", ctl.PanGu)
 	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
 	rg.POST("/v1/bigmodel/codegeex", ctl.CodeGeex)
@@ -255,6 +256,65 @@ func (ctl *BigModelController) Ask(ctx *gin.Context) {
 		pl.DomainAccount(), q,
 		filepath.Join(pl.Account, f),
 	)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPost(ctx, questionAskResp{v})
+	}
+}
+
+// @Title AskHF
+// @Description vqa for hf
+// @Tags  BigModel
+// @Param	picture		formData 	file	true	"picture"
+// @Accept json
+// @Success 201 {object} describePictureResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/ask_hf [post]
+func (ctl *BigModelController) AskHF(ctx *gin.Context) {
+	_, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
+	req := questionAskHFReq{}
+
+	// get picture
+	f, err := ctx.FormFile("picture")
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if f.Size > apiConfig.MaxPictureSizeToDescribe {
+		ctl.sendBadRequestParamWithMsg(ctx, "too big picture")
+
+		return
+	}
+
+	p, err := f.Open()
+	if err != nil {
+		ctl.sendBadRequestParamWithMsg(ctx, "can't get picture")
+
+		return
+	}
+
+	defer p.Close()
+
+	req.Picture = p
+
+	// get question
+	req.Question = ctx.PostForm("question")
+
+	var cmd app.VQAHFCmd
+	if cmd, err = req.toCmd(); err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	v, code, err := ctl.s.VQAHF(&cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {

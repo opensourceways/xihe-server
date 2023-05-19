@@ -28,6 +28,7 @@ type BigModelService interface {
 	GenPictures(types.Account, string) ([]string, string, error)
 	Ask(types.Account, domain.Question, string) (string, string, error)
 	VQAUploadPicture(io.Reader, types.Account, string) error
+	VQAHF(*VQAHFCmd) (string, string, error)
 
 	// luojia
 	LuoJiaUploadPicture(io.Reader, types.Account) error

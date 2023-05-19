@@ -60,6 +60,7 @@ type CloudConfig struct {
 
 type Endpoints struct {
 	VQA              string `json:"vqa"                required:"true"`
+	VQAHF            string `json:"vqa_hf"             required:"true"`
 	Pangu            string `json:"pangu"              required:"true"`
 	LuoJia           string `json:"luojia"             required:"true"`
 	WuKong           string `json:"wukong"             required:"true"`

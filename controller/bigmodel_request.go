@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"io"
 
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
@@ -9,8 +10,9 @@ import (
 )
 
 const (
-	temp_account    = "wukong_icbc"
-	temp_account_hf = "wukong_hf"
+	temp_account        = "wukong_icbc"
+	temp_account_hf     = "wukong_hf"
+	temp_account_vqa_hf = "vqa_hf"
 )
 
 type describePictureResp struct {
@@ -68,6 +70,27 @@ type questionAskResp struct {
 
 type pictureUploadResp struct {
 	Path string `json:"path"`
+}
+
+type questionAskHFReq struct {
+	Picture  io.Reader `json:"picture"`
+	Question string    `json:"question"`
+}
+
+func (req *questionAskHFReq) toCmd() (
+	cmd app.VQAHFCmd, err error,
+) {
+	if cmd.User, err = types.NewAccount(temp_account_vqa_hf); err != nil {
+		return
+	}
+
+	cmd.Picture = req.Picture
+
+	cmd.Ask = req.Question
+
+	err = cmd.Validate()
+
+	return
 }
 
 type panguRequest struct {

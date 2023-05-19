@@ -62,3 +62,13 @@ func (s bigModelService) Ask(
 func (s bigModelService) VQAUploadPicture(f io.Reader, user types.Account, fileName string) error {
 	return s.fm.VQAUploadPicture(f, user, fileName)
 }
+
+func (s bigModelService) VQAHF(cmd *VQAHFCmd) (v string, code string, err error) {
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelVQA)
+
+	if v, err = s.fm.AskHF(cmd.Picture, cmd.User, cmd.Ask); err != nil {
+		code = s.setCode(err)
+	}
+
+	return
+}
