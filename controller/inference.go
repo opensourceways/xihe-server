@@ -134,18 +134,8 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		return
 	}
 
-	// get resourcelevel
-	resources, err := ctl.project.FindUserProjects(
-		[]repository.UserResourceListOption{
-			{
-				Owner: owner,
-				Ids: []string{
-					projectId,
-				},
-			},
-		},
-	)
-	if err != nil || len(resources) < 1 {
+	var level string
+	if level, err = ctl.getResourceLevel(owner, projectId); err != nil {
 		ws.WriteJSON(newResponseError(err))
 
 		log.Errorf("inference failed: get reource, err:%s", err.Error())
@@ -164,7 +154,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		ProjectId:     v.Id,
 		ProjectName:   v.Name.(domain.ResourceName),
 		ProjectOwner:  owner,
-		ResourceLevel: resources[0].Level.ResourceLevel(),
+		ResourceLevel: level,
 		InferenceDir:  ctl.inferenceDir,
 		BootFile:      ctl.inferenceBootFile,
 	}
@@ -219,4 +209,27 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	log.Error("inference timeout")
 
 	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
+}
+
+func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid string) (level string, err error) {
+	resources, err := ctl.project.FindUserProjects(
+		[]repository.UserResourceListOption{
+			{
+				Owner: owner,
+				Ids: []string{
+					pid,
+				},
+			},
+		},
+	)
+
+	if err != nil || len(resources) < 1 {
+		return
+	}
+
+	if resources[0].Level != nil {
+		level = resources[0].Level.ResourceLevel()
+	}
+
+	return
 }
