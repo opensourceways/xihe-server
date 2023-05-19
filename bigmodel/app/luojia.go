@@ -35,9 +35,11 @@ func (s bigModelService) ListLuoJiaRecord(user types.Account) (
 		return
 	}
 
+	r := s.bigmodelService.LatestLuojiaList(v)
+
 	dtos = append(dtos, LuoJiaRecordDTO{
-		CreatedAt: utils.ToDate(v[0].CreatedAt),
-		Id:        v[0].Id,
+		CreatedAt: utils.ToDate(r.CreatedAt),
+		Id:        r.Id,
 	})
 
 	return

@@ -2,6 +2,7 @@ package service
 
 import (
 	"net/url"
+	"sort"
 	"strings"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
@@ -17,6 +18,9 @@ type BigModelService interface {
 	IsDigg(types.Account, []string) bool
 	LinkLikePublic(string, types.Account) (LinkLikePublicOpt, error)
 	IsPathCotain(string, []domain.WuKongPicture) bool
+
+	// luojia
+	LatestLuojiaList([]domain.LuoJiaRecord) domain.LuoJiaRecord
 }
 
 type bigModelService struct {
@@ -137,6 +141,18 @@ func toOBSPath(link string) (obspath string) {
 
 	t := strings.Split(u, ".ovaijisuan.com:443/")[1]
 	obspath = strings.Split(t, "?AWSAccessKeyId")[0]
+
+	return
+}
+
+func (s *bigModelService) LatestLuojiaList(v []domain.LuoJiaRecord) (r domain.LuoJiaRecord) {
+	sort.Slice(v, func(i, j int) bool {
+		return v[i].CreatedAt < v[j].CreatedAt
+	})
+
+	if len(v) > 0 {
+		return v[len(v)-1]
+	}
 
 	return
 }
