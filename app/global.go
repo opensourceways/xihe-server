@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/opensourceways/xihe-server/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 )
 
@@ -58,7 +59,7 @@ func (s projectService) ListGlobal(cmd *GlobalResourceListCmd) (
 	}
 
 	// find avatars
-	users := make([]domain.Account, len(items))
+	users := make([]userdomain.Account, len(items))
 	for i := range items {
 		users[i] = items[i].Owner
 	}
@@ -121,7 +122,7 @@ func (s modelService) ListGlobal(cmd *GlobalResourceListCmd) (
 	}
 
 	// find avatars
-	users := make([]domain.Account, len(items))
+	users := make([]userdomain.Account, len(items))
 	for i := range items {
 		users[i] = items[i].Owner
 	}
@@ -184,7 +185,7 @@ func (s datasetService) ListGlobal(cmd *GlobalResourceListCmd) (
 	}
 
 	// find avatars
-	users := make([]domain.Account, len(items))
+	users := make([]userdomain.Account, len(items))
 	for i := range items {
 		users[i] = items[i].Owner
 	}

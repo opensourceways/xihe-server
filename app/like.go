@@ -6,6 +6,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -42,7 +43,7 @@ type LikeService interface {
 
 func NewLikeService(
 	repo repository.Like,
-	user repository.User,
+	user userrepo.User,
 	model repository.Model,
 	project repository.Project,
 	dataset repository.Dataset,

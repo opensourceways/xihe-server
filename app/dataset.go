@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -100,7 +101,7 @@ type DatasetService interface {
 }
 
 func NewDatasetService(
-	user repository.User,
+	user userrepo.User,
 	repo repository.Dataset,
 	proj repository.Project,
 	model repository.Model,

@@ -5,7 +5,9 @@ import (
 	"fmt"
 
 	"github.com/opensourceways/xihe-server/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -32,7 +34,7 @@ func (r *ResourceDTO) identity() string {
 }
 
 type resourceService struct {
-	user    repository.User
+	user    userrepo.User
 	model   repository.Model
 	project repository.Project
 	dataset repository.Dataset
@@ -83,10 +85,10 @@ func (s resourceService) listDatasets(resources []domain.ResourceIndex) (
 }
 
 func (s resourceService) singleResourceOptions(resources []domain.ResourceIndex) (
-	users []domain.Account,
+	users []userdomain.Account,
 	options []repository.UserResourceListOption,
 ) {
-	ul := make(map[string]domain.Account)
+	ul := make(map[string]userdomain.Account)
 	ro := make(map[string][]string)
 
 	for i := range resources {
@@ -107,12 +109,12 @@ func (s resourceService) singleResourceOptions(resources []domain.ResourceIndex)
 }
 
 func (s resourceService) toOptions(resources []*domain.ResourceObject) (
-	users []domain.Account,
+	users []userdomain.Account,
 	projects []repository.UserResourceListOption,
 	datasets []repository.UserResourceListOption,
 	models []repository.UserResourceListOption,
 ) {
-	ul := make(map[string]domain.Account)
+	ul := make(map[string]userdomain.Account)
 	po := make(map[string][]string)
 	do := make(map[string][]string)
 	mo := make(map[string][]string)
@@ -146,7 +148,7 @@ func (s resourceService) toOptions(resources []*domain.ResourceObject) (
 }
 
 func (s resourceService) listResources(
-	users []domain.Account,
+	users []userdomain.Account,
 	projects []repository.UserResourceListOption,
 	datasets []repository.UserResourceListOption,
 	models []repository.UserResourceListOption,
@@ -159,7 +161,7 @@ func (s resourceService) listResources(
 		return
 	}
 
-	userInfos := make(map[string]*domain.UserInfo)
+	userInfos := make(map[string]*userdomain.UserInfo)
 	for i := range allUsers {
 		item := &allUsers[i]
 		userInfos[item.Account.Account()] = item
@@ -225,7 +227,7 @@ func (s resourceService) listResources(
 }
 
 func (s resourceService) projectToResourceDTO(
-	userInfos map[string]*domain.UserInfo,
+	userInfos map[string]*userdomain.UserInfo,
 	projects []domain.ProjectSummary, dtos []ResourceDTO,
 ) {
 	for i := range projects {
@@ -258,7 +260,7 @@ func (s resourceService) projectToResourceDTO(
 }
 
 func (s resourceService) modelToResourceDTO(
-	userInfos map[string]*domain.UserInfo,
+	userInfos map[string]*userdomain.UserInfo,
 	data []domain.ModelSummary, dtos []ResourceDTO,
 ) {
 	for i := range data {
@@ -289,7 +291,7 @@ func (s resourceService) modelToResourceDTO(
 }
 
 func (s resourceService) datasetToResourceDTO(
-	userInfos map[string]*domain.UserInfo,
+	userInfos map[string]*userdomain.UserInfo,
 	data []domain.DatasetSummary, dtos []ResourceDTO,
 ) {
 	for i := range data {
@@ -330,7 +332,7 @@ func (s resourceService) store(v *domain.ResourceIndex, m map[string][]string) {
 }
 
 func (s resourceService) toOptionList(
-	m map[string][]string, users map[string]domain.Account,
+	m map[string][]string, users map[string]userdomain.Account,
 ) []repository.UserResourceListOption {
 
 	if len(m) == 0 {
@@ -352,12 +354,12 @@ func (s resourceService) toOptionList(
 	return r
 }
 
-func (s resourceService) userMapToList(m map[string]domain.Account) []domain.Account {
+func (s resourceService) userMapToList(m map[string]userdomain.Account) []userdomain.Account {
 	if len(m) == 0 {
 		return nil
 	}
 
-	r := make([]domain.Account, len(m))
+	r := make([]userdomain.Account, len(m))
 
 	i := 0
 	for _, u := range m {
@@ -368,7 +370,7 @@ func (s resourceService) userMapToList(m map[string]domain.Account) []domain.Acc
 	return r
 }
 
-func (s resourceService) findUserAvater(users []domain.Account) ([]string, error) {
+func (s resourceService) findUserAvater(users []userdomain.Account) ([]string, error) {
 	allUsers, err := s.user.FindUsersInfo(users)
 	if err != nil {
 		return nil, err

@@ -16,7 +16,7 @@ import (
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
-	corepo "github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -64,7 +64,7 @@ type BigModelService interface {
 
 func NewBigModelService(
 	fm bigmodel.BigModel,
-	user corepo.User,
+	user userrepo.User,
 	luojia repository.LuoJia,
 	wukong repository.WuKong,
 	wukongPicture repository.WuKongPicture,
@@ -88,7 +88,7 @@ type bigModelService struct {
 	fm bigmodel.BigModel
 
 	sender        message.AsyncMessageProducer
-	user          corepo.User
+	user          userrepo.User
 	luojia        repository.LuoJia
 	wukong        repository.WuKong
 	wukongPicture repository.WuKongPicture
