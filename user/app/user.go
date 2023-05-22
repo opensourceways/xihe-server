@@ -1,60 +1,128 @@
 package app
 
 import (
-	types "github.com/opensourceways/xihe-server/domain"
-	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/domain/message"
+	platform "github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 type UserService interface {
-	UpsertUserRegInfo(*UserRegisterInfoCmd) error
-	GetUserRegInfo(types.Account) (UserRegisterInfoDTO, error)
+	// user
+	Create(*UserCreateCmd) (UserDTO, error)
+	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
+
+	GetByAccount(domain.Account) (UserDTO, error)
+	GetByFollower(owner, follower domain.Account) (UserDTO, bool, error)
+
+	AddFollowing(*domain.FollowerInfo) error
+	RemoveFollowing(*domain.FollowerInfo) error
+	ListFollowing(*FollowsListCmd) (FollowsDTO, error)
+
+	AddFollower(*domain.FollowerInfo) error
+	RemoveFollower(*domain.FollowerInfo) error
+	ListFollower(*FollowsListCmd) (FollowsDTO, error)
 }
 
-var _ UserService = (*userService)(nil)
-
+// ps: platform user service
 func NewUserService(
-	userregRepo repository.UserReg,
-) *userService {
-	return &userService{
-		userregRepo: userregRepo,
+	repo repository.User,
+	ps platform.User, sender message.Sender,
+) UserService {
+	return userService{
+		ps:     ps,
+		repo:   repo,
+		sender: sender,
 	}
 }
 
 type userService struct {
-	userregRepo repository.UserReg
+	ps     platform.User
+	repo   repository.User
+	sender message.Sender
 }
 
-func (s *userService) UpsertUserRegInfo(cmd *UserRegisterInfoCmd) (err error) {
-	r := new(domain.UserRegInfo)
-	cmd.toUserRegInfo(r)
+func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
+	// TODO keep transaction
 
-	if err = s.userregRepo.AddUserRegInfo(r); err != nil {
-		if !repoerr.IsErrorDuplicateCreating(err) {
-			return
-		}
+	v := cmd.toUser()
 
-		u, err := s.userregRepo.GetUserRegInfo(cmd.Account)
-		if err != nil {
-			return err
-		}
-
-		if err = s.userregRepo.UpdateUserRegInfo(r, u.Version); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (s *userService) GetUserRegInfo(user types.Account) (dto UserRegisterInfoDTO, err error) {
-	u, err := s.userregRepo.GetUserRegInfo(user)
+	// new code platform user
+	pu, err := s.ps.New(platform.UserOption{
+		Email:    v.Email,
+		Name:     v.Account,
+		Password: cmd.Password,
+	})
 	if err != nil {
 		return
 	}
 
-	dto.toUserRegInfoDTO(&u)
+	v.PlatformUser = pu
+
+	// apply token
+	token, err := s.ps.NewToken(pu)
+	if err != nil {
+		return
+	}
+
+	v.PlatformToken = token
+
+	// update user
+	u, err := s.repo.Save(&v)
+	if err != nil {
+		return
+	}
+
+	s.toUserDTO(&u, &dto)
+
+	_ = s.sender.AddOperateLogForNewUser(u.Account)
 
 	return
+}
+
+func (s userService) GetByAccount(account domain.Account) (dto UserDTO, err error) {
+	v, err := s.repo.GetByAccount(account)
+	if err != nil {
+		return
+	}
+
+	s.toUserDTO(&v, &dto)
+
+	return
+}
+
+func (s userService) GetByFollower(owner, follower domain.Account) (
+	dto UserDTO, isFollower bool, err error,
+) {
+	v, isFollower, err := s.repo.GetByFollower(owner, follower)
+	if err != nil {
+		return
+	}
+
+	s.toUserDTO(&v, &dto)
+
+	return
+}
+
+func (s userService) toUserDTO(u *domain.User, dto *UserDTO) {
+	*dto = UserDTO{
+		Id:      u.Id,
+		Email:   u.Email.Email(),
+		Account: u.Account.Account(),
+	}
+
+	if u.Bio != nil {
+		dto.Bio = u.Bio.Bio()
+	}
+
+	if u.AvatarId != nil {
+		dto.AvatarId = u.AvatarId.AvatarId()
+	}
+
+	dto.FollowerCount = u.FollowerCount
+	dto.FollowingCount = u.FollowingCount
+
+	dto.Platform.Token = u.PlatformToken
+	dto.Platform.UserId = u.PlatformUser.Id
+	dto.Platform.NamespaceId = u.PlatformUser.NamespaceId
 }
