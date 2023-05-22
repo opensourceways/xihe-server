@@ -7,11 +7,12 @@ import (
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForSearchController(
 	rg *gin.RouterGroup,
-	user repository.User,
+	user userrepo.User,
 	proj repository.Project,
 	model repository.Model,
 	dataset repository.Dataset,

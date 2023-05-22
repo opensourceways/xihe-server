@@ -6,11 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/opensourceways/xihe-server/app"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 type oldUserTokenPayload struct {
@@ -54,7 +56,7 @@ type newUserTokenPayload struct {
 
 func AddRouterForLoginController(
 	rg *gin.RouterGroup,
-	repo repository.User,
+	repo userrepo.User,
 	ps platform.User,
 	auth authing.User,
 	login repository.Login,
@@ -62,7 +64,7 @@ func AddRouterForLoginController(
 ) {
 	pc := LoginController{
 		auth: auth,
-		us:   app.NewUserService(repo, ps, sender),
+		us:   userapp.NewUserService(repo, ps, sender),
 		ls:   app.NewLoginService(login),
 	}
 
@@ -76,7 +78,7 @@ type LoginController struct {
 	baseController
 
 	auth     authing.User
-	us       app.UserService
+	us       userapp.UserService
 	ls       app.LoginService
 	password domain.Password
 }
@@ -118,7 +120,7 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 	} else {
 		if user.Email != info.Email.Email() {
 			ctl.us.UpdateBasicInfo(
-				info.Name, app.UpdateUserBasicInfoCmd{Email: info.Email},
+				info.Name, userapp.UpdateUserBasicInfoCmd{Email: info.Email},
 			)
 		}
 	}
@@ -178,8 +180,8 @@ func (ctl *LoginController) newLogin(ctx *gin.Context, info authing.Login) (err 
 	return
 }
 
-func (ctl *LoginController) newUser(ctx *gin.Context, info authing.Login) (user app.UserDTO, err error) {
-	cmd := app.UserCreateCmd{
+func (ctl *LoginController) newUser(ctx *gin.Context, info authing.Login) (user userapp.UserDTO, err error) {
+	cmd := userapp.UserCreateCmd{
 		Email:    info.Email,
 		Account:  info.Name,
 		Password: ctl.password,

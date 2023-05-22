@@ -9,11 +9,12 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForDatasetController(
 	rg *gin.RouterGroup,
-	user repository.User,
+	user userrepo.User,
 	repo repository.Dataset,
 	model repository.Model,
 	proj repository.Project,
@@ -47,7 +48,7 @@ func AddRouterForDatasetController(
 type DatasetController struct {
 	baseController
 
-	user repository.User
+	user userrepo.User
 	repo repository.Dataset
 	tags repository.Tags
 	like repository.Like

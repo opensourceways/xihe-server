@@ -6,8 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
+	userapp "github.com/opensourceways/xihe-server/user/app"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 // @Title Create
@@ -58,7 +59,7 @@ func (ctl *UserController) AddFollowing(ctx *gin.Context) {
 		return
 	}
 
-	f := &domain.FollowerInfo{
+	f := &userdomain.FollowerInfo{
 		User:     user,
 		Follower: pl.DomainAccount(),
 	}
@@ -102,7 +103,7 @@ func (ctl *UserController) RemoveFollowing(ctx *gin.Context) {
 		return
 	}
 
-	f := &domain.FollowerInfo{
+	f := &userdomain.FollowerInfo{
 		User:     user,
 		Follower: pl.DomainAccount(),
 	}
@@ -146,7 +147,7 @@ func (ctl *UserController) ListFollowing(ctx *gin.Context) {
 
 func (ctl *UserController) genListFollowsCmd(
 	ctx *gin.Context, user domain.Account,
-) (cmd app.FollowsListCmd, ok bool) {
+) (cmd userapp.FollowsListCmd, ok bool) {
 	var err error
 
 	if v := ctl.getQueryParameter(ctx, "count_per_page"); v != "" {

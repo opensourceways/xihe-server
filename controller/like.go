@@ -10,12 +10,13 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForLikeController(
 	rg *gin.RouterGroup,
 	repo repository.Like,
-	user repository.User,
+	user userrepo.User,
 	proj repository.Project,
 	model repository.Model,
 	dataset repository.Dataset,

@@ -10,11 +10,12 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForProjectController(
 	rg *gin.RouterGroup,
-	user repository.User,
+	user userrepo.User,
 	repo repository.Project,
 	model repository.Model,
 	dataset repository.Dataset,
@@ -60,7 +61,7 @@ func AddRouterForProjectController(
 type ProjectController struct {
 	baseController
 
-	user repository.User
+	user userrepo.User
 	repo repository.Project
 	s    app.ProjectService
 

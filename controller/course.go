@@ -7,16 +7,17 @@ import (
 	"github.com/opensourceways/xihe-server/course/app"
 	"github.com/opensourceways/xihe-server/course/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
-	commonuser "github.com/opensourceways/xihe-server/user/app"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 )
 
 func AddRouterForCourseController(
 	rg *gin.RouterGroup,
 
 	s app.CourseService,
-	us commonuser.UserService,
+	us userapp.RegService,
 	project repository.Project,
-	user repository.User,
+	user userrepo.User,
 ) {
 	ctl := CourseController{
 		s:       s,
@@ -41,9 +42,9 @@ type CourseController struct {
 	baseController
 
 	s       app.CourseService
-	us      commonuser.UserService
+	us      userapp.RegService
 	project repository.Project
-	user    repository.User
+	user    userrepo.User
 }
 
 // @Summary Apply

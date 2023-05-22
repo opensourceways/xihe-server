@@ -5,17 +5,17 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/opensourceways/xihe-server/app"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
-	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForUserController(
 	rg *gin.RouterGroup,
-	repo repository.User,
+	repo userrepo.User,
 	ps platform.User,
 	auth authing.User,
 	sender message.Sender,
@@ -23,7 +23,7 @@ func AddRouterForUserController(
 	ctl := UserController{
 		auth: auth,
 		repo: repo,
-		s:    app.NewUserService(repo, ps, sender),
+		s:    userapp.NewUserService(repo, ps, sender),
 	}
 
 	rg.POST("/v1/user", ctl.Create) // TODO: delete
@@ -43,9 +43,9 @@ func AddRouterForUserController(
 type UserController struct {
 	baseController
 
-	repo repository.User
+	repo userrepo.User
 	auth authing.User
-	s    app.UserService
+	s    userapp.UserService
 }
 
 // @Summary Create
@@ -187,7 +187,7 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 		return
 	}
 
-	resp := func(u *app.UserDTO, isFollower bool) {
+	resp := func(u *userapp.UserDTO, isFollower bool) {
 		ctx.JSON(http.StatusOK, newResponseData(
 			userDetail{
 				UserDTO:    u,

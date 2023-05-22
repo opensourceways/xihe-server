@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/opensourceways/xihe-server/app"
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/user/app"
+	"github.com/opensourceways/xihe-server/user/domain"
 )
 
 type userBasicInfoUpdateRequest struct {
