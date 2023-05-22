@@ -2,6 +2,7 @@ package message
 
 import (
 	bmdomain "github.com/opensourceways/xihe-server/bigmodel/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain"
 )
 
@@ -35,8 +36,8 @@ type Sender interface {
 	AddOperateLogForCreateResource(domain.ResourceObject, domain.ResourceName) error
 	AddOperateLogForDownloadFile(domain.Account, RepoFile) error
 
-	AddFollowing(*domain.FollowerInfo) error
-	RemoveFollowing(*domain.FollowerInfo) error
+	AddFollowing(*userdomain.FollowerInfo) error
+	RemoveFollowing(*userdomain.FollowerInfo) error
 
 	AddLike(*domain.ResourceObject) error
 	RemoveLike(*domain.ResourceObject) error
@@ -72,8 +73,8 @@ type EventHandler interface {
 }
 
 type FollowingHandler interface {
-	HandleEventAddFollowing(*domain.FollowerInfo) error
-	HandleEventRemoveFollowing(*domain.FollowerInfo) error
+	HandleEventAddFollowing(*userdomain.FollowerInfo) error
+	HandleEventRemoveFollowing(*userdomain.FollowerInfo) error
 }
 
 type LikeHandler interface {

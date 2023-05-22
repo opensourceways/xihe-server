@@ -12,6 +12,7 @@ import (
 	bigmoddelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 )
@@ -156,12 +157,12 @@ func registerHandlerForFollowing(handler interface{}) (mq.Subscriber, error) {
 			return
 		}
 
-		f := &domain.FollowerInfo{}
-		if f.User, err = domain.NewAccount(body.User); err != nil {
+		f := &userdomain.FollowerInfo{}
+		if f.User, err = userdomain.NewAccount(body.User); err != nil {
 			return
 		}
 
-		if f.Follower, err = domain.NewAccount(body.Follower); err != nil {
+		if f.Follower, err = userdomain.NewAccount(body.Follower); err != nil {
 			return
 		}
 

@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/xanzy/go-gitlab"
 
-	"github.com/opensourceways/xihe-server/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain/platform"
 )
 
@@ -51,7 +51,7 @@ type administrator struct {
 	cli *sdk.Client
 }
 
-func (m *administrator) New(u platform.UserOption) (r domain.PlatformUser, err error) {
+func (m *administrator) New(u platform.UserOption) (r userdomain.PlatformUser, err error) {
 	name := u.Name.Account()
 	email := u.Email.Email()
 	pass := u.Password.Password()
@@ -75,7 +75,7 @@ func (m *administrator) New(u platform.UserOption) (r domain.PlatformUser, err e
 	return
 }
 
-func (m *administrator) NewToken(u domain.PlatformUser) (string, error) {
+func (m *administrator) NewToken(u userdomain.PlatformUser) (string, error) {
 	uid, err := strconv.Atoi(u.Id)
 	if err != nil {
 		return "", err

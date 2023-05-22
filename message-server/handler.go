@@ -16,6 +16,8 @@ import (
 	bigmodelmessage "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
+	userapp "github.com/opensourceways/xihe-server/user/app"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -42,7 +44,7 @@ type handler struct {
 	maxRetry         int
 	trainingEndpoint string
 
-	user      app.UserService
+	user      userapp.UserService
 	model     app.ModelMessageService
 	dataset   app.DatasetMessageService
 	project   app.ProjectMessageService
@@ -136,7 +138,7 @@ func (h *handler) getHandlerForEventRelatedResource(
 	return
 }
 
-func (h *handler) HandleEventAddFollowing(f *domain.FollowerInfo) error {
+func (h *handler) HandleEventAddFollowing(f *userdomain.FollowerInfo) error {
 	return h.do(func(bool) (err error) {
 		if err = h.user.AddFollower(f); err == nil {
 			return
@@ -150,7 +152,7 @@ func (h *handler) HandleEventAddFollowing(f *domain.FollowerInfo) error {
 	})
 }
 
-func (h *handler) HandleEventRemoveFollowing(f *domain.FollowerInfo) (err error) {
+func (h *handler) HandleEventRemoveFollowing(f *userdomain.FollowerInfo) (err error) {
 	return h.do(func(bool) error {
 		return h.user.RemoveFollower(f)
 	})

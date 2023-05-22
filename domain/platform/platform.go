@@ -4,6 +4,7 @@ import (
 	"io"
 
 	"github.com/opensourceways/xihe-server/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 type UserOption struct {
@@ -13,8 +14,8 @@ type UserOption struct {
 }
 
 type User interface {
-	New(UserOption) (domain.PlatformUser, error)
-	NewToken(domain.PlatformUser) (string, error)
+	New(UserOption) (userdomain.PlatformUser, error)
+	NewToken(userdomain.PlatformUser) (string, error)
 }
 
 type RepoOption struct {

@@ -27,6 +27,8 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	userapp "github.com/opensourceways/xihe-server/user/app"
+	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
 type options struct {
@@ -105,16 +107,14 @@ func main() {
 func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	collections := &cfg.Mongodb.Collections
 
-	userRepo := repositories.NewUserRepository(
-		mongodb.NewUserMapper(collections.User),
-	)
+	userRepo := userrepo.NewUserRepo(mongodb.NewCollection(collections.User))
 
 	h := &handler{
 		log:              log,
 		maxRetry:         cfg.MaxRetry,
 		trainingEndpoint: cfg.TrainingEndpoint,
 
-		user: app.NewUserService(userRepo, nil, nil),
+		user: userapp.NewUserService(userRepo, nil, nil),
 
 		project: app.NewProjectMessageService(
 			repositories.NewProjectRepository(

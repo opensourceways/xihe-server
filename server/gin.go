@@ -13,6 +13,7 @@ import (
 
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
+	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 	bigmodelasynccli "github.com/opensourceways/xihe-server/bigmodel/infrastructure/asynccli"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
@@ -38,7 +39,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
-	"github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
@@ -85,8 +85,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		mongodb.NewDatasetMapper(collections.Dataset),
 	)
 
-	user := repositories.NewUserRepository(
-		mongodb.NewUserMapper(collections.User),
+	// user := repositories.NewUserRepository(
+	// 	mongodb.NewUserMapper(collections.User),
+	// )
+	user := userrepoimpl.NewUserRepo(
+		mongodb.NewCollection(collections.User),
 	)
 
 	login := repositories.NewLoginRepository(
@@ -152,8 +155,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	uploader := competitionimpl.NewCompetitionService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)
 
-	userAppService := userapp.NewUserService(
-		repositoryimpl.NewUserRegRepo(
+	userRegService := userapp.NewRegService(
+		userrepoimpl.NewUserRegRepo(
 			mongodb.NewCollection(collections.Registration),
 		),
 	)
@@ -168,7 +171,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	)
 
 	courseAppService := courseapp.NewCourseService(
-		usercli.NewUserCli(userAppService),
+		usercli.NewUserCli(userRegService),
 		proj,
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
@@ -266,7 +269,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForCourseController(
-			v1, courseAppService, userAppService, proj, user,
+			v1, courseAppService, userRegService, proj, user,
 		)
 
 		controller.AddRouterForHomeController(
