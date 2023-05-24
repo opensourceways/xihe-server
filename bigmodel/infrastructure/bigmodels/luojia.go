@@ -12,13 +12,13 @@ import (
 )
 
 type luojiaHFResp struct {
-	status int    `json:"status"`
-	msg    string `json:"msg"`
-	result string `json:"result"`
+	Status int    `json:"status"`
+	Msg    string `json:"msg"`
+	Result string `json:"result"`
 }
 
-func (r *luojiaHFResp) Result() string {
-	return r.result
+func (r *luojiaHFResp) result() string {
+	return r.Result
 }
 
 type luojiaInfo struct {
@@ -128,6 +128,8 @@ func (s *service) sendReqToLuoJiaHF(endpoint string, f io.Reader) (res string, e
 		return "", err
 	}
 
+	writer.Close()
+
 	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
 	if err != nil {
 		return "", err
@@ -142,10 +144,9 @@ func (s *service) sendReqToLuoJiaHF(endpoint string, f io.Reader) (res string, e
 	req.Header.Set("Content-Type", writer.FormDataContentType())
 
 	resp := new(luojiaHFResp)
-
 	if _, err = s.hc.ForwardTo(req, resp); err != nil {
 		return "", err
 	}
 
-	return resp.Result(), nil
+	return resp.result(), nil
 }
