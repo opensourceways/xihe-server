@@ -23,6 +23,7 @@ const (
 	errorCodeError          = "email_code_error"
 	errorEmailDuplicateBind = "email_email_duplicate_bind"
 	errorUserDuplicateBind  = "email_user_duplicate_bind"
+	errorEmailDuplicateSend = "email_email_duplicate_send"
 )
 
 type managerBody struct {
@@ -191,6 +192,11 @@ func errorReturn(err error) (code string) {
 
 	if strings.Contains(errinfo, "E00016") {
 		code = errorUserDuplicateBind
+		return
+	}
+
+	if strings.Contains(errinfo, "E00049") {
+		code = errorEmailDuplicateSend
 		return
 	}
 
