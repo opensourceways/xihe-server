@@ -63,6 +63,7 @@ type Endpoints struct {
 	VQAHF            string `json:"vqa_hf"             required:"true"`
 	Pangu            string `json:"pangu"              required:"true"`
 	LuoJia           string `json:"luojia"             required:"true"`
+	LuoJiaHF         string `json:"luojia_hf"          required:"true"`
 	WuKong           string `json:"wukong"             required:"true"`
 	WuKong4IMG       string `json:"wukong_4img"        required:"true"`
 	WuKongHF         string `json:"wukong_hf"          required:"true"`

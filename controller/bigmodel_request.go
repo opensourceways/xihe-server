@@ -10,9 +10,10 @@ import (
 )
 
 const (
-	temp_account        = "wukong_icbc"
-	temp_account_hf     = "wukong_hf"
-	temp_account_vqa_hf = "vqa_hf"
+	temp_account           = "wukong_icbc"
+	temp_account_hf        = "wukong_hf"
+	temp_account_vqa_hf    = "vqa_hf"
+	temp_account_luojia_hf = "luojia_hf"
 )
 
 type describePictureResp struct {
@@ -87,6 +88,24 @@ func (req *questionAskHFReq) toCmd() (
 	cmd.Picture = req.Picture
 
 	cmd.Ask = req.Question
+
+	err = cmd.Validate()
+
+	return
+}
+
+type luojiaHFReq struct {
+	Picture io.Reader `json:"picture"`
+}
+
+func (req *luojiaHFReq) toCmd() (
+	cmd app.LuoJiaHFCmd, err error,
+) {
+	if cmd.User, err = types.NewAccount(temp_account_luojia_hf); err != nil {
+		return
+	}
+
+	cmd.Picture = req.Picture
 
 	err = cmd.Validate()
 

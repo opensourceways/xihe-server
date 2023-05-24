@@ -8,6 +8,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 type DescribePictureCmd struct {
@@ -25,6 +26,19 @@ type VQAHFCmd struct {
 
 func (cmd *VQAHFCmd) Validate() error {
 	if cmd.Picture == nil || cmd.Ask == "" {
+		return errors.New("invalid cmd")
+	}
+
+	return nil
+}
+
+type LuoJiaHFCmd struct {
+	User    userdomain.Account
+	Picture io.Reader
+}
+
+func (cmd *LuoJiaHFCmd) Validate() error {
+	if cmd.Picture == nil {
 		return errors.New("invalid cmd")
 	}
 

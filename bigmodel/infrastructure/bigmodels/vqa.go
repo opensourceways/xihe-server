@@ -110,7 +110,7 @@ func (s *service) VQAUploadPicture(f io.Reader, user types.Account, fileName str
 func (s *service) AskHF(f io.Reader, user types.Account, ask string) (string, error) {
 	buf := new(bytes.Buffer)
 	writer := multipart.NewWriter(buf)
-	file, err := writer.CreateFormFile("file", "WechatIMG2645.jpeg")
+	file, err := writer.CreateFormFile("file", "filename")
 	if err != nil {
 		return "", err
 	}

@@ -34,6 +34,7 @@ type BigModelService interface {
 	LuoJiaUploadPicture(io.Reader, types.Account) error
 	LuoJia(types.Account) (string, error)
 	ListLuoJiaRecord(types.Account) ([]LuoJiaRecordDTO, error)
+	LuoJiaHF(*LuoJiaHFCmd) (string, error)
 
 	// pangu
 	PanGu(types.Account, string) (string, string, error)

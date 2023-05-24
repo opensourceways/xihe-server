@@ -46,6 +46,7 @@ type BigModel interface {
 	// luojia
 	LuoJiaUploadPicture(f io.Reader, u types.Account) error
 	LuoJia(string) (string, error)
+	LuoJiaHF(io.Reader) (string, error)
 
 	// pangu
 	PanGu(string) (string, error)

@@ -32,6 +32,7 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/ask_hf", ctl.AskHF)
 	rg.POST("/v1/bigmodel/pangu", ctl.PanGu)
 	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
+	rg.POST("/v1/bigmodel/luojia_hf", ctl.LuoJiaHF)
 	rg.POST("/v1/bigmodel/codegeex", ctl.CodeGeex)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
 	rg.POST("/v1/bigmodel/wukong_hf", ctl.WuKongHF)
@@ -365,6 +366,62 @@ func (ctl *BigModelController) LuoJia(ctx *gin.Context) {
 	}
 
 	if v, err := ctl.s.LuoJia(pl.DomainAccount()); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPost(ctx, luojiaResp{v})
+	}
+}
+
+// @Title LuoJiaHF
+// @Description luojia for hf
+// @Tags  BigModel
+// @Param	picture		formData 	file	true	"picture"
+// @Accept json
+// @Success 201 {object} describePictureResp
+// @Failure 500 system_error        system error
+// @Router /v1/bigmodel/luojia_hf [post]
+func (ctl *BigModelController) LuoJiaHF(ctx *gin.Context) {
+	_, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
+	req := luojiaHFReq{}
+
+	// get picture
+	f, err := ctx.FormFile("picture")
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if f.Size > apiConfig.MaxPictureSizeToDescribe {
+		ctl.sendBadRequestParamWithMsg(ctx, "too big picture")
+
+		return
+	}
+
+	p, err := f.Open()
+	if err != nil {
+		ctl.sendBadRequestParamWithMsg(ctx, "can't get picture")
+
+		return
+	}
+
+	defer p.Close()
+
+	req.Picture = p
+
+	var cmd app.LuoJiaHFCmd
+	if cmd, err = req.toCmd(); err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	v, err := ctl.s.LuoJiaHF(&cmd)
+	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
 		ctl.sendRespOfPost(ctx, luojiaResp{v})
