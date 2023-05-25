@@ -60,14 +60,14 @@ type BigModelController struct {
 	s app.BigModelService
 }
 
-// @Title DescribePicture
-// @Description describe a picture
-// @Tags  BigModel
-// @Param	picture		formData 	file	true	"picture"
-// @Accept json
-// @Success 201 {object} describePictureResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/describe_picture [post]
+//	@Title			DescribePicture
+//	@Description	describe a picture
+//	@Tags			BigModel
+//	@Param			picture	formData	file	true	"picture"
+//	@Accept			json
+//	@Success		201	{object}		describePictureResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/describe_picture [post]
 func (ctl *BigModelController) DescribePicture(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -104,14 +104,14 @@ func (ctl *BigModelController) DescribePicture(ctx *gin.Context) {
 	}
 }
 
-// @Title DescribePicture
-// @Description describe a picture for hf
-// @Tags  BigModel
-// @Param	picture		formData 	file	true	"picture"
-// @Accept json
-// @Success 201 {object} describePictureResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/describe_picture_hf [post]
+//	@Title			DescribePicture
+//	@Description	describe a picture for hf
+//	@Tags			BigModel
+//	@Param			picture	formData	file	true	"picture"
+//	@Accept			json
+//	@Success		201	{object}		describePictureResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/describe_picture_hf [post]
 func (ctl *BigModelController) DescribePictureHF(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -155,14 +155,14 @@ func (ctl *BigModelController) DescribePictureHF(ctx *gin.Context) {
 	}
 }
 
-// @Title GenSinglePicture
-// @Description generate a picture based on a text
-// @Tags  BigModel
-// @Param	body	body 	pictureGenerateRequest	true	"body of generating picture"
-// @Accept json
-// @Success 201 {object} pictureGenerateResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/single_picture [post]
+//	@Title			GenSinglePicture
+//	@Description	generate a picture based on a text
+//	@Tags			BigModel
+//	@Param			body	body	pictureGenerateRequest	true	"body of generating picture"
+//	@Accept			json
+//	@Success		201	{object}		pictureGenerateResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/single_picture [post]
 func (ctl *BigModelController) GenSinglePicture(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -190,14 +190,14 @@ func (ctl *BigModelController) GenSinglePicture(ctx *gin.Context) {
 	}
 }
 
-// @Title GenMultiplePictures
-// @Description generate multiple pictures based on a text
-// @Tags  BigModel
-// @Param	body	body 	pictureGenerateRequest	true	"body of generating picture"
-// @Accept json
-// @Success 201 {object} multiplePicturesGenerateResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/multiple_pictures [post]
+//	@Title			GenMultiplePictures
+//	@Description	generate multiple pictures based on a text
+//	@Tags			BigModel
+//	@Param			body	body	pictureGenerateRequest	true	"body of generating picture"
+//	@Accept			json
+//	@Success		201	{object}		multiplePicturesGenerateResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/multiple_pictures [post]
 func (ctl *BigModelController) GenMultiplePictures(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -225,14 +225,14 @@ func (ctl *BigModelController) GenMultiplePictures(ctx *gin.Context) {
 	}
 }
 
-// @Title Ask
-// @Description ask question based on a picture
-// @Tags  BigModel
-// @Param	body	body 	questionAskRequest	true	"body of ask question"
-// @Accept json
-// @Success 201 {object} questionAskResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/ask [post]
+//	@Title			Ask
+//	@Description	ask question based on a picture
+//	@Tags			BigModel
+//	@Param			body	body	questionAskRequest	true	"body of ask question"
+//	@Accept			json
+//	@Success		201	{object}		questionAskResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/ask [post]
 func (ctl *BigModelController) Ask(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -264,14 +264,14 @@ func (ctl *BigModelController) Ask(ctx *gin.Context) {
 	}
 }
 
-// @Title AskHF
-// @Description vqa for hf
-// @Tags  BigModel
-// @Param	picture		formData 	file	true	"picture"
-// @Accept json
-// @Success 201 {object} describePictureResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/ask_hf [post]
+//	@Title			AskHF
+//	@Description	vqa for hf
+//	@Tags			BigModel
+//	@Param			picture	formData	file	true	"picture"
+//	@Accept			json
+//	@Success		201	{object}		describePictureResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/ask_hf [post]
 func (ctl *BigModelController) AskHF(ctx *gin.Context) {
 	_, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -323,14 +323,14 @@ func (ctl *BigModelController) AskHF(ctx *gin.Context) {
 	}
 }
 
-// @Title PanGu
-// @Description pan-gu big model
-// @Tags  BigModel
-// @Param	body	body 	panguRequest	true	"body of pan-gu"
-// @Accept json
-// @Success 201 {object} panguResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/pangu [post]
+//	@Title			PanGu
+//	@Description	pan-gu big model
+//	@Tags			BigModel
+//	@Param			body	body	panguRequest	true	"body of pan-gu"
+//	@Accept			json
+//	@Success		201	{object}		panguResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/pangu [post]
 func (ctl *BigModelController) PanGu(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -352,13 +352,13 @@ func (ctl *BigModelController) PanGu(ctx *gin.Context) {
 	}
 }
 
-// @Title LuoJia
-// @Description luo-jia big model
-// @Tags  BigModel
-// @Accept json
-// @Success 201 {object} luojiaResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/luojia [post]
+//	@Title			LuoJia
+//	@Description	luo-jia big model
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		201	{object}		luojiaResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/luojia [post]
 func (ctl *BigModelController) LuoJia(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -372,14 +372,14 @@ func (ctl *BigModelController) LuoJia(ctx *gin.Context) {
 	}
 }
 
-// @Title LuoJiaHF
-// @Description luojia for hf
-// @Tags  BigModel
-// @Param	picture		formData 	file	true	"picture"
-// @Accept json
-// @Success 201 {object} describePictureResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/luojia_hf [post]
+//	@Title			LuoJiaHF
+//	@Description	luojia for hf
+//	@Tags			BigModel
+//	@Param			picture	formData	file	true	"picture"
+//	@Accept			json
+//	@Success		201	{object}		describePictureResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/luojia_hf [post]
 func (ctl *BigModelController) LuoJiaHF(ctx *gin.Context) {
 	_, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -428,13 +428,13 @@ func (ctl *BigModelController) LuoJiaHF(ctx *gin.Context) {
 	}
 }
 
-// @Title ListLuoJiaRecord
-// @Description list luo-jia big model records
-// @Tags  BigModel
-// @Accept json
-// @Success 200 {object} app.LuoJiaRecordDTO
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/luojia [get]
+//	@Title			ListLuoJiaRecord
+//	@Description	list luo-jia big model records
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		app.LuoJiaRecordDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/luojia [get]
 func (ctl *BigModelController) ListLuoJiaRecord(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -448,14 +448,14 @@ func (ctl *BigModelController) ListLuoJiaRecord(ctx *gin.Context) {
 	}
 }
 
-// @Title CodeGeex
-// @Description codegeex big model
-// @Tags  BigModel
-// @Param	body	body 	CodeGeexRequest		true	"codegeex body"
-// @Accept json
-// @Success 201 {object} app.CodeGeexDTO
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/codegeex [post]
+//	@Title			CodeGeex
+//	@Description	codegeex big model
+//	@Tags			BigModel
+//	@Param			body	body	CodeGeexRequest	true	"codegeex body"
+//	@Accept			json
+//	@Success		201	{object}		app.CodeGeexDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/codegeex [post]
 func (ctl *BigModelController) CodeGeex(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -484,14 +484,14 @@ func (ctl *BigModelController) CodeGeex(ctx *gin.Context) {
 	}
 }
 
-// @Title VQAUploadPicture
-// @Description upload a picture for vqa
-// @Tags  BigModel
-// @Param	picture		formData 	file	true	"picture"
-// @Accept json
-// @Success 201 {object} pictureUploadResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/vqa_upload_picture [post]
+//	@Title			VQAUploadPicture
+//	@Description	upload a picture for vqa
+//	@Tags			BigModel
+//	@Param			picture	formData	file	true	"picture"
+//	@Accept			json
+//	@Success		201	{object}		pictureUploadResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/vqa_upload_picture [post]
 func (ctl *BigModelController) VQAUploadPicture(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -533,14 +533,14 @@ func (ctl *BigModelController) VQAUploadPicture(ctx *gin.Context) {
 	}
 }
 
-// @Title LuoJiaUploadPicture
-// @Description upload a picture for luo-jia
-// @Tags  BigModel
-// @Param	picture		formData 	file	true	"picture"
-// @Accept json
-// @Success 201 {object} pictureUploadResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/luojia_upload_picture [post]
+//	@Title			LuoJiaUploadPicture
+//	@Description	upload a picture for luo-jia
+//	@Tags			BigModel
+//	@Param			picture	formData	file	true	"picture"
+//	@Accept			json
+//	@Success		201	{object}		pictureUploadResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/luojia_upload_picture [post]
 func (ctl *BigModelController) LuoJiaUploadPicture(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -574,14 +574,14 @@ func (ctl *BigModelController) LuoJiaUploadPicture(ctx *gin.Context) {
 	}
 }
 
-// @Title GenWuKongSamples
-// @Description gen wukong samples
-// @Tags  BigModel
-// @Param	batch	path 	int	true	"batch num"
-// @Accept json
-// @Success 201
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/samples/{batch} [get]
+//	@Title			GenWuKongSamples
+//	@Description	gen wukong samples
+//	@Tags			BigModel
+//	@Param			batch	path	int	true	"batch num"
+//	@Accept			json
+//	@Success		201
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/samples/{batch} [get]
 func (ctl *BigModelController) GenWuKongSamples(ctx *gin.Context) {
 	if _, _, ok := ctl.checkUserApiToken(ctx, false); !ok {
 		return
@@ -603,14 +603,14 @@ func (ctl *BigModelController) GenWuKongSamples(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKong
-// @Description generates pictures by WuKong
-// @Tags  BigModel
-// @Param	body	body 	wukongRequest	true	"body of wukong"
-// @Accept json
-// @Success 201 {object} wukongPicturesGenerateResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong [post]
+//	@Title			WuKong
+//	@Description	generates pictures by WuKong
+//	@Tags			BigModel
+//	@Param			body	body	wukongRequest	true	"body of wukong"
+//	@Accept			json
+//	@Success		201	{object}		wukongPicturesGenerateResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong [post]
 func (ctl *BigModelController) WuKong(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -638,15 +638,15 @@ func (ctl *BigModelController) WuKong(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKong
-// @Description generates pictures by WuKong-hf
-// @Tags  BigModel
-// @Param	body	body 	wukongHFRequest	true	"body of wukong"
-// @Accept json
-// @Success 201 {object} wukongPicturesGenerateResp
-// @Failure 500 system_error        system error
-// @Failure 404 bigmodel_sensitive_info		picture error
-// @Router /v1/bigmodel/wukong_hf [post]
+//	@Title			WuKong
+//	@Description	generates pictures by WuKong-hf
+//	@Tags			BigModel
+//	@Param			body	body	wukongHFRequest	true	"body of wukong"
+//	@Accept			json
+//	@Success		201	{object}				wukongPicturesGenerateResp
+//	@Failure		500	system_error			system	error
+//	@Failure		404	bigmodel_sensitive_info	picture	error
+//	@Router			/v1/bigmodel/wukong_hf [post]
 func (ctl *BigModelController) WuKongHF(ctx *gin.Context) {
 	_, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -674,15 +674,15 @@ func (ctl *BigModelController) WuKongHF(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKong
-// @Description generates pictures by WuKong-icbc
-// @Tags  BigModel
-// @Param	body	body 	wukongICBCRequest	true	"body of wukong"
-// @Accept json
-// @Success 201 {object} wukongPicturesGenerateResp
-// @Failure 500 system_error        system error
-// @Failure 404 bigmodel_sensitive_info		picture error
-// @Router /v1/bigmodel/wukong_icbc [post]
+//	@Title			WuKong
+//	@Description	generates pictures by WuKong-icbc
+//	@Tags			BigModel
+//	@Param			body	body	wukongICBCRequest	true	"body of wukong"
+//	@Accept			json
+//	@Success		201	{object}				wukongPicturesGenerateResp
+//	@Failure		500	system_error			system	error
+//	@Failure		404	bigmodel_sensitive_info	picture	error
+//	@Router			/v1/bigmodel/wukong_icbc [post]
 func (ctl *BigModelController) WuKongICBC(ctx *gin.Context) {
 	_, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -710,14 +710,14 @@ func (ctl *BigModelController) WuKongICBC(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKong
-// @Description send async wukong request task
-// @Tags  BigModel
-// @Param	body	body 	wukongRequest	true	"body of wukong"
-// @Accept json
-// @Success 201 {object} wukongPicturesGenerateResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong_async [post]
+//	@Title			WuKong
+//	@Description	send async wukong request task
+//	@Tags			BigModel
+//	@Param			body	body	wukongRequest	true	"body of wukong"
+//	@Accept			json
+//	@Success		201	{object}		wukongPicturesGenerateResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong_async [post]
 func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -745,13 +745,13 @@ func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKong
-// @Description get wukong rank
-// @Tags  BigModel
-// @Accept json
-// @Success 200 {object} app.WuKongRankDTO
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/rank [get]
+//	@Title			WuKong
+//	@Description	get wukong rank
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		app.WuKongRankDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/rank [get]
 func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 	token := ctx.GetHeader(headerSecWebsocket)
 	if token == "" {
@@ -811,13 +811,13 @@ func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 	}
 }
 
-// @Title WuKong
-// @Description get last finished task
-// @Tags  BigModel
-// @Accept json
-// @Success 200 {object} app.WuKongRankDTO
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/task [get]
+//	@Title			WuKong
+//	@Description	get last finished task
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		app.WuKongRankDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/task [get]
 func (ctl *BigModelController) WuKongLastFinisedTask(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -832,13 +832,13 @@ func (ctl *BigModelController) WuKongLastFinisedTask(ctx *gin.Context) {
 	}
 }
 
-// @Title AddLike
-// @Description add like to wukong picture
-// @Tags  BigModel
-// @Accept json
-// @Success 202 {object} wukongAddLikeResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/like [post]
+//	@Title			AddLike
+//	@Description	add like to wukong picture
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		202	{object}		wukongAddLikeResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/like [post]
 func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -874,14 +874,14 @@ func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 	}
 }
 
-// @Title CancelLike
-// @Description cancel like on wukong picture
-// @Tags  BigModel
-// @Param	id	path 	string	true	"picture id"
-// @Accept json
-// @Success 204
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/like/{id} [delete]
+//	@Title			CancelLike
+//	@Description	cancel like on wukong picture
+//	@Tags			BigModel
+//	@Param			id	path	string	true	"picture id"
+//	@Accept			json
+//	@Success		204
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/like/{id} [delete]
 func (ctl *BigModelController) CancelLike(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -898,14 +898,14 @@ func (ctl *BigModelController) CancelLike(ctx *gin.Context) {
 	}
 }
 
-// @Title CancelPublic
-// @Description cancel public on wukong picture
-// @Tags  BigModel
-// @Param	id	path 	string	true	"picture id"
-// @Accept json
-// @Success 204
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/public/{id} [delete]
+//	@Title			CancelPublic
+//	@Description	cancel public on wukong picture
+//	@Tags			BigModel
+//	@Param			id	path	string	true	"picture id"
+//	@Accept			json
+//	@Success		204
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/public/{id} [delete]
 func (ctl *BigModelController) CancelPublic(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -922,13 +922,13 @@ func (ctl *BigModelController) CancelPublic(ctx *gin.Context) {
 	}
 }
 
-// @Title ListLike
-// @Description list wukong pictures user liked
-// @Tags  BigModel
-// @Accept json
-// @Success 200 {object} app.WuKongLikeDTO
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong [get]
+//	@Title			ListLike
+//	@Description	list wukong pictures user liked
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		app.WuKongLikeDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong [get]
 func (ctl *BigModelController) ListLike(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -943,13 +943,13 @@ func (ctl *BigModelController) ListLike(ctx *gin.Context) {
 	}
 }
 
-// @Title AddDigg
-// @Description add digg to wukong picture
-// @Tags  BigModel
-// @Accept json
-// @Success 202 {object} wukongDiggResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/digg [post]
+//	@Title			AddDigg
+//	@Description	add digg to wukong picture
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		202	{object}		wukongDiggResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/digg [post]
 func (ctl *BigModelController) AddDigg(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -975,14 +975,14 @@ func (ctl *BigModelController) AddDigg(ctx *gin.Context) {
 	}
 }
 
-// @Title CancelDigg
-// @Description delete digg to wukong picture
-// @Tags  BigModel
-// @Param	body	body 	wukongCancelDiggPublicRequest	true	"body of wukong"
-// @Accept json
-// @Success 202 {object} wukongDiggResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/digg [delete]
+//	@Title			CancelDigg
+//	@Description	delete digg to wukong picture
+//	@Tags			BigModel
+//	@Param			body	body	wukongCancelDiggPublicRequest	true	"body of wukong"
+//	@Accept			json
+//	@Success		202	{object}		wukongDiggResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/digg [delete]
 func (ctl *BigModelController) CancelDigg(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -1008,13 +1008,13 @@ func (ctl *BigModelController) CancelDigg(ctx *gin.Context) {
 	}
 }
 
-// @Title AddPublic
-// @Description add public to wukong picture
-// @Tags  BigModel
-// @Accept json
-// @Success 202 {object} wukongAddPublicResp
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/public [post]
+//	@Title			AddPublic
+//	@Description	add public to wukong picture
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		202	{object}		wukongAddPublicResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/public [post]
 func (ctl *BigModelController) AddPublic(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -1054,13 +1054,13 @@ func (ctl *BigModelController) AddPublic(ctx *gin.Context) {
 	}
 }
 
-// @Title ListPublic
-// @Description list wukong pictures user publiced
-// @Tags  BigModel
-// @Accept json
-// @Success 200 {object} app.WuKongPublicDTO
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/public [get]
+//	@Title			ListPublic
+//	@Description	list wukong pictures user publiced
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		app.WuKongPublicDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/public [get]
 func (ctl *BigModelController) ListPublic(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -1075,13 +1075,13 @@ func (ctl *BigModelController) ListPublic(ctx *gin.Context) {
 	}
 }
 
-// @Title GetPublicGlobal
-// @Description list all wukong pictures publiced
-// @Tags  BigModel
-// @Accept json
-// @Success 200 {object} app.WuKongPublicDTO
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/publics [get]
+//	@Title			GetPublicGlobal
+//	@Description	list all wukong pictures publiced
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		app.WuKongPublicDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/publics [get]
 func (ctl *BigModelController) GetPublicsGlobal(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -1134,14 +1134,14 @@ func (ctl *BigModelController) GetPublicsGlobal(ctx *gin.Context) {
 	}
 }
 
-// @Title GenDownloadURL
-// @Description generate download url of wukong picture
-// @Tags  BigModel
-// @Param	body	body 	wukongPictureLink	true	"body of wukong"
-// @Accept json
-// @Success 202 {object} wukongPictureLink
-// @Failure 500 system_error        system error
-// @Router /v1/bigmodel/wukong/link [put]
+//	@Title			GenDownloadURL
+//	@Description	generate download url of wukong picture
+//	@Tags			BigModel
+//	@Param			body	body	wukongPictureLink	true	"body of wukong"
+//	@Accept			json
+//	@Success		202	{object}		wukongPictureLink
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/link [put]
 func (ctl *BigModelController) GenDownloadURL(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {

@@ -35,13 +35,13 @@ type ChallengeController struct {
 	s app.ChallengeService
 }
 
-// @Summary Get
-// @Description get detail of challenge
-// @Tags  Challenge
-// @Accept json
-// @Success 200 {object} app.ChallengeCompetitorInfoDTO
-// @Failure 500 system_error        system error
-// @Router /v1/challenge [get]
+//	@Summary		Get
+//	@Description	get detail of challenge
+//	@Tags			Challenge
+//	@Accept			json
+//	@Success		200	{object}		app.ChallengeCompetitorInfoDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/challenge [get]
 func (ctl *ChallengeController) Get(ctx *gin.Context) {
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -61,13 +61,13 @@ func (ctl *ChallengeController) Get(ctx *gin.Context) {
 	}
 }
 
-// @Summary GetRankingList
-// @Description get ranking list of challenge
-// @Tags  Challenge
-// @Accept json
-// @Success 200 {object} app.ChallengeRankingDTO
-// @Failure 500 system_error        system error
-// @Router /v1/challenge/ranking [get]
+//	@Summary		GetRankingList
+//	@Description	get ranking list of challenge
+//	@Tags			Challenge
+//	@Accept			json
+//	@Success		200	{object}		app.ChallengeRankingDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/challenge/ranking [get]
 func (ctl *ChallengeController) GetRankingList(ctx *gin.Context) {
 	data, err := ctl.s.GetRankingList()
 	if err != nil {
@@ -77,14 +77,14 @@ func (ctl *ChallengeController) GetRankingList(ctx *gin.Context) {
 	}
 }
 
-// @Summary Apply
-// @Description apply the challenge
-// @Tags  Challenge
-// @Param	body	body	competitorApplyRequest	true	"body of applying"
-// @Accept json
-// @Success 201
-// @Failure 500 system_error        system error
-// @Router /v1/challenge/competitor [post]
+//	@Summary		Apply
+//	@Description	apply the challenge
+//	@Tags			Challenge
+//	@Param			body	body	competitorApplyRequest	true	"body of applying"
+//	@Accept			json
+//	@Success		201
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/challenge/competitor [post]
 func (ctl *ChallengeController) Apply(ctx *gin.Context) {
 	req := competitorApplyRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -117,13 +117,13 @@ func (ctl *ChallengeController) Apply(ctx *gin.Context) {
 	}
 }
 
-// @Summary GetAIQuestions
-// @Description get ai questions
-// @Tags  Challenge
-// @Accept json
-// @Success 200 {object} app.AIQuestionDTO
-// @Failure 500 system_error        system error
-// @Router /v1/challenge/aiquestions [get]
+//	@Summary		GetAIQuestions
+//	@Description	get ai questions
+//	@Tags			Challenge
+//	@Accept			json
+//	@Success		200	{object}		app.AIQuestionDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/challenge/aiquestions [get]
 func (ctl *ChallengeController) GetAIQuestions(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -137,14 +137,14 @@ func (ctl *ChallengeController) GetAIQuestions(ctx *gin.Context) {
 	}
 }
 
-// @Summary Submit
-// @Description submit answer of ai question
-// @Tags  Challenge
-// @Param	body	body	aiQuestionAnswerSubmitRequest	true	"body of ai question answer"
-// @Accept json
-// @Success 201 {object} aiQuestionAnswerSubmitResp
-// @Failure 500 system_error        system error
-// @Router /v1/challenge/aiquestions [post]
+//	@Summary		Submit
+//	@Description	submit answer of ai question
+//	@Tags			Challenge
+//	@Param			body	body	aiQuestionAnswerSubmitRequest	true	"body of ai question answer"
+//	@Accept			json
+//	@Success		201	{object}		aiQuestionAnswerSubmitResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/challenge/aiquestions [post]
 func (ctl *ChallengeController) Submit(ctx *gin.Context) {
 	req := aiQuestionAnswerSubmitRequest{}
 

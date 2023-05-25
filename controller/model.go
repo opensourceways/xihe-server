@@ -62,15 +62,15 @@ type ModelController struct {
 	newPlatformRepository func(string, string) platform.Repository
 }
 
-// @Summary Check
-// @Description check whether the name can be applied to create a new model
-// @Tags  Model
-// @Param	owner	path	string	true	"owner of model"
-// @Param	name	path	string	true	"name of model"
-// @Accept json
-// @Success 200 {object} canApplyResourceNameResp
-// @Produce json
-// @Router /v1/model/{owner}/{name}/check [get]
+//	@Summary		Check
+//	@Description	check whether the name can be applied to create a new model
+//	@Tags			Model
+//	@Param			owner	path	string	true	"owner of model"
+//	@Param			name	path	string	true	"name of model"
+//	@Accept			json
+//	@Success		200	{object}	canApplyResourceNameResp
+//	@Produce		json
+//	@Router			/v1/model/{owner}/{name}/check [get]
 func (ctl *ModelController) Check(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -108,17 +108,17 @@ func (ctl *ModelController) Check(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(canApplyResourceNameResp{b}))
 }
 
-// @Summary Create
-// @Description create model
-// @Tags  Model
-// @Param	body	body 	modelCreateRequest	true	"body of creating model"
-// @Accept json
-// @Success 201 {object} app.ModelDTO
-// @Failure 400 bad_request_body    can't parse request body
-// @Failure 400 bad_request_param   some parameter of body is invalid
-// @Failure 500 system_error        system error
-// @Failure 500 duplicate_creating  create model repeatedly
-// @Router /v1/model [post]
+//	@Summary		Create
+//	@Description	create model
+//	@Tags			Model
+//	@Param			body	body	modelCreateRequest	true	"body of creating model"
+//	@Accept			json
+//	@Success		201	{object}			app.ModelDTO
+//	@Failure		400	bad_request_body	can't	parse		request	body
+//	@Failure		400	bad_request_param	some	parameter	of		body	is	invalid
+//	@Failure		500	system_error		system	error
+//	@Failure		500	duplicate_creating	create	model	repeatedly
+//	@Router			/v1/model [post]
 func (ctl *ModelController) Create(ctx *gin.Context) {
 	req := modelCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -167,15 +167,15 @@ func (ctl *ModelController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newResponseData(d))
 }
 
-// @Summary Delete
-// @Description delete model
-// @Tags  Model
-// @Param	owner	path	string	true	"owner of model"
-// @Param	name	path	string	true	"name of model"
-// @Accept json
-// @Success 204
-// @Produce json
-// @Router /v1/model/{owner}/{name} [delete]
+//	@Summary		Delete
+//	@Description	delete model
+//	@Tags			Model
+//	@Param			owner	path	string	true	"owner of model"
+//	@Param			name	path	string	true	"name of model"
+//	@Accept			json
+//	@Success		204
+//	@Produce		json
+//	@Router			/v1/model/{owner}/{name} [delete]
 func (ctl *ModelController) Delete(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -227,14 +227,14 @@ func (ctl *ModelController) Delete(ctx *gin.Context) {
 	}
 }
 
-// @Summary Update
-// @Description update property of model
-// @Tags  Model
-// @Param	id	path	string			true	"id of model"
-// @Param	body	body 	modelUpdateRequest	true	"body of updating model"
-// @Accept json
-// @Produce json
-// @Router /v1/model/{owner}/{id} [put]
+//	@Summary		Update
+//	@Description	update property of model
+//	@Tags			Model
+//	@Param			id		path	string				true	"id of model"
+//	@Param			body	body	modelUpdateRequest	true	"body of updating model"
+//	@Accept			json
+//	@Produce		json
+//	@Router			/v1/model/{owner}/{id} [put]
 func (ctl *ModelController) Update(ctx *gin.Context) {
 	req := modelUpdateRequest{}
 
@@ -300,15 +300,15 @@ func (ctl *ModelController) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData(d))
 }
 
-// @Summary Get
-// @Description get model
-// @Tags  Model
-// @Param	owner	path	string	true	"owner of model"
-// @Param	name	path	string	true	"name of model"
-// @Accept json
-// @Success 200 {object} modelDetail
-// @Produce json
-// @Router /v1/model/{owner}/{name} [get]
+//	@Summary		Get
+//	@Description	get model
+//	@Tags			Model
+//	@Param			owner	path	string	true	"owner of model"
+//	@Param			name	path	string	true	"name of model"
+//	@Accept			json
+//	@Success		200	{object}	modelDetail
+//	@Produce		json
+//	@Router			/v1/model/{owner}/{name} [get]
 func (ctl *ModelController) Get(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -382,19 +382,19 @@ func (ctl *ModelController) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(detail))
 }
 
-// @Summary List
-// @Description list model
-// @Tags  Model
-// @Param	owner		path	string	true	"owner of model"
-// @Param	name		query	string	false	"name of model"
-// @Param	repo_type	query	string	false	"repo type of model, value can be public or private"
-// @Param	count_per_page	query	int	false	"count per page"
-// @Param	page_num	query	int	false	"page num which starts from 1"
-// @Param	sort_by		query	string	false	"sort keys, value can be update_time, first_letter, download_count"
-// @Accept json
-// @Success 200 {object} modelsInfo
-// @Produce json
-// @Router /v1/model/{owner} [get]
+//	@Summary		List
+//	@Description	list model
+//	@Tags			Model
+//	@Param			owner			path	string	true	"owner of model"
+//	@Param			name			query	string	false	"name of model"
+//	@Param			repo_type		query	string	false	"repo type of model, value can be public or private"
+//	@Param			count_per_page	query	int		false	"count per page"
+//	@Param			page_num		query	int		false	"page num which starts from 1"
+//	@Param			sort_by			query	string	false	"sort keys, value can be update_time, first_letter, download_count"
+//	@Accept			json
+//	@Success		200	{object}	modelsInfo
+//	@Produce		json
+//	@Router			/v1/model/{owner} [get]
 func (ctl *ModelController) List(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -458,20 +458,20 @@ func (ctl *ModelController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(&result))
 }
 
-// @Summary ListGlobal
-// @Description list global public model
-// @Tags  Model
-// @Param	name		query	string	false	"name of model"
-// @Param	tags		query	string	false	"tags, separate multiple tags with commas"
-// @Param	tag_kinds	query	string	false	"tag kinds, separate multiple kinds with commas"
-// @Param	level		query	string	false	"model level, such as official, good"
-// @Param	count_per_page	query	int	false	"count per page"
-// @Param	page_num	query	int	false	"page num which starts from 1"
-// @Param	sort_by		query	string	false	"sort keys, value can be update_time, first_letter, download_count"
-// @Accept json
-// @Success 200 {object} app.GlobalModelsDTO
-// @Produce json
-// @Router /v1/model [get]
+//	@Summary		ListGlobal
+//	@Description	list global public model
+//	@Tags			Model
+//	@Param			name			query	string	false	"name of model"
+//	@Param			tags			query	string	false	"tags, separate multiple tags with commas"
+//	@Param			tag_kinds		query	string	false	"tag kinds, separate multiple kinds with commas"
+//	@Param			level			query	string	false	"model level, such as official, good"
+//	@Param			count_per_page	query	int		false	"count per page"
+//	@Param			page_num		query	int		false	"page num which starts from 1"
+//	@Param			sort_by			query	string	false	"sort keys, value can be update_time, first_letter, download_count"
+//	@Accept			json
+//	@Success		200	{object}	app.GlobalModelsDTO
+//	@Produce		json
+//	@Router			/v1/model [get]
 func (ctl *ModelController) ListGlobal(ctx *gin.Context) {
 	cmd, err := ctl.getListGlobalResourceParameter(ctx)
 	if err != nil {
@@ -492,15 +492,15 @@ func (ctl *ModelController) ListGlobal(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(result))
 }
 
-// @Summary AddRelatedDataset
-// @Description add related dataset to model
-// @Tags  Model
-// @Param	owner	path	string				true	"owner of model"
-// @Param	id	path	string				true	"id of model"
-// @Param	body	body 	relatedResourceAddRequest	true	"body of related dataset"
-// @Accept json
-// @Success 202 {object} app.ResourceDTO
-// @Router /v1/model/relation/{owner}/{id}/dataset [put]
+//	@Summary		AddRelatedDataset
+//	@Description	add related dataset to model
+//	@Tags			Model
+//	@Param			owner	path	string						true	"owner of model"
+//	@Param			id		path	string						true	"id of model"
+//	@Param			body	body	relatedResourceAddRequest	true	"body of related dataset"
+//	@Accept			json
+//	@Success		202	{object}	app.ResourceDTO
+//	@Router			/v1/model/relation/{owner}/{id}/dataset [put]
 func (ctl *ModelController) AddRelatedDataset(ctx *gin.Context) {
 	req := relatedResourceAddRequest{}
 
@@ -558,15 +558,15 @@ func (ctl *ModelController) AddRelatedDataset(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(data)))
 }
 
-// @Summary RemoveRelatedDataset
-// @Description remove related dataset to model
-// @Tags  Model
-// @Param	owner	path	string				true	"owner of model"
-// @Param	id	path	string				true	"id of model"
-// @Param	body	body 	relatedResourceRemoveRequest	true	"body of related dataset"
-// @Accept json
-// @Success 204
-// @Router /v1/model/relation/{owner}/{id}/dataset [delete]
+//	@Summary		RemoveRelatedDataset
+//	@Description	remove related dataset to model
+//	@Tags			Model
+//	@Param			owner	path	string							true	"owner of model"
+//	@Param			id		path	string							true	"id of model"
+//	@Param			body	body	relatedResourceRemoveRequest	true	"body of related dataset"
+//	@Accept			json
+//	@Success		204
+//	@Router			/v1/model/relation/{owner}/{id}/dataset [delete]
 func (ctl *ModelController) RemoveRelatedDataset(ctx *gin.Context) {
 	req := relatedResourceRemoveRequest{}
 
@@ -606,15 +606,15 @@ func (ctl *ModelController) RemoveRelatedDataset(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
-// @Summary SetTags
-// @Description set tags for model
-// @Tags  Model
-// @Param	owner	path	string				true	"owner of model"
-// @Param	id	path	string				true	"id of model"
-// @Param	body	body 	resourceTagsUpdateRequest	true	"body of tags"
-// @Accept json
-// @Success 202
-// @Router /v1/model/{owner}/{id}/tags [put]
+//	@Summary		SetTags
+//	@Description	set tags for model
+//	@Tags			Model
+//	@Param			owner	path	string						true	"owner of model"
+//	@Param			id		path	string						true	"id of model"
+//	@Param			body	body	resourceTagsUpdateRequest	true	"body of tags"
+//	@Accept			json
+//	@Success		202
+//	@Router			/v1/model/{owner}/{id}/tags [put]
 func (ctl *ModelController) SetTags(ctx *gin.Context) {
 	req := resourceTagsUpdateRequest{}
 

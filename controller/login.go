@@ -83,16 +83,16 @@ type LoginController struct {
 	password domain.Password
 }
 
-// @Title Login
-// @Description callback of authentication by authing
-// @Tags  Login
-// @Param	code		query	string	true	"authing code"
-// @Param	redirect_uri	query	string	true	"redirect uri"
-// @Accept json
-// @Success 200 {object} app.UserDTO
-// @Failure 500 system_error         system error
-// @Failure 501 duplicate_creating   create user repeatedly which should not happen
-// @Router / [get]
+//	@Title			Login
+//	@Description	callback of authentication by authing
+//	@Tags			Login
+//	@Param			code			query	string	true	"authing code"
+//	@Param			redirect_uri	query	string	true	"redirect uri"
+//	@Accept			json
+//	@Success		200	{object}			app.UserDTO
+//	@Failure		500	system_error		system	error
+//	@Failure		501	duplicate_creating	create	user	repeatedly	which	should	not	happen
+//	@Router			/ [get]
 func (ctl *LoginController) Login(ctx *gin.Context) {
 	info, err := ctl.auth.GetByCode(
 		ctl.getQueryParameter(ctx, "code"),
@@ -197,16 +197,16 @@ func (ctl *LoginController) newUser(ctx *gin.Context, info authing.Login) (user 
 	return
 }
 
-// @Title Logout
-// @Description get info of login
-// @Tags  Login
-// @Param	account	path	string	true	"account"
-// @Accept json
-// @Success 200 {object} app.LoginDTO
-// @Failure 400 bad_request_param   account is invalid
-// @Failure 401 not_allowed         can't get login info of other user
-// @Failure 500 system_error        system error
-// @Router /{account} [get]
+//	@Title			Logout
+//	@Description	get info of login
+//	@Tags			Login
+//	@Param			account	path	string	true	"account"
+//	@Accept			json
+//	@Success		200	{object}			app.LoginDTO
+//	@Failure		400	bad_request_param	account	is	invalid
+//	@Failure		401	not_allowed			can't	get	login	info	of	other	user
+//	@Failure		500	system_error		system	error
+//	@Router			/{account} [get]
 func (ctl *LoginController) Logout(ctx *gin.Context) {
 	account, err := domain.NewAccount(ctx.Param("account"))
 	if err != nil {
