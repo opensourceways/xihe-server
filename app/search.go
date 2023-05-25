@@ -33,7 +33,10 @@ func newResourceSearchOption(name string) repository.ResourceSearchOption {
 		Name:   name,
 		TopNum: 3,
 	}
-	option.RepoType, _ = domain.NewRepoType(domain.RepoTypePublic)
+	type1, _ := domain.NewRepoType(domain.RepoTypePublic)
+	type2, _ := domain.NewRepoType(domain.RepoTypeOnline)
+	option.RepoType = append(option.RepoType, type1)
+	option.RepoType = append(option.RepoType, type2)
 
 	return option
 }

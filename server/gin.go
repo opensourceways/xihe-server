@@ -248,7 +248,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForRepoFileController(
-			v1, gitlabRepo, model, proj, dataset, sender,
+			v1, gitlabRepo, model, proj, dataset, sender, user, gitlabUser,
 		)
 
 		controller.AddRouterForInferenceController(

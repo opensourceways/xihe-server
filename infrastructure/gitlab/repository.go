@@ -36,11 +36,13 @@ func (r *repository) New(repo *platform.RepoOption) (string, error) {
 
 	var visibility sdk.VisibilityValue
 	switch repo.RepoType.RepoType() {
-	case domain.RepoTypePrivate:
+	case domain.RepoTypePublic:
+		visibility = sdk.PublicVisibility
+	case domain.RepoTypeOnline:
 		visibility = sdk.PrivateVisibility
 
 	default:
-		visibility = sdk.PublicVisibility
+		visibility = sdk.PrivateVisibility
 	}
 
 	name := repo.Name.ResourceName()

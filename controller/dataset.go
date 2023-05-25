@@ -416,11 +416,13 @@ func (ctl *DatasetController) List(ctx *gin.Context) {
 
 	if visitor || pl.isNotMe(owner) {
 		if cmd.RepoType == nil {
-			cmd.RepoType, _ = domain.NewRepoType(domain.RepoTypePublic)
+			type1, _ := domain.NewRepoType(domain.RepoTypePublic)
+			type2, _ := domain.NewRepoType(domain.RepoTypeOnline)
+			cmd.RepoType = append(cmd.RepoType, type1)
+			cmd.RepoType = append(cmd.RepoType, type2)
 		} else {
-			if cmd.RepoType.RepoType() != domain.RepoTypePublic {
+			if cmd.RepoType[0].RepoType() != domain.RepoTypePublic {
 				ctx.JSON(http.StatusOK, newResponseData(nil))
-
 				return
 			}
 		}

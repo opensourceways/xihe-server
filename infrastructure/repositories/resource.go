@@ -7,7 +7,7 @@ import (
 
 type ResourceListDO struct {
 	Name         string
-	RepoType     string
+	RepoType     []string
 	PageNum      int
 	CountPerPage int
 }
@@ -20,7 +20,9 @@ func toResourceListDO(r *repository.ResourceListOption) ResourceListDO {
 	}
 
 	if r.RepoType != nil {
-		do.RepoType = r.RepoType.RepoType()
+		for i := range r.RepoType {
+			do.RepoType = append(do.RepoType, r.RepoType[i].RepoType())
+		}
 	}
 
 	return do

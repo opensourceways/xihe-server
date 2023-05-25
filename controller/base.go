@@ -241,8 +241,14 @@ func (ctl baseController) getListResourceParameter(
 	}
 
 	if v := ctl.getQueryParameter(ctx, "repo_type"); v != "" {
-		if cmd.RepoType, err = domain.NewRepoType(v); err != nil {
-			return
+		r := strings.Split(v, "+")
+		for i := range r {
+			var t domain.RepoType
+			t, err = domain.NewRepoType(r[i])
+			if err != nil {
+				return
+			}
+			cmd.RepoType = append(cmd.RepoType, t)
 		}
 	}
 

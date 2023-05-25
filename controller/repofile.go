@@ -12,6 +12,8 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	uapp "github.com/opensourceways/xihe-server/user/app"
+	urepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForRepoFileController(
@@ -21,9 +23,12 @@ func AddRouterForRepoFileController(
 	project repository.Project,
 	dataset repository.Dataset,
 	sender message.Sender,
+	ru urepo.User,
+	pu platform.User,
 ) {
 	ctl := RepoFileController{
 		s:       app.NewRepoFileService(p, sender),
+		us:      uapp.NewUserService(ru, pu, sender),
 		model:   model,
 		project: project,
 		dataset: dataset,
@@ -43,6 +48,7 @@ type RepoFileController struct {
 	baseController
 
 	s       app.RepoFileService
+	us      uapp.UserService
 	model   repository.Model
 	project repository.Project
 	dataset repository.Dataset
@@ -320,6 +326,10 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 		return
 	}
 
+	if repoInfo.IsOnline() {
+		user, _ := ctl.us.GetByAccount(u.User)
+		u.Token = user.Platform.Token
+	}
 	v, err := ctl.s.Preview(&u, &info)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -398,8 +408,9 @@ func (ctl *RepoFileController) checkForView(ctx *gin.Context) (
 	}
 
 	viewOther := visitor || pl.isNotMe(user)
+	viewReadme := repoInfo.IsOnline() && ctx.Param("path") == "README.md"
 
-	if viewOther && repoInfo.IsPrivate() {
+	if viewOther && repoInfo.IsPrivate() && !viewReadme {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
 			errorResourceNotExists,
 			"can't access private project",

@@ -67,6 +67,10 @@ func (s *ResourceSummary) IsPrivate() bool {
 	return s.RepoType.RepoType() == RepoTypePrivate
 }
 
+func (s *ResourceSummary) IsOnline() bool {
+	return s.RepoType.RepoType() == RepoTypeOnline
+}
+
 func (s *ResourceSummary) ResourceIndex() ResourceIndex {
 	return ResourceIndex{
 		Owner: s.Owner,

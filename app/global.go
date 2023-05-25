@@ -2,8 +2,8 @@ package app
 
 import (
 	"github.com/opensourceways/xihe-server/domain"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 type GlobalResourceListCmd struct {
@@ -14,8 +14,10 @@ type GlobalResourceListCmd struct {
 
 func (cmd *GlobalResourceListCmd) toResourceListOption() repository.GlobalResourceListOption {
 	// only allow to list public resources.
-	cmd.RepoType, _ = domain.NewRepoType(domain.RepoTypePublic)
-
+	type1, _ := domain.NewRepoType(domain.RepoTypePublic)
+	type2, _ := domain.NewRepoType(domain.RepoTypeOnline)
+	cmd.RepoType = append(cmd.RepoType, type1)
+	cmd.RepoType = append(cmd.RepoType, type2)
 	return cmd.GlobalResourceListOption
 }
 
