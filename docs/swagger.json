@@ -145,7 +145,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.CodeGeexDTO"
+                            "$ref": "#/definitions/app.CodeGeexDTO"
                         }
                     },
                     "500": {
@@ -238,7 +238,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO"
+                            "$ref": "#/definitions/app.LuoJiaRecordDTO"
                         }
                     },
                     "500": {
@@ -496,7 +496,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongLikeDTO"
+                            "$ref": "#/definitions/app.WuKongLikeDTO"
                         }
                     },
                     "500": {
@@ -646,7 +646,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -706,7 +706,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO"
+                            "$ref": "#/definitions/app.WuKongPublicDTO"
                         }
                     },
                     "500": {
@@ -761,7 +761,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -785,7 +785,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO"
+                            "$ref": "#/definitions/app.WuKongPublicDTO"
                         }
                     },
                     "500": {
@@ -842,7 +842,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1108,7 +1108,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1197,7 +1197,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1277,7 +1277,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO"
+                            "$ref": "#/definitions/app.CompetitionSummaryDTO"
                         }
                     },
                     "500": {
@@ -1312,7 +1312,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.UserCompetitionDTO"
+                            "$ref": "#/definitions/app.UserCompetitionDTO"
                         }
                     },
                     "500": {
@@ -1354,7 +1354,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1430,7 +1430,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1464,7 +1464,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionsDTO"
+                            "$ref": "#/definitions/app.CompetitionSubmissionsDTO"
                         }
                     },
                     "500": {
@@ -1504,7 +1504,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO"
+                            "$ref": "#/definitions/app.CompetitionSubmissionDTO"
                         }
                     },
                     "500": {
@@ -1539,7 +1539,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionTeamDTO"
+                            "$ref": "#/definitions/app.CompetitionTeamDTO"
                         }
                     },
                     "500": {
@@ -1579,7 +1579,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1618,7 +1618,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1659,7 +1659,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1700,7 +1700,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1732,7 +1732,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1764,7 +1764,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1805,7 +1805,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1848,7 +1848,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1887,7 +1887,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1910,7 +1910,7 @@
                 "summary": "GetRegisterInfo",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1942,7 +1942,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1980,7 +1980,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2012,7 +2012,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2044,7 +2044,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2085,7 +2085,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2126,7 +2126,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2167,7 +2167,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2419,7 +2419,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     }
                 }
             }
@@ -2492,7 +2492,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     }
                 }
             }
@@ -2768,7 +2768,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2798,7 +2798,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2891,7 +2891,7 @@
                 "summary": "ListAll",
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -3144,7 +3144,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     }
                 }
             }
@@ -3282,7 +3282,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     }
                 }
             }
@@ -3355,7 +3355,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     }
                 }
             }
@@ -3571,7 +3571,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     }
                 }
             }
@@ -3656,7 +3656,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     }
                 }
             }
@@ -3840,7 +3840,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     }
                 }
             }
@@ -3913,7 +3913,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     }
                 }
             }
@@ -3985,7 +3985,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4039,7 +4039,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4097,7 +4097,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4146,7 +4146,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4191,7 +4191,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4298,7 +4298,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -4621,7 +4621,7 @@
                 ],
                 "responses": {
                     "202": {
-                        "description": "Accepted"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -4710,7 +4710,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -4927,7 +4927,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -5063,7 +5063,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -5156,7 +5156,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -5201,7 +5201,7 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -5262,7 +5262,7 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -5535,19 +5535,124 @@
                 }
             }
         },
+        "app.CodeGeexDTO": {
+            "type": "object",
+            "properties": {
+                "finish": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CompetitionSubmissionDTO": {
+            "type": "object",
+            "properties": {
+                "file_name": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "submit_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CompetitionSubmissionsDTO": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.CompetitionSubmissionDTO"
+                    }
+                },
+                "project": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CompetitionSummaryDTO": {
+            "type": "object",
+            "properties": {
+                "bonus": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "poster": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CompetitionTeamDTO": {
+            "type": "object",
+            "properties": {
+                "members": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.CompetitionTeamMemberDTO"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CompetitionTeamMemberDTO": {
+            "type": "object",
+            "properties": {
+                "account": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                }
+            }
+        },
         "app.CompetitonRankingDTO": {
             "type": "object",
             "properties": {
                 "final": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.RankingDTO"
+                        "$ref": "#/definitions/app.RankingDTO"
                     }
                 },
                 "preliminary": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.RankingDTO"
+                        "$ref": "#/definitions/app.RankingDTO"
                     }
                 }
             }
@@ -5936,6 +6041,17 @@
                 }
             }
         },
+        "app.LuoJiaRecordDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
         "app.ModelDTO": {
             "type": "object",
             "properties": {
@@ -6049,6 +6165,20 @@
                     }
                 },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.RankingDTO": {
+            "type": "object",
+            "properties": {
+                "score": {
+                    "type": "number"
+                },
+                "submit_at": {
+                    "type": "string"
+                },
+                "team_name": {
                     "type": "string"
                 }
             }
@@ -6195,6 +6325,71 @@
                 }
             }
         },
+        "app.UserCompetitionDTO": {
+            "type": "object",
+            "properties": {
+                "bonus": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "dataset_doc": {
+                    "type": "string"
+                },
+                "dataset_url": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "doc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "forum": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_competitor": {
+                    "type": "boolean"
+                },
+                "is_finalist": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phase": {
+                    "type": "string"
+                },
+                "poster": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "team_id": {
+                    "type": "string"
+                },
+                "team_role": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "winners": {
+                    "type": "string"
+                }
+            }
+        },
         "app.UserDTO": {
             "type": "object",
             "properties": {
@@ -6246,6 +6441,75 @@
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "app.WuKongLikeDTO": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "owner": {
+                    "description": "owner of picture",
+                    "type": "string"
+                },
+                "style": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.WuKongPublicDTO": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "digg_count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_digg": {
+                    "type": "boolean"
+                },
+                "is_like": {
+                    "type": "boolean"
+                },
+                "like_id": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "owner": {
+                    "description": "owner of picture",
+                    "type": "string"
+                },
+                "style": {
+                    "type": "string"
                 }
             }
         },
@@ -7423,270 +7687,6 @@
                     }
                 },
                 "kind": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_bigmodel_app.CodeGeexDTO": {
-            "type": "object",
-            "properties": {
-                "finish": {
-                    "type": "string"
-                },
-                "result": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO": {
-            "type": "object",
-            "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_bigmodel_app.WuKongLikeDTO": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_public": {
-                    "type": "boolean"
-                },
-                "link": {
-                    "type": "string"
-                },
-                "owner": {
-                    "description": "owner of picture",
-                    "type": "string"
-                },
-                "style": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "digg_count": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_digg": {
-                    "type": "boolean"
-                },
-                "is_like": {
-                    "type": "boolean"
-                },
-                "like_id": {
-                    "type": "string"
-                },
-                "link": {
-                    "type": "string"
-                },
-                "owner": {
-                    "description": "owner of picture",
-                    "type": "string"
-                },
-                "style": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO": {
-            "type": "object",
-            "properties": {
-                "file_name": {
-                    "type": "string"
-                },
-                "score": {
-                    "type": "number"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "submit_at": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionsDTO": {
-            "type": "object",
-            "properties": {
-                "details": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO"
-                    }
-                },
-                "project": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO": {
-            "type": "object",
-            "properties": {
-                "bonus": {
-                    "type": "integer"
-                },
-                "count": {
-                    "type": "integer"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "string"
-                },
-                "host": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "poster": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_competition_app.CompetitionTeamDTO": {
-            "type": "object",
-            "properties": {
-                "members": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionTeamMemberDTO"
-                    }
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_competition_app.CompetitionTeamMemberDTO": {
-            "type": "object",
-            "properties": {
-                "account": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_competition_app.RankingDTO": {
-            "type": "object",
-            "properties": {
-                "score": {
-                    "type": "number"
-                },
-                "submit_at": {
-                    "type": "string"
-                },
-                "team_name": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_opensourceways_xihe-server_competition_app.UserCompetitionDTO": {
-            "type": "object",
-            "properties": {
-                "bonus": {
-                    "type": "integer"
-                },
-                "count": {
-                    "type": "integer"
-                },
-                "dataset_doc": {
-                    "type": "string"
-                },
-                "dataset_url": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "doc": {
-                    "type": "string"
-                },
-                "duration": {
-                    "type": "string"
-                },
-                "forum": {
-                    "type": "string"
-                },
-                "host": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_competitor": {
-                    "type": "boolean"
-                },
-                "is_finalist": {
-                    "type": "boolean"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "phase": {
-                    "type": "string"
-                },
-                "poster": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "team_id": {
-                    "type": "string"
-                },
-                "team_role": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "winners": {
                     "type": "string"
                 }
             }
