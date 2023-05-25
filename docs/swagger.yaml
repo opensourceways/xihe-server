@@ -55,24 +55,23 @@ definitions:
     type: object
   app.CloudDTO:
     properties:
+      credit:
+        type: integer
       feature:
+        type: string
+      has_holding:
+        type: boolean
+      id:
         type: string
       image:
         type: string
-      is_free:
+      is_idle:
         type: boolean
       name:
         type: string
       processor:
         type: string
       spec:
-        type: string
-    type: object
-  app.CodeGeexDTO:
-    properties:
-      finish:
-        type: string
-      result:
         type: string
     type: object
   app.CompetitonRankingDTO:
@@ -329,14 +328,11 @@ definitions:
     type: object
   app.LoginDTO:
     properties:
+      access:
+        type: string
       info:
         type: string
-    type: object
-  app.LuoJiaRecordDTO:
-    properties:
-      created_at:
-        type: string
-      id:
+      user_id:
         type: string
     type: object
   app.ModelDTO:
@@ -543,49 +539,10 @@ definitions:
       total:
         type: integer
     type: object
-  app.WuKongLikeDTO:
+  app.WuKongRankDTO:
     properties:
-      created_at:
-        type: string
-      desc:
-        type: string
-      id:
-        type: string
-      is_public:
-        type: boolean
-      link:
-        type: string
-      owner:
-        description: owner of picture
-        type: string
-      style:
-        type: string
-    type: object
-  app.WuKongPublicDTO:
-    properties:
-      avatar:
-        type: string
-      created_at:
-        type: string
-      desc:
-        type: string
-      digg_count:
+      rank:
         type: integer
-      id:
-        type: string
-      is_digg:
-        type: boolean
-      is_like:
-        type: boolean
-      like_id:
-        type: string
-      link:
-        type: string
-      owner:
-        description: owner of picture
-        type: string
-      style:
-        type: string
     type: object
   controller.AddCourseRelatedProjectRequest:
     properties:
@@ -691,6 +648,19 @@ definitions:
       key:
         type: string
       value:
+        type: string
+    type: object
+  controller.PlayRecordRequest:
+    properties:
+      finish_count:
+        type: integer
+      lesson_id:
+        type: string
+      play_count:
+        type: integer
+      point_id:
+        type: string
+      section_id:
         type: string
     type: object
   controller.RepoFileCreateRequest:
@@ -1286,6 +1256,13 @@ definitions:
       digg_count:
         type: integer
     type: object
+  controller.wukongHFRequest:
+    properties:
+      desc:
+        type: string
+      style:
+        type: string
+    type: object
   controller.wukongICBCRequest:
     properties:
       desc:
@@ -1309,6 +1286,8 @@ definitions:
     properties:
       desc:
         type: string
+      img_quantity:
+        type: integer
       style:
         type: string
     type: object
@@ -1319,6 +1298,66 @@ definitions:
           type: string
         type: array
       kind:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_bigmodel_app.CodeGeexDTO:
+    properties:
+      finish:
+        type: string
+      result:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_bigmodel_app.WuKongLikeDTO:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      desc:
+        type: string
+      id:
+        type: string
+      is_public:
+        type: boolean
+      link:
+        type: string
+      owner:
+        description: owner of picture
+        type: string
+      style:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      desc:
+        type: string
+      digg_count:
+        type: integer
+      id:
+        type: string
+      is_digg:
+        type: boolean
+      is_like:
+        type: boolean
+      like_id:
+        type: string
+      link:
+        type: string
+      owner:
+        description: owner of picture
+        type: string
+      style:
         type: string
     type: object
   github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO:
@@ -1547,6 +1586,28 @@ paths:
             type: system_error
       tags:
       - BigModel
+  /v1/bigmodel/ask_hf:
+    post:
+      consumes:
+      - application/json
+      description: vqa for hf
+      parameters:
+      - description: picture
+        in: formData
+        name: picture
+        required: true
+        type: file
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.describePictureResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
   /v1/bigmodel/codegeex:
     post:
       consumes:
@@ -1563,7 +1624,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/app.CodeGeexDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.CodeGeexDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -1592,6 +1653,28 @@ paths:
             type: system_error
       tags:
       - BigModel
+  /v1/bigmodel/describe_picture_hf:
+    post:
+      consumes:
+      - application/json
+      description: describe a picture for hf
+      parameters:
+      - description: picture
+        in: formData
+        name: picture
+        required: true
+        type: file
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.describePictureResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
   /v1/bigmodel/luojia:
     get:
       consumes:
@@ -1601,7 +1684,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.LuoJiaRecordDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -1617,6 +1700,28 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/controller.luojiaResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/luojia_hf:
+    post:
+      consumes:
+      - application/json
+      description: luojia for hf
+      parameters:
+      - description: picture
+        in: formData
+        name: picture
+        required: true
+        type: file
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.describePictureResp'
         "500":
           description: Internal Server Error
           schema:
@@ -1745,7 +1850,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.WuKongLikeDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongLikeDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -1880,7 +1985,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.WuKongPublicDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -1931,7 +2036,23 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.WuKongPublicDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/wukong/rank:
+    get:
+      consumes:
+      - application/json
+      description: get wukong rank
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.WuKongRankDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -1952,6 +2073,72 @@ paths:
       responses:
         "201":
           description: Created
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/wukong/task:
+    get:
+      consumes:
+      - application/json
+      description: get last finished task
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.WuKongRankDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/wukong_async:
+    post:
+      consumes:
+      - application/json
+      description: send async wukong request task
+      parameters:
+      - description: body of wukong
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.wukongRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.wukongPicturesGenerateResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/wukong_hf:
+    post:
+      consumes:
+      - application/json
+      description: generates pictures by WuKong-hf
+      parameters:
+      - description: body of wukong
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.wukongHFRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.wukongPicturesGenerateResp'
+        "404":
+          description: Not Found
+          schema:
+            type: bigmodel_sensitive_info
         "500":
           description: Internal Server Error
           schema:
@@ -2551,6 +2738,32 @@ paths:
       summary: List
       tags:
       - Course
+  /v1/course/:id/asg/:asgid:
+    get:
+      consumes:
+      - application/json
+      description: Get assignment
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: asg id
+        in: path
+        name: asgid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetAssignment
+      tags:
+      - Course
   /v1/course/{id}:
     get:
       consumes:
@@ -2691,6 +2904,48 @@ paths:
           schema:
             type: system_error
       summary: AddCourseRelatedProject
+      tags:
+      - Course
+  /v1/course/{id}/record:
+    put:
+      consumes:
+      - application/json
+      description: add play record
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: record info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.PlayRecordRequest'
+      responses:
+        "202":
+          description: Accepted
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: AddPlayRecord
+      tags:
+      - Course
+  /v1/course/reginfo:
+    get:
+      consumes:
+      - application/json
+      description: get register info
+      responses:
+        "200":
+          description: OK
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetRegisterInfo
       tags:
       - Course
   /v1/dataset:
@@ -4517,6 +4772,65 @@ paths:
             type: system_error
       tags:
       - Activity
+  /v1/user/check_email:
+    get:
+      consumes:
+      - application/json
+      description: check user email
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            type: "no"
+      tags:
+      - User
+  /v1/user/email/bind:
+    post:
+      consumes:
+      - application/json
+      description: bind email according the code
+      parameters:
+      - description: body of creating user
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.userCreateRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.UserDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "500":
+          description: Internal Server Error
+          schema:
+            type: duplicate_creating
+      summary: BindEmail
+      tags:
+      - User
+  /v1/user/email/sendbind:
+    post:
+      consumes:
+      - application/json
+      description: send code to user
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.UserDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: duplicate_creating
+      summary: SendBindEmail
+      tags:
+      - User
   /v1/user/follower/{account}:
     get:
       consumes:
