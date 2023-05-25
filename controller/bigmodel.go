@@ -113,7 +113,7 @@ func (ctl *BigModelController) DescribePicture(ctx *gin.Context) {
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/bigmodel/describe_picture_hf [post]
 func (ctl *BigModelController) DescribePictureHF(ctx *gin.Context) {
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
