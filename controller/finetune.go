@@ -43,14 +43,14 @@ type FinetuneController struct {
 	fs app.FinetuneService
 }
 
-// @Summary Create
-// @Description create finetune
-// @Tags  Finetune
-// @Param	body	body 	FinetuneCreateRequest	true	"body of creating finetune"
-// @Accept json
-// @Success 201 {object} finetuneCreateResp
-// @Failure 500 system_error        system error
-// @Router /v1/finetune [post]
+//	@Summary		Create
+//	@Description	create finetune
+//	@Tags			Finetune
+//	@Param			body	body	FinetuneCreateRequest	true	"body of creating finetune"
+//	@Accept			json
+//	@Success		201	{object}		finetuneCreateResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/finetune [post]
 func (ctl *FinetuneController) Create(ctx *gin.Context) {
 	req := FinetuneCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -78,14 +78,14 @@ func (ctl *FinetuneController) Create(ctx *gin.Context) {
 	}
 }
 
-// @Summary Delete
-// @Description delete finetune
-// @Tags  Finetune
-// @Param	id	path	string	true	"finetune id"
-// @Accept json
-// @Success 204
-// @Failure 500 system_error        system error
-// @Router /v1/finetune/{id} [delete]
+//	@Summary		Delete
+//	@Description	delete finetune
+//	@Tags			Finetune
+//	@Param			id	path	string	true	"finetune id"
+//	@Accept			json
+//	@Success		204
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/finetune/{id} [delete]
 func (ctl *FinetuneController) Delete(ctx *gin.Context) {
 	index, ok := ctl.finetuneIndex(ctx)
 	if !ok {
@@ -99,14 +99,14 @@ func (ctl *FinetuneController) Delete(ctx *gin.Context) {
 	}
 }
 
-// @Summary Terminate
-// @Description terminate finetune
-// @Tags  Finetune
-// @Param	id	path	string	true	"finetune id"
-// @Accept json
-// @Success 202
-// @Failure 500 system_error        system error
-// @Router /v1/finetune/{id} [put]
+//	@Summary		Terminate
+//	@Description	terminate finetune
+//	@Tags			Finetune
+//	@Param			id	path	string	true	"finetune id"
+//	@Accept			json
+//	@Success		202
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/finetune/{id} [put]
 func (ctl *FinetuneController) Terminate(ctx *gin.Context) {
 	index, ok := ctl.finetuneIndex(ctx)
 	if !ok {
@@ -132,13 +132,13 @@ func (ctl *FinetuneController) finetuneIndex(ctx *gin.Context) (
 	return
 }
 
-// @Summary List
-// @Description list finetunes
-// @Tags  Finetune
-// @Accept json
-// @Success 200 {object} app.UserFinetunesDTO
-// @Failure 500 system_error        system error
-// @Router /v1/finetune [get]
+//	@Summary		List
+//	@Description	list finetunes
+//	@Tags			Finetune
+//	@Accept			json
+//	@Success		200	{object}		app.UserFinetunesDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/finetune [get]
 func (ctl *FinetuneController) List(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -152,13 +152,13 @@ func (ctl *FinetuneController) List(ctx *gin.Context) {
 	}
 }
 
-// @Summary WatchFinetunes
-// @Description watch finetunes
-// @Tags  Finetune
-// @Accept json
-// @Success 200 {object} app.FinetuneSummaryDTO
-// @Failure 500 system_error        system error
-// @Router /v1/finetune/ws [get]
+//	@Summary		WatchFinetunes
+//	@Description	watch finetunes
+//	@Tags			Finetune
+//	@Accept			json
+//	@Success		200	{object}		app.FinetuneSummaryDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/finetune/ws [get]
 func (ctl *FinetuneController) WatchFinetunes(ctx *gin.Context) {
 	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
 	if !ok {
@@ -266,14 +266,14 @@ func (ctl *FinetuneController) watchFinetunes(ws *websocket.Conn, user domain.Ac
 	}
 }
 
-// @Summary WatchSingle
-// @Description watch single finetune
-// @Tags  Finetune
-// @Param	id	path	string	true	"finetune id"
-// @Accept json
-// @Success 200 {object} finetuneLog
-// @Failure 500 system_error        system error
-// @Router /v1/finetune/{id}/log/ws [get]
+//	@Summary		WatchSingle
+//	@Description	watch single finetune
+//	@Tags			Finetune
+//	@Param			id	path	string	true	"finetune id"
+//	@Accept			json
+//	@Success		200	{object}		finetuneLog
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/finetune/{id}/log/ws [get]
 func (ctl *FinetuneController) WatchSingle(ctx *gin.Context) {
 	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
 	if !ok {
@@ -344,14 +344,14 @@ func (ctl *FinetuneController) WatchSingle(ctx *gin.Context) {
 	}
 }
 
-// @Summary Log
-// @Description download finetune log
-// @Tags  Finetune
-// @Param	id	path	string	true	"finetune id"
-// @Accept json
-// @Success 200 {object} finetuneLog
-// @Failure 500 system_error        system error
-// @Router /v1/finetune/{id}/log [get]
+//	@Summary		Log
+//	@Description	download finetune log
+//	@Tags			Finetune
+//	@Param			id	path	string	true	"finetune id"
+//	@Accept			json
+//	@Success		200	{object}		finetuneLog
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/finetune/{id}/log [get]
 func (ctl *FinetuneController) Log(ctx *gin.Context) {
 	index, ok := ctl.finetuneIndex(ctx)
 	if !ok {

@@ -87,6 +87,40 @@
                 }
             }
         },
+        "/v1/bigmodel/ask_hf": {
+            "post": {
+                "description": "vqa for hf",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "picture",
+                        "name": "picture",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.describePictureResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/bigmodel/codegeex": {
             "post": {
                 "description": "codegeex big model",
@@ -111,7 +145,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/app.CodeGeexDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.CodeGeexDTO"
                         }
                     },
                     "500": {
@@ -157,6 +191,40 @@
                 }
             }
         },
+        "/v1/bigmodel/describe_picture_hf": {
+            "post": {
+                "description": "describe a picture for hf",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "picture",
+                        "name": "picture",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.describePictureResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/bigmodel/luojia": {
             "get": {
                 "description": "list luo-jia big model records",
@@ -170,7 +238,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.LuoJiaRecordDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO"
                         }
                     },
                     "500": {
@@ -194,6 +262,40 @@
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/controller.luojiaResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/luojia_hf": {
+            "post": {
+                "description": "luojia for hf",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "picture",
+                        "name": "picture",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.describePictureResp"
                         }
                     },
                     "500": {
@@ -394,7 +496,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.WuKongLikeDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongLikeDTO"
                         }
                     },
                     "500": {
@@ -604,7 +706,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.WuKongPublicDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO"
                         }
                     },
                     "500": {
@@ -683,7 +785,32 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.WuKongPublicDTO"
+                            "$ref": "#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/wukong/rank": {
+            "get": {
+                "description": "get wukong rank",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.WuKongRankDTO"
                         }
                     },
                     "500": {
@@ -716,6 +843,109 @@
                 "responses": {
                     "201": {
                         "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/wukong/task": {
+            "get": {
+                "description": "get last finished task",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.WuKongRankDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/wukong_async": {
+            "post": {
+                "description": "send async wukong request task",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "parameters": [
+                    {
+                        "description": "body of wukong",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.wukongRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.wukongPicturesGenerateResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/wukong_hf": {
+            "post": {
+                "description": "generates pictures by WuKong-hf",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "parameters": [
+                    {
+                        "description": "body of wukong",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.wukongHFRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.wukongPicturesGenerateResp"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "bigmodel_sensitive_info"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1629,6 +1859,68 @@
                 }
             }
         },
+        "/v1/course/:id/asg/:asgid": {
+            "get": {
+                "description": "Get assignment",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "GetAssignment",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "asg id",
+                        "name": "asgid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/course/reginfo": {
+            "get": {
+                "description": "get register info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "GetRegisterInfo",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/course/{id}": {
             "get": {
                 "description": "get course infomation",
@@ -1829,6 +2121,47 @@
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/controller.AddCourseRelatedProjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/course/{id}/record": {
+            "put": {
+                "description": "add play record",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "AddPlayRecord",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "record info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.PlayRecordRequest"
                         }
                     }
                 ],
@@ -4583,6 +4916,97 @@
                 }
             }
         },
+        "/v1/user/check_email": {
+            "get": {
+                "description": "check user email",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "no"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/email/bind": {
+            "post": {
+                "description": "bind email according the code",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "BindEmail",
+                "parameters": [
+                    {
+                        "description": "body of creating user",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.userCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/app.UserDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "duplicate_creating"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/email/sendbind": {
+            "post": {
+                "description": "send code to user",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "SendBindEmail",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/app.UserDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "duplicate_creating"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/user/follower/{account}": {
             "get": {
                 "description": "list followers",
@@ -5082,13 +5506,22 @@
         "app.CloudDTO": {
             "type": "object",
             "properties": {
+                "credit": {
+                    "type": "integer"
+                },
                 "feature": {
+                    "type": "string"
+                },
+                "has_holding": {
+                    "type": "boolean"
+                },
+                "id": {
                     "type": "string"
                 },
                 "image": {
                     "type": "string"
                 },
-                "is_free": {
+                "is_idle": {
                     "type": "boolean"
                 },
                 "name": {
@@ -5098,17 +5531,6 @@
                     "type": "string"
                 },
                 "spec": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.CodeGeexDTO": {
-            "type": "object",
-            "properties": {
-                "finish": {
-                    "type": "string"
-                },
-                "result": {
                     "type": "string"
                 }
             }
@@ -5503,18 +5925,13 @@
         "app.LoginDTO": {
             "type": "object",
             "properties": {
-                "info": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.LuoJiaRecordDTO": {
-            "type": "object",
-            "properties": {
-                "created_at": {
+                "access": {
                     "type": "string"
                 },
-                "id": {
+                "info": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "string"
                 }
             }
@@ -5832,69 +6249,11 @@
                 }
             }
         },
-        "app.WuKongLikeDTO": {
+        "app.WuKongRankDTO": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_public": {
-                    "type": "boolean"
-                },
-                "link": {
-                    "type": "string"
-                },
-                "owner": {
-                    "description": "owner of picture",
-                    "type": "string"
-                },
-                "style": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.WuKongPublicDTO": {
-            "type": "object",
-            "properties": {
-                "avatar": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "digg_count": {
+                "rank": {
                     "type": "integer"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "is_digg": {
-                    "type": "boolean"
-                },
-                "is_like": {
-                    "type": "boolean"
-                },
-                "like_id": {
-                    "type": "string"
-                },
-                "link": {
-                    "type": "string"
-                },
-                "owner": {
-                    "description": "owner of picture",
-                    "type": "string"
-                },
-                "style": {
-                    "type": "string"
                 }
             }
         },
@@ -6059,6 +6418,26 @@
                     "type": "string"
                 },
                 "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.PlayRecordRequest": {
+            "type": "object",
+            "properties": {
+                "finish_count": {
+                    "type": "integer"
+                },
+                "lesson_id": {
+                    "type": "string"
+                },
+                "play_count": {
+                    "type": "integer"
+                },
+                "point_id": {
+                    "type": "string"
+                },
+                "section_id": {
                     "type": "string"
                 }
             }
@@ -6979,6 +7358,17 @@
                 }
             }
         },
+        "controller.wukongHFRequest": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "string"
+                },
+                "style": {
+                    "type": "string"
+                }
+            }
+        },
         "controller.wukongICBCRequest": {
             "type": "object",
             "properties": {
@@ -7015,6 +7405,9 @@
                 "desc": {
                     "type": "string"
                 },
+                "img_quantity": {
+                    "type": "integer"
+                },
                 "style": {
                     "type": "string"
                 }
@@ -7030,6 +7423,97 @@
                     }
                 },
                 "kind": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_bigmodel_app.CodeGeexDTO": {
+            "type": "object",
+            "properties": {
+                "finish": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_bigmodel_app.WuKongLikeDTO": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "owner": {
+                    "description": "owner of picture",
+                    "type": "string"
+                },
+                "style": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "digg_count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_digg": {
+                    "type": "boolean"
+                },
+                "is_like": {
+                    "type": "boolean"
+                },
+                "like_id": {
+                    "type": "string"
+                },
+                "link": {
+                    "type": "string"
+                },
+                "owner": {
+                    "description": "owner of picture",
+                    "type": "string"
+                },
+                "style": {
                     "type": "string"
                 }
             }

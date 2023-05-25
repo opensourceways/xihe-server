@@ -73,15 +73,15 @@ type ProjectController struct {
 	newPlatformRepository func(string, string) platform.Repository
 }
 
-// @Summary Check
-// @Description check whether the name can be applied to create a new project
-// @Tags  Project
-// @Param	owner	path	string	true	"owner of project"
-// @Param	name	path	string	true	"name of project"
-// @Accept json
-// @Success 200 {object} canApplyResourceNameResp
-// @Produce json
-// @Router /v1/project/{owner}/{name}/check [get]
+//	@Summary		Check
+//	@Description	check whether the name can be applied to create a new project
+//	@Tags			Project
+//	@Param			owner	path	string	true	"owner of project"
+//	@Param			name	path	string	true	"name of project"
+//	@Accept			json
+//	@Success		200	{object}	canApplyResourceNameResp
+//	@Produce		json
+//	@Router			/v1/project/{owner}/{name}/check [get]
 func (ctl *ProjectController) Check(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -119,13 +119,13 @@ func (ctl *ProjectController) Check(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(canApplyResourceNameResp{b}))
 }
 
-// @Summary Create
-// @Description create project
-// @Tags  Project
-// @Param	body	body 	projectCreateRequest	true	"body of creating project"
-// @Accept json
-// @Produce json
-// @Router /v1/project [post]
+//	@Summary		Create
+//	@Description	create project
+//	@Tags			Project
+//	@Param			body	body	projectCreateRequest	true	"body of creating project"
+//	@Accept			json
+//	@Produce		json
+//	@Router			/v1/project [post]
 func (ctl *ProjectController) Create(ctx *gin.Context) {
 	req := projectCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -174,15 +174,15 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newResponseData(d))
 }
 
-// @Summary Delete
-// @Description delete project
-// @Tags  Project
-// @Param	owner	path	string	true	"owner of project"
-// @Param	name	path	string	true	"name of project"
-// @Accept json
-// @Success 204
-// @Produce json
-// @Router /v1/project/{owner}/{name} [delete]
+//	@Summary		Delete
+//	@Description	delete project
+//	@Tags			Project
+//	@Param			owner	path	string	true	"owner of project"
+//	@Param			name	path	string	true	"name of project"
+//	@Accept			json
+//	@Success		204
+//	@Produce		json
+//	@Router			/v1/project/{owner}/{name} [delete]
 func (ctl *ProjectController) Delete(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -234,15 +234,15 @@ func (ctl *ProjectController) Delete(ctx *gin.Context) {
 	}
 }
 
-// @Summary Update
-// @Description update project
-// @Tags  Project
-// @Param	owner	path	string			true	"owner of project"
-// @Param	id	path	string			true	"id of project"
-// @Param	body	body 	projectUpdateRequest	true	"body of updating project"
-// @Accept json
-// @Produce json
-// @Router /v1/project/{owner}/{id} [put]
+//	@Summary		Update
+//	@Description	update project
+//	@Tags			Project
+//	@Param			owner	path	string					true	"owner of project"
+//	@Param			id		path	string					true	"id of project"
+//	@Param			body	body	projectUpdateRequest	true	"body of updating project"
+//	@Accept			json
+//	@Produce		json
+//	@Router			/v1/project/{owner}/{id} [put]
 func (ctl *ProjectController) Update(ctx *gin.Context) {
 	req := projectUpdateRequest{}
 
@@ -308,15 +308,15 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData(d))
 }
 
-// @Summary Get
-// @Description get project
-// @Tags  Project
-// @Param	owner	path	string	true	"owner of project"
-// @Param	name	path	string	true	"name of project"
-// @Accept json
-// @Success 200 {object} projectDetail
-// @Produce json
-// @Router /v1/project/{owner}/{name} [get]
+//	@Summary		Get
+//	@Description	get project
+//	@Tags			Project
+//	@Param			owner	path	string	true	"owner of project"
+//	@Param			name	path	string	true	"name of project"
+//	@Accept			json
+//	@Success		200	{object}	projectDetail
+//	@Produce		json
+//	@Router			/v1/project/{owner}/{name} [get]
 func (ctl *ProjectController) Get(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -390,19 +390,19 @@ func (ctl *ProjectController) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(detail))
 }
 
-// @Summary List
-// @Description list project
-// @Tags  Project
-// @Param	owner		path	string	true	"owner of project"
-// @Param	name		query	string	false	"name of project"
-// @Param	repo_type	query	string	false	"repo type of project, value can be public or private"
-// @Param	count_per_page	query	int	false	"count per page"
-// @Param	page_num	query	int	false	"page num which starts from 1"
-// @Param	sort_by		query	string	false	"sort keys, value can be update_time, first_letter, download_count"
-// @Accept json
-// @Success 200 {object} projectsInfo
-// @Produce json
-// @Router /v1/project/{owner} [get]
+//	@Summary		List
+//	@Description	list project
+//	@Tags			Project
+//	@Param			owner			path	string	true	"owner of project"
+//	@Param			name			query	string	false	"name of project"
+//	@Param			repo_type		query	string	false	"repo type of project, value can be public or private"
+//	@Param			count_per_page	query	int		false	"count per page"
+//	@Param			page_num		query	int		false	"page num which starts from 1"
+//	@Param			sort_by			query	string	false	"sort keys, value can be update_time, first_letter, download_count"
+//	@Accept			json
+//	@Success		200	{object}	projectsInfo
+//	@Produce		json
+//	@Router			/v1/project/{owner} [get]
 func (ctl *ProjectController) List(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -466,20 +466,20 @@ func (ctl *ProjectController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(&result))
 }
 
-// @Summary ListGlobal
-// @Description list global public project
-// @Tags  Project
-// @Param	name		query	string	false	"name of project"
-// @Param	tags		query	string	false	"tags, separate multiple tags with commas"
-// @Param	tag_kinds	query	string	false	"tag kinds, separate multiple kinds with commas"
-// @Param	level		query	string	false	"project level, such as official, good"
-// @Param	count_per_page	query	int	false	"count per page"
-// @Param	page_num	query	int	false	"page num which starts from 1"
-// @Param	sort_by		query	string	false	"sort keys, value can be update_time, first_letter, download_count"
-// @Accept json
-// @Success 200 {object} app.GlobalProjectsDTO
-// @Produce json
-// @Router /v1/project [get]
+//	@Summary		ListGlobal
+//	@Description	list global public project
+//	@Tags			Project
+//	@Param			name			query	string	false	"name of project"
+//	@Param			tags			query	string	false	"tags, separate multiple tags with commas"
+//	@Param			tag_kinds		query	string	false	"tag kinds, separate multiple kinds with commas"
+//	@Param			level			query	string	false	"project level, such as official, good"
+//	@Param			count_per_page	query	int		false	"count per page"
+//	@Param			page_num		query	int		false	"page num which starts from 1"
+//	@Param			sort_by			query	string	false	"sort keys, value can be update_time, first_letter, download_count"
+//	@Accept			json
+//	@Success		200	{object}	app.GlobalProjectsDTO
+//	@Produce		json
+//	@Router			/v1/project [get]
 func (ctl *ProjectController) ListGlobal(ctx *gin.Context) {
 	cmd, err := ctl.getListGlobalResourceParameter(ctx)
 	if err != nil {
@@ -500,15 +500,15 @@ func (ctl *ProjectController) ListGlobal(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(result))
 }
 
-// @Summary Fork
-// @Description fork project
-// @Tags  Project
-// @Param	owner	path	string			true	"owner of forked project"
-// @Param	id	path	string			true	"id of forked project"
-// @Param	body	body 	projectForkRequest	true	"body of forking project"
-// @Accept json
-// @Produce json
-// @Router /v1/project/{owner}/{id} [post]
+//	@Summary		Fork
+//	@Description	fork project
+//	@Tags			Project
+//	@Param			owner	path	string				true	"owner of forked project"
+//	@Param			id		path	string				true	"id of forked project"
+//	@Param			body	body	projectForkRequest	true	"body of forking project"
+//	@Accept			json
+//	@Produce		json
+//	@Router			/v1/project/{owner}/{id} [post]
 func (ctl *ProjectController) Fork(ctx *gin.Context) {
 	req := projectForkRequest{}
 
@@ -594,15 +594,15 @@ func (ctl *ProjectController) Fork(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newResponseData(data))
 }
 
-// @Summary AddRelatedModel
-// @Description add related model to project
-// @Tags  Project
-// @Param	owner	path	string				true	"owner of project"
-// @Param	id	path	string				true	"id of project"
-// @Param	body	body 	relatedResourceAddRequest	true	"body of related model"
-// @Accept json
-// @Success 202 {object} app.ResourceDTO
-// @Router /v1/project/relation/{owner}/{id}/model [put]
+//	@Summary		AddRelatedModel
+//	@Description	add related model to project
+//	@Tags			Project
+//	@Param			owner	path	string						true	"owner of project"
+//	@Param			id		path	string						true	"id of project"
+//	@Param			body	body	relatedResourceAddRequest	true	"body of related model"
+//	@Accept			json
+//	@Success		202	{object}	app.ResourceDTO
+//	@Router			/v1/project/relation/{owner}/{id}/model [put]
 func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 	req := relatedResourceAddRequest{}
 
@@ -660,15 +660,15 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(data)))
 }
 
-// @Summary RemoveRelatedModel
-// @Description remove related model to project
-// @Tags  Project
-// @Param	owner	path	string				true	"owner of project"
-// @Param	id	path	string				true	"id of project"
-// @Param	body	body 	relatedResourceRemoveRequest	true	"body of related model"
-// @Accept json
-// @Success 204
-// @Router /v1/project/relation/{owner}/{id}/model [delete]
+//	@Summary		RemoveRelatedModel
+//	@Description	remove related model to project
+//	@Tags			Project
+//	@Param			owner	path	string							true	"owner of project"
+//	@Param			id		path	string							true	"id of project"
+//	@Param			body	body	relatedResourceRemoveRequest	true	"body of related model"
+//	@Accept			json
+//	@Success		204
+//	@Router			/v1/project/relation/{owner}/{id}/model [delete]
 func (ctl *ProjectController) RemoveRelatedModel(ctx *gin.Context) {
 	req := relatedResourceRemoveRequest{}
 
@@ -708,15 +708,15 @@ func (ctl *ProjectController) RemoveRelatedModel(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
-// @Summary AddRelatedDataset
-// @Description add related dataset to project
-// @Tags  Project
-// @Param	owner	path	string				true	"owner of project"
-// @Param	id	path	string				true	"id of project"
-// @Param	body	body 	relatedResourceAddRequest	true	"body of related dataset"
-// @Accept json
-// @Success 202 {object} app.ResourceDTO
-// @Router /v1/project/relation/{owner}/{id}/dataset [put]
+//	@Summary		AddRelatedDataset
+//	@Description	add related dataset to project
+//	@Tags			Project
+//	@Param			owner	path	string						true	"owner of project"
+//	@Param			id		path	string						true	"id of project"
+//	@Param			body	body	relatedResourceAddRequest	true	"body of related dataset"
+//	@Accept			json
+//	@Success		202	{object}	app.ResourceDTO
+//	@Router			/v1/project/relation/{owner}/{id}/dataset [put]
 func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 	req := relatedResourceAddRequest{}
 
@@ -774,15 +774,15 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(data)))
 }
 
-// @Summary RemoveRelatedDataset
-// @Description remove related dataset to project
-// @Tags  Project
-// @Param	owner	path	string				true	"owner of project"
-// @Param	id	path	string				true	"id of project"
-// @Param	body	body 	relatedResourceRemoveRequest	true	"body of related dataset"
-// @Accept json
-// @Success 204
-// @Router /v1/project/relation/{owner}/{id}/dataset [delete]
+//	@Summary		RemoveRelatedDataset
+//	@Description	remove related dataset to project
+//	@Tags			Project
+//	@Param			owner	path	string							true	"owner of project"
+//	@Param			id		path	string							true	"id of project"
+//	@Param			body	body	relatedResourceRemoveRequest	true	"body of related dataset"
+//	@Accept			json
+//	@Success		204
+//	@Router			/v1/project/relation/{owner}/{id}/dataset [delete]
 func (ctl *ProjectController) RemoveRelatedDataset(ctx *gin.Context) {
 	req := relatedResourceRemoveRequest{}
 
@@ -822,15 +822,15 @@ func (ctl *ProjectController) RemoveRelatedDataset(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
-// @Summary SetTags
-// @Description set tags for project
-// @Tags  Project
-// @Param	owner	path	string				true	"owner of project"
-// @Param	id	path	string				true	"id of project"
-// @Param	body	body 	resourceTagsUpdateRequest	true	"body of tags"
-// @Accept json
-// @Success 202
-// @Router /v1/project/{owner}/{id}/tags [put]
+//	@Summary		SetTags
+//	@Description	set tags for project
+//	@Tags			Project
+//	@Param			owner	path	string						true	"owner of project"
+//	@Param			id		path	string						true	"id of project"
+//	@Param			body	body	resourceTagsUpdateRequest	true	"body of tags"
+//	@Accept			json
+//	@Success		202
+//	@Router			/v1/project/{owner}/{id}/tags [put]
 func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 	req := resourceTagsUpdateRequest{}
 
