@@ -36,6 +36,7 @@ func AddRouterForRepoFileController(
 
 	rg.GET("/v1/repo/:type/:user/:name", ctl.DownloadRepo)
 	rg.GET("/v1/repo/:type/:user/:name/files", ctl.List)
+	rg.GET("/v1/repo/:type/:user/:name/readme", ctl.ContainReadme)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path", ctl.Download)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path/preview", ctl.Preview)
 	rg.PUT("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Update)
@@ -54,18 +55,18 @@ type RepoFileController struct {
 	dataset repository.Dataset
 }
 
-//	@Summary		Create
-//	@Description	create repo file
-//	@Tags			RepoFile
-//	@Param			name	path	string					true	"repo name"
-//	@Param			path	path	string					true	"repo file path"
-//	@Param			body	body	RepoFileCreateRequest	true	"body of creating repo file"
-//	@Accept			json
-//	@Success		201
-//	@Failure		400	bad_request_body	can't	parse		request	body
-//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/repo/{type}/{name}/file/{path} [post]
+// @Summary		Create
+// @Description	create repo file
+// @Tags			RepoFile
+// @Param			name	path	string					true	"repo name"
+// @Param			path	path	string					true	"repo file path"
+// @Param			body	body	RepoFileCreateRequest	true	"body of creating repo file"
+// @Accept			json
+// @Success		201
+// @Failure		400	bad_request_body	can't	parse		request	body
+// @Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{name}/file/{path} [post]
 func (ctl *RepoFileController) Create(ctx *gin.Context) {
 	req := RepoFileCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -103,18 +104,18 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newResponseData("successful"))
 }
 
-//	@Summary		Update
-//	@Description	update repo file
-//	@Tags			RepoFile
-//	@Param			name	path	string					true	"repo name"
-//	@Param			path	path	string					true	"repo file path"
-//	@Param			body	body	RepoFileUpdateRequest	true	"body of updating repo file"
-//	@Accept			json
-//	@Success		202
-//	@Failure		400	bad_request_body	can't	parse		request	body
-//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/repo/{type}/{name}/file/{path} [put]
+// @Summary		Update
+// @Description	update repo file
+// @Tags			RepoFile
+// @Param			name	path	string					true	"repo name"
+// @Param			path	path	string					true	"repo file path"
+// @Param			body	body	RepoFileUpdateRequest	true	"body of updating repo file"
+// @Accept			json
+// @Success		202
+// @Failure		400	bad_request_body	can't	parse		request	body
+// @Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{name}/file/{path} [put]
 func (ctl *RepoFileController) Update(ctx *gin.Context) {
 	req := RepoFileUpdateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -152,16 +153,16 @@ func (ctl *RepoFileController) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData("successful"))
 }
 
-//	@Summary		Delete
-//	@Description	Delete repo file
-//	@Tags			RepoFile
-//	@Param			name	path	string	true	"repo name"
-//	@Param			path	path	string	true	"repo file path"
-//	@Accept			json
-//	@Success		204
-//	@Failure		400	bad_request_param	some	parameter	of	body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/repo/{type}/{name}/file/{path} [delete]
+// @Summary		Delete
+// @Description	Delete repo file
+// @Tags			RepoFile
+// @Param			name	path	string	true	"repo name"
+// @Param			path	path	string	true	"repo file path"
+// @Accept			json
+// @Success		204
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{name}/file/{path} [delete]
 func (ctl *RepoFileController) Delete(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -188,16 +189,16 @@ func (ctl *RepoFileController) Delete(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, newResponseData("successful"))
 }
 
-//	@Summary		DeleteDir
-//	@Description	Delete repo directory
-//	@Tags			RepoFile
-//	@Param			name	path	string	true	"repo name"
-//	@Param			path	path	string	true	"repo dir"
-//	@Accept			json
-//	@Success		204
-//	@Failure		400	bad_request_param	some	parameter	of	body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/repo/{type}/{name}/dir/{path} [delete]
+// @Summary		DeleteDir
+// @Description	Delete repo directory
+// @Tags			RepoFile
+// @Param			name	path	string	true	"repo name"
+// @Param			path	path	string	true	"repo dir"
+// @Accept			json
+// @Success		204
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{name}/dir/{path} [delete]
 func (ctl *RepoFileController) DeleteDir(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -224,17 +225,17 @@ func (ctl *RepoFileController) DeleteDir(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, newResponseData("successful"))
 }
 
-//	@Summary		Download
-//	@Description	Download repo file
-//	@Tags			RepoFile
-//	@Param			user	path	string	true	"user"
-//	@Param			name	path	string	true	"repo name"
-//	@Param			path	path	string	true	"repo file path"
-//	@Accept			json
-//	@Success		200	{object}			app.RepoFileDownloadDTO
-//	@Failure		400	bad_request_param	some	parameter	of	body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/repo/{type}/{user}/{name}/file/{path} [get]
+// @Summary		Download
+// @Description	Download repo file
+// @Tags			RepoFile
+// @Param			user	path	string	true	"user"
+// @Param			name	path	string	true	"repo name"
+// @Param			path	path	string	true	"repo file path"
+// @Accept			json
+// @Success		200	{object}			app.RepoFileDownloadDTO
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{user}/{name}/file/{path} [get]
 func (ctl *RepoFileController) Download(ctx *gin.Context) {
 	pl, u, repoInfo, ok := ctl.checkForView(ctx)
 	if !ok {
@@ -266,16 +267,16 @@ func (ctl *RepoFileController) Download(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		DownloadRepo
-//	@Description	Download repo
-//	@Tags			RepoFile
-//	@Param			user	path	string	true	"user"
-//	@Param			name	path	string	true	"repo name"
-//	@Accept			json
-//	@Success		200
-//	@Failure		400	bad_request_param	some	parameter	of	body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/repo/{type}/{user}/{name} [get]
+// @Summary		DownloadRepo
+// @Description	Download repo
+// @Tags			RepoFile
+// @Param			user	path	string	true	"user"
+// @Param			name	path	string	true	"repo name"
+// @Accept			json
+// @Success		200
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{user}/{name} [get]
 func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 	_, u, repoInfo, ok := ctl.checkForView(ctx)
 	if !ok {
@@ -296,17 +297,17 @@ func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 	})
 }
 
-//	@Summary		Preview
-//	@Description	preview repo file
-//	@Tags			RepoFile
-//	@Param			user	path	string	true	"user"
-//	@Param			name	path	string	true	"repo name"
-//	@Param			path	path	string	true	"repo file path"
-//	@Accept			json
-//	@Success		200
-//	@Failure		400	bad_request_param	some	parameter	of	body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/repo/{type}/{user}/{name}/file/{path}/preview [get]
+// @Summary		Preview
+// @Description	preview repo file
+// @Tags			RepoFile
+// @Param			user	path	string	true	"user"
+// @Param			name	path	string	true	"repo name"
+// @Param			path	path	string	true	"repo file path"
+// @Accept			json
+// @Success		200
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{user}/{name}/file/{path}/preview [get]
 func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 	_, u, repoInfo, ok := ctl.checkForView(ctx)
 	if !ok {
@@ -326,7 +327,7 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 		return
 	}
 
-	if repoInfo.IsOnline() {
+	if repoInfo.IsOnline() && ctx.Param("path") == "README.md" {
 		user, _ := ctl.us.GetByAccount(u.User)
 		u.Token = user.Platform.Token
 	}
@@ -340,17 +341,63 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 	ctx.Data(http.StatusOK, http.DetectContentType(v), v)
 }
 
-//	@Summary		List
-//	@Description	list repo file in a path
-//	@Tags			RepoFile
-//	@Param			user	path	string	true	"user"
-//	@Param			name	path	string	true	"repo name"
-//	@Param			path	query	string	true	"repo file path"
-//	@Accept			json
-//	@Success		200	{object}			app.RepoPathItem
-//	@Failure		400	bad_request_param	some	parameter	of	body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/repo/{type}/{user}/{name}/files [get]
+// @Summary		ContainReadme
+// @Description	if contain readme
+// @Tags			RepoFile
+// @Param			type	path	string	true	"repo type"
+// @Param			user	path	string	true	"user"
+// @Param			name	path	string	true	"repo name"
+// @Accept			json
+// @Success		200
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{user}/{name}/readme [get]
+func (ctl *RepoFileController) ContainReadme(ctx *gin.Context) {
+	_, u, repoInfo, ok := ctl.checkForView(ctx)
+	if !ok {
+		return
+	}
+
+	var err error
+	info := app.RepoDir{
+		RepoName: repoInfo.Name,
+	}
+
+	info.Path, err = domain.NewDirectory(ctl.getQueryParameter(ctx, "path"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+	user, _ := ctl.us.GetByAccount(u.User)
+	u.Token = user.Platform.Token
+
+	v, err := ctl.s.List(&u, &info)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+
+	b := checkReamde(v)
+	req := RepoContainReadmeRequest{}
+	req.HasReadme = b
+	ctx.JSON(http.StatusOK, newResponseData(req))
+}
+
+// @Summary		List
+// @Description	list repo file in a path
+// @Tags			RepoFile
+// @Param			user	path	string	true	"user"
+// @Param			name	path	string	true	"repo name"
+// @Param			path	query	string	true	"repo file path"
+// @Accept			json
+// @Success		200	{object}			app.RepoPathItem
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{type}/{user}/{name}/files [get]
 func (ctl *RepoFileController) List(ctx *gin.Context) {
 	_, u, repoInfo, ok := ctl.checkForView(ctx)
 	if !ok {
@@ -408,9 +455,15 @@ func (ctl *RepoFileController) checkForView(ctx *gin.Context) (
 	}
 
 	viewOther := visitor || pl.isNotMe(user)
-	viewReadme := repoInfo.IsOnline() && ctx.Param("path") == "README.md"
 
-	if viewOther && repoInfo.IsPrivate() && !viewReadme {
+	var viewReadme bool
+	if ctx.Param("path") == "" {
+		viewReadme = true
+	} else {
+		viewReadme = repoInfo.IsOnline() && ctx.Param("path") == "README.md"
+	}
+
+	if viewOther && (repoInfo.IsPrivate() || !viewReadme) {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
 			errorResourceNotExists,
 			"can't access private project",
@@ -488,6 +541,15 @@ func (ctl *RepoFileController) getRepoInfo(ctx *gin.Context, user domain.Account
 	}
 
 	return
+}
+
+func checkReamde(v []platform.RepoPathItem) (b bool) {
+	for i := range v {
+		if v[i].Path == "README.md" {
+			return true
+		}
+	}
+	return false
 }
 
 type resourceSummary struct {
