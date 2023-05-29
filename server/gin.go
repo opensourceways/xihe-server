@@ -197,6 +197,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		sender,
 	)
 
+	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, sender)
+
+	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, sender)
+
+	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, sender)
+
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	{
 		controller.AddRouterForProjectController(
@@ -276,7 +282,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForHomeController(
-			v1, courseAppService, competitionAppService,
+			v1, courseAppService, competitionAppService, projectService, modelService, datasetService,
 		)
 
 		controller.AddRouterForCloudController(
