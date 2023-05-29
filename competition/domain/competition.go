@@ -9,6 +9,7 @@ type CompetitionSummary struct {
 	Status   CompetitionStatus
 	Duration CompetitionDuration
 	Poster   URL
+	Tags     []CompetitionTag
 }
 
 type Competition struct {

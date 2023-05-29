@@ -3,15 +3,37 @@ package repositoryimpl
 import (
 	"context"
 
-	"go.mongodb.org/mongo-driver/bson"
-
 	"github.com/opensourceways/xihe-server/competition/domain"
 	"github.com/opensourceways/xihe-server/competition/domain/repository"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func NewCompetitionRepo(m mongodbClient) repository.Competition {
 	return competitionRepoImpl{m}
+}
+
+func condFieldOfArrayElem(key string) string {
+	return "$$this." + key
+}
+
+func valueInCondForArrayElem(key string, value interface{}) bson.M {
+	return bson.M{"$in": bson.A{value, condFieldOfArrayElem(key)}}
+}
+
+func condForArrayElem(conds bson.A) bson.M {
+	n := len(conds)
+	if n > 1 {
+		return bson.M{"$and": conds}
+	}
+
+	if n == 1 {
+		return conds[0].(bson.M)
+	}
+
+	return bson.M{
+		"$toBool": 1,
+	}
 }
 
 type competitionRepoImpl struct {
@@ -78,12 +100,17 @@ func (impl competitionRepoImpl) FindCompetitions(opt *repository.CompetitionList
 	f := func(ctx context.Context) error {
 		filter := bson.M{}
 		if opt.Status != nil {
-			filter["status"] = opt.Status.CompetitionStatus()
+			filter[fieldStatus] = opt.Status.CompetitionStatus()
 		}
+
 		if len(opt.CompetitionIds) > 0 {
 			filter[fieldId] = bson.M{
 				"$in": opt.CompetitionIds,
 			}
+		}
+
+		if opt.Tag != nil {
+			filter[fieldTags] = opt.Tag.CompetitionTag()
 		}
 
 		return impl.cli.GetDocs(ctx, filter, nil, &v)

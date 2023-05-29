@@ -34,6 +34,14 @@ func (doc *dCompetition) toCompetitionSummary(c *domain.CompetitionSummary) (err
 		return
 	}
 
+	var t domain.CompetitionTag
+	for _, v := range doc.Tags {
+		if t, err = domain.NewCompetitionTag(v); err != nil {
+			return
+		}
+		c.Tags = append(c.Tags, t)
+	}
+
 	c.Duration, err = domain.NewCompetitionDuration(doc.Duration)
 
 	return

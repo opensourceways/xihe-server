@@ -133,6 +133,17 @@ func (ctl *CompetitionController) List(ctx *gin.Context) {
 		}
 	}
 
+	if s := ctl.getQueryParameter(ctx, "tag"); s != "" {
+		tag, err := domain.NewCompetitionTag(s)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+				errorBadRequestParam, err,
+			))
+			return
+		}
+		cmd.Tag = tag
+	}
+
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return

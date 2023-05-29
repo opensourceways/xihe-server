@@ -109,6 +109,7 @@ func (s *competitionService) List(cmd *CompetitionListCMD) (
 
 	return s.listCompetitions(&repository.CompetitionListOption{
 		Status: cmd.Status,
+		Tag:    cmd.Tag,
 	})
 }
 

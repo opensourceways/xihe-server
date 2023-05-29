@@ -13,6 +13,7 @@ import (
 type CompetitionListCMD struct {
 	Status domain.CompetitionStatus
 	User   types.Account
+	Tag    domain.CompetitionTag
 }
 
 type CompetitorApplyCmd domain.Competitor
@@ -55,15 +56,16 @@ func (cmd *CompetitionAddReleatedProjectCMD) repo() string {
 }
 
 type CompetitionSummaryDTO struct {
-	CompetitorCount int    `json:"count"`
-	Bonus           int    `json:"bonus"`
-	Id              string `json:"id"`
-	Name            string `json:"name"`
-	Host            string `json:"host"`
-	Desc            string `json:"desc"`
-	Status          string `json:"status"`
-	Poster          string `json:"poster"`
-	Duration        string `json:"duration"`
+	CompetitorCount int      `json:"count"`
+	Bonus           int      `json:"bonus"`
+	Id              string   `json:"id"`
+	Name            string   `json:"name"`
+	Host            string   `json:"host"`
+	Desc            string   `json:"desc"`
+	Status          string   `json:"status"`
+	Poster          string   `json:"poster"`
+	Duration        string   `json:"duration"`
+	Tags            []string `json:"tags"`
 }
 
 type CompetitionDTO struct {
@@ -160,6 +162,10 @@ func (s competitionService) toCompetitionSummaryDTO(
 		Poster:          c.Poster.URL(),
 		Duration:        c.Duration.CompetitionDuration(),
 		CompetitorCount: competitorsCount,
+	}
+
+	for _, v := range c.Tags {
+		dto.Tags = append(dto.Tags, v.CompetitionTag())
 	}
 }
 

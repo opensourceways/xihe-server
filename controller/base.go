@@ -20,6 +20,7 @@ const (
 	headerSecWebsocket = "Sec-Websocket-Protocol"
 
 	roleIndividuals = "individuals"
+	fileReadme      = "README.md"
 )
 
 type baseController struct {

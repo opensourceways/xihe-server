@@ -327,7 +327,7 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 		return
 	}
 
-	if repoInfo.IsOnline() && ctx.Param("path") == "README.md" {
+	if repoInfo.IsOnline() && ctx.Param("path") == fileReadme {
 		user, _ := ctl.us.GetByAccount(u.User)
 		u.Token = user.Platform.Token
 	}
@@ -354,7 +354,6 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 //	@Router			/v1/repo/{type}/{user}/{name}/readme [get]
 func (ctl *RepoFileController) ContainReadme(ctx *gin.Context) {
 	_, u, repoInfo, ok := ctl.checkForView(ctx)
-	fmt.Printf("repoInfo: %v\n", repoInfo)
 	if !ok {
 		return
 	}
@@ -374,7 +373,6 @@ func (ctl *RepoFileController) ContainReadme(ctx *gin.Context) {
 	}
 
 	v, err := ctl.s.List(&u, &info)
-	fmt.Printf("v: %v\n", v)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
@@ -460,7 +458,7 @@ func (ctl *RepoFileController) checkForView(ctx *gin.Context) (
 	if ctx.Param("path") == "" {
 		viewReadme = true
 	} else {
-		viewReadme = repoInfo.IsOnline() && ctx.Param("path") == "README.md"
+		viewReadme = repoInfo.IsOnline() && ctx.Param("path") == fileReadme
 	}
 
 	if viewOther && (repoInfo.IsPrivate() || !viewReadme) {
@@ -550,7 +548,7 @@ func (ctl *RepoFileController) containReadme(v []platform.RepoPathItem) (
 	for i := range v {
 		var t platform.RepoPathItem
 		t = v[i]
-		if t.Path == "README.md" {
+		if t.Path == fileReadme {
 			b = true
 			return
 		}
