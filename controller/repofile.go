@@ -38,6 +38,7 @@ func AddRouterForRepoFileController(
 	rg.GET("/v1/repo/:type/:user/:name/files", ctl.List)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path", ctl.Download)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path/preview", ctl.Preview)
+	rg.GET("/v1/repo/:type/:user/:name/readme", ctl.ContainReadme)
 	rg.PUT("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Update)
 	rg.POST("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.DELETE("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
@@ -326,7 +327,7 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 		return
 	}
 
-	if repoInfo.IsOnline() {
+	if repoInfo.IsOnline() && ctx.Param("path") == "README.md" {
 		user, _ := ctl.us.GetByAccount(u.User)
 		u.Token = user.Platform.Token
 	}
@@ -338,6 +339,52 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 	}
 
 	ctx.Data(http.StatusOK, http.DetectContentType(v), v)
+}
+
+//	@Summary		ContainReadme
+//	@Description	preview repo file
+//	@Tags			RepoFile
+//	@Param			user	path	string	true	"user"
+//	@Param			name	path	string	true	"repo name"
+//	@Param			path	path	string	true	"repo file path"
+//	@Accept			json
+//	@Success		200
+//	@Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/repo/{type}/{user}/{name}/readme [get]
+func (ctl *RepoFileController) ContainReadme(ctx *gin.Context) {
+	_, u, repoInfo, ok := ctl.checkForView(ctx)
+	fmt.Printf("repoInfo: %v\n", repoInfo)
+	if !ok {
+		return
+	}
+
+	var err error
+	info := app.RepoDir{
+		RepoName: repoInfo.Name,
+	}
+
+	info.Path, err = domain.NewDirectory("")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	v, err := ctl.s.List(&u, &info)
+	fmt.Printf("v: %v\n", v)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+	b := ctl.containReadme(v)
+	res := ContainReadmeInfo{
+		HasReadme: b,
+	}
+
+	ctx.JSON(http.StatusOK, newResponseData(res))
 }
 
 //	@Summary		List
@@ -408,9 +455,15 @@ func (ctl *RepoFileController) checkForView(ctx *gin.Context) (
 	}
 
 	viewOther := visitor || pl.isNotMe(user)
-	viewReadme := repoInfo.IsOnline() && ctx.Param("path") == "README.md"
 
-	if viewOther && repoInfo.IsPrivate() && !viewReadme {
+	var viewReadme bool
+	if ctx.Param("path") == "" {
+		viewReadme = true
+	} else {
+		viewReadme = repoInfo.IsOnline() && ctx.Param("path") == "README.md"
+	}
+
+	if viewOther && (repoInfo.IsPrivate() || !viewReadme) {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
 			errorResourceNotExists,
 			"can't access private project",
@@ -487,6 +540,21 @@ func (ctl *RepoFileController) getRepoInfo(ctx *gin.Context, user domain.Account
 		s.ResourceSummary, err = ctl.dataset.GetSummaryByName(user, name)
 	}
 
+	return
+}
+
+func (ctl *RepoFileController) containReadme(v []platform.RepoPathItem) (
+	b bool,
+) {
+	b = false
+	for i := range v {
+		var t platform.RepoPathItem
+		t = v[i]
+		if t.Path == "README.md" {
+			b = true
+			return
+		}
+	}
 	return
 }
 
