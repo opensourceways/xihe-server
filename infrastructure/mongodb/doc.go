@@ -96,6 +96,7 @@ type ProjectPropertyItem struct {
 	Name     string `bson:"name"       json:"name"`
 	FL       byte   `bson:"fl"         json:"fl"`
 	Desc     string `bson:"desc"       json:"desc"`
+	Title    string `bson:"title"       json:"title"`
 	CoverId  string `bson:"cover_id"   json:"cover_id"`
 	RepoType string `bson:"repo_type"  json:"repo_type"`
 	// set omitempty to avoid set it to null occasionally.
@@ -146,6 +147,7 @@ type ModelPropertyItem struct {
 	Level    int      `bson:"level"      json:"level"`
 	Name     string   `bson:"name"       json:"name"`
 	Desc     string   `bson:"desc"       json:"desc"`
+	Title    string   `bson:"title"      json:"title"`
 	RepoType string   `bson:"repo_type"  json:"repo_type"`
 	Tags     []string `bson:"tags"       json:"tags"`
 	TagKinds []string `bson:"kinds"      json:"kinds"`

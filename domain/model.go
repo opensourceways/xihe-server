@@ -68,6 +68,7 @@ func (m *Model) RelatedResources() []ResourceObjects {
 type ModelModifiableProperty struct {
 	Name     ResourceName
 	Desc     ResourceDesc
+	Title    ResourceTitle
 	RepoType RepoType
 	Tags     []string
 	TagKinds []string

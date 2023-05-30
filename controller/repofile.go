@@ -461,7 +461,7 @@ func (ctl *RepoFileController) checkForView(ctx *gin.Context) (
 		viewReadme = repoInfo.IsOnline() && ctx.Param("path") == fileReadme
 	}
 
-	if viewOther && (repoInfo.IsPrivate() || !viewReadme) {
+	if viewOther && !repoInfo.IsPublic() && (repoInfo.IsPrivate() || !viewReadme) {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
 			errorResourceNotExists,
 			"can't access private project",

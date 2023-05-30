@@ -230,6 +230,7 @@ func (col model) toModelDoc(do *repositories.ModelDO) (bson.M, error) {
 			FL:       do.FL,
 			Name:     do.Name,
 			Desc:     do.Desc,
+			Title:    do.Title,
 			RepoType: do.RepoType,
 			Tags:     do.Tags,
 			TagKinds: do.TagKinds,

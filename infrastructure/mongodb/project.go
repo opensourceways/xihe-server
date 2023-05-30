@@ -225,6 +225,7 @@ func (col project) toProjectDoc(do *repositories.ProjectDO) (bson.M, error) {
 			FL:       do.FL,
 			Name:     do.Name,
 			Desc:     do.Desc,
+			Title:    do.Title,
 			CoverId:  do.CoverId,
 			RepoType: do.RepoType,
 			Tags:     do.Tags,

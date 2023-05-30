@@ -71,6 +71,7 @@ func (p *Project) RelatedResources() []ResourceObjects {
 type ProjectModifiableProperty struct {
 	Name     ResourceName
 	Desc     ResourceDesc
+	Title    ResourceTitle
 	CoverId  CoverId
 	RepoType RepoType
 	Tags     []string

@@ -197,6 +197,10 @@ func (impl model) toModelDO(m *domain.Model) ModelDO {
 		do.Desc = m.Desc.ResourceDesc()
 	}
 
+	if m.Title != nil {
+		do.Title = m.Title.ResourceTitle()
+	}
+
 	return do
 }
 
@@ -206,6 +210,7 @@ type ModelDO struct {
 	Name          string
 	FL            byte
 	Desc          string
+	Title         string
 	Protocol      string
 	RepoType      string
 	RepoId        string

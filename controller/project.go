@@ -137,7 +137,14 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 		return
 	}
 
-	cmd, err := req.toCmd()
+	tags, err := ctl.tags.List(apiConfig.Tags.ProjectTagDomains)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+
+	cmd, err := req.toCmd(tags)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,

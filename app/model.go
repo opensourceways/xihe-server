@@ -15,8 +15,10 @@ type ModelCreateCmd struct {
 	Owner    domain.Account
 	Name     domain.ResourceName
 	Desc     domain.ResourceDesc
+	Title    domain.ResourceTitle
 	RepoType domain.RepoType
 	Protocol domain.ProtocolName
+	Tags     []string
 }
 
 func (cmd *ModelCreateCmd) Validate() error {
@@ -35,6 +37,7 @@ func (cmd *ModelCreateCmd) Validate() error {
 func (cmd *ModelCreateCmd) toModel(v *domain.Model) {
 	now := utils.Now()
 
+	normTags := []string{cmd.Protocol.ProtocolName()}
 	*v = domain.Model{
 		Owner:     cmd.Owner,
 		Protocol:  cmd.Protocol,
@@ -43,8 +46,9 @@ func (cmd *ModelCreateCmd) toModel(v *domain.Model) {
 		ModelModifiableProperty: domain.ModelModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     cmd.Desc,
+			Title:    cmd.Title,
 			RepoType: cmd.RepoType,
-			Tags:     []string{cmd.Protocol.ProtocolName()},
+			Tags:     append(normTags, cmd.Tags...),
 			TagKinds: []string{},
 		},
 	}

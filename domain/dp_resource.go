@@ -80,6 +80,28 @@ func (r resourceName) FirstLetterOfName() byte {
 	return string(r)[0]
 }
 
+// ResourceTitle
+type ResourceTitle interface {
+	ResourceTitle() string
+}
+
+func NewResourceTitle(v string) (ResourceTitle, error) {
+	max := config.MaxTitleLength
+	min := config.MinTitleLength
+
+	if n := len(v); n > max || n < min {
+		return nil, fmt.Errorf("title's length should be between %d to %d", min, max)
+	}
+
+	return resourceTitle(v), nil
+}
+
+type resourceTitle string
+
+func (r resourceTitle) ResourceTitle() string {
+	return string(r)
+}
+
 // ResourceType
 type ResourceType interface {
 	ResourceType() string

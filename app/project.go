@@ -20,6 +20,8 @@ type ProjectCreateCmd struct {
 	RepoType domain.RepoType
 	Protocol domain.ProtocolName
 	Training domain.TrainingPlatform
+	Title    domain.ResourceTitle
+	Tags     []string
 }
 
 func (cmd *ProjectCreateCmd) Validate() error {
@@ -40,6 +42,9 @@ func (cmd *ProjectCreateCmd) Validate() error {
 
 func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
 	now := utils.Now()
+	normTags := []string{cmd.Type.ProjType(),
+		cmd.Protocol.ProtocolName(),
+		cmd.Training.TrainingPlatform()}
 
 	*r = domain.Project{
 		Owner:     cmd.Owner,
@@ -51,13 +56,10 @@ func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
 		ProjectModifiableProperty: domain.ProjectModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     cmd.Desc,
+			Title:    cmd.Title,
 			CoverId:  cmd.CoverId,
 			RepoType: cmd.RepoType,
-			Tags: []string{
-				cmd.Type.ProjType(),
-				cmd.Protocol.ProtocolName(),
-				cmd.Training.TrainingPlatform(),
-			},
+			Tags:     append(cmd.Tags, normTags...),
 			TagKinds: []string{},
 		},
 	}
