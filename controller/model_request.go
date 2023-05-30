@@ -39,6 +39,10 @@ func (req *modelCreateRequest) toCmd(
 		return
 	}
 
+	if req.Title == "" {
+		req.Title = req.Name
+	}
+
 	if cmd.Title, err = domain.NewResourceTitle(req.Title); err != nil {
 		return
 	}
