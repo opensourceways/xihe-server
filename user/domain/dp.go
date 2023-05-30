@@ -114,7 +114,7 @@ func NewBio(v string) (Bio, error) {
 		return dpBio(v), nil
 	}
 
-	if utils.StrLen(v) > 30 { // TODO: to config
+	if utils.StrLen(v) > 200 { // TODO: to config
 		return nil, errors.New("invalid bio")
 	}
 
