@@ -3,17 +3,22 @@ package controller
 import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 type datasetCreateRequest struct {
-	Owner    string `json:"owner" required:"true"`
-	Name     string `json:"name" required:"true"`
-	Desc     string `json:"desc"`
-	Protocol string `json:"protocol" required:"true"`
-	RepoType string `json:"repo_type" required:"true"`
+	Owner    string   `json:"owner" required:"true"`
+	Name     string   `json:"name" required:"true"`
+	Desc     string   `json:"desc"`
+	Title    string   `json:"title"`
+	Protocol string   `json:"protocol" required:"true"`
+	RepoType string   `json:"repo_type" required:"true"`
+	Tags     []string `json:"tags"`
 }
 
-func (req *datasetCreateRequest) toCmd() (cmd app.DatasetCreateCmd, err error) {
+func (req *datasetCreateRequest) toCmd(
+	validTags []domain.DomainTags,
+) (cmd app.DatasetCreateCmd, err error) {
 	if cmd.Owner, err = domain.NewAccount(req.Owner); err != nil {
 		return
 	}
@@ -33,6 +38,26 @@ func (req *datasetCreateRequest) toCmd() (cmd app.DatasetCreateCmd, err error) {
 	if cmd.RepoType, err = domain.NewRepoType(req.RepoType); err != nil {
 		return
 	}
+
+	if req.Title == "" {
+		req.Title = req.Name
+	}
+
+	if cmd.Title, err = domain.NewResourceTitle(req.Title); err != nil {
+		return
+	}
+
+	tags := sets.NewString()
+	for i := range validTags {
+		for _, item := range validTags[i].Items {
+			tags.Insert(item.Items...)
+		}
+	}
+
+	if len(req.Tags) > 0 && !tags.HasAll(req.Tags...) {
+		return
+	}
+	cmd.Tags = req.Tags
 
 	err = cmd.Validate()
 
