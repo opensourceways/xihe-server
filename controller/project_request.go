@@ -57,6 +57,7 @@ func (p *projectCreateRequest) toCmd(
 	if p.Title == "" {
 		p.Title = p.Name
 	}
+
 	if cmd.Title, err = domain.NewResourceTitle(p.Title); err != nil {
 		return
 	}

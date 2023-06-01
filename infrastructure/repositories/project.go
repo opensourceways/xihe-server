@@ -224,6 +224,10 @@ func (do *ProjectDO) toProject(r *domain.Project) (err error) {
 		return
 	}
 
+	if r.Title, err = domain.NewResourceTitle(do.Title); err != nil {
+		return
+	}
+
 	if r.Type, err = domain.NewProjType(do.Type); err != nil {
 		return
 	}

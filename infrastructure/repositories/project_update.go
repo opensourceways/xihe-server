@@ -116,6 +116,7 @@ type ProjectPropertyDO struct {
 	FL       byte
 	Name     string
 	Desc     string
+	Title    string
 	Level    int
 	CoverId  string
 	RepoType string
@@ -234,6 +235,7 @@ type ProjectSummaryDO struct {
 	Owner         string
 	Name          string
 	Desc          string
+	Title         string
 	Level         int
 	CoverId       string
 	Tags          []string
@@ -255,6 +257,10 @@ func (do *ProjectSummaryDO) toProjectSummary(r *domain.ProjectSummary) (err erro
 	}
 
 	if r.Desc, err = domain.NewResourceDesc(do.Desc); err != nil {
+		return
+	}
+
+	if r.Title, err = domain.NewResourceTitle(do.Title); err != nil {
 		return
 	}
 

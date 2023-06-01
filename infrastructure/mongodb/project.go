@@ -244,6 +244,7 @@ func (col project) toProjectDO(owner string, item *projectItem, do *repositories
 		Owner:         owner,
 		Name:          item.Name,
 		Desc:          item.Desc,
+		Title:         item.Title,
 		Type:          item.Type,
 		Level:         item.Level,
 		CoverId:       item.CoverId,

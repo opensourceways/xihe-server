@@ -84,6 +84,7 @@ type ProjectSummary struct {
 	Owner         Account
 	Name          ResourceName
 	Desc          ResourceDesc
+	Title         ResourceTitle
 	Level         ResourceLevel
 	CoverId       CoverId
 	Tags          []string

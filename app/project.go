@@ -15,12 +15,12 @@ type ProjectCreateCmd struct {
 	Owner    domain.Account
 	Name     domain.ResourceName
 	Desc     domain.ResourceDesc
+	Title    domain.ResourceTitle
 	Type     domain.ProjType
 	CoverId  domain.CoverId
 	RepoType domain.RepoType
 	Protocol domain.ProtocolName
 	Training domain.TrainingPlatform
-	Title    domain.ResourceTitle
 	Tags     []string
 }
 
@@ -75,6 +75,7 @@ type ProjectSummaryDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Level         string   `json:"level"`
 	CoverId       string   `json:"cover_id"`
 	Tags          []string `json:"tags"`
@@ -89,6 +90,7 @@ type ProjectDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Type          string   `json:"type"`
 	CoverId       string   `json:"cover_id"`
 	Protocol      string   `json:"protocol"`
@@ -332,6 +334,10 @@ func (s projectService) toProjectDTO(p *domain.Project, dto *ProjectDTO) {
 		dto.Desc = p.Desc.ResourceDesc()
 	}
 
+	if p.Title != nil {
+		dto.Title = p.Title.ResourceTitle()
+	}
+
 }
 
 func (s projectService) toProjectSummaryDTO(p *domain.ProjectSummary, dto *ProjectSummaryDTO) {
@@ -349,6 +355,10 @@ func (s projectService) toProjectSummaryDTO(p *domain.ProjectSummary, dto *Proje
 
 	if p.Desc != nil {
 		dto.Desc = p.Desc.ResourceDesc()
+	}
+
+	if p.Title != nil {
+		dto.Title = p.Title.ResourceTitle()
 	}
 
 	if p.Level != nil {
