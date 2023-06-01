@@ -64,6 +64,7 @@ type ModelSummaryDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Tags          []string `json:"tags"`
 	UpdatedAt     string   `json:"updated_at"`
 	LikeCount     int      `json:"like_count"`
@@ -75,6 +76,7 @@ type ModelDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Protocol      string   `json:"protocol"`
 	RepoType      string   `json:"repo_type"`
 	RepoId        string   `json:"repo_id"`
@@ -294,6 +296,10 @@ func (s modelService) toModelDTO(m *domain.Model, dto *ModelDTO) {
 		dto.Desc = m.Desc.ResourceDesc()
 	}
 
+	if m.Title != nil {
+		dto.Title = m.Title.ResourceTitle()
+	}
+
 }
 
 func (s modelService) toModelSummaryDTO(m *domain.ModelSummary, dto *ModelSummaryDTO) {
@@ -309,6 +315,10 @@ func (s modelService) toModelSummaryDTO(m *domain.ModelSummary, dto *ModelSummar
 
 	if m.Desc != nil {
 		dto.Desc = m.Desc.ResourceDesc()
+	}
+
+	if m.Title != nil {
+		dto.Title = m.Title.ResourceTitle()
 	}
 
 }

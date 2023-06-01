@@ -79,6 +79,7 @@ type ModelSummary struct {
 	Owner         Account
 	Name          ResourceName
 	Desc          ResourceDesc
+	Title         ResourceTitle
 	Tags          []string
 	UpdatedAt     int64
 	LikeCount     int

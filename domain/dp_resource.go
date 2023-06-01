@@ -86,10 +86,13 @@ type ResourceTitle interface {
 }
 
 func NewResourceTitle(v string) (ResourceTitle, error) {
+	if v == "" {
+		return resourceTitle(v), nil
+	}
+
 	max := config.MaxTitleLength
 	min := config.MinTitleLength
-
-	if n := len(v); n > max || n < min {
+	if n := utils.StrLen(v); n > max || n < min {
 		return nil, fmt.Errorf("title's length should be between %d to %d", min, max)
 	}
 

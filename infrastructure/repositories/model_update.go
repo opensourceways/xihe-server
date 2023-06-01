@@ -181,6 +181,7 @@ type ModelSummaryDO struct {
 	Owner         string
 	Name          string
 	Desc          string
+	Title         string
 	Tags          []string
 	UpdatedAt     int64
 	LikeCount     int
@@ -199,6 +200,10 @@ func (do *ModelSummaryDO) toModelSummary(r *domain.ModelSummary) (err error) {
 	}
 
 	if r.Desc, err = domain.NewResourceDesc(do.Desc); err != nil {
+		return
+	}
+
+	if r.Title, err = domain.NewResourceTitle(do.Title); err != nil {
 		return
 	}
 

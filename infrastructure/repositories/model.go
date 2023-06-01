@@ -241,6 +241,10 @@ func (do *ModelDO) toModel(r *domain.Model) (err error) {
 		return
 	}
 
+	if r.Title, err = domain.NewResourceTitle(do.Title); err != nil {
+		return
+	}
+
 	if r.RepoType, err = domain.NewRepoType(do.RepoType); err != nil {
 		return
 	}

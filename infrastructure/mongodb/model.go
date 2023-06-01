@@ -248,6 +248,7 @@ func (col model) toModelDO(owner string, item *modelItem, do *repositories.Model
 		Owner:         owner,
 		Name:          item.Name,
 		Desc:          item.Desc,
+		Title:         item.Title,
 		Protocol:      item.Protocol,
 		RepoType:      item.RepoType,
 		RepoId:        item.RepoId,
