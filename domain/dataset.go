@@ -64,6 +64,7 @@ func (d *Dataset) RelatedResources() []ResourceObjects {
 type DatasetModifiableProperty struct {
 	Name     ResourceName
 	Desc     ResourceDesc
+	Title    ResourceTitle
 	RepoType RepoType
 	Tags     []string
 	TagKinds []string
@@ -74,6 +75,7 @@ type DatasetSummary struct {
 	Owner         Account
 	Name          ResourceName
 	Desc          ResourceDesc
+	Title         ResourceTitle
 	Tags          []string
 	UpdatedAt     int64
 	LikeCount     int

@@ -8,6 +8,7 @@ const (
 	fieldBio            = "bio"
 	fieldJob            = "job"
 	fieldDesc           = "desc"
+	fieldTitle          = "title"
 	fieldDate           = "date"
 	fieldLevel          = "level"
 	fieldDetail         = "detail"
@@ -193,6 +194,7 @@ type DatasetPropertyItem struct {
 	Level    int      `bson:"level"      json:"level"`
 	Name     string   `bson:"name"       json:"name"`
 	Desc     string   `bson:"desc"       json:"desc"`
+	Title    string   `bson:"title"      json:"title"`
 	RepoType string   `bson:"repo_type"  json:"repo_type"`
 	Tags     []string `bson:"tags"       json:"tags"`
 	TagKinds []string `bson:"kinds"      json:"kinds"`

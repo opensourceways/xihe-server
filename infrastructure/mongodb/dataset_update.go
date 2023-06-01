@@ -167,7 +167,7 @@ func (col dataset) listResource(
 
 func (col dataset) summaryFields() []string {
 	return []string{
-		fieldId, fieldName, fieldDesc, fieldTags, fieldFirstLetter,
+		fieldId, fieldName, fieldDesc, fieldTitle, fieldTags, fieldFirstLetter,
 		fieldUpdatedAt, fieldLikeCount, fieldDownloadCount, fieldLevel,
 	}
 }
@@ -178,6 +178,7 @@ func (col dataset) toDatasetSummaryDO(owner string, item *datasetItem, do *repos
 		Owner:         owner,
 		Name:          item.Name,
 		Desc:          item.Desc,
+		Title:         item.Title,
 		Tags:          item.Tags,
 		UpdatedAt:     item.UpdatedAt,
 		LikeCount:     item.LikeCount,
