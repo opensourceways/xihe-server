@@ -117,12 +117,6 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		if user, err = ctl.newUser(ctx, info); err != nil {
 			return
 		}
-	} else {
-		if user.Email != info.Email.Email() {
-			ctl.us.UpdateBasicInfo(
-				info.Name, userapp.UpdateUserBasicInfoCmd{Email: info.Email},
-			)
-		}
 	}
 
 	if err := ctl.newLogin(ctx, info); err != nil {
