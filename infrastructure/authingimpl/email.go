@@ -22,7 +22,7 @@ const (
 
 	errorCodeError          = "email_code_error"
 	errorEmailDuplicateBind = "email_email_duplicate_bind"
-	errorUserDuplicateBind  = "email_user_duplicate_bind"
+	ErrorUserDuplicateBind  = "email_user_duplicate_bind"
 	errorEmailDuplicateSend = "email_email_duplicate_send"
 )
 
@@ -191,7 +191,7 @@ func errorReturn(err error) (code string) {
 	}
 
 	if strings.Contains(errinfo, "E00016") {
-		code = errorUserDuplicateBind
+		code = ErrorUserDuplicateBind
 		return
 	}
 

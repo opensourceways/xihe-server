@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain/login"
@@ -49,7 +50,22 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 	}
 
 	if code, err = s.auth.VerifyBindEmail(cmd.Email.Email(), cmd.PassCode, info.UserId); err != nil {
-		return
+		if !isCodeUserDuplicateBind(code) {
+			return
+		}
+
+		// get authing email which saved in xihe
+		var login app.LoginDTO
+		login, err = s.login.GetAccessAndIdToken(cmd.User)
+		if err != nil {
+			return
+		}
+
+		// if bind email is authing email, bind email
+		if login.Email != cmd.Email.Email() {
+			return
+		}
+
 	}
 
 	// create platform account

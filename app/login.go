@@ -8,14 +8,14 @@ import (
 )
 
 type LoginCreateCmd struct {
-	Account     domain.Account
-	Info        string
-	AccessToken string
-	UserId      string
+	Account domain.Account
+	Info    string
+	Email   domain.Email
+	UserId  string
 }
 
 func (cmd *LoginCreateCmd) Validate() error {
-	if b := cmd.Account != nil && cmd.Info != "" && cmd.AccessToken != "" && cmd.UserId != ""; !b {
+	if b := cmd.Account != nil && cmd.Info != "" && cmd.Email != nil && cmd.UserId != ""; !b {
 		return errors.New("invalid cmd of creating login")
 	}
 
@@ -24,17 +24,17 @@ func (cmd *LoginCreateCmd) Validate() error {
 
 func (cmd *LoginCreateCmd) toLogin() domain.Login {
 	return domain.Login{
-		Account:     cmd.Account,
-		Info:        cmd.Info,
-		AccessToken: cmd.AccessToken,
-		UserId:      cmd.UserId,
+		Account: cmd.Account,
+		Info:    cmd.Info,
+		Email:   cmd.Email,
+		UserId:  cmd.UserId,
 	}
 }
 
 type LoginDTO struct {
-	Info        string `json:"info"`
-	AccessToken string `json:"access"`
-	UserId      string `json:"user_id"`
+	Info   string `json:"info"`
+	Email  string `json:"email"`
+	UserId string `json:"user_id"`
 }
 
 type LoginService interface {
@@ -72,6 +72,6 @@ func (s loginService) Get(account domain.Account) (dto LoginDTO, err error) {
 
 func (s loginService) toLoginDTO(u *domain.Login, dto *LoginDTO) {
 	dto.Info = u.Info
-	dto.AccessToken = u.AccessToken
+	dto.Email = u.Email.Email()
 	dto.UserId = u.UserId
 }
