@@ -16,7 +16,8 @@ import (
 )
 
 const (
-	headerPrivateToken = "PRIVATE-TOKEN"
+	cookiePrivateToken = "PRIVATE-TOKEN"
+	xcsrfToken         = "CSRF-Token"
 	headerSecWebsocket = "Sec-Websocket-Protocol"
 
 	roleIndividuals = "individuals"
@@ -27,11 +28,11 @@ type baseController struct {
 }
 
 func (ctl baseController) newApiToken(ctx *gin.Context, pl interface{}) (
-	string, error,
+	token string, csrftoken string, err error,
 ) {
 	addr, err := ctl.getRemoteAddr(ctx)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	ac := &accessController{
@@ -41,16 +42,26 @@ func (ctl baseController) newApiToken(ctx *gin.Context, pl interface{}) (
 		RemoteAddr: addr,
 	}
 
-	token, err := ac.newToken(apiConfig.TokenKey)
+	t, err := ac.newToken(apiConfig.TokenKey)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return ctl.encryptData(token)
+	ct := ac.genCSRFToken(t)
+
+	if token, err = ctl.encryptData(t); err != nil {
+		return
+	}
+
+	if csrftoken, err = ctl.encryptDataForCSRF(ct); err != nil {
+		return
+	}
+
+	return
 }
 
-func (ctl baseController) checkApiToken(ctx *gin.Context, token string, pl interface{}, refresh bool) (ok bool) {
-	addr, err := ctl.getRemoteAddr(ctx)
+func (ctl baseController) checkToken(ctx *gin.Context, token string, pl interface{}) (ac accessController, tokenbyte []byte, ok bool) {
+	tokenbyte, err := ctl.decryptData(token)
 	if err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
@@ -60,21 +71,11 @@ func (ctl baseController) checkApiToken(ctx *gin.Context, token string, pl inter
 		return
 	}
 
-	b, err := ctl.decryptData(token)
-	if err != nil {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			newResponseCodeError(errorSystemError, err),
-		)
-
-		return
-	}
-
-	ac := accessController{
+	ac = accessController{
 		Payload: pl,
 	}
 
-	if err := ac.initByToken(string(b), apiConfig.TokenKey); err != nil {
+	if err := ac.initByToken(string(tokenbyte), apiConfig.TokenKey); err != nil {
 		ctx.JSON(
 			http.StatusInternalServerError,
 			newResponseCodeError(errorSystemError, err),
@@ -83,7 +84,7 @@ func (ctl baseController) checkApiToken(ctx *gin.Context, token string, pl inter
 		return
 	}
 
-	if err = ac.verify([]string{roleIndividuals}, addr); err != nil {
+	if err = ac.verify([]string{roleIndividuals}); err != nil {
 		ctx.JSON(
 			http.StatusUnauthorized,
 			newResponseCodeError(errorInvalidToken, err),
@@ -93,35 +94,69 @@ func (ctl baseController) checkApiToken(ctx *gin.Context, token string, pl inter
 
 	ok = true
 
-	if !refresh {
-		return
-	}
-
-	if v, err := ac.refreshToken(apiConfig.TokenExpiry, apiConfig.TokenKey); err == nil {
-		if v, err = ctl.encryptData(v); err == nil {
-			token = v
-		}
-	}
-
-	ctx.Header(headerPrivateToken, token)
-
 	return
 }
 
-func (ctl baseController) checkNewUserApiToken(ctx *gin.Context) (
-	pl newUserTokenPayload, ok bool,
-) {
-	token := ctx.GetHeader(headerPrivateToken)
-	if token == "" {
+func (ctl baseController) checkCSRFToken(ctx *gin.Context, tokenbyte []byte, csrftoken string) (ok bool) {
+	csrfbyte, err := ctl.decryptDataForCSRF(csrftoken)
+	if err != nil {
 		ctx.JSON(
-			http.StatusBadRequest,
-			newResponseCodeMsg(errorBadRequestHeader, "no token"),
+			http.StatusInternalServerError,
+			newResponseCodeError(errorSystemError, err),
 		)
 
 		return
 	}
 
-	ok = ctl.checkApiToken(ctx, token, &pl, false)
+	if !verifyCSRFToken(tokenbyte, csrfbyte) {
+		ctx.JSON(
+			http.StatusUnauthorized,
+			newResponseCodeError(errorInvalidToken, errors.New("token not allowed")),
+		)
+
+		return
+	}
+
+	ok = true
+
+	return
+}
+
+func (ctl baseController) refreshDoubleToken(ac accessController) (token, csrftoken string) {
+	decode, err := ac.refreshToken(apiConfig.TokenExpiry, apiConfig.TokenKey)
+	if err == nil {
+		if t, err := ctl.encryptData(decode); err == nil {
+			token = t
+		}
+	}
+
+	if w := ac.genCSRFToken(decode); len(w) != 0 {
+		if t, err := ctl.encryptDataForCSRF(w); err == nil {
+			csrftoken = t
+		}
+	}
+
+	return
+}
+
+func (ctl baseController) checkApiToken(
+	ctx *gin.Context, token string, csrftoken string, pl interface{}, refresh bool,
+) (ok bool) {
+	ac, tokenbyte, ok := ctl.checkToken(ctx, token, pl)
+	if !ok {
+		return
+	}
+
+	if ok = ctl.checkCSRFToken(ctx, tokenbyte, csrftoken); !ok {
+		return
+	}
+
+	if !refresh {
+		return
+	}
+
+	token, csrftoken = ctl.refreshDoubleToken(ac)
+	ctl.setRespToken(ctx, token, csrftoken)
 
 	return
 }
@@ -131,8 +166,11 @@ func (ctl baseController) checkUserApiToken(
 ) (
 	pl oldUserTokenPayload, visitor bool, ok bool,
 ) {
-	token := ctx.GetHeader(headerPrivateToken)
-	if token == "" {
+
+	token := ctl.getCookieToken(ctx)
+	csrftoken := ctl.getCSRFToken(ctx)
+
+	if token == "" || csrftoken == "" {
 		if allowVistor {
 			visitor = true
 			ok = true
@@ -146,13 +184,31 @@ func (ctl baseController) checkUserApiToken(
 		return
 	}
 
-	ok = ctl.checkApiToken(ctx, token, &pl, true)
+	ok = ctl.checkApiToken(ctx, token, csrftoken, &pl, true)
 
 	return
 }
 
-func (ctl baseController) setRespToken(ctx *gin.Context, token string) {
-	ctx.Header(headerPrivateToken, token)
+func (ctl baseController) setRespCookieToken(ctx *gin.Context, token string) {
+	cookie := &http.Cookie{
+		Name:     cookiePrivateToken,
+		Value:    token,
+		Path:     "/",
+		Expires:  utils.ExpiryReduceSecond(apiConfig.TokenExpiry),
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+
+	http.SetCookie(ctx.Writer, cookie)
+}
+
+func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token string) {
+	ctx.Header(xcsrfToken, token)
+}
+
+func (ctl baseController) setRespToken(ctx *gin.Context, token string, csrftoken string) {
+	ctl.setRespCSRFToken(ctx, csrftoken)
+	ctl.setRespCookieToken(ctx, token)
 }
 
 func (ctl baseController) getRemoteAddr(ctx *gin.Context) (string, error) {
@@ -167,6 +223,7 @@ func (ctl baseController) getRemoteAddr(ctx *gin.Context) (string, error) {
 	return "", errors.New("can not fetch client ip")
 }
 
+// crypt for token
 func (ctl baseController) encryptData(d string) (string, error) {
 	t, err := encryptHelper.Encrypt([]byte(d))
 	if err != nil {
@@ -182,6 +239,24 @@ func (ctl baseController) decryptData(s string) ([]byte, error) {
 	}
 
 	return encryptHelper.Decrypt(dst)
+}
+
+// crypt for csrftoken
+func (ctl baseController) encryptDataForCSRF(d string) (string, error) {
+	t, err := encryptHelperCSRF.Encrypt([]byte(d))
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(t), nil
+}
+
+func (ctl baseController) decryptDataForCSRF(s string) ([]byte, error) {
+	dst, err := hex.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return encryptHelperCSRF.Decrypt(dst)
 }
 
 func (ctl baseController) getQueryParameter(ctx *gin.Context, key string) string {
@@ -314,23 +389,97 @@ func (ctl baseController) getListGlobalResourceParameter(
 	return
 }
 
-func (ctl *baseController) checkTokenForWebsocket(ctx *gin.Context) (
-	pl oldUserTokenPayload, token string, ok bool,
+func (ctl *baseController) checkTokenForWebsocket(
+	ctx *gin.Context, allowVistor bool,
+) (
+	pl oldUserTokenPayload, csrftoken string, visitor, ok bool,
 ) {
-	token = ctx.GetHeader(headerSecWebsocket)
-	if token == "" {
-		//TODO delete
-		log.Errorf("check token for ws, no token")
+	csrftoken = ctl.getTokenForWebsocket(ctx)
 
+	if csrftoken == "" {
+		if allowVistor {
+			visitor = true
+			ok = true
+		} else {
+			ctx.JSON(
+				http.StatusBadRequest,
+				newResponseCodeMsg(errorBadRequestHeader, "no token"),
+			)
+		}
+
+		return
+	}
+
+	ok = ctl.checkCSRFTokenForWebSocket(ctx, csrftoken, &pl)
+
+	return
+}
+
+func (ctl *baseController) getCookieToken(ctx *gin.Context) (token string) {
+	cookie, err := ctx.Request.Cookie(cookiePrivateToken)
+	if err != nil {
+		return
+	}
+
+	return cookie.Value
+}
+
+func (ctl *baseController) getCSRFToken(ctx *gin.Context) (token string) {
+	return ctx.GetHeader(xcsrfToken)
+}
+
+func (ctl *baseController) getCSRFTokenForWebsocket(ctx *gin.Context) (token string) {
+	return ctx.GetHeader(headerSecWebsocket)
+}
+
+func (ctl *baseController) getToken(ctx *gin.Context) (token, csrftoken string) {
+	token = ctl.getCookieToken(ctx)
+	csrftoken = ctl.getCSRFToken(ctx)
+
+	return
+}
+
+func (ctl baseController) checkCSRFTokenForWebSocket(
+	ctx *gin.Context, csrftoken string, pl interface{},
+) (ok bool) {
+	ctokenbyte, err := ctl.decryptDataForCSRF(csrftoken)
+	if err != nil {
 		ctx.JSON(
-			http.StatusBadRequest,
-			newResponseCodeMsg(errorBadRequestHeader, "no token"),
+			http.StatusInternalServerError,
+			newResponseCodeError(errorSystemError, err),
 		)
 
 		return
 	}
 
-	ok = ctl.checkApiToken(ctx, token, &pl, false)
+	ac := accessController{
+		Payload: pl,
+	}
+
+	if err := ac.initByToken(string(ctokenbyte), apiConfig.TokenKey); err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			newResponseCodeError(errorSystemError, err),
+		)
+
+		return
+	}
+
+	if err = ac.verify([]string{roleIndividuals}); err != nil {
+		ctx.JSON(
+			http.StatusUnauthorized,
+			newResponseCodeError(errorInvalidToken, err),
+		)
+		return
+	}
+
+	ok = true
+
+	return
+}
+
+func (ctl *baseController) getTokenForWebsocket(ctx *gin.Context) (csrftoken string) {
+	csrftoken = ctl.getCSRFTokenForWebsocket(ctx)
 
 	return
 }

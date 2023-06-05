@@ -38,7 +38,7 @@ func AddRouterForTrainingController(
 	rg.GET("/v1/train/project/:pid/training", checkUserEmailMiddleware(&ctl.baseController), ctl.List)
 	rg.GET("/v1/train/project/:pid/training/ws", ctl.ListByWS)
 	rg.GET(
-		"/v1/train/project/:pid/training/:id/result/:type", checkUserEmailMiddleware(&ctl.baseController), 
+		"/v1/train/project/:pid/training/:id/result/:type", checkUserEmailMiddleware(&ctl.baseController),
 		ctl.GetResultDownloadURL,
 	)
 	rg.GET("/v1/train/project/:pid/training/:id", ctl.Get)
@@ -204,7 +204,7 @@ func (ctl *TrainingController) Terminate(ctx *gin.Context) {
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/train/project/{pid}/training/{id} [get]
 func (ctl *TrainingController) Get(ctx *gin.Context) {
-	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
@@ -219,9 +219,9 @@ func (ctl *TrainingController) Get(ctx *gin.Context) {
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 
@@ -334,7 +334,7 @@ func (ctl *TrainingController) List(ctx *gin.Context) {
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/train/project/{pid}/training/ws [get]
 func (ctl *TrainingController) ListByWS(ctx *gin.Context) {
-	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
@@ -343,9 +343,9 @@ func (ctl *TrainingController) ListByWS(ctx *gin.Context) {
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 

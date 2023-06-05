@@ -130,7 +130,7 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		PlatformUserNamespaceId: user.Platform.NamespaceId,
 	}
 
-	token, err := ctl.newApiToken(ctx, payload)
+	token, csrftoken, err := ctl.newApiToken(ctx, payload)
 	if err != nil {
 		ctl.sendRespWithInternalError(
 			ctx, newResponseCodeError(errorSystemError, err),
@@ -139,7 +139,7 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctl.setRespToken(ctx, token)
+	ctl.setRespToken(ctx, token, csrftoken)
 	ctx.JSON(http.StatusOK, newResponseData(user))
 }
 

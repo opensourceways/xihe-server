@@ -37,6 +37,10 @@ func Date() string {
 	return time.Now().Format("2006-01-02")
 }
 
+func ExpiryReduceSecond(expiry int64) time.Time {
+	return time.Now().Add(time.Duration(expiry-10) * time.Second)
+}
+
 func Expiry(expiry int64) int64 {
 	return time.Now().Add(time.Second * time.Duration(expiry)).Unix()
 }

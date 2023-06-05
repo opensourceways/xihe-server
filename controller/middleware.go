@@ -8,7 +8,12 @@ import (
 
 func checkUserEmailMiddleware(ctl *baseController) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		pl, _, _ := ctl.checkUserApiToken(ctx, false)
+		pl, _, ok := ctl.checkUserApiToken(ctx, false)
+		if !ok {
+			ctx.Abort()
+
+			return
+		}
 
 		if !pl.hasEmail() {
 			ctl.sendCodeMessage(

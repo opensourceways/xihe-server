@@ -754,25 +754,16 @@ func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/bigmodel/wukong/rank [get]
 func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
-	token := ctx.GetHeader(headerSecWebsocket)
-	if token == "" {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorBadRequestParam, "no token",
-		))
-
-		return
-	}
-
-	pl := oldUserTokenPayload{}
-	if ok := ctl.checkApiToken(ctx, token, &pl, false); !ok {
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
+	if !ok {
 		return
 	}
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 

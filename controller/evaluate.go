@@ -143,7 +143,7 @@ func (ctl *EvaluateController) createStandard(
 //	@Failure		500	system_error		system	error
 //	@Router			/v1/evaluate/project/{pid}/training/{tid}/evaluate/{id} [get]
 func (ctl *EvaluateController) Watch(ctx *gin.Context) {
-	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
@@ -157,9 +157,9 @@ func (ctl *EvaluateController) Watch(ctx *gin.Context) {
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 

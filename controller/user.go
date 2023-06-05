@@ -74,7 +74,7 @@ type UserController struct {
 //	@Failure		500	duplicate_creating	create	user	repeatedly
 //	@Router			/v1/user [post]
 func (ctl *UserController) Create(ctx *gin.Context) {
-	token := ctx.GetHeader(headerPrivateToken)
+	token, _ := ctl.getToken(ctx)
 
 	if token != apiConfig.DefaultPassword {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -110,7 +110,7 @@ func (ctl *UserController) Create(ctx *gin.Context) {
 		return
 	}
 
-	token, err = ctl.newApiToken(ctx, oldUserTokenPayload{
+	token, csrftoken, err := ctl.newApiToken(ctx, oldUserTokenPayload{
 		Account:                 d.Account,
 		Email:                   d.Email,
 		PlatformToken:           d.Platform.Token,
@@ -124,7 +124,7 @@ func (ctl *UserController) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctl.setRespToken(ctx, token)
+	ctl.setRespToken(ctx, token, csrftoken)
 	ctx.JSON(http.StatusCreated, newResponseData(d))
 }
 
@@ -371,7 +371,7 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 	}
 
 	// create new token
-	f := func() (token string) {
+	f := func() (token, csrftoken string) {
 		user, err := ctl.s.GetByAccount(pl.DomainAccount())
 		if err != nil {
 			return
@@ -384,7 +384,7 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 			PlatformUserNamespaceId: user.Platform.NamespaceId,
 		}
 
-		token, err = ctl.newApiToken(ctx, payload)
+		token, csrftoken, err = ctl.newApiToken(ctx, payload)
 		if err != nil {
 			return
 		}
@@ -395,9 +395,9 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 	if code, err := ctl.email.VerifyBindEmail(&cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
-		token := f()
+		token, csrftoken := f()
 		if token != "" {
-			ctl.setRespToken(ctx, token)
+			ctl.setRespToken(ctx, token, csrftoken)
 		}
 
 		ctl.sendRespOfPost(ctx, "success")

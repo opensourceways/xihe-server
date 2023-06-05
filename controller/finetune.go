@@ -160,16 +160,16 @@ func (ctl *FinetuneController) List(ctx *gin.Context) {
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/finetune/ws [get]
 func (ctl *FinetuneController) WatchFinetunes(ctx *gin.Context) {
-	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 
@@ -275,7 +275,7 @@ func (ctl *FinetuneController) watchFinetunes(ws *websocket.Conn, user domain.Ac
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/finetune/{id}/log/ws [get]
 func (ctl *FinetuneController) WatchSingle(ctx *gin.Context) {
-	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
@@ -287,9 +287,9 @@ func (ctl *FinetuneController) WatchSingle(ctx *gin.Context) {
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 

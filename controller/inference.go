@@ -57,32 +57,23 @@ type InferenceController struct {
 //	@Failure		500	system_error		system	error
 //	@Router			/v1/inference/project/{owner}/{pid} [get]
 func (ctl *InferenceController) Create(ctx *gin.Context) {
-	token := ctx.GetHeader(headerSecWebsocket)
-	if token == "" {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorBadRequestParam, "no token",
-		))
-
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, true)
+	if !ok {
 		return
 	}
 
-	pl := oldUserTokenPayload{}
 	visitor := true
 	projectId := ctx.Param("pid")
 
-	if token != "visitor-"+projectId {
+	if csrftoken != "visitor-"+projectId {
 		visitor = false
-
-		if ok := ctl.checkApiToken(ctx, token, &pl, false); !ok {
-			return
-		}
 	}
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 
