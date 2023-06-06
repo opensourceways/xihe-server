@@ -89,6 +89,10 @@ func (impl model) UpdateProperty(info *repository.ModelPropertyUpdateInfo) error
 		do.Desc = p.Desc.ResourceDesc()
 	}
 
+	if p.Title != nil {
+		do.Title = p.Title.ResourceTitle()
+	}
+
 	if err := impl.mapper.UpdateProperty(&do); err != nil {
 		return convertError(err)
 	}
@@ -102,6 +106,7 @@ type ModelPropertyDO struct {
 	FL       byte
 	Name     string
 	Desc     string
+	Title    string
 	RepoType string
 	Tags     []string
 	TagKinds []string

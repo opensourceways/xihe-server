@@ -49,6 +49,10 @@ func (impl dataset) UpdateProperty(info *repository.DatasetPropertyUpdateInfo) e
 		do.Desc = p.Desc.ResourceDesc()
 	}
 
+	if p.Title != nil {
+		do.Title = p.Title.ResourceTitle()
+	}
+
 	if err := impl.mapper.UpdateProperty(&do); err != nil {
 		return convertError(err)
 	}

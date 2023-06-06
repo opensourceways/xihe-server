@@ -67,6 +67,7 @@ func (req *datasetCreateRequest) toCmd(
 type datasetUpdateRequest struct {
 	Name     *string `json:"name"`
 	Desc     *string `json:"desc"`
+	Title    *string `json:"title"`
 	RepoType *string `json:"type"`
 }
 
@@ -79,6 +80,12 @@ func (p *datasetUpdateRequest) toCmd() (cmd app.DatasetUpdateCmd, err error) {
 
 	if p.Desc != nil {
 		if cmd.Desc, err = domain.NewResourceDesc(*p.Desc); err != nil {
+			return
+		}
+	}
+
+	if p.Title != nil {
+		if cmd.Title, err = domain.NewResourceTitle(*p.Title); err != nil {
 			return
 		}
 	}

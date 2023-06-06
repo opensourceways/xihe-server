@@ -372,6 +372,11 @@ func (ctl *RepoFileController) ContainReadme(ctx *gin.Context) {
 		return
 	}
 
+	if repoInfo.IsOnline() {
+		user, _ := ctl.us.GetByAccount(u.User)
+		u.Token = user.Platform.Token
+	}
+
 	v, err := ctl.s.List(&u, &info)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

@@ -82,6 +82,7 @@ func (p *projectCreateRequest) toCmd(
 type projectUpdateRequest struct {
 	Name     *string `json:"name"`
 	Desc     *string `json:"desc"`
+	Title    *string `json:"title"`
 	RepoType *string `json:"type"`
 	CoverId  *string `json:"cover_id"`
 }
@@ -95,6 +96,12 @@ func (p *projectUpdateRequest) toCmd() (cmd app.ProjectUpdateCmd, err error) {
 
 	if p.Desc != nil {
 		if cmd.Desc, err = domain.NewResourceDesc(*p.Desc); err != nil {
+			return
+		}
+	}
+
+	if p.Title != nil {
+		if cmd.Title, err = domain.NewResourceTitle(*p.Title); err != nil {
 			return
 		}
 	}

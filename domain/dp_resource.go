@@ -83,6 +83,7 @@ func (r resourceName) FirstLetterOfName() byte {
 // ResourceTitle
 type ResourceTitle interface {
 	ResourceTitle() string
+	DomainValue
 }
 
 func NewResourceTitle(v string) (ResourceTitle, error) {
@@ -102,6 +103,10 @@ func NewResourceTitle(v string) (ResourceTitle, error) {
 type resourceTitle string
 
 func (r resourceTitle) ResourceTitle() string {
+	return string(r)
+}
+
+func (r resourceTitle) DomainValue() string {
 	return string(r)
 }
 

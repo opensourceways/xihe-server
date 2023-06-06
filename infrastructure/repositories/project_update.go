@@ -99,6 +99,10 @@ func (impl project) UpdateProperty(info *repository.ProjectPropertyUpdateInfo) e
 		do.Desc = p.Desc.ResourceDesc()
 	}
 
+	if p.Title != nil {
+		do.Title = p.Title.ResourceTitle()
+	}
+
 	if p.Level != nil {
 		do.Level = p.Level.Int()
 	}
