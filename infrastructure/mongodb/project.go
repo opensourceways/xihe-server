@@ -85,6 +85,7 @@ func (col project) UpdateProperty(do *repositories.ProjectPropertyDO) error {
 		Name:     do.Name,
 		FL:       do.FL,
 		Desc:     do.Desc,
+		Title:    do.Title,
 		CoverId:  do.CoverId,
 		RepoType: do.RepoType,
 		Tags:     do.Tags,
