@@ -103,7 +103,7 @@ func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
 
 	cmd := app.GlobalResourceListCmd{}
 
-	cmd.TagKinds = append(cmd.Tags, "electricity")
+	cmd.Tags = append(cmd.Tags, "electricity")
 
 	p, err := ctl.project.ListGlobal(&cmd)
 	if err != nil {
