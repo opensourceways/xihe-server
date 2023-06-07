@@ -306,3 +306,26 @@ type wukongPictureLink struct {
 type wukongDiggResp struct {
 	DiggCount int `json:"digg_count"`
 }
+
+type aiDetectorReq struct {
+	Lang string `json:"lang"`
+	Text string `json:"text"`
+}
+
+func (req aiDetectorReq) toCmd() (cmd app.AIDetectorCmd, err error) {
+	if cmd.Lang, err = domain.NewLang(req.Lang); err != nil {
+		return
+	}
+
+	if cmd.Text, err = domain.NewAIDetectorText(req.Text); err != nil {
+		return
+	}
+
+	err = cmd.Validate()
+
+	return
+}
+
+type aiDetectorResp struct {
+	IsMachine bool `json:"is_machine"`
+}

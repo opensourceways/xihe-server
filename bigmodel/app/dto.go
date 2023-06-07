@@ -221,3 +221,21 @@ type wukongPictureDTO struct {
 type WuKongRankDTO struct {
 	Rank int `json:"rank"`
 }
+
+type AIDetectorCmd struct {
+	Lang domain.Lang           `json:"lang"`
+	Text domain.AIDetectorText `json:"text"`
+}
+
+func (cmd AIDetectorCmd) Validate() error {
+	input := domain.AIDetectorInput{
+		Lang: cmd.Lang,
+		Text: cmd.Text,
+	}
+
+	if !input.IsTextLengthOK() {
+		return errors.New("text length too long")
+	}
+
+	return nil
+}

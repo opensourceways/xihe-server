@@ -61,6 +61,9 @@ type BigModelService interface {
 	DiggPicture(*WuKongAddDiggCmd) (int, error)
 	CancelDiggPicture(*WuKongCancelDiggCmd) (int, error)
 	ReGenerateDownloadURL(types.Account, string) (string, string, error)
+
+	// ai detector
+	AIDetector(*AIDetectorCmd) (string, bool, error)
 }
 
 func NewBigModelService(

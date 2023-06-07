@@ -19,6 +19,9 @@ const (
 	bigmodelGenPicture    = "gen_picture"
 	bigmodelDescPicture   = "desc_picture"
 	bigmodelDescPictureHF = "desc_picture_hf"
+
+	langZH = "zh"
+	langEN = "en"
 )
 
 var (
@@ -159,4 +162,53 @@ func (r obspath) OBSPath() string {
 
 func (r obspath) IsTempPath() bool {
 	return strings.Contains(r.OBSPath(), "generate/")
+}
+
+type AIDetectorText interface {
+	AIDetectorText() string
+}
+
+func NewAIDetectorText(v string) (AIDetectorText, error) {
+	if v == "" || len(v) > 2000 {
+		return nil, errors.New("invalid AI detector text")
+	}
+
+	return aidetectortext(v), nil
+}
+
+type aidetectortext string
+
+func (r aidetectortext) AIDetectorText() string {
+	return string(r)
+}
+
+type Lang interface {
+	Lang() string
+	IsZH() bool
+	IsEN() bool
+}
+
+func NewLang(v string) (Lang, error) {
+	b := v == langZH ||
+		v == langEN
+
+	if !b {
+		return nil, errors.New("language invalid")
+	}
+
+	return lang(v), nil
+}
+
+type lang string
+
+func (r lang) Lang() string {
+	return string(r)
+}
+
+func (r lang) IsZH() bool {
+	return r.Lang() == langZH
+}
+
+func (r lang) IsEN() bool {
+	return r.Lang() == langEN
 }

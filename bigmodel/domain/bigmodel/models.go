@@ -53,4 +53,7 @@ type BigModel interface {
 
 	// codegeex
 	CodeGeex(*CodeGeexReq) (CodeGeexResp, error)
+
+	// ai detector
+	AIDetector(domain.AIDetectorInput) (bool, error)
 }

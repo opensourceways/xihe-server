@@ -52,6 +52,7 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/wukong/digg", ctl.AddDigg)
 	rg.DELETE("/v1/bigmodel/wukong/digg", ctl.CancelDigg)
 	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
+	rg.POST("/v1/bigmodel/ai_detector", ctl.AIDetector)
 }
 
 type BigModelController struct {
@@ -1162,5 +1163,41 @@ func (ctl *BigModelController) GenDownloadURL(ctx *gin.Context) {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPut(ctx, wukongPictureLink{link})
+	}
+}
+
+//	@Title			AI Detector
+//	@Description	detecte if text generate by ai
+//	@Tags			BigModel
+//	@Param			body	body	aiDetectorReq	true	"body of ai detector"
+//	@Accept			json
+//	@Success		202	{object}		aiDetectorResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/link [put]
+func (ctl *BigModelController) AIDetector(ctx *gin.Context) {
+	_, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := aiDetectorReq{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	code, ismachine, err := ctl.s.AIDetector(&cmd)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPost(ctx, aiDetectorResp{ismachine})
 	}
 }
