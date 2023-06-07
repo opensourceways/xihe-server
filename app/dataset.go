@@ -19,6 +19,8 @@ type DatasetCreateCmd struct {
 	RepoType domain.RepoType
 	Protocol domain.ProtocolName
 	Tags     []string
+	TagKinds []string
+	All      []domain.DomainTags
 }
 
 func (cmd *DatasetCreateCmd) Validate() error {
@@ -32,6 +34,22 @@ func (cmd *DatasetCreateCmd) Validate() error {
 	}
 
 	return nil
+}
+
+func (cmd *DatasetCreateCmd) genTagKinds(tags []string) []string {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	r := make([]string, 0, len(cmd.All))
+
+	for i := range cmd.All {
+		if v := cmd.All[i].GetKindsOfTags(tags); len(v) > 0 {
+			r = append(r, v...)
+		}
+	}
+
+	return r
 }
 
 func (cmd *DatasetCreateCmd) toDataset(v *domain.Dataset) {
@@ -48,7 +66,7 @@ func (cmd *DatasetCreateCmd) toDataset(v *domain.Dataset) {
 			Title:    cmd.Title,
 			RepoType: cmd.RepoType,
 			Tags:     append(normTags, cmd.Tags...),
-			TagKinds: []string{},
+			TagKinds: cmd.genTagKinds(cmd.Tags),
 		},
 	}
 }

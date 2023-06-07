@@ -58,6 +58,7 @@ func (req *datasetCreateRequest) toCmd(
 		return
 	}
 	cmd.Tags = req.Tags
+	cmd.All = validTags
 
 	err = cmd.Validate()
 

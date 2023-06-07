@@ -58,6 +58,7 @@ func (req *modelCreateRequest) toCmd(
 		return
 	}
 	cmd.Tags = req.Tags
+	cmd.All = validTags
 
 	err = cmd.Validate()
 

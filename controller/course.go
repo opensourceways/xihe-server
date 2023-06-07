@@ -7,8 +7,8 @@ import (
 	"github.com/opensourceways/xihe-server/course/app"
 	"github.com/opensourceways/xihe-server/course/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
-	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForCourseController(
@@ -90,7 +90,7 @@ func (ctl *CourseController) Apply(ctx *gin.Context) {
 //	@Param			type	query	string	false	"course type, such as ai, mindspore, foundation"
 //	@Param			mine	query	string	false	"just list courses of player, if it is set"
 //	@Accept			json
-//	@Success		200
+//	@Success		200	{object}		app.CourseSummuryDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/course [get]
 func (ctl *CourseController) List(ctx *gin.Context) {
@@ -141,7 +141,7 @@ func (ctl *CourseController) List(ctx *gin.Context) {
 //	@Tags			Course
 //	@Param			id	path	string	true	"course id"
 //	@Accept			json
-//	@Success		201
+//	@Success		200	{object}		app.CourseDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/course/{id} [get]
 func (ctl *CourseController) Get(ctx *gin.Context) {
@@ -221,7 +221,7 @@ func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 //	@Param			id		path	string	true	"course id"
 //	@Param			status	query	string	false	"assignments status, such as finish"
 //	@Accept			json
-//	@Success		201
+//	@Success		200	{object}		app.AsgWorkDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/course/{id}/asg/list [get]
 func (ctl *CourseController) ListAssignments(ctx *gin.Context) {
@@ -261,7 +261,7 @@ func (ctl *CourseController) ListAssignments(ctx *gin.Context) {
 //	@Tags			Course
 //	@Param			id	path	string	true	"course id"
 //	@Accept			json
-//	@Success		200
+//	@Success		200	{object}		app.RelateProjectDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/course/{id}/asg/result [get]
 func (ctl *CourseController) GetSubmissions(ctx *gin.Context) {
@@ -304,7 +304,7 @@ func (ctl *CourseController) GetSubmissions(ctx *gin.Context) {
 //	@Tags			Course
 //	@Param			id	path	string	true	"course id"
 //	@Accept			json
-//	@Success		200
+//	@Success		200	{object}		app.CertInfoDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/course/{id}/cert [get]
 func (ctl *CourseController) GetCertification(ctx *gin.Context) {
@@ -332,7 +332,7 @@ func (ctl *CourseController) GetCertification(ctx *gin.Context) {
 //	@Description	get register info
 //	@Tags			Course
 //	@Accept			json
-//	@Success		200
+//	@Success		200	{object}		app.UserRegisterInfoDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/course/reginfo [get]
 func (ctl *CourseController) GetRegisterInfo(ctx *gin.Context) {
@@ -355,7 +355,7 @@ func (ctl *CourseController) GetRegisterInfo(ctx *gin.Context) {
 //	@Param			id		path	string	true	"course id"
 //	@Param			asgid	path	string	true	"asg id"
 //	@Accept			json
-//	@Success		200
+//	@Success		200	{object}		app.AsgDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/course/:id/asg/:asgid [get]
 func (ctl *CourseController) GetAssignment(ctx *gin.Context) {

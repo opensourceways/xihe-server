@@ -44,7 +44,7 @@ type HomeController struct {
 //	@Description	list the courses and competitions
 //	@Tags			HomePage
 //	@Accept			json
-//	@Success		200
+//	@Success		200	{object}		homeInfo
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/homepage [get]
 func (ctl *HomeController) ListAll(ctx *gin.Context) {
@@ -77,7 +77,7 @@ func (ctl *HomeController) ListAll(ctx *gin.Context) {
 //	@Description	list the project dataset model courses and competitions
 //	@Tags			HomePage
 //	@Accept			json
-//	@Success		200
+//	@Success		200	{object}		homeElectricityInfo
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/homepage/electricity [get]
 func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
@@ -102,7 +102,8 @@ func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
 	}
 
 	cmd := app.GlobalResourceListCmd{}
-	cmd.Tags = append(cmd.Tags, "electricity")
+
+	cmd.TagKinds = append(cmd.Tags, "electricity")
 
 	p, err := ctl.project.ListGlobal(&cmd)
 	if err != nil {

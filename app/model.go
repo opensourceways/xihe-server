@@ -19,6 +19,8 @@ type ModelCreateCmd struct {
 	RepoType domain.RepoType
 	Protocol domain.ProtocolName
 	Tags     []string
+	TagKinds []string
+	All      []domain.DomainTags
 }
 
 func (cmd *ModelCreateCmd) Validate() error {
@@ -32,6 +34,22 @@ func (cmd *ModelCreateCmd) Validate() error {
 	}
 
 	return nil
+}
+
+func (cmd *ModelCreateCmd) genTagKinds(tags []string) []string {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	r := make([]string, 0, len(cmd.All))
+
+	for i := range cmd.All {
+		if v := cmd.All[i].GetKindsOfTags(tags); len(v) > 0 {
+			r = append(r, v...)
+		}
+	}
+
+	return r
 }
 
 func (cmd *ModelCreateCmd) toModel(v *domain.Model) {
@@ -49,7 +67,7 @@ func (cmd *ModelCreateCmd) toModel(v *domain.Model) {
 			Title:    cmd.Title,
 			RepoType: cmd.RepoType,
 			Tags:     append(normTags, cmd.Tags...),
-			TagKinds: []string{},
+			TagKinds: cmd.genTagKinds(cmd.Tags),
 		},
 	}
 }
