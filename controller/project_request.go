@@ -73,6 +73,7 @@ func (p *projectCreateRequest) toCmd(
 		return
 	}
 	cmd.Tags = p.Tags
+	cmd.All = validTags
 
 	err = cmd.Validate()
 

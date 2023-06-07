@@ -22,6 +22,8 @@ type ProjectCreateCmd struct {
 	Protocol domain.ProtocolName
 	Training domain.TrainingPlatform
 	Tags     []string
+	TagKinds []string
+	All      []domain.DomainTags
 }
 
 func (cmd *ProjectCreateCmd) Validate() error {
@@ -38,6 +40,22 @@ func (cmd *ProjectCreateCmd) Validate() error {
 	}
 
 	return nil
+}
+
+func (cmd *ProjectCreateCmd) genTagKinds(tags []string) []string {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	r := make([]string, 0, len(cmd.All))
+
+	for i := range cmd.All {
+		if v := cmd.All[i].GetKindsOfTags(tags); len(v) > 0 {
+			r = append(r, v...)
+		}
+	}
+
+	return r
 }
 
 func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
@@ -60,7 +78,7 @@ func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
 			CoverId:  cmd.CoverId,
 			RepoType: cmd.RepoType,
 			Tags:     append(cmd.Tags, normTags...),
-			TagKinds: []string{},
+			TagKinds: cmd.genTagKinds(cmd.Tags),
 		},
 	}
 }
