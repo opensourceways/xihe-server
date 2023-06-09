@@ -6,7 +6,6 @@ import (
 
 type UserInfo struct {
 	Name     domain.Account
-	Email    domain.Email
 	Bio      domain.Bio
 	AvatarId domain.AvatarId
 	UserId   string
