@@ -101,7 +101,10 @@ func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	}
 
-	cmd := app.GlobalResourceListCmd{}
+	cmd, err := ctl.getListGlobalResourceParameter(ctx)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	}
 
 	cmd.Tags = append(cmd.Tags, "electricity")
 

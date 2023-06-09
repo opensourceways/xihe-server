@@ -253,8 +253,9 @@ func listResourceWithoutSort(
 				conds := bson.A{}
 
 				if do.RepoType != nil {
-					q := bson.M{fieldRepoType: bson.M{"$or": do.RepoType}}
-					conds = append(conds, q)
+					conds = append(conds, inCondForArrayElem(
+						fieldRepoType, do.RepoType,
+					))
 				}
 
 				if do.Name != "" {
