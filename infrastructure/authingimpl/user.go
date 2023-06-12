@@ -54,6 +54,7 @@ func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInf
 	var v struct {
 		Name    string `json:"username,omitempty"`
 		Picture string `json:"picture,omitempty"`
+		Email   string `json:"email,omitempty"`
 		Sub     string `json:"sub,omitempty"`
 	}
 
@@ -62,6 +63,10 @@ func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInf
 	}
 
 	if userInfo.Name, err = domain.NewAccount(v.Name); err != nil {
+		return
+	}
+
+	if userInfo.Email, err = domain.NewEmail(v.Email); err != nil {
 		return
 	}
 
