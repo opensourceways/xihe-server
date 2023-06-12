@@ -2,8 +2,8 @@ package message
 
 import (
 	bmdomain "github.com/opensourceways/xihe-server/bigmodel/domain"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 type EvaluateInfo struct {
@@ -31,7 +31,6 @@ type RepoFile struct {
 
 type Sender interface {
 	AddOperateLogForNewUser(domain.Account) error
-	AddOperateLogForCreateTraining(domain.TrainingIndex) error
 	AddOperateLogForAccessBigModel(domain.Account, bmdomain.BigmodelType) error
 	AddOperateLogForCreateResource(domain.ResourceObject, domain.ResourceName) error
 	AddOperateLogForDownloadFile(domain.Account, RepoFile) error
@@ -49,7 +48,7 @@ type Sender interface {
 	RemoveRelatedResource(*RelatedResource) error
 	RemoveRelatedResources(*RelatedResources) error
 
-	CreateTraining(*domain.TrainingIndex) error
+	CreateTraining(*MsgTraining) error
 	CreateFinetune(*domain.FinetuneIndex) error
 
 	CreateInference(*domain.InferenceInfo) error

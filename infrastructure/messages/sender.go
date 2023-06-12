@@ -7,9 +7,9 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -71,17 +71,6 @@ func (s sender) IncreaseDownload(obj *domain.ResourceObject) error {
 	toMsgResourceObject(obj, v)
 
 	return s.send(topics.Download, v)
-}
-
-// Training
-func (s sender) CreateTraining(info *domain.TrainingIndex) error {
-	v := msgTraining{
-		User:       info.Project.Owner.Account(),
-		ProjectId:  info.Project.Id,
-		TrainingId: info.TrainingId,
-	}
-
-	return s.send(topics.Training, &v)
 }
 
 // Finetune
@@ -210,13 +199,6 @@ func (s sender) AddOperateLogForCreateResource(
 		"id":   obj.Id,
 		"name": name.ResourceName(),
 		"type": obj.Type.ResourceType(),
-	})
-}
-
-func (s sender) AddOperateLogForCreateTraining(index domain.TrainingIndex) error {
-	return s.sendOperateLog(index.Project.Owner, "training", map[string]string{
-		"id":         index.TrainingId,
-		"project_id": index.Project.Id,
 	})
 }
 

@@ -12,9 +12,9 @@ import (
 	bigmoddelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) error {
@@ -305,25 +305,24 @@ func registerHandlerForTraining(handler interface{}) (mq.Subscriber, error) {
 			return
 		}
 
-		body := msgTraining{}
+		body := message.MsgTraining{}
 		if err = json.Unmarshal(msg.Body, &body); err != nil {
 			return
 		}
 
-		if body.ProjectId == "" || body.TrainingId == "" {
+		if body.Details["project_id"] == "" || body.Details["training_id"] == "" {
 			err = errors.New("invalid message of training")
 
 			return
 		}
 
 		v := domain.TrainingIndex{}
-
-		if v.Project.Owner, err = domain.NewAccount(body.User); err != nil {
+		if v.Project.Owner, err = domain.NewAccount(body.Details["project_owner"]); err != nil {
 			return
 		}
 
-		v.Project.Id = body.ProjectId
-		v.TrainingId = body.TrainingId
+		v.Project.Id = body.Details["project_id"]
+		v.TrainingId = body.Details["training_id"]
 
 		return h.HandleEventCreateTraining(&v)
 	})
