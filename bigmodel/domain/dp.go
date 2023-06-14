@@ -169,7 +169,7 @@ type AIDetectorText interface {
 }
 
 func NewAIDetectorText(v string) (AIDetectorText, error) {
-	if v == "" || len(v) > 2000 {
+	if v == "" {
 		return nil, errors.New("invalid AI detector text")
 	}
 
