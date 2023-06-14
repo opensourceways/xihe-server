@@ -58,7 +58,7 @@ func (r AIDetectorInput) IsTextLengthOK() bool {
 	}
 
 	if r.Lang.IsZH() {
-		return utils.StrLen(r.Text.AIDetectorText()) <= 500
+		return utils.StrLen(r.Text.AIDetectorText()) <= 2000
 	}
 
 	return false
