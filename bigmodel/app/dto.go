@@ -223,6 +223,7 @@ type WuKongRankDTO struct {
 }
 
 type AIDetectorCmd struct {
+	User types.Account         `json:"user"`
 	Lang domain.Lang           `json:"lang"`
 	Text domain.AIDetectorText `json:"text"`
 }

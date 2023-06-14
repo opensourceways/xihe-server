@@ -19,6 +19,7 @@ const (
 	bigmodelGenPicture    = "gen_picture"
 	bigmodelDescPicture   = "desc_picture"
 	bigmodelDescPictureHF = "desc_picture_hf"
+	bigmodelAIDetector    = "ai_detector"
 
 	langZH = "zh"
 	langEN = "en"
@@ -35,6 +36,7 @@ var (
 	BigmodelGenPicture    = BigmodelType(bigmodelGenPicture)
 	BigmodelDescPicture   = BigmodelType(bigmodelDescPicture)
 	BigmodelDescPictureHF = BigmodelType(bigmodelDescPictureHF)
+	BigmodelAIDetector    = BigmodelType(bigmodelAIDetector)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,

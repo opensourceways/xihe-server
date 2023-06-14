@@ -312,7 +312,7 @@ type aiDetectorReq struct {
 	Text string `json:"text"`
 }
 
-func (req aiDetectorReq) toCmd() (cmd app.AIDetectorCmd, err error) {
+func (req aiDetectorReq) toCmd(user types.Account) (cmd app.AIDetectorCmd, err error) {
 	if cmd.Lang, err = domain.NewLang(req.Lang); err != nil {
 		return
 	}
@@ -320,6 +320,8 @@ func (req aiDetectorReq) toCmd() (cmd app.AIDetectorCmd, err error) {
 	if cmd.Text, err = domain.NewAIDetectorText(req.Text); err != nil {
 		return
 	}
+
+	cmd.User = user
 
 	err = cmd.Validate()
 

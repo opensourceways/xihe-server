@@ -1166,7 +1166,7 @@ func (ctl *BigModelController) GenDownloadURL(ctx *gin.Context) {
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/bigmodel/wukong/link [put]
 func (ctl *BigModelController) AIDetector(ctx *gin.Context) {
-	_, _, ok := ctl.checkUserApiToken(ctx, false)
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
@@ -1178,7 +1178,7 @@ func (ctl *BigModelController) AIDetector(ctx *gin.Context) {
 		return
 	}
 
-	cmd, err := req.toCmd()
+	cmd, err := req.toCmd(pl.DomainAccount())
 	if err != nil {
 		ctl.sendBadRequestParam(ctx, err)
 
