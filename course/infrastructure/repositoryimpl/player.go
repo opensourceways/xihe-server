@@ -122,12 +122,12 @@ func (impl *playerRepoImpl) docFilterFindPlayer(cid, account string) bson.M {
 	}
 }
 
-func (impl *playerRepoImpl) SaveRepo(course_id string, a *domain.CourseProject, version int) error {
+func (impl *playerRepoImpl) SaveRepo(courseId string, a *domain.CourseProject, version int) error {
 	f := func(ctx context.Context) error {
 
 		return impl.cli.UpdateDoc(
 			ctx,
-			impl.docFilterFindPlayer(course_id, a.Owner.Account()),
+			impl.docFilterFindPlayer(courseId, a.Owner.Account()),
 			bson.M{fieldRepo: a.RepoRouting}, mongoCmdSet, version,
 		)
 	}

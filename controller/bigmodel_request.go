@@ -10,10 +10,10 @@ import (
 )
 
 const (
-	temp_account           = "wukong_icbc"
-	temp_account_hf        = "wukong_hf"
-	temp_account_vqa_hf    = "vqa_hf"
-	temp_account_luojia_hf = "luojia_hf"
+	tempAccount         = "wukong_icbc"
+	tempAccountHF       = "wukong_hf"
+	tempAccountVQAHF    = "vqa_hf"
+	tempAccountLuoJiaHF = "luojia_hf"
 )
 
 type describePictureResp struct {
@@ -81,7 +81,7 @@ type questionAskHFReq struct {
 func (req *questionAskHFReq) toCmd() (
 	cmd app.VQAHFCmd, err error,
 ) {
-	if cmd.User, err = types.NewAccount(temp_account_vqa_hf); err != nil {
+	if cmd.User, err = types.NewAccount(tempAccountVQAHF); err != nil {
 		return
 	}
 
@@ -101,7 +101,7 @@ type luojiaHFReq struct {
 func (req *luojiaHFReq) toCmd() (
 	cmd app.LuoJiaHFCmd, err error,
 ) {
-	if cmd.User, err = types.NewAccount(temp_account_luojia_hf); err != nil {
+	if cmd.User, err = types.NewAccount(tempAccountLuoJiaHF); err != nil {
 		return
 	}
 
@@ -171,7 +171,7 @@ type wukongICBCRequest struct {
 }
 
 func (req *wukongICBCRequest) toCmd() (cmd app.WuKongICBCCmd, err error) {
-	if cmd.User, err = types.NewAccount(temp_account); err != nil {
+	if cmd.User, err = types.NewAccount(tempAccount); err != nil {
 		return
 	}
 
@@ -192,7 +192,7 @@ type wukongHFRequest struct {
 }
 
 func (req *wukongHFRequest) toCmd() (cmd app.WuKongHFCmd, err error) {
-	if cmd.User, err = types.NewAccount(temp_account_hf); err != nil {
+	if cmd.User, err = types.NewAccount(tempAccountHF); err != nil {
 		return
 	}
 

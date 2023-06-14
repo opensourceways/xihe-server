@@ -16,11 +16,11 @@ import (
 	bigmodelmessage "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
-	userapp "github.com/opensourceways/xihe-server/user/app"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 var _ message.EventHandler = (*handler)(nil)
@@ -378,10 +378,10 @@ func (h *handler) HandleEventBigModelWuKongInferenceError(msg *bigmodelmessage.M
 		return err
 	}
 
-	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, _ := strconv.Atoi(msg.Details["task_id"])
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(task_id),
+			Id:     uint64(taskId),
 			Status: status,
 		},
 	}
@@ -410,10 +410,10 @@ func (h *handler) HandleEventBigModelWuKongAsyncTaskStart(msg *bigmodelmessage.M
 		return err
 	}
 
-	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, _ := strconv.Atoi(msg.Details["task_id"])
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(task_id),
+			Id:     uint64(taskId),
 			Status: status,
 		},
 	}
@@ -436,10 +436,10 @@ func (h *handler) HandleEventBigModelWuKongAsyncTaskFinish(msg *bigmodelmessage.
 		return err
 	}
 
-	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, _ := strconv.Atoi(msg.Details["task_id"])
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(task_id),
+			Id:     uint64(taskId),
 			Status: status,
 		},
 	}

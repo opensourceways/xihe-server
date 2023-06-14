@@ -16,7 +16,7 @@ var (
 
 	endpoint         string
 	defaultBranch    string
-	graphql_endpoint string
+	graphqlEndpoint string
 
 	maxFileCount int
 )
@@ -42,7 +42,7 @@ func Init(cfg *Config) error {
 	endpoint = strings.TrimSuffix(cfg.Endpoint, "/")
 	maxFileCount = cfg.MaxFileCount
 	defaultBranch = cfg.DefaultBranch
-	graphql_endpoint = strings.TrimSuffix(cfg.GraphqlEndpoint, "/")
+	graphqlEndpoint = strings.TrimSuffix(cfg.GraphqlEndpoint, "/")
 
 	return nil
 }
