@@ -23,6 +23,8 @@ const (
 	roleIndividuals = "individuals"
 	fileReadme      = "README.md"
 	fileApp         = "app.py"
+
+	visitorPrefix = "visitor"
 )
 
 type baseController struct {
@@ -396,6 +398,10 @@ func (ctl *baseController) checkTokenForWebsocket(
 	pl oldUserTokenPayload, csrftoken string, visitor, ok bool,
 ) {
 	csrftoken = ctl.getTokenForWebsocket(ctx)
+
+	if strings.HasPrefix(csrftoken, visitorPrefix) {
+		return pl, csrftoken, true, true
+	}
 
 	if csrftoken == "" {
 		if allowVistor {
