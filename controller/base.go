@@ -22,6 +22,7 @@ const (
 
 	roleIndividuals = "individuals"
 	fileReadme      = "README.md"
+	fileApp         = "app.py"
 )
 
 type baseController struct {

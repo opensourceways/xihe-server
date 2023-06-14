@@ -39,6 +39,7 @@ func AddRouterForRepoFileController(
 	rg.GET("/v1/repo/:type/:user/:name/file/:path", ctl.Download)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path/preview", ctl.Preview)
 	rg.GET("/v1/repo/:type/:user/:name/readme", ctl.ContainReadme)
+	rg.GET("/v1/repo/:type/:user/:name/app", ctl.ContainApp)
 	rg.PUT("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Update)
 	rg.POST("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.DELETE("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
@@ -342,7 +343,7 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 }
 
 //	@Summary		ContainReadme
-//	@Description	preview repo file
+//	@Description	repo file contain readme
 //	@Tags			RepoFile
 //	@Param			user	path	string	true	"user"
 //	@Param			name	path	string	true	"repo name"
@@ -382,9 +383,59 @@ func (ctl *RepoFileController) ContainReadme(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
 	}
-	b := ctl.containReadme(v)
-	res := ContainReadmeInfo{
-		HasReadme: b,
+	b := ctl.containFile(v, fileReadme)
+	res := ContainFileInfo{
+		HasFile: b,
+	}
+
+	ctx.JSON(http.StatusOK, newResponseData(res))
+}
+
+//	@Summary		ContainApp
+//	@Description	repo file contain app
+//	@Tags			RepoFile
+//	@Param			user	path	string	true	"user"
+//	@Param			name	path	string	true	"repo name"
+//	@Param			path	path	string	true	"repo file path"
+//	@Accept			json
+//	@Success		200
+//	@Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/repo/{type}/{user}/{name}/app [get]
+func (ctl *RepoFileController) ContainApp(ctx *gin.Context) {
+	_, u, repoInfo, ok := ctl.checkForView(ctx)
+	if !ok {
+		return
+	}
+
+	var err error
+	info := app.RepoDir{
+		RepoName: repoInfo.Name,
+	}
+
+	info.Path, err = domain.NewDirectory("inference")
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	if repoInfo.IsOnline() {
+		user, _ := ctl.us.GetByAccount(u.User)
+		u.Token = user.Platform.Token
+	}
+
+	v, err := ctl.s.List(&u, &info)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+
+	b := ctl.containFile(v, fileApp)
+	res := ContainFileInfo{
+		HasFile: b,
 	}
 
 	ctx.JSON(http.StatusOK, newResponseData(res))
@@ -546,14 +597,13 @@ func (ctl *RepoFileController) getRepoInfo(ctx *gin.Context, user domain.Account
 	return
 }
 
-func (ctl *RepoFileController) containReadme(v []platform.RepoPathItem) (
+func (ctl *RepoFileController) containFile(v []platform.RepoPathItem, fileName string) (
 	b bool,
 ) {
 	b = false
 	for i := range v {
-		var t platform.RepoPathItem
-		t = v[i]
-		if t.Path == fileReadme {
+		t := v[i]
+		if t.Name == fileName {
 			b = true
 			return
 		}

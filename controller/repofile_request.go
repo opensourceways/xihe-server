@@ -7,8 +7,8 @@ type RepoFileCreateRequest struct {
 	Base64Encoded bool   `json:"base64_encoded"`
 }
 
-type ContainReadmeInfo struct {
-	HasReadme bool `json:"has_readme"`
+type ContainFileInfo struct {
+	HasFile bool `json:"has_file"`
 }
 
 func (req *RepoFileCreateRequest) toContent() (cmd app.RepoFileContent) {
