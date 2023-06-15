@@ -17,14 +17,15 @@ type ResourceDTO struct {
 		AvatarId string `json:"avatar_id"`
 	} `json:"owner"`
 
-	Id       string   `json:"id"`
-	Name     string   `json:"name"`
-	Type     string   `json:"type"`
-	Desc     string   `json:"description"`
-	Title    string   `json:"title"`
-	CoverId  string   `json:"cover_id"`
-	UpdateAt string   `json:"update_at"`
-	Tags     []string `json:"tags"`
+	Id            string   `json:"id"`
+	Name          string   `json:"name"`
+	Type          string   `json:"type"`
+	Desc          string   `json:"description"`
+	Title         string   `json:"title"`
+	CoverId       string   `json:"cover_id"`
+	UpdateAt      string   `json:"update_at"`
+	Tags          []string `json:"tags"`
+	ResourceLevel string   `json:"level"`
 
 	LikeCount     int `json:"like_count"`
 	ForkCount     int `json:"fork_count"`
@@ -253,6 +254,10 @@ func (s resourceService) projectToResourceDTO(
 
 		if p.Title != nil {
 			v.Title = p.Title.ResourceTitle()
+		}
+
+		if p.Level != nil {
+			v.ResourceLevel = p.Level.ResourceLevel()
 		}
 
 		if u, ok := userInfos[p.Owner.Account()]; ok {
