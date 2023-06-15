@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/opensourceways/xihe-server/domain"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -17,12 +17,14 @@ type ResourceDTO struct {
 		AvatarId string `json:"avatar_id"`
 	} `json:"owner"`
 
-	Id       string `json:"id"`
-	Name     string `json:"name"`
-	Type     string `json:"type"`
-	Desc     string `json:"description"`
-	CoverId  string `json:"cover_id"`
-	UpdateAt string `json:"update_at"`
+	Id       string   `json:"id"`
+	Name     string   `json:"name"`
+	Type     string   `json:"type"`
+	Desc     string   `json:"description"`
+	Title    string   `json:"title"`
+	CoverId  string   `json:"cover_id"`
+	UpdateAt string   `json:"update_at"`
+	Tags     []string `json:"tags"`
 
 	LikeCount     int `json:"like_count"`
 	ForkCount     int `json:"fork_count"`
@@ -238,6 +240,7 @@ func (s resourceService) projectToResourceDTO(
 			Name:          p.Name.ResourceName(),
 			Type:          domain.ResourceTypeProject.ResourceType(),
 			CoverId:       p.CoverId.CoverId(),
+			Tags:          p.Tags,
 			UpdateAt:      utils.ToDate(p.UpdatedAt),
 			LikeCount:     p.LikeCount,
 			ForkCount:     p.ForkCount,
@@ -246,6 +249,10 @@ func (s resourceService) projectToResourceDTO(
 
 		if p.Desc != nil {
 			v.Desc = p.Desc.ResourceDesc()
+		}
+
+		if p.Title != nil {
+			v.Title = p.Title.ResourceTitle()
 		}
 
 		if u, ok := userInfos[p.Owner.Account()]; ok {
@@ -269,6 +276,7 @@ func (s resourceService) modelToResourceDTO(
 		v := ResourceDTO{
 			Id:            d.Id,
 			Name:          d.Name.ResourceName(),
+			Tags:          d.Tags,
 			Type:          domain.ResourceTypeModel.ResourceType(),
 			UpdateAt:      utils.ToDate(d.UpdatedAt),
 			LikeCount:     d.LikeCount,
@@ -277,6 +285,10 @@ func (s resourceService) modelToResourceDTO(
 
 		if d.Desc != nil {
 			v.Desc = d.Desc.ResourceDesc()
+		}
+
+		if d.Title != nil {
+			v.Title = d.Title.ResourceTitle()
 		}
 
 		if u, ok := userInfos[d.Owner.Account()]; ok {
@@ -300,6 +312,7 @@ func (s resourceService) datasetToResourceDTO(
 		v := ResourceDTO{
 			Id:            d.Id,
 			Name:          d.Name.ResourceName(),
+			Tags:          d.Tags,
 			Type:          domain.ResourceTypeDataset.ResourceType(),
 			UpdateAt:      utils.ToDate(d.UpdatedAt),
 			LikeCount:     d.LikeCount,
@@ -308,6 +321,10 @@ func (s resourceService) datasetToResourceDTO(
 
 		if d.Desc != nil {
 			v.Desc = d.Desc.ResourceDesc()
+		}
+
+		if d.Title != nil {
+			v.Title = d.Title.ResourceTitle()
 		}
 
 		if u, ok := userInfos[d.Owner.Account()]; ok {
