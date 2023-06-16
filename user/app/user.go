@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
+	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
 )
@@ -12,6 +13,7 @@ type UserService interface {
 	Create(*UserCreateCmd) (UserDTO, error)
 	CreatePlatformAccount(*CreatePlatformAccountCmd) (PlatformInfoDTO, error)
 	UpdatePlateformInfo(*UpdatePlateformInfoCmd) error
+	NewPlatformAccountWithUpdate(*CreatePlatformAccountCmd) error
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
 
 	GetByAccount(domain.Account) (UserDTO, error)
@@ -87,12 +89,39 @@ func (s userService) GetByFollower(owner, follower domain.Account) (
 	return
 }
 
+func (s userService) NewPlatformAccountWithUpdate(cmd *CreatePlatformAccountCmd) (err error) {
+	// create platform account
+	dto, err := s.CreatePlatformAccount(cmd)
+	if err != nil {
+		return
+	}
+
+	// update user information
+	updatecmd := &UpdatePlateformInfoCmd{
+		PlatformInfoDTO: dto,
+		User:            cmd.Account,
+		Email:           cmd.Email,
+	}
+
+	for i := 0; i <= 5; i++ {
+		if err = s.UpdatePlateformInfo(updatecmd); err != nil {
+			if !typerepo.IsErrorConcurrentUpdating(err) {
+				return
+			}
+		} else {
+			break
+		}
+	}
+
+	return
+}
+
 func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (dto PlatformInfoDTO, err error) {
 	// create platform account
 	pu, err := s.ps.New(platform.UserOption{
-		Email:    cmd.email,
-		Name:     cmd.account,
-		Password: cmd.password,
+		Email:    cmd.Email,
+		Name:     cmd.Account,
+		Password: cmd.Password,
 	})
 	if err != nil {
 		return

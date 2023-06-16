@@ -5,7 +5,6 @@ import (
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/authing"
-	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain/login"
 )
 
@@ -70,31 +69,13 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 
 	// create platform account
 	pfcmd := &CreatePlatformAccountCmd{
-		email:    cmd.Email,
-		account:  cmd.User,
-		password: cmd.PassWord,
+		Email:    cmd.Email,
+		Account:  cmd.User,
+		Password: cmd.PassWord,
 	}
 
-	dto, err := s.us.CreatePlatformAccount(pfcmd)
-	if err != nil {
+	if err = s.us.NewPlatformAccountWithUpdate(pfcmd); err != nil {
 		return
-	}
-
-	// update user information
-	updatecmd := &UpdatePlateformInfoCmd{
-		PlatformInfoDTO: dto,
-		User:            cmd.User,
-		Email:           cmd.Email,
-	}
-
-	for i := 0; i <= 5; i++ {
-		if err = s.us.UpdatePlateformInfo(updatecmd); err != nil {
-			if !repository.IsErrorConcurrentUpdating(err) {
-				return
-			}
-		} else {
-			break
-		}
 	}
 
 	return

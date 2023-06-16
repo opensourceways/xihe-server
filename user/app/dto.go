@@ -127,9 +127,9 @@ type BindEmailCmd struct {
 }
 
 type CreatePlatformAccountCmd struct {
-	email    domain.Email
-	account  domain.Account
-	password domain.Password
+	Email    domain.Email
+	Account  domain.Account
+	Password domain.Password
 }
 
 type PlatformInfoDTO struct {

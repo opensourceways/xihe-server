@@ -177,7 +177,37 @@ func (ctl *LoginController) newUser(ctx *gin.Context, info authing.Login) (user 
 
 	if user, err = ctl.us.Create(&cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
 	}
+
+	if cmd.Email.Email() != "" {
+		if err = ctl.newPlateformAccount(&cmd); err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+			return
+		}
+
+		// update userdto
+		user, err = ctl.us.GetByAccount(cmd.Account)
+		if err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+			return
+		}
+	}
+
+	return
+}
+
+func (ctl *LoginController) newPlateformAccount(cmd *userapp.UserCreateCmd) (err error) {
+	in := userapp.CreatePlatformAccountCmd{
+		Email:    cmd.Email,
+		Account:  cmd.Account,
+		Password: cmd.Password,
+	}
+
+	err = ctl.us.NewPlatformAccountWithUpdate(&in)
 
 	return
 }
