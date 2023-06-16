@@ -128,7 +128,9 @@ func (s *service) sendReqToLuoJiaHF(endpoint string, f io.Reader) (res string, e
 		return "", err
 	}
 
-	writer.Close()
+	if err = writer.Close(); err != nil {
+		return "", err
+	}
 
 	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
 	if err != nil {

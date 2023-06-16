@@ -378,7 +378,10 @@ func (h *handler) HandleEventBigModelWuKongInferenceError(msg *bigmodelmessage.M
 		return err
 	}
 
-	taskId, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, err := strconv.Atoi(msg.Details["task_id"])
+	if err != nil {
+		return err
+	}
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
 			Id:     uint64(taskId),
@@ -410,7 +413,10 @@ func (h *handler) HandleEventBigModelWuKongAsyncTaskStart(msg *bigmodelmessage.M
 		return err
 	}
 
-	taskId, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, err := strconv.Atoi(msg.Details["task_id"])
+	if err != nil {
+		return err
+	}
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
 			Id:     uint64(taskId),
@@ -436,7 +442,10 @@ func (h *handler) HandleEventBigModelWuKongAsyncTaskFinish(msg *bigmodelmessage.
 		return err
 	}
 
-	taskId, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, err := strconv.Atoi(msg.Details["task_id"])
+	if err != nil {
+		return err
+	}
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
 			Id:     uint64(taskId),

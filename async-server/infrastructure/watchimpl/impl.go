@@ -32,7 +32,7 @@ func NewWather(
 	}
 }
 
-func (w *Watcher) watchRequset() (err error) {
+func (w *Watcher) watchRequset() {
 	logrus.Debug("start watching request")
 
 	for now := range w.timer.C {
@@ -43,17 +43,18 @@ func (w *Watcher) watchRequset() (err error) {
 		}
 
 	}
-
-	return
 }
 
 func (w *Watcher) work(bname string, time int64) (err error) {
 	defer w.wg.Done()
 
 	if v, ok := w.handles[bname]; !ok {
-		return fmt.Errorf("internal error, cannot found the bigmodel name:%s", bname)
+		return fmt.Errorf("internal error, cannot found the bigmodel name: %s", bname)
 	} else {
-		v(bname, time)
+		err := v(bname, time)
+		if err != nil {
+			return fmt.Errorf("internal error, cannot run handle function: %s", err.Error())
+		}
 	}
 
 	return nil

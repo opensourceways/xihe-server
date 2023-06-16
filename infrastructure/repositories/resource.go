@@ -121,9 +121,7 @@ func (do *ResourceSummaryDO) toProject() (s domain.ResourceSummary, err error) {
 		return
 	}
 
-	err = do.convert(&s)
-
-	return
+	return s, do.convert(&s)
 }
 
 func (do *ResourceSummaryDO) toModel() (s domain.ResourceSummary, err error) {
@@ -131,9 +129,7 @@ func (do *ResourceSummaryDO) toModel() (s domain.ResourceSummary, err error) {
 		return
 	}
 
-	err = do.convert(&s)
-
-	return
+	return s, do.convert(&s)
 }
 
 func (do *ResourceSummaryDO) toDataset() (s domain.ResourceSummary, err error) {
@@ -141,9 +137,7 @@ func (do *ResourceSummaryDO) toDataset() (s domain.ResourceSummary, err error) {
 		return
 	}
 
-	err = do.convert(&s)
-
-	return
+	return s, do.convert(&s)
 }
 
 func (do *ResourceSummaryDO) convert(s *domain.ResourceSummary) (err error) {

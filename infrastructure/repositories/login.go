@@ -27,9 +27,7 @@ func (impl login) Get(account domain.Account) (r domain.Login, err error) {
 		return
 	}
 
-	err = do.toLogin(&r)
-
-	return
+	return r, do.toLogin(&r)
 }
 
 func (impl login) Save(u *domain.Login) (err error) {

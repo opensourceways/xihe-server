@@ -54,7 +54,9 @@ func (s *service) DescribePicture(
 		return "", errors.New("copy file failed")
 	}
 
-	writer.Close()
+	if err = writer.Close(); err != nil {
+		return "", err
+	}
 
 	var es string
 	switch estype {

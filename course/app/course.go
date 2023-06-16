@@ -200,7 +200,10 @@ func (s *courseService) GetSubmissions(cmd *GetSubmissionCmd) (
 	if err != nil {
 		return
 	}
-	dtos.RelatedProject, err = s.listRelatedProject(project, 1)
+
+	if dtos.RelatedProject, err = s.listRelatedProject(project, 1); err != nil {
+		return
+	}
 
 	return
 }

@@ -48,7 +48,9 @@ func (s *service) DescribePicture(
 		return "", errors.New("copy file failed")
 	}
 
-	writer.Close()
+	if err = writer.Close(); err != nil {
+		return "", err
+	}
 
 	req, err := http.NewRequest(
 		http.MethodPost, s.pictureDescInfo.endpoint, buf,

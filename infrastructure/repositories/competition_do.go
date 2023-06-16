@@ -120,7 +120,9 @@ func (do *CompetitionDO) toCompetition(
 		return
 	}
 
-	err = do.CompetitionSummaryDO.toCompetitionSummary(&c.CompetitionSummary)
+	if err = do.CompetitionSummaryDO.toCompetitionSummary(&c.CompetitionSummary); err != nil {
+		return
+	}
 
 	return
 }

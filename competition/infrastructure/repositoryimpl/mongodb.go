@@ -51,7 +51,9 @@ func genDoc(doc interface{}) (m bson.M, err error) {
 		return
 	}
 
-	err = json.Unmarshal(v, &m)
+	if err = json.Unmarshal(v, &m); err != nil {
+		return
+	}
 
 	return
 }

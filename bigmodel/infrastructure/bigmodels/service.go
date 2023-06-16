@@ -112,7 +112,9 @@ func genToken(cfg *CloudConfig) (string, error) {
 
 	t := resp.Header.Get("x-subject-token")
 
-	resp.Body.Close()
+	if err = resp.Body.Close(); err != nil {
+		return "", err
+	}
 
 	return t, nil
 }

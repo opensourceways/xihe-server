@@ -51,9 +51,7 @@ func (r *CloudService) ToCloud(c *domain.Cloud) (err error) {
 		return
 	}
 
-	r.caculateRemain(c, &plist)
-
-	return
+	return r.caculateRemain(c, &plist)
 }
 
 func (r *CloudService) SubscribeCloud(

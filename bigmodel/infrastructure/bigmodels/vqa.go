@@ -115,14 +115,17 @@ func (s *service) AskHF(f io.Reader, user types.Account, ask string) (string, er
 		return "", err
 	}
 
-	_, err = io.Copy(file, f)
-	if err != nil {
+	if _, err = io.Copy(file, f); err != nil {
 		return "", err
 	}
 
-	writer.WriteField("question", ask)
+	if err = writer.WriteField("question", ask); err != nil {
+		return "", err
+	}
 
-	writer.Close()
+	if err = writer.Close(); err != nil {
+		return "", err
+	}
 
 	req, err := http.NewRequest(http.MethodPost, s.vqaInfo.endpointHF, buf)
 	if err != nil {
