@@ -1,6 +1,8 @@
 package repositoryimpl
 
 import (
+	"errors"
+
 	"github.com/opensourceways/xihe-server/async-server/domain"
 	"github.com/opensourceways/xihe-server/async-server/domain/repository"
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
@@ -42,7 +44,10 @@ func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 	}
 
 	if table.MetaData["style"] != nil {
-		p.Style = table.MetaData["style"].(string)
+		var ok bool
+		if p.Style, ok = table.MetaData["style"].(string); !ok {
+			return errors.New("assertion error")
+		}
 	}
 
 	p.Id = table.Id
@@ -51,7 +56,9 @@ func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 }
 
 func (table *TAsyncTask) toWuKongTaskResp(p *repository.WuKongResp) (err error) {
-	table.toWuKongTask(&p.WuKongTask)
+	if err = table.toWuKongTask(&p.WuKongTask); err != nil {
+		return
+	}
 
 	if table.MetaData["links"] != nil {
 		if p.Links, err = domain.NewLinks(table.MetaData["links"].(string)); err != nil {
