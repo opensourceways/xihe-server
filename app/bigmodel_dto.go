@@ -58,12 +58,6 @@ func (cmd *WuKongCmd) Validate() error {
 	return nil
 }
 
-type WuKongICBCCmd struct {
-	WuKongCmd
-
-	User domain.Account
-}
-
 type WuKongPicturesListCmd = repository.WuKongPictureListOption
 
 type WuKongAddLikeFromTempCmd struct {

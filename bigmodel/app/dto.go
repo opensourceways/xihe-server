@@ -99,12 +99,6 @@ func (cmd *WuKongCmd) Validate() error {
 	return nil
 }
 
-type WuKongICBCCmd struct {
-	WuKongCmd
-
-	User types.Account
-}
-
 type WuKongHFCmd struct {
 	WuKongCmd
 

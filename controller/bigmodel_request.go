@@ -10,7 +10,6 @@ import (
 )
 
 const (
-	tempAccount         = "wukong_icbc"
 	tempAccountHF       = "wukong_hf"
 	tempAccountVQAHF    = "vqa_hf"
 	tempAccountLuoJiaHF = "luojia_hf"
@@ -158,27 +157,6 @@ func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
 		cmd.EsType = string(domain.BigmodelWuKong4Img)
 	default:
 		cmd.EsType = string(domain.BigmodelWuKong)
-	}
-
-	err = cmd.Validate()
-
-	return
-}
-
-type wukongICBCRequest struct {
-	Desc  string `json:"desc"`
-	Style string `json:"style"`
-}
-
-func (req *wukongICBCRequest) toCmd() (cmd app.WuKongICBCCmd, err error) {
-	if cmd.User, err = types.NewAccount(tempAccount); err != nil {
-		return
-	}
-
-	cmd.Style = req.Style
-
-	if cmd.Desc, err = domain.NewWuKongPictureDesc(req.Desc); err != nil {
-		return
 	}
 
 	err = cmd.Validate()
