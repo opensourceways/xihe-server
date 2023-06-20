@@ -411,7 +411,7 @@ func (impl *userRepoImpl) FindFollowing(owner domain.Account, option *repository
 func (impl *userRepoImpl) FindFollower(owner domain.Account, option *repository.FollowFindOption) (
 	info repository.FollowerUserInfos, err error,
 ) {
-	v, err := impl.getFollows(owner.Account(), fieldFollowing)
+	v, err := impl.getFollows(owner.Account(), fieldFollower)
 	if err != nil {
 		err = typesrepo.ConvertError(err)
 		return
