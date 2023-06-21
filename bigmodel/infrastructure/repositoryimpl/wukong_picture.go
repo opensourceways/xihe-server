@@ -60,15 +60,7 @@ func (impl *wukongPictureRepoImpl) ListPublicsByUserName(user types.Account) (
 		return nil, 0, err
 	}
 
-	// sort picture
-	func(p []domain.WuKongPicture) {
-		sort.Slice(p, func(i, j int) bool {
-			ti, _ := utils.ToUnixTime(p[i].CreatedAt)
-			tj, _ := utils.ToUnixTime(p[j].CreatedAt)
-
-			return ti.Before(tj)
-		})
-	}(v)
+	sortWuKongPictureByTime(v)
 
 	return v, version, nil
 }
@@ -342,6 +334,8 @@ func (impl *wukongPictureRepoImpl) GetPublicsGlobal() (r []domain.WuKongPicture,
 		}
 	}
 
+	sortWuKongPictureByTime(r)
+
 	return
 }
 
@@ -358,15 +352,7 @@ func (impl *wukongPictureRepoImpl) GetOfficialPublicsGlobal() (r []domain.WuKong
 		}
 	}
 
-	// sort picture
-	func(p []domain.WuKongPicture) {
-		sort.Slice(p, func(i, j int) bool {
-			ti, _ := utils.ToUnixTime(p[i].CreatedAt)
-			tj, _ := utils.ToUnixTime(p[j].CreatedAt)
-
-			return ti.Before(tj)
-		})
-	}(d)
+	sortWuKongPictureByTime(d)
 
 	return
 }
@@ -473,4 +459,13 @@ func toPictureItemDoc(d *domain.WuKongPicture) (bson.M, error) {
 	}
 
 	return genDoc(p)
+}
+
+func sortWuKongPictureByTime(p []domain.WuKongPicture) {
+	sort.Slice(p, func(i, j int) bool {
+		ti, _ := utils.ToUnixTime(p[i].CreatedAt)
+		tj, _ := utils.ToUnixTime(p[j].CreatedAt)
+
+		return ti.After(tj)
+	})
 }
