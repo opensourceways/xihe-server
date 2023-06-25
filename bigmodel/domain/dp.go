@@ -214,3 +214,25 @@ func (r lang) IsZH() bool {
 func (r lang) IsEN() bool {
 	return r.Lang() == langEN
 }
+
+// taichu
+type Desc interface {
+	Desc() string
+}
+
+func NewDesc(v string) (Desc, error) {
+	b := v == "" ||
+		utils.StrLen(v) > 30
+
+	if b {
+		return nil, errors.New("invalid desc")
+	}
+
+	return desc(v), nil
+}
+
+type desc string
+
+func (r desc) Desc() string {
+	return string(r)
+}

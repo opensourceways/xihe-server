@@ -24,11 +24,11 @@ func (s bigModelService) DescribePictureHF(
 }
 
 func (s bigModelService) GenPicture(
-	user types.Account, desc string,
+	cmd GenPictureCmd,
 ) (link string, code string, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelGenPicture)
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelGenPicture)
 
-	if link, err = s.fm.GenPicture(user, desc); err != nil {
+	if link, err = s.fm.GenPicture(cmd.User, cmd.Desc.Desc()); err != nil {
 		code = s.setCode(err)
 	}
 
@@ -36,11 +36,11 @@ func (s bigModelService) GenPicture(
 }
 
 func (s bigModelService) GenPictures(
-	user types.Account, desc string,
+	cmd GenPictureCmd,
 ) (links []string, code string, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelGenPicture)
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelGenPicture)
 
-	if links, err = s.fm.GenPictures(user, desc); err != nil {
+	if links, err = s.fm.GenPictures(cmd.User, cmd.Desc.Desc()); err != nil {
 		code = s.setCode(err)
 	}
 

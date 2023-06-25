@@ -24,8 +24,8 @@ type BigModelService interface {
 	// taichu
 	DescribePicture(types.Account, io.Reader, string, int64) (string, error)
 	DescribePictureHF(*DescribePictureCmd) (string, error)
-	GenPicture(types.Account, string) (string, string, error)
-	GenPictures(types.Account, string) ([]string, string, error)
+	GenPicture(GenPictureCmd) (string, string, error)
+	GenPictures(GenPictureCmd) ([]string, string, error)
 	Ask(types.Account, domain.Question, string) (string, string, error)
 	VQAUploadPicture(io.Reader, types.Account, string) error
 	VQAHF(*VQAHFCmd) (string, string, error)

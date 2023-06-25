@@ -5,6 +5,7 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
+// luojia
 type UserLuoJiaRecord struct {
 	User types.Account
 
@@ -21,6 +22,7 @@ type LuoJiaRecordIndex struct {
 	Id   string
 }
 
+// wukong
 type WuKongPicture struct {
 	Id        string
 	Owner     types.Account
@@ -47,6 +49,7 @@ func (r *WuKongPicture) SetDefaultDiggs() {
 	r.Diggs = []string{}
 }
 
+// ai detector
 type AIDetectorInput struct {
 	Lang Lang
 	Text AIDetectorText
@@ -62,4 +65,9 @@ func (r AIDetectorInput) IsTextLengthOK() bool {
 	}
 
 	return false
+}
+
+// taichu
+type GenPictureInput struct {
+	Desc Desc
 }

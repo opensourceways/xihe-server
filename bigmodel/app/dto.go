@@ -234,3 +234,9 @@ func (cmd AIDetectorCmd) Validate() error {
 
 	return nil
 }
+
+// taichu
+type GenPictureCmd struct {
+	User types.Account `json:"user"`
+	Desc domain.Desc   `json:"desc"`
+}

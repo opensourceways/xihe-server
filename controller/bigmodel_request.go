@@ -23,12 +23,14 @@ type pictureGenerateRequest struct {
 	Desc string `json:"desc"`
 }
 
-func (req *pictureGenerateRequest) validate() error {
-	if req.Desc == "" {
-		return errors.New("missing desc")
+func (req *pictureGenerateRequest) toCmd(user types.Account) (cmd app.GenPictureCmd, err error) {
+	if cmd.Desc, err = domain.NewDesc(req.Desc); err != nil {
+		return
 	}
 
-	return nil
+	cmd.User = user
+
+	return
 }
 
 type pictureGenerateResp struct {

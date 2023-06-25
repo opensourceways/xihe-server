@@ -176,13 +176,14 @@ func (ctl *BigModelController) GenSinglePicture(ctx *gin.Context) {
 		return
 	}
 
-	if err := req.validate(); err != nil {
+	cmd, err := req.toCmd(pl.DomainAccount())
+	if err != nil {
 		ctl.sendBadRequestParam(ctx, err)
 
 		return
 	}
 
-	v, code, err := ctl.s.GenPicture(pl.DomainAccount(), req.Desc)
+	v, code, err := ctl.s.GenPicture(cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
@@ -211,13 +212,14 @@ func (ctl *BigModelController) GenMultiplePictures(ctx *gin.Context) {
 		return
 	}
 
-	if err := req.validate(); err != nil {
+	cmd, err := req.toCmd(pl.DomainAccount())
+	if err != nil {
 		ctl.sendBadRequestParam(ctx, err)
 
 		return
 	}
 
-	v, code, err := ctl.s.GenPictures(pl.DomainAccount(), req.Desc)
+	v, code, err := ctl.s.GenPictures(cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
