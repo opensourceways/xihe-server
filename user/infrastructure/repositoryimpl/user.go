@@ -430,8 +430,6 @@ func (impl *userRepoImpl) FindFollower(owner domain.Account, option *repository.
 
 	if option.Follower == nil {
 		info.Users, err = impl.listFollowsDirectly(items, false)
-	} else if owner == option.Follower {
-		info.Users, err = impl.listFollowsDirectly(items, true)
 	} else {
 		info.Users, err = impl.listFollows(option.Follower.Account(), items)
 	}
