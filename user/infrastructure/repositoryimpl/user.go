@@ -417,7 +417,7 @@ func (impl *userRepoImpl) FindFollower(owner domain.Account, option *repository.
 		return
 	}
 
-	items := v.Following
+	items := v.Follower
 	total := len(items)
 	if total == 0 {
 		return
