@@ -60,6 +60,9 @@ type Question interface {
 
 func NewQuestion(v string) (Question, error) {
 	// TODO check format
+	if utils.StrLen(v) > 30 {
+		return nil, errors.New("invalid question")
+	}
 
 	return question(v), nil
 }
