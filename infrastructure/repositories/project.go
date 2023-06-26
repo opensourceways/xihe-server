@@ -259,6 +259,7 @@ func (do *ProjectDO) toProject(r *domain.Project) (err error) {
 	r.Level = domain.NewResourceLevelByNum(do.Level)
 	r.RepoId = do.RepoId
 	r.Tags = do.Tags
+	r.TagKinds = do.TagKinds
 	r.Version = do.Version
 	r.CreatedAt = do.CreatedAt
 	r.UpdatedAt = do.UpdatedAt

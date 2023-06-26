@@ -263,6 +263,7 @@ func (do *ModelDO) toModel(r *domain.Model) (err error) {
 
 	r.RepoId = do.RepoId
 	r.Tags = do.Tags
+	r.TagKinds = do.TagKinds
 	r.Version = do.Version
 	r.CreatedAt = do.CreatedAt
 	r.UpdatedAt = do.UpdatedAt
