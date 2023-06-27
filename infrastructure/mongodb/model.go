@@ -254,6 +254,7 @@ func (col model) toModelDO(owner string, item *modelItem, do *repositories.Model
 		RepoType:      item.RepoType,
 		RepoId:        item.RepoId,
 		Tags:          item.Tags,
+		TagKinds:      item.TagKinds,
 		CreatedAt:     item.CreatedAt,
 		UpdatedAt:     item.UpdatedAt,
 		Version:       item.Version,

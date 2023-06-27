@@ -253,6 +253,7 @@ func (col dataset) toDatasetDO(owner string, item *datasetItem, do *repositories
 		RepoType:      item.RepoType,
 		RepoId:        item.RepoId,
 		Tags:          item.Tags,
+		TagKinds:      item.TagKinds,
 		CreatedAt:     item.CreatedAt,
 		UpdatedAt:     item.UpdatedAt,
 		Version:       item.Version,
