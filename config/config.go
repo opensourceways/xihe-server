@@ -9,10 +9,11 @@ import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	"github.com/opensourceways/xihe-server/app"
+	asyncrepoimol "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
-	asyncrepoimol "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -64,6 +65,7 @@ type Config struct {
 	Authing     authingimpl.Config     `json:"authing"      required:"true"`
 	Mongodb     Mongodb                `json:"mongodb"      required:"true"`
 	Postgresql  PostgresqlConfig       `json:"postgresql"   required:"true"`
+	Redis       Redis                  `json:"redis"        required:"true"`
 	Gitlab      gitlab.Config          `json:"gitlab"       required:"true"`
 	Domain      domain.Config          `json:"domain"       required:"true"`
 	App         app.Config             `json:"app"          required:"true"`
@@ -89,6 +91,7 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
 		&cfg.Postgresql.Cloud,
+		&cfg.Redis.DB,
 		&cfg.Gitlab,
 		&cfg.App,
 		&cfg.API,
@@ -141,6 +144,10 @@ type PostgresqlConfig struct {
 
 	Cloud cloudrepoimpl.Config
 	Async asyncrepoimol.Config
+}
+
+type Redis struct {
+	DB redis.Config `json:"db" required:"true"`
 }
 
 type MongodbCollections struct {

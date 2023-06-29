@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
 	"github.com/opensourceways/xihe-server/app"
@@ -16,9 +17,9 @@ import (
 )
 
 const (
-	cookiePrivateToken = "PRIVATE-TOKEN"
-	xcsrfToken         = "CSRF-Token"
-	headerSecWebsocket = "Sec-Websocket-Protocol"
+	sessionPrivateToken = "PRIVATE-TOKEN"
+	xcsrfToken          = "CSRF-Token"
+	headerSecWebsocket  = "Sec-Websocket-Protocol"
 
 	roleIndividuals = "individuals"
 	fileReadme      = "README.md"
@@ -170,7 +171,7 @@ func (ctl baseController) checkUserApiToken(
 	pl oldUserTokenPayload, visitor bool, ok bool,
 ) {
 
-	token := ctl.getCookieToken(ctx)
+	token := ctl.getSessionToken(ctx)
 	csrftoken := ctl.getCSRFToken(ctx)
 
 	if token == "" || csrftoken == "" {
@@ -192,17 +193,14 @@ func (ctl baseController) checkUserApiToken(
 	return
 }
 
-func (ctl baseController) setRespCookieToken(ctx *gin.Context, token string) {
-	cookie := &http.Cookie{
-		Name:     cookiePrivateToken,
-		Value:    token,
-		Path:     "/",
-		Expires:  utils.ExpiryReduceSecond(apiConfig.TokenExpiry),
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	}
+func (ctl baseController) setRespSessionToken(ctx *gin.Context, token string) {
+	session := sessions.Default(ctx)
 
-	http.SetCookie(ctx.Writer, cookie)
+	session.Delete(sessionPrivateToken)
+
+	session.Set(sessionPrivateToken, token)
+
+	session.Save()
 }
 
 func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token string) {
@@ -211,7 +209,111 @@ func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token string) {
 
 func (ctl baseController) setRespToken(ctx *gin.Context, token string, csrftoken string) {
 	ctl.setRespCSRFToken(ctx, csrftoken)
-	ctl.setRespCookieToken(ctx, token)
+	ctl.setRespSessionToken(ctx, token)
+}
+
+func (ctl *baseController) checkTokenForWebsocket(
+	ctx *gin.Context, allowVistor bool,
+) (
+	pl oldUserTokenPayload, csrftoken string, visitor, ok bool,
+) {
+	csrftoken = ctl.getTokenForWebsocket(ctx)
+
+	if strings.HasPrefix(csrftoken, visitorPrefix) {
+		return pl, csrftoken, true, true
+	}
+
+	if csrftoken == "" {
+		if allowVistor {
+			visitor = true
+			ok = true
+		} else {
+			ctx.JSON(
+				http.StatusBadRequest,
+				newResponseCodeMsg(errorBadRequestHeader, "no token"),
+			)
+		}
+
+		return
+	}
+
+	ok = ctl.checkCSRFTokenForWebSocket(ctx, csrftoken, &pl)
+
+	return
+}
+
+func (ctl *baseController) getSessionToken(ctx *gin.Context) (token string) {
+	session := sessions.Default(ctx)
+
+	v := session.Get(sessionPrivateToken)
+	if v == nil {
+		token = ""
+	} else {
+		token = v.(string)
+	}
+
+	return
+}
+
+func (ctl *baseController) getCSRFToken(ctx *gin.Context) (token string) {
+	return ctx.GetHeader(xcsrfToken)
+}
+
+func (ctl *baseController) getTokenForWebsocket(ctx *gin.Context) (csrftoken string) {
+	return ctx.GetHeader(headerSecWebsocket)
+}
+
+func (ctl *baseController) getToken(ctx *gin.Context) (token, csrftoken string) {
+	token = ctl.getSessionToken(ctx)
+	csrftoken = ctl.getCSRFToken(ctx)
+
+	return
+}
+
+func (ctl baseController) checkCSRFTokenForWebSocket(
+	ctx *gin.Context, csrftoken string, pl interface{},
+) (ok bool) {
+	ctokenbyte, err := ctl.decryptDataForCSRF(csrftoken)
+	if err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			newResponseCodeError(errorSystemError, err),
+		)
+
+		return
+	}
+
+	ac := accessController{
+		Payload: pl,
+	}
+
+	if err := ac.initByToken(string(ctokenbyte), apiConfig.TokenKey); err != nil {
+		ctx.JSON(
+			http.StatusInternalServerError,
+			newResponseCodeError(errorSystemError, err),
+		)
+
+		return
+	}
+
+	if err = ac.verify([]string{roleIndividuals}); err != nil {
+		ctx.JSON(
+			http.StatusUnauthorized,
+			newResponseCodeError(errorInvalidToken, err),
+		)
+		return
+	}
+
+	ok = true
+
+	return
+}
+
+func (ctl baseController) cleanSession(ctx *gin.Context) {
+	session := sessions.Default(ctx)
+
+	session.Delete(sessionPrivateToken)
+	session.Save()
 }
 
 func (ctl baseController) getRemoteAddr(ctx *gin.Context) (string, error) {
@@ -388,105 +490,6 @@ func (ctl baseController) getListGlobalResourceParameter(
 
 	cmd.ResourceListOption = v.ResourceListOption
 	cmd.SortType = v.SortType
-
-	return
-}
-
-func (ctl *baseController) checkTokenForWebsocket(
-	ctx *gin.Context, allowVistor bool,
-) (
-	pl oldUserTokenPayload, csrftoken string, visitor, ok bool,
-) {
-	csrftoken = ctl.getTokenForWebsocket(ctx)
-
-	if strings.HasPrefix(csrftoken, visitorPrefix) {
-		return pl, csrftoken, true, true
-	}
-
-	if csrftoken == "" {
-		if allowVistor {
-			visitor = true
-			ok = true
-		} else {
-			ctx.JSON(
-				http.StatusBadRequest,
-				newResponseCodeMsg(errorBadRequestHeader, "no token"),
-			)
-		}
-
-		return
-	}
-
-	ok = ctl.checkCSRFTokenForWebSocket(ctx, csrftoken, &pl)
-
-	return
-}
-
-func (ctl *baseController) getCookieToken(ctx *gin.Context) (token string) {
-	cookie, err := ctx.Request.Cookie(cookiePrivateToken)
-	if err != nil {
-		return
-	}
-
-	return cookie.Value
-}
-
-func (ctl *baseController) getCSRFToken(ctx *gin.Context) (token string) {
-	return ctx.GetHeader(xcsrfToken)
-}
-
-func (ctl *baseController) getCSRFTokenForWebsocket(ctx *gin.Context) (token string) {
-	return ctx.GetHeader(headerSecWebsocket)
-}
-
-func (ctl *baseController) getToken(ctx *gin.Context) (token, csrftoken string) {
-	token = ctl.getCookieToken(ctx)
-	csrftoken = ctl.getCSRFToken(ctx)
-
-	return
-}
-
-func (ctl baseController) checkCSRFTokenForWebSocket(
-	ctx *gin.Context, csrftoken string, pl interface{},
-) (ok bool) {
-	ctokenbyte, err := ctl.decryptDataForCSRF(csrftoken)
-	if err != nil {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			newResponseCodeError(errorSystemError, err),
-		)
-
-		return
-	}
-
-	ac := accessController{
-		Payload: pl,
-	}
-
-	if err := ac.initByToken(string(ctokenbyte), apiConfig.TokenKey); err != nil {
-		ctx.JSON(
-			http.StatusInternalServerError,
-			newResponseCodeError(errorSystemError, err),
-		)
-
-		return
-	}
-
-	if err = ac.verify([]string{roleIndividuals}); err != nil {
-		ctx.JSON(
-			http.StatusUnauthorized,
-			newResponseCodeError(errorInvalidToken, err),
-		)
-		return
-	}
-
-	ok = true
-
-	return
-}
-
-func (ctl *baseController) getTokenForWebsocket(ctx *gin.Context) (csrftoken string) {
-	csrftoken = ctl.getCSRFTokenForWebsocket(ctx)
 
 	return
 }

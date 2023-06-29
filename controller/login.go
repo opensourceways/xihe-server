@@ -262,6 +262,8 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 		return
 	}
 
+	ctl.cleanSession(ctx)
+
 	info.Info = string(v)
 	ctx.JSON(http.StatusOK, newResponseData(info))
 }
