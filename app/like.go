@@ -73,6 +73,12 @@ type likeService struct {
 }
 
 func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
+	if isprivate, ok := s.rs.IsPrivate(
+		cmd.ResourceOwner, cmd.ResourceType, cmd.ResourceId,
+	); !ok || isprivate {
+		return errors.New("cannot like private or not exsit resource")
+	}
+
 	now := utils.Now()
 
 	obj := domain.ResourceObject{Type: cmd.ResourceType}

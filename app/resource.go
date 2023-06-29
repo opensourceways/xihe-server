@@ -428,3 +428,25 @@ func (s resourceService) canApplyResourceName(owner domain.Account, name domain.
 
 	return true
 }
+
+func (s resourceService) IsPrivate(owner domain.Account, resourceType domain.ResourceType, id string) (isprivate bool, ok bool) {
+
+	switch resourceType.ResourceType() {
+	case domain.ResourceProject:
+		if p, err := s.project.Get(owner, id); err == nil {
+			return p.IsPrivate(), true
+		}
+	case domain.ResourceModel:
+		if m, err := s.model.Get(owner, id); err == nil {
+			return m.IsPrivate(), true
+		}
+	case domain.ResourceDataset:
+		if d, err := s.dataset.Get(owner, id); err == nil {
+			return d.IsPrivate(), true
+		}
+	default:
+		return false, false
+	}
+
+	return false, false
+}
