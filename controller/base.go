@@ -170,7 +170,22 @@ func (ctl baseController) checkUserApiToken(
 ) (
 	pl oldUserTokenPayload, visitor bool, ok bool,
 ) {
+	return ctl.checkUserApiTokenBase(ctx, allowVistor, true)
+}
 
+func (ctl baseController) checkUserApiTokenNoRefresh(
+	ctx *gin.Context, allowVistor bool,
+) (
+	pl oldUserTokenPayload, visitor bool, ok bool,
+) {
+	return ctl.checkUserApiTokenBase(ctx, allowVistor, false)
+}
+
+func (ctl baseController) checkUserApiTokenBase(
+	ctx *gin.Context, allowVistor bool, refresh bool,
+) (
+	pl oldUserTokenPayload, visitor bool, ok bool,
+) {
 	token := ctl.getSessionToken(ctx)
 	csrftoken := ctl.getCSRFToken(ctx)
 
@@ -188,7 +203,7 @@ func (ctl baseController) checkUserApiToken(
 		return
 	}
 
-	ok = ctl.checkApiToken(ctx, token, csrftoken, &pl, true)
+	ok = ctl.checkApiToken(ctx, token, csrftoken, &pl, refresh)
 
 	return
 }
