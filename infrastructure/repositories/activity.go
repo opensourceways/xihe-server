@@ -57,6 +57,7 @@ func (impl activity) toActivityDO(v *domain.Activity) ActivityDO {
 	return ActivityDO{
 		Type:             v.Type.ActivityType(),
 		Time:             v.Time,
+		RepoType:         v.RepoType.RepoType(),
 		ResourceObjectDO: toResourceObjectDO(&v.ResourceObject),
 	}
 }
@@ -68,12 +69,20 @@ type ActivityDO struct {
 	Type string
 	Time int64
 
+	RepoType string
+
 	ResourceObjectDO
 }
 
 func (do *ActivityDO) toActivity(r *domain.Activity) (err error) {
 	if r.Type, err = domain.NewActivityType(do.Type); err != nil {
 		return
+	}
+
+	if do.RepoType != "" {
+		if r.RepoType, err = domain.NewRepoType(do.RepoType); err != nil {
+			return
+		}
 	}
 
 	r.Time = do.Time

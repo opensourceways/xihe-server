@@ -257,6 +257,8 @@ type activityItem struct {
 	Type string `bson:"type" json:"type"`
 	Time int64  `bson:"time" json:"time"`
 
+	RepoType string `bson:"repo_type" json:"repo_type"`
+
 	ResourceObject `bson:",inline"`
 }
 

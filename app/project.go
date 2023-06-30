@@ -207,7 +207,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 
 	// add activity
 	r := p.ResourceObject()
-	ua := genActivityForCreatingResource(r)
+	ua := genActivityForCreatingResource(r, p.ProjectModifiableProperty.RepoType)
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, p.Name)

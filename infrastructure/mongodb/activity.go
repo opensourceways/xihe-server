@@ -90,6 +90,7 @@ func (col activity) toActivityDoc(do *repositories.ActivityDO) (bson.M, error) {
 	v := activityItem{
 		Type:           do.Type,
 		Time:           do.Time,
+		RepoType:       do.RepoType,
 		ResourceObject: toResourceObject(&do.ResourceObjectDO),
 	}
 
@@ -100,6 +101,7 @@ func (col activity) toActivityDO(item *activityItem, do *repositories.ActivityDO
 	*do = repositories.ActivityDO{
 		Type:             item.Type,
 		Time:             item.Time,
+		RepoType:         item.RepoType,
 		ResourceObjectDO: toResourceObjectDO(&item.ResourceObject),
 	}
 }

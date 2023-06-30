@@ -53,5 +53,15 @@ type Activity struct {
 	Type ActivityType
 	Time int64
 
+	RepoType RepoType
+
 	ResourceObject
+}
+
+func (r Activity) IsPublic() bool {
+	if r.RepoType == nil {
+		return false
+	}
+
+	return r.RepoType.RepoType() == RepoTypePublic
 }

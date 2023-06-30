@@ -42,6 +42,11 @@ type ActivityController struct {
 //	@Router			/v1/user/activity/{account} [get]
 func (ctl *ActivityController) List(ctx *gin.Context) {
 	// TODO: list by page
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
 	account, err := domain.NewAccount(ctx.Param("account"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
@@ -51,7 +56,12 @@ func (ctl *ActivityController) List(ctx *gin.Context) {
 		return
 	}
 
-	if data, err := ctl.s.List(account); err != nil {
+	var all bool
+	if pl.isMyself(account) {
+		all = true
+	}
+
+	if data, err := ctl.s.List(account, all); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctx.JSON(http.StatusOK, newResponseData(data))

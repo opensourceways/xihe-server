@@ -61,7 +61,7 @@ func (s projectService) Fork(cmd *ProjectForkCmd, pr platform.Repository) (dto P
 
 	// create activity
 	r := p.ResourceObject()
-	ua := genActivityForCreatingResource(r)
+	ua := genActivityForCreatingResource(r, p.ProjectModifiableProperty.RepoType)
 	ua.Type = domain.ActivityTypeFork
 	_ = s.activity.Save(&ua)
 

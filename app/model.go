@@ -183,7 +183,7 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 
 	// add activity
 	r := m.ResourceObject()
-	ua := genActivityForCreatingResource(r)
+	ua := genActivityForCreatingResource(r, m.ModelModifiableProperty.RepoType)
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, m.Name)

@@ -14,7 +14,7 @@ type ActivityDTO struct {
 }
 
 type ActivityService interface {
-	List(domain.Account) ([]ActivityDTO, error)
+	List(domain.Account, bool) ([]ActivityDTO, error)
 }
 
 func NewActivityService(
@@ -40,7 +40,13 @@ type activityService struct {
 	rs   resourceService
 }
 
-func (s activityService) List(owner domain.Account) (
+func (s activityService) List(owner domain.Account, all bool) (
+	dtos []ActivityDTO, err error,
+) {
+	return s.list(owner, all)
+}
+
+func (s activityService) list(owner domain.Account, all bool) (
 	dtos []ActivityDTO, err error,
 ) {
 	activities, err := s.repo.Find(owner, repository.ActivityFindOption{})
@@ -75,14 +81,16 @@ func (s activityService) List(owner domain.Account) (
 	_ = sortAndSet(orders, func(i int) error {
 		item := &activities[i]
 
-		if r, ok := rm[item.String()]; ok {
-			dtos[j] = ActivityDTO{
-				Type:     item.Type.ActivityType(),
-				Time:     utils.ToDate(item.Time),
-				Resource: *r,
-			}
+		if all || item.IsPublic() {
+			if r, ok := rm[item.String()]; ok {
+				dtos[j] = ActivityDTO{
+					Type:     item.Type.ActivityType(),
+					Time:     utils.ToDate(item.Time),
+					Resource: *r,
+				}
 
-			j++
+				j++
+			}
 		}
 
 		return nil
@@ -95,12 +103,13 @@ func (s activityService) List(owner domain.Account) (
 	return
 }
 
-func genActivityForCreatingResource(obj domain.ResourceObject) domain.UserActivity {
+func genActivityForCreatingResource(obj domain.ResourceObject, repotype domain.RepoType) domain.UserActivity {
 	return domain.UserActivity{
 		Owner: obj.Owner,
 		Activity: domain.Activity{
 			Type:           domain.ActivityTypeCreate,
 			Time:           utils.Now(),
+			RepoType:       repotype,
 			ResourceObject: obj,
 		},
 	}

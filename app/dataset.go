@@ -179,7 +179,7 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 
 	// add activity
 	r := d.ResourceObject()
-	ua := genActivityForCreatingResource(r)
+	ua := genActivityForCreatingResource(r, d.DatasetModifiableProperty.RepoType)
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, d.Name)
