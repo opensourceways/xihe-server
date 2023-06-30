@@ -1,8 +1,6 @@
 package app
 
-import (
-	"github.com/opensourceways/xihe-server/domain"
-)
+import "github.com/opensourceways/xihe-server/user/domain"
 
 func (s userService) AddFollower(f *domain.FollowerInfo) error {
 	return s.repo.AddFollower(f)
@@ -30,4 +28,19 @@ func (s userService) ListFollower(cmd *FollowsListCmd) (
 	dto.Data = dtos
 
 	return
+}
+
+func (s userService) toFollowDTO(f *domain.FollowerUserInfo, dto *FollowDTO) {
+	*dto = FollowDTO{
+		Account:    f.Account.Account(),
+		IsFollower: f.IsFollower,
+	}
+
+	if f.Bio != nil {
+		dto.Bio = f.Bio.Bio()
+	}
+
+	if f.AvatarId != nil {
+		dto.AvatarId = f.AvatarId.AvatarId()
+	}
 }

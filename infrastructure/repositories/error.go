@@ -36,6 +36,10 @@ func NewErrorConcurrentUpdating(err error) errorConcurrentUpdating {
 }
 
 // convertError
+func ConvertError(err error) (out error) {
+	return convertError(err)
+}
+
 func convertError(err error) (out error) {
 	switch err.(type) {
 	case errorDuplicateCreating:

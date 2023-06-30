@@ -2,7 +2,6 @@ package authingimpl
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -16,16 +15,19 @@ import (
 var userInstance *user
 
 type Config struct {
-	APPId    string `json:"app_id"    required:"true"`
-	Secret   string `json:"secret"    required:"true"`
-	Endpoint string `json:"endpoint"  required:"true"`
+	APPId    string `json:"app_id"        required:"true"`
+	Secret   string `json:"secret"        required:"true"`
+	Endpoint string `json:"endpoint"      required:"true"`
 }
 
 func Init(v *Config) {
 	userInstance = &user{
-		cfg:         *v,
-		tokenURL:    v.Endpoint + "/token",
-		userInfoURL: v.Endpoint + "/user",
+		cfg:                *v,
+		tokenURL:           v.Endpoint + "/oidc/token",
+		userInfoURL:        v.Endpoint + "/oidc/user",
+		getManagerTokenURL: v.Endpoint + "/manager/token",
+		sendEmailURL:       v.Endpoint + "/manager/sendcode",
+		bindEmailURL:       v.Endpoint + "/manager/bind/account",
 	}
 }
 
@@ -34,9 +36,12 @@ func NewAuthingUser() *user {
 }
 
 type user struct {
-	cfg         Config
-	tokenURL    string
-	userInfoURL string
+	cfg                Config
+	tokenURL           string
+	userInfoURL        string
+	getManagerTokenURL string
+	sendEmailURL       string
+	bindEmailURL       string
 }
 
 func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInfo, err error) {
@@ -50,14 +55,12 @@ func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInf
 		Name    string `json:"username,omitempty"`
 		Picture string `json:"picture,omitempty"`
 		Email   string `json:"email,omitempty"`
+		Sub     string `json:"sub,omitempty"`
 	}
 
 	if err = impl.getUserInfoByAccessToken(accessToken, &v); err != nil {
 		return
 	}
-
-	// TODO: delete
-	fmt.Printf("user info = %v\n", v)
 
 	if userInfo.Name, err = domain.NewAccount(v.Name); err != nil {
 		return
@@ -70,6 +73,8 @@ func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInf
 	if userInfo.AvatarId, err = domain.NewAvatarId(v.Picture); err != nil {
 		return
 	}
+
+	userInfo.UserId = v.Sub
 
 	return
 }
@@ -141,6 +146,7 @@ func (impl *user) getUserInfoByAccessToken(accessToken string, result interface{
 func sendHttpRequest(req *http.Request, result interface{}) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", "xihe-server-authing")
+	req.Header.Add("content-type", "application/json")
 
 	hc := utils.NewHttpClient(3)
 

@@ -171,7 +171,7 @@ func (col project) listResource(
 
 func (col project) summaryFields() []string {
 	return []string{
-		fieldId, fieldName, fieldDesc, fieldCoverId, fieldTags, fieldFirstLetter,
+		fieldId, fieldName, fieldDesc, fieldTitle, fieldCoverId, fieldTags, fieldFirstLetter,
 		fieldUpdatedAt, fieldLikeCount, fieldForkCount, fieldDownloadCount, fieldLevel,
 	}
 }
@@ -182,6 +182,7 @@ func (col project) toProjectSummaryDO(owner string, item *projectItem, do *repos
 		Owner:         owner,
 		Name:          item.Name,
 		Desc:          item.Desc,
+		Title:         item.Title,
 		Level:         item.Level,
 		CoverId:       item.CoverId,
 		Tags:          item.Tags,

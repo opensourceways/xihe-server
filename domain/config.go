@@ -21,6 +21,8 @@ type Config struct {
 	MaxBioLength          int `json:"max_bio_length"`
 	MaxNameLength         int `json:"max_name_length"`
 	MinNameLength         int `json:"min_name_length"`
+	MaxTitleLength        int `json:"max_title_length"`
+	MinTitleLength        int `json:"min_title_length"`
 	MaxDescLength         int `json:"max_desc_length"`
 	MaxNicknameLength     int `json:"max_nickname_length"`
 	MaxRelatedResourceNum int `json:"max_related_resource_num"`
@@ -47,6 +49,10 @@ func (cfg *Config) SetDefault() {
 
 	if cfg.MinNameLength <= 0 {
 		cfg.MinNameLength = 5
+	}
+
+	if cfg.MaxTitleLength <= 0 {
+		cfg.MaxTitleLength = 100
 	}
 
 	if cfg.MaxDescLength <= 0 {

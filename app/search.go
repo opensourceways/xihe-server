@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 type SearchDTO struct {
@@ -32,7 +33,10 @@ func newResourceSearchOption(name string) repository.ResourceSearchOption {
 		Name:   name,
 		TopNum: 3,
 	}
-	option.RepoType, _ = domain.NewRepoType(domain.RepoTypePublic)
+	type1, _ := domain.NewRepoType(domain.RepoTypePublic)
+	type2, _ := domain.NewRepoType(domain.RepoTypeOnline)
+	option.RepoType = append(option.RepoType, type1)
+	option.RepoType = append(option.RepoType, type2)
 
 	return option
 }
@@ -42,7 +46,7 @@ type SearchService interface {
 }
 
 func NewSearchService(
-	user repository.User,
+	user userrepo.User,
 	model repository.Model,
 	project repository.Project,
 	dataset repository.Dataset,
@@ -56,7 +60,7 @@ func NewSearchService(
 }
 
 type searchService struct {
-	user    repository.User
+	user    userrepo.User
 	model   repository.Model
 	project repository.Project
 	dataset repository.Dataset
@@ -115,7 +119,7 @@ func (s searchService) search(
 func (s searchService) searchUser(name string) (
 	dto UserSearchDTO, err error,
 ) {
-	v, err := s.user.Search(&repository.UserSearchOption{
+	v, err := s.user.Search(&userrepo.UserSearchOption{
 		Name:   name,
 		TopNum: 10,
 	})

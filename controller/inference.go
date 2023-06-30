@@ -45,44 +45,35 @@ type InferenceController struct {
 	inferenceBootFile domain.FilePath
 }
 
-// @Summary Create
-// @Description create inference
-// @Tags  Inference
-// @Param	owner	path 	string			true	"project owner"
-// @Param	pid	path 	string			true	"project id"
-// @Accept json
-// @Success 201 {object} app.InferenceDTO
-// @Failure 400 bad_request_body    can't parse request body
-// @Failure 401 bad_request_param   some parameter of body is invalid
-// @Failure 500 system_error        system error
-// @Router /v1/inference/project/{owner}/{pid} [get]
+//	@Summary		Create
+//	@Description	create inference
+//	@Tags			Inference
+//	@Param			owner	path	string	true	"project owner"
+//	@Param			pid		path	string	true	"project id"
+//	@Accept			json
+//	@Success		201	{object}			app.InferenceDTO
+//	@Failure		400	bad_request_body	can't	parse		request	body
+//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/inference/project/{owner}/{pid} [get]
 func (ctl *InferenceController) Create(ctx *gin.Context) {
-	token := ctx.GetHeader(headerSecWebsocket)
-	if token == "" {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorBadRequestParam, "no token",
-		))
-
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, true)
+	if !ok {
 		return
 	}
 
-	pl := oldUserTokenPayload{}
 	visitor := true
 	projectId := ctx.Param("pid")
 
-	if token != "visitor-"+projectId {
+	if csrftoken != "visitor-"+projectId {
 		visitor = false
-
-		if ok := ctl.checkApiToken(ctx, token, &pl, false); !ok {
-			return
-		}
 	}
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 
@@ -134,18 +125,8 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		return
 	}
 
-	// get resourcelevel
-	resources, err := ctl.project.FindUserProjects(
-		[]repository.UserResourceListOption{
-			{
-				Owner: owner,
-				Ids: []string{
-					projectId,
-				},
-			},
-		},
-	)
-	if err != nil || len(resources) < 1 {
+	var level string
+	if level, err = ctl.getResourceLevel(owner, projectId); err != nil {
 		ws.WriteJSON(newResponseError(err))
 
 		log.Errorf("inference failed: get reource, err:%s", err.Error())
@@ -162,9 +143,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	cmd := app.InferenceCreateCmd{
 		ProjectId:     v.Id,
-		ProjectName:   v.Name.(domain.ResourceName),
+		ProjectName:   v.Name,
 		ProjectOwner:  owner,
-		ResourceLevel: resources[0].Level.ResourceLevel(),
+		ResourceLevel: level,
 		InferenceDir:  ctl.inferenceDir,
 		BootFile:      ctl.inferenceBootFile,
 	}
@@ -219,4 +200,27 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	log.Error("inference timeout")
 
 	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
+}
+
+func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid string) (level string, err error) {
+	resources, err := ctl.project.FindUserProjects(
+		[]repository.UserResourceListOption{
+			{
+				Owner: owner,
+				Ids: []string{
+					pid,
+				},
+			},
+		},
+	)
+
+	if err != nil || len(resources) < 1 {
+		return
+	}
+
+	if resources[0].Level != nil {
+		level = resources[0].Level.ResourceLevel()
+	}
+
+	return
 }

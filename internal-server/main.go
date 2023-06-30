@@ -48,24 +48,27 @@ func (o *options) addFlags(fs *flag.FlagSet) {
 	)
 }
 
-func gatherOptions(fs *flag.FlagSet, args ...string) options {
+func gatherOptions(fs *flag.FlagSet, args ...string) (options, error) {
 	var o options
 
 	o.addFlags(fs)
 
-	_ = fs.Parse(args)
+	err := fs.Parse(args)
 
-	return o
+	return o, err
 }
 
 func main() {
 	logrusutil.ComponentInit("xihe")
 	log := logrus.NewEntry(logrus.StandardLogger())
 
-	o := gatherOptions(
+	o, err := gatherOptions(
 		flag.NewFlagSet(os.Args[0], flag.ExitOnError),
 		os.Args[1:]...,
 	)
+	if err != nil {
+		logrus.Fatalf("new options failed, err:%s", err.Error())
+	}
 
 	if err := o.Validate(); err != nil {
 		logrus.Fatalf("Invalid options, err:%s", err.Error())

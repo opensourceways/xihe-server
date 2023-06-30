@@ -11,6 +11,8 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 type oldUserTokenPayload struct {
@@ -54,7 +56,7 @@ type newUserTokenPayload struct {
 
 func AddRouterForLoginController(
 	rg *gin.RouterGroup,
-	repo repository.User,
+	repo userrepo.User,
 	ps platform.User,
 	auth authing.User,
 	login repository.Login,
@@ -62,7 +64,7 @@ func AddRouterForLoginController(
 ) {
 	pc := LoginController{
 		auth: auth,
-		us:   app.NewUserService(repo, ps, sender),
+		us:   userapp.NewUserService(repo, ps, sender),
 		ls:   app.NewLoginService(login),
 	}
 
@@ -76,21 +78,21 @@ type LoginController struct {
 	baseController
 
 	auth     authing.User
-	us       app.UserService
+	us       userapp.UserService
 	ls       app.LoginService
 	password domain.Password
 }
 
-// @Title Login
-// @Description callback of authentication by authing
-// @Tags  Login
-// @Param	code		query	string	true	"authing code"
-// @Param	redirect_uri	query	string	true	"redirect uri"
-// @Accept json
-// @Success 200 {object} app.UserDTO
-// @Failure 500 system_error         system error
-// @Failure 501 duplicate_creating   create user repeatedly which should not happen
-// @Router / [get]
+//	@Title			Login
+//	@Description	callback of authentication by authing
+//	@Tags			Login
+//	@Param			code			query	string	true	"authing code"
+//	@Param			redirect_uri	query	string	true	"redirect uri"
+//	@Accept			json
+//	@Success		200	{object}			app.UserDTO
+//	@Failure		500	system_error		system	error
+//	@Failure		501	duplicate_creating	create	user	repeatedly	which	should	not	happen
+//	@Router			/ [get]
 func (ctl *LoginController) Login(ctx *gin.Context) {
 	info, err := ctl.auth.GetByCode(
 		ctl.getQueryParameter(ctx, "code"),
@@ -115,12 +117,6 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		if user, err = ctl.newUser(ctx, info); err != nil {
 			return
 		}
-	} else {
-		if user.Email != info.Email.Email() {
-			ctl.us.UpdateBasicInfo(
-				info.Name, app.UpdateUserBasicInfoCmd{Email: info.Email},
-			)
-		}
 	}
 
 	if err := ctl.newLogin(ctx, info); err != nil {
@@ -134,7 +130,7 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		PlatformUserNamespaceId: user.Platform.NamespaceId,
 	}
 
-	token, err := ctl.newApiToken(ctx, payload)
+	token, csrftoken, err := ctl.newApiToken(ctx, payload)
 	if err != nil {
 		ctl.sendRespWithInternalError(
 			ctx, newResponseCodeError(errorSystemError, err),
@@ -143,7 +139,7 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctl.setRespToken(ctx, token)
+	ctl.setRespToken(ctx, token, csrftoken)
 	ctx.JSON(http.StatusOK, newResponseData(user))
 }
 
@@ -157,19 +153,11 @@ func (ctl *LoginController) newLogin(ctx *gin.Context, info authing.Login) (err 
 		return
 	}
 
-	accessToken, err := ctl.encryptData(info.AccessToken)
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseCodeError(
-			errorSystemError, err,
-		))
-
-		return
-	}
-
 	err = ctl.ls.Create(&app.LoginCreateCmd{
-		Account:     info.Name,
-		Info:        idToken,
-		AccessToken: accessToken,
+		Account: info.Name,
+		Email:   info.Email,
+		Info:    idToken,
+		UserId:  info.UserId,
 	})
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -178,8 +166,8 @@ func (ctl *LoginController) newLogin(ctx *gin.Context, info authing.Login) (err 
 	return
 }
 
-func (ctl *LoginController) newUser(ctx *gin.Context, info authing.Login) (user app.UserDTO, err error) {
-	cmd := app.UserCreateCmd{
+func (ctl *LoginController) newUser(ctx *gin.Context, info authing.Login) (user userapp.UserDTO, err error) {
+	cmd := userapp.UserCreateCmd{
 		Email:    info.Email,
 		Account:  info.Name,
 		Password: ctl.password,
@@ -189,21 +177,51 @@ func (ctl *LoginController) newUser(ctx *gin.Context, info authing.Login) (user 
 
 	if user, err = ctl.us.Create(&cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+
+	if cmd.Email.Email() != "" {
+		if err = ctl.newPlateformAccount(&cmd); err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+			return
+		}
+
+		// update userdto
+		user, err = ctl.us.GetByAccount(cmd.Account)
+		if err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+			return
+		}
 	}
 
 	return
 }
 
-// @Title Logout
-// @Description get info of login
-// @Tags  Login
-// @Param	account	path	string	true	"account"
-// @Accept json
-// @Success 200 {object} app.LoginDTO
-// @Failure 400 bad_request_param   account is invalid
-// @Failure 401 not_allowed         can't get login info of other user
-// @Failure 500 system_error        system error
-// @Router /{account} [get]
+func (ctl *LoginController) newPlateformAccount(cmd *userapp.UserCreateCmd) (err error) {
+	in := userapp.CreatePlatformAccountCmd{
+		Email:    cmd.Email,
+		Account:  cmd.Account,
+		Password: cmd.Password,
+	}
+
+	err = ctl.us.NewPlatformAccountWithUpdate(&in)
+
+	return
+}
+
+//	@Title			Logout
+//	@Description	get info of login
+//	@Tags			Login
+//	@Param			account	path	string	true	"account"
+//	@Accept			json
+//	@Success		200	{object}			app.LoginDTO
+//	@Failure		400	bad_request_param	account	is	invalid
+//	@Failure		401	not_allowed			can't	get	login	info	of	other	user
+//	@Failure		500	system_error		system	error
+//	@Router			/{account} [get]
 func (ctl *LoginController) Logout(ctx *gin.Context) {
 	account, err := domain.NewAccount(ctx.Param("account"))
 	if err != nil {
@@ -243,6 +261,8 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 
 		return
 	}
+
+	ctl.cleanSession(ctx)
 
 	info.Info = string(v)
 	ctx.JSON(http.StatusOK, newResponseData(info))

@@ -8,12 +8,13 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForActivityController(
 	rg *gin.RouterGroup,
 	repo repository.Activity,
-	user repository.User,
+	user userrepo.User,
 	proj repository.Project,
 	model repository.Model,
 	dataset repository.Dataset,
@@ -31,14 +32,14 @@ type ActivityController struct {
 	s app.ActivityService
 }
 
-// @Title List
-// @Description list activitys
-// @Tags  Activity
-// @Param	account	path	string	true	"the account the activities belong to"
-// @Accept json
-// @Success 200 {object} app.ActivityDTO
-// @Failure 500 system_error        system error
-// @Router /v1/user/activity/{account} [get]
+//	@Title			List
+//	@Description	list activitys
+//	@Tags			Activity
+//	@Param			account	path	string	true	"the account the activities belong to"
+//	@Accept			json
+//	@Success		200	{object}		app.ActivityDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/user/activity/{account} [get]
 func (ctl *ActivityController) List(ctx *gin.Context) {
 	// TODO: list by page
 	account, err := domain.NewAccount(ctx.Param("account"))

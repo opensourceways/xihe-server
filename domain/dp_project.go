@@ -5,6 +5,7 @@ import "errors"
 const (
 	RepoTypePublic  = "public"
 	RepoTypePrivate = "private"
+	RepoTypeOnline  = "online"
 )
 
 // RepoType
@@ -13,7 +14,7 @@ type RepoType interface {
 }
 
 func NewRepoType(v string) (RepoType, error) {
-	if v != RepoTypePublic && v != RepoTypePrivate {
+	if v != RepoTypePublic && v != RepoTypePrivate && v != RepoTypeOnline {
 		return nil, errors.New("unknown repo type")
 	}
 

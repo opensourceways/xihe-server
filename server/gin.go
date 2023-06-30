@@ -5,12 +5,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/community-robot-lib/interrupts"
 	"github.com/sirupsen/logrus"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	"github.com/opensourceways/xihe-server/app"
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
@@ -38,13 +41,30 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
-	"github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
+	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
+func newStore(cfg *config.Redis) (redis.Store, error) {
+	return redis.NewStore(cfg.DB.IdleSize, cfg.DB.NetWork, cfg.DB.Address, cfg.DB.Password, []byte(cfg.DB.KeyPair))
+}
+
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
+	store, err := newStore(&cfg.Redis)
+	if err != nil {
+		panic(err)
+	}
+
+	store.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   int(cfg.API.TokenExpiry - 60),
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	})
+
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(logRequest())
+	r.Use(sessions.Sessions("xihe-session", store))
 
 	setRouter(r, cfg)
 
@@ -85,8 +105,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		mongodb.NewDatasetMapper(collections.Dataset),
 	)
 
-	user := repositories.NewUserRepository(
-		mongodb.NewUserMapper(collections.User),
+	// user := repositories.NewUserRepository(
+	// 	mongodb.NewUserMapper(collections.User),
+	// )
+	user := userrepoimpl.NewUserRepo(
+		mongodb.NewCollection(collections.User),
 	)
 
 	login := repositories.NewLoginRepository(
@@ -152,11 +175,13 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	uploader := competitionimpl.NewCompetitionService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)
 
-	userAppService := userapp.NewUserService(
-		repositoryimpl.NewUserRegRepo(
+	userRegService := userapp.NewRegService(
+		userrepoimpl.NewUserRegRepo(
 			mongodb.NewCollection(collections.Registration),
 		),
 	)
+
+	loginService := app.NewLoginService(login)
 
 	asyncAppService := asyncapp.NewTaskService(asyncrepoimpl.NewAsyncTaskRepo(&cfg.Postgresql.Async))
 
@@ -168,7 +193,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	)
 
 	courseAppService := courseapp.NewCourseService(
-		usercli.NewUserCli(userAppService),
+		usercli.NewUserCli(userRegService),
 		proj,
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
@@ -191,6 +216,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		sender,
 	)
 
+	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, sender)
+
+	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, sender)
+
+	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, sender)
+
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	{
 		controller.AddRouterForProjectController(
@@ -210,7 +241,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 		controller.AddRouterForUserController(
 			v1, user, gitlabUser,
-			authingUser, sender,
+			authingUser, loginService, sender,
 		)
 
 		controller.AddRouterForLoginController(
@@ -242,7 +273,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForRepoFileController(
-			v1, gitlabRepo, model, proj, dataset, sender,
+			v1, gitlabRepo, model, proj, dataset, sender, user, gitlabUser,
 		)
 
 		controller.AddRouterForInferenceController(
@@ -266,11 +297,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForCourseController(
-			v1, courseAppService, userAppService, proj, user,
+			v1, courseAppService, userRegService, proj, user,
 		)
 
 		controller.AddRouterForHomeController(
-			v1, courseAppService, competitionAppService,
+			v1, courseAppService, competitionAppService, projectService, modelService, datasetService,
 		)
 
 		controller.AddRouterForCloudController(

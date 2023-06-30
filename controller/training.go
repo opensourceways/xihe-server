@@ -32,13 +32,13 @@ func AddRouterForTrainingController(
 		dataset: dataset,
 	}
 
-	rg.POST("/v1/train/project/:pid/training", ctl.Create)
+	rg.POST("/v1/train/project/:pid/training", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.POST("/v1/train/project/:pid/training/:id", ctl.Recreate)
 	rg.PUT("/v1/train/project/:pid/training/:id", ctl.Terminate)
-	rg.GET("/v1/train/project/:pid/training", ctl.List)
+	rg.GET("/v1/train/project/:pid/training", checkUserEmailMiddleware(&ctl.baseController), ctl.List)
 	rg.GET("/v1/train/project/:pid/training/ws", ctl.ListByWS)
 	rg.GET(
-		"/v1/train/project/:pid/training/:id/result/:type",
+		"/v1/train/project/:pid/training/:id/result/:type", checkUserEmailMiddleware(&ctl.baseController),
 		ctl.GetResultDownloadURL,
 	)
 	rg.GET("/v1/train/project/:pid/training/:id", ctl.Get)
@@ -55,17 +55,17 @@ type TrainingController struct {
 	dataset repository.Dataset
 }
 
-// @Summary Create
-// @Description create training
-// @Tags  Training
-// @Param	pid	path 	string			true	"project id"
-// @Param	body	body 	TrainingCreateRequest	true	"body of creating training"
-// @Accept json
-// @Success 201 {object} trainingCreateResp
-// @Failure 400 bad_request_body    can't parse request body
-// @Failure 401 bad_request_param   some parameter of body is invalid
-// @Failure 500 system_error        system error
-// @Router /v1/train/project/{pid}/training [post]
+//	@Summary		Create
+//	@Description	create training
+//	@Tags			Training
+//	@Param			pid		path	string					true	"project id"
+//	@Param			body	body	TrainingCreateRequest	true	"body of creating training"
+//	@Accept			json
+//	@Success		201	{object}			trainingCreateResp
+//	@Failure		400	bad_request_body	can't	parse		request	body
+//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/train/project/{pid}/training [post]
 func (ctl *TrainingController) Create(ctx *gin.Context) {
 	req := TrainingCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -119,17 +119,17 @@ func (ctl *TrainingController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newResponseData(trainingCreateResp{v}))
 }
 
-// @Summary Recreate
-// @Description recreate training
-// @Tags  Training
-// @Param	pid	path 	string	true	"project id"
-// @Param	id	path	string	true	"training id"
-// @Accept json
-// @Success 201 {object} trainingCreateResp
-// @Failure 400 bad_request_body    can't parse request body
-// @Failure 401 bad_request_param   some parameter of body is invalid
-// @Failure 500 system_error        system error
-// @Router /v1/train/project/{pid}/training/{id} [post]
+//	@Summary		Recreate
+//	@Description	recreate training
+//	@Tags			Training
+//	@Param			pid	path	string	true	"project id"
+//	@Param			id	path	string	true	"training id"
+//	@Accept			json
+//	@Success		201	{object}			trainingCreateResp
+//	@Failure		400	bad_request_body	can't	parse		request	body
+//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/train/project/{pid}/training/{id} [post]
 func (ctl *TrainingController) Recreate(ctx *gin.Context) {
 	info, ok := ctl.getTrainingInfo(ctx)
 	if !ok {
@@ -146,15 +146,15 @@ func (ctl *TrainingController) Recreate(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newResponseData(trainingCreateResp{v}))
 }
 
-// @Summary Delete
-// @Description delete training
-// @Tags  Training
-// @Param	pid	path 	string	true	"project id"
-// @Param	id	path	string	true	"training id"
-// @Accept json
-// @Success 204
-// @Failure 500 system_error        system error
-// @Router /v1/train/project/{pid}/training/{id} [delete]
+//	@Summary		Delete
+//	@Description	delete training
+//	@Tags			Training
+//	@Param			pid	path	string	true	"project id"
+//	@Param			id	path	string	true	"training id"
+//	@Accept			json
+//	@Success		204
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/train/project/{pid}/training/{id} [delete]
 func (ctl *TrainingController) Delete(ctx *gin.Context) {
 	info, ok := ctl.getTrainingInfo(ctx)
 	if !ok {
@@ -170,15 +170,15 @@ func (ctl *TrainingController) Delete(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
-// @Summary Terminate
-// @Description terminate training
-// @Tags  Training
-// @Param	pid	path 	string	true	"project id"
-// @Param	id	path	string	true	"training id"
-// @Accept json
-// @Success 202
-// @Failure 500 system_error        system error
-// @Router /v1/train/project/{pid}/training/{id} [put]
+//	@Summary		Terminate
+//	@Description	terminate training
+//	@Tags			Training
+//	@Param			pid	path	string	true	"project id"
+//	@Param			id	path	string	true	"training id"
+//	@Accept			json
+//	@Success		202
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/train/project/{pid}/training/{id} [put]
 func (ctl *TrainingController) Terminate(ctx *gin.Context) {
 	info, ok := ctl.getTrainingInfo(ctx)
 	if !ok {
@@ -194,17 +194,17 @@ func (ctl *TrainingController) Terminate(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData("success"))
 }
 
-// @Summary Get
-// @Description get training info
-// @Tags  Training
-// @Param	pid	path 	string	true	"project id"
-// @Param	id	path	string	true	"training id"
-// @Accept json
-// @Success 200 {object} trainingDetail
-// @Failure 500 system_error        system error
-// @Router /v1/train/project/{pid}/training/{id} [get]
+//	@Summary		Get
+//	@Description	get training info
+//	@Tags			Training
+//	@Param			pid	path	string	true	"project id"
+//	@Param			id	path	string	true	"training id"
+//	@Accept			json
+//	@Success		200	{object}		trainingDetail
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/train/project/{pid}/training/{id} [get]
 func (ctl *TrainingController) Get(ctx *gin.Context) {
-	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
@@ -219,9 +219,9 @@ func (ctl *TrainingController) Get(ctx *gin.Context) {
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 
@@ -301,14 +301,14 @@ func (ctl *TrainingController) watchTraining(ws *websocket.Conn, index *domain.T
 	}
 }
 
-// @Summary List
-// @Description get trainings
-// @Tags  Training
-// @Param	pid	path 	string	true	"project id"
-// @Accept json
-// @Success 200 {object} app.TrainingSummaryDTO
-// @Failure 500 system_error        system error
-// @Router /v1/train/project/{pid}/training [get]
+//	@Summary		List
+//	@Description	get trainings
+//	@Tags			Training
+//	@Param			pid	path	string	true	"project id"
+//	@Accept			json
+//	@Success		200	{object}		app.TrainingSummaryDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/train/project/{pid}/training [get]
 func (ctl *TrainingController) List(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -325,16 +325,16 @@ func (ctl *TrainingController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(v))
 }
 
-// @Summary List
-// @Description get trainings
-// @Tags  Training
-// @Param	pid	path 	string	true	"project id"
-// @Accept json
-// @Success 200 {object} app.TrainingSummaryDTO
-// @Failure 500 system_error        system error
-// @Router /v1/train/project/{pid}/training/ws [get]
+//	@Summary		List
+//	@Description	get trainings
+//	@Tags			Training
+//	@Param			pid	path	string	true	"project id"
+//	@Accept			json
+//	@Success		200	{object}		app.TrainingSummaryDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/train/project/{pid}/training/ws [get]
 func (ctl *TrainingController) ListByWS(ctx *gin.Context) {
-	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
@@ -343,9 +343,9 @@ func (ctl *TrainingController) ListByWS(ctx *gin.Context) {
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 
@@ -438,16 +438,16 @@ func (ctl *TrainingController) watchTrainings(ws *websocket.Conn, user domain.Ac
 	}
 }
 
-// @Summary GetLog
-// @Description get log url of training for downloading
-// @Tags  Training
-// @Param	pid	path 	string	true	"project id"
-// @Param	id	path	string	true	"training id"
-// @Param	type	path	string	true	"training result: log, output"
-// @Accept json
-// @Success 200 {object} trainingLogResp
-// @Failure 500 system_error        system error
-// @Router /v1/train/project/{pid}/training/{id}/result/{type} [get]
+//	@Summary		GetLog
+//	@Description	get log url of training for downloading
+//	@Tags			Training
+//	@Param			pid		path	string	true	"project id"
+//	@Param			id		path	string	true	"training id"
+//	@Param			type	path	string	true	"training result: log, output"
+//	@Accept			json
+//	@Success		200	{object}		trainingLogResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/train/project/{pid}/training/{id}/result/{type} [get]
 func (ctl *TrainingController) GetResultDownloadURL(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {

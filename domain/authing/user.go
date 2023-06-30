@@ -9,16 +9,21 @@ type UserInfo struct {
 	Email    domain.Email
 	Bio      domain.Bio
 	AvatarId domain.AvatarId
+	UserId   string
 }
 
 type Login struct {
 	UserInfo
 
-	IDToken string
+	IDToken     string
 	AccessToken string
 }
 
 type User interface {
 	GetByCode(code, redirectURI string) (Login, error)
 	GetByAccessToken(accessToken string) (UserInfo, error)
+
+	// email
+	SendBindEmail(email, capt string) (code string, err error)
+	VerifyBindEmail(email, passCode, userid string) (code string, err error)
 }

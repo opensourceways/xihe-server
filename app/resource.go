@@ -6,6 +6,8 @@ import (
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -15,12 +17,15 @@ type ResourceDTO struct {
 		AvatarId string `json:"avatar_id"`
 	} `json:"owner"`
 
-	Id       string `json:"id"`
-	Name     string `json:"name"`
-	Type     string `json:"type"`
-	Desc     string `json:"description"`
-	CoverId  string `json:"cover_id"`
-	UpdateAt string `json:"update_at"`
+	Id            string   `json:"id"`
+	Name          string   `json:"name"`
+	Type          string   `json:"type"`
+	Desc          string   `json:"description"`
+	Title         string   `json:"title"`
+	CoverId       string   `json:"cover_id"`
+	UpdateAt      string   `json:"update_at"`
+	Tags          []string `json:"tags"`
+	ResourceLevel string   `json:"level"`
 
 	LikeCount     int `json:"like_count"`
 	ForkCount     int `json:"fork_count"`
@@ -32,7 +37,7 @@ func (r *ResourceDTO) identity() string {
 }
 
 type resourceService struct {
-	user    repository.User
+	user    userrepo.User
 	model   repository.Model
 	project repository.Project
 	dataset repository.Dataset
@@ -83,10 +88,10 @@ func (s resourceService) listDatasets(resources []domain.ResourceIndex) (
 }
 
 func (s resourceService) singleResourceOptions(resources []domain.ResourceIndex) (
-	users []domain.Account,
+	users []userdomain.Account,
 	options []repository.UserResourceListOption,
 ) {
-	ul := make(map[string]domain.Account)
+	ul := make(map[string]userdomain.Account)
 	ro := make(map[string][]string)
 
 	for i := range resources {
@@ -107,12 +112,12 @@ func (s resourceService) singleResourceOptions(resources []domain.ResourceIndex)
 }
 
 func (s resourceService) toOptions(resources []*domain.ResourceObject) (
-	users []domain.Account,
+	users []userdomain.Account,
 	projects []repository.UserResourceListOption,
 	datasets []repository.UserResourceListOption,
 	models []repository.UserResourceListOption,
 ) {
-	ul := make(map[string]domain.Account)
+	ul := make(map[string]userdomain.Account)
 	po := make(map[string][]string)
 	do := make(map[string][]string)
 	mo := make(map[string][]string)
@@ -146,7 +151,7 @@ func (s resourceService) toOptions(resources []*domain.ResourceObject) (
 }
 
 func (s resourceService) listResources(
-	users []domain.Account,
+	users []userdomain.Account,
 	projects []repository.UserResourceListOption,
 	datasets []repository.UserResourceListOption,
 	models []repository.UserResourceListOption,
@@ -159,7 +164,7 @@ func (s resourceService) listResources(
 		return
 	}
 
-	userInfos := make(map[string]*domain.UserInfo)
+	userInfos := make(map[string]*userdomain.UserInfo)
 	for i := range allUsers {
 		item := &allUsers[i]
 		userInfos[item.Account.Account()] = item
@@ -225,7 +230,7 @@ func (s resourceService) listResources(
 }
 
 func (s resourceService) projectToResourceDTO(
-	userInfos map[string]*domain.UserInfo,
+	userInfos map[string]*userdomain.UserInfo,
 	projects []domain.ProjectSummary, dtos []ResourceDTO,
 ) {
 	for i := range projects {
@@ -236,6 +241,7 @@ func (s resourceService) projectToResourceDTO(
 			Name:          p.Name.ResourceName(),
 			Type:          domain.ResourceTypeProject.ResourceType(),
 			CoverId:       p.CoverId.CoverId(),
+			Tags:          p.Tags,
 			UpdateAt:      utils.ToDate(p.UpdatedAt),
 			LikeCount:     p.LikeCount,
 			ForkCount:     p.ForkCount,
@@ -244,6 +250,14 @@ func (s resourceService) projectToResourceDTO(
 
 		if p.Desc != nil {
 			v.Desc = p.Desc.ResourceDesc()
+		}
+
+		if p.Title != nil {
+			v.Title = p.Title.ResourceTitle()
+		}
+
+		if p.Level != nil {
+			v.ResourceLevel = p.Level.ResourceLevel()
 		}
 
 		if u, ok := userInfos[p.Owner.Account()]; ok {
@@ -258,7 +272,7 @@ func (s resourceService) projectToResourceDTO(
 }
 
 func (s resourceService) modelToResourceDTO(
-	userInfos map[string]*domain.UserInfo,
+	userInfos map[string]*userdomain.UserInfo,
 	data []domain.ModelSummary, dtos []ResourceDTO,
 ) {
 	for i := range data {
@@ -267,6 +281,7 @@ func (s resourceService) modelToResourceDTO(
 		v := ResourceDTO{
 			Id:            d.Id,
 			Name:          d.Name.ResourceName(),
+			Tags:          d.Tags,
 			Type:          domain.ResourceTypeModel.ResourceType(),
 			UpdateAt:      utils.ToDate(d.UpdatedAt),
 			LikeCount:     d.LikeCount,
@@ -275,6 +290,10 @@ func (s resourceService) modelToResourceDTO(
 
 		if d.Desc != nil {
 			v.Desc = d.Desc.ResourceDesc()
+		}
+
+		if d.Title != nil {
+			v.Title = d.Title.ResourceTitle()
 		}
 
 		if u, ok := userInfos[d.Owner.Account()]; ok {
@@ -289,7 +308,7 @@ func (s resourceService) modelToResourceDTO(
 }
 
 func (s resourceService) datasetToResourceDTO(
-	userInfos map[string]*domain.UserInfo,
+	userInfos map[string]*userdomain.UserInfo,
 	data []domain.DatasetSummary, dtos []ResourceDTO,
 ) {
 	for i := range data {
@@ -298,6 +317,7 @@ func (s resourceService) datasetToResourceDTO(
 		v := ResourceDTO{
 			Id:            d.Id,
 			Name:          d.Name.ResourceName(),
+			Tags:          d.Tags,
 			Type:          domain.ResourceTypeDataset.ResourceType(),
 			UpdateAt:      utils.ToDate(d.UpdatedAt),
 			LikeCount:     d.LikeCount,
@@ -306,6 +326,10 @@ func (s resourceService) datasetToResourceDTO(
 
 		if d.Desc != nil {
 			v.Desc = d.Desc.ResourceDesc()
+		}
+
+		if d.Title != nil {
+			v.Title = d.Title.ResourceTitle()
 		}
 
 		if u, ok := userInfos[d.Owner.Account()]; ok {
@@ -330,7 +354,7 @@ func (s resourceService) store(v *domain.ResourceIndex, m map[string][]string) {
 }
 
 func (s resourceService) toOptionList(
-	m map[string][]string, users map[string]domain.Account,
+	m map[string][]string, users map[string]userdomain.Account,
 ) []repository.UserResourceListOption {
 
 	if len(m) == 0 {
@@ -352,12 +376,12 @@ func (s resourceService) toOptionList(
 	return r
 }
 
-func (s resourceService) userMapToList(m map[string]domain.Account) []domain.Account {
+func (s resourceService) userMapToList(m map[string]userdomain.Account) []userdomain.Account {
 	if len(m) == 0 {
 		return nil
 	}
 
-	r := make([]domain.Account, len(m))
+	r := make([]userdomain.Account, len(m))
 
 	i := 0
 	for _, u := range m {
@@ -368,7 +392,7 @@ func (s resourceService) userMapToList(m map[string]domain.Account) []domain.Acc
 	return r
 }
 
-func (s resourceService) findUserAvater(users []domain.Account) ([]string, error) {
+func (s resourceService) findUserAvater(users []userdomain.Account) ([]string, error) {
 	allUsers, err := s.user.FindUsersInfo(users)
 	if err != nil {
 		return nil, err
@@ -403,4 +427,26 @@ func (s resourceService) canApplyResourceName(owner domain.Account, name domain.
 	}
 
 	return true
+}
+
+func (s resourceService) IsPrivate(owner domain.Account, resourceType domain.ResourceType, id string) (isprivate bool, ok bool) {
+
+	switch resourceType.ResourceType() {
+	case domain.ResourceProject:
+		if p, err := s.project.Get(owner, id); err == nil {
+			return p.IsPrivate(), true
+		}
+	case domain.ResourceModel:
+		if m, err := s.model.Get(owner, id); err == nil {
+			return m.IsPrivate(), true
+		}
+	case domain.ResourceDataset:
+		if d, err := s.dataset.Get(owner, id); err == nil {
+			return d.IsPrivate(), true
+		}
+	default:
+		return false, false
+	}
+
+	return false, false
 }

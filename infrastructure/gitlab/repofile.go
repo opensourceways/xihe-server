@@ -207,7 +207,7 @@ func (impl *repoFile) List(u *platform.UserInfo, info *platform.RepoDir) (
 	data = strings.ReplaceAll(data, "\n", "")
 	data = strings.ReplaceAll(data, "\t", "")
 
-	req, err := http.NewRequest(http.MethodPost, graphql_endpoint, strings.NewReader(data))
+	req, err := http.NewRequest(http.MethodPost, graphqlEndpoint, strings.NewReader(data))
 	if err != nil {
 		return
 	}
@@ -255,7 +255,7 @@ func (impl *repoFile) DeleteDir(u *platform.UserInfo, info *platform.RepoDirInfo
 	data = strings.ReplaceAll(data, "\n", "")
 	data = strings.ReplaceAll(data, "\t", "")
 
-	req, err := http.NewRequest(http.MethodPost, graphql_endpoint, strings.NewReader(data))
+	req, err := http.NewRequest(http.MethodPost, graphqlEndpoint, strings.NewReader(data))
 	if err != nil {
 		return
 	}
@@ -351,7 +351,7 @@ func (impl *repoFile) GetDirFileInfo(u *platform.UserInfo, info *platform.RepoDi
 	data = strings.ReplaceAll(data, "\n", "")
 	data = strings.ReplaceAll(data, "\t", "")
 
-	req, err := http.NewRequest(http.MethodPost, graphql_endpoint, strings.NewReader(data))
+	req, err := http.NewRequest(http.MethodPost, graphqlEndpoint, strings.NewReader(data))
 	if err != nil {
 		return
 	}

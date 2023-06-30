@@ -19,6 +19,8 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 var _ message.EventHandler = (*handler)(nil)
@@ -42,7 +44,7 @@ type handler struct {
 	maxRetry         int
 	trainingEndpoint string
 
-	user      app.UserService
+	user      userapp.UserService
 	model     app.ModelMessageService
 	dataset   app.DatasetMessageService
 	project   app.ProjectMessageService
@@ -136,7 +138,7 @@ func (h *handler) getHandlerForEventRelatedResource(
 	return
 }
 
-func (h *handler) HandleEventAddFollowing(f *domain.FollowerInfo) error {
+func (h *handler) HandleEventAddFollowing(f *userdomain.FollowerInfo) error {
 	return h.do(func(bool) (err error) {
 		if err = h.user.AddFollower(f); err == nil {
 			return
@@ -150,7 +152,7 @@ func (h *handler) HandleEventAddFollowing(f *domain.FollowerInfo) error {
 	})
 }
 
-func (h *handler) HandleEventRemoveFollowing(f *domain.FollowerInfo) (err error) {
+func (h *handler) HandleEventRemoveFollowing(f *userdomain.FollowerInfo) (err error) {
 	return h.do(func(bool) error {
 		return h.user.RemoveFollower(f)
 	})
@@ -376,10 +378,13 @@ func (h *handler) HandleEventBigModelWuKongInferenceError(msg *bigmodelmessage.M
 		return err
 	}
 
-	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, err := strconv.Atoi(msg.Details["task_id"])
+	if err != nil {
+		return err
+	}
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(task_id),
+			Id:     uint64(taskId),
 			Status: status,
 		},
 	}
@@ -408,10 +413,13 @@ func (h *handler) HandleEventBigModelWuKongAsyncTaskStart(msg *bigmodelmessage.M
 		return err
 	}
 
-	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, err := strconv.Atoi(msg.Details["task_id"])
+	if err != nil {
+		return err
+	}
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(task_id),
+			Id:     uint64(taskId),
 			Status: status,
 		},
 	}
@@ -434,10 +442,13 @@ func (h *handler) HandleEventBigModelWuKongAsyncTaskFinish(msg *bigmodelmessage.
 		return err
 	}
 
-	task_id, _ := strconv.Atoi(msg.Details["task_id"])
+	taskId, err := strconv.Atoi(msg.Details["task_id"])
+	if err != nil {
+		return err
+	}
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(task_id),
+			Id:     uint64(taskId),
 			Status: status,
 		},
 	}

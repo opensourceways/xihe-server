@@ -94,7 +94,9 @@ func (e *Endpoints) validate() (err error) {
 		return
 	}
 
-	_, err = e.parse(e.MultiplePictures)
+	if _, err = e.parse(e.MultiplePictures); err != nil {
+		return
+	}
 
 	return
 }

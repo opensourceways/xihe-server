@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"github.com/opensourceways/xihe-server/app"
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/user/app"
+	"github.com/opensourceways/xihe-server/user/domain"
 )
 
 type userBasicInfoUpdateRequest struct {
@@ -68,4 +68,40 @@ type userDetail struct {
 	*app.UserDTO
 
 	IsFollower bool `json:"is_follower"`
+}
+
+type EmailCode struct {
+	Email string `json:"email"`
+	Code  string `json:"code"`
+}
+
+func (req *EmailCode) toCmd(user domain.Account) (cmd app.BindEmailCmd, err error) {
+	if cmd.Email, err = domain.NewEmail(req.Email); err != nil {
+		return
+	}
+
+	cmd.PassCode = req.Code
+	cmd.User = user
+
+	if cmd.PassWord, err = domain.NewPassword(apiConfig.DefaultPassword); err != nil {
+		return
+	}
+
+	return
+}
+
+type EmailSend struct {
+	Email string `json:"email"`
+	Capt  string `json:"capt"`
+}
+
+func (req *EmailSend) toCmd(user domain.Account) (cmd app.SendBindEmailCmd, err error) {
+	if cmd.Email, err = domain.NewEmail(req.Email); err != nil {
+		return
+	}
+
+	cmd.User = user
+	cmd.Capt = req.Capt
+
+	return
 }

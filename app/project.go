@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -14,11 +15,15 @@ type ProjectCreateCmd struct {
 	Owner    domain.Account
 	Name     domain.ResourceName
 	Desc     domain.ResourceDesc
+	Title    domain.ResourceTitle
 	Type     domain.ProjType
 	CoverId  domain.CoverId
 	RepoType domain.RepoType
 	Protocol domain.ProtocolName
 	Training domain.TrainingPlatform
+	Tags     []string
+	TagKinds []string
+	All      []domain.DomainTags
 }
 
 func (cmd *ProjectCreateCmd) Validate() error {
@@ -37,8 +42,27 @@ func (cmd *ProjectCreateCmd) Validate() error {
 	return nil
 }
 
+func (cmd *ProjectCreateCmd) genTagKinds(tags []string) []string {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	r := make([]string, 0, len(cmd.All))
+
+	for i := range cmd.All {
+		if v := cmd.All[i].GetKindsOfTags(tags); len(v) > 0 {
+			r = append(r, v...)
+		}
+	}
+
+	return r
+}
+
 func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
 	now := utils.Now()
+	normTags := []string{cmd.Type.ProjType(),
+		cmd.Protocol.ProtocolName(),
+		cmd.Training.TrainingPlatform()}
 
 	*r = domain.Project{
 		Owner:     cmd.Owner,
@@ -50,14 +74,11 @@ func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
 		ProjectModifiableProperty: domain.ProjectModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     cmd.Desc,
+			Title:    cmd.Title,
 			CoverId:  cmd.CoverId,
 			RepoType: cmd.RepoType,
-			Tags: []string{
-				cmd.Type.ProjType(),
-				cmd.Protocol.ProtocolName(),
-				cmd.Training.TrainingPlatform(),
-			},
-			TagKinds: []string{},
+			Tags:     append(cmd.Tags, normTags...),
+			TagKinds: cmd.genTagKinds(cmd.Tags),
 		},
 	}
 }
@@ -72,6 +93,7 @@ type ProjectSummaryDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Level         string   `json:"level"`
 	CoverId       string   `json:"cover_id"`
 	Tags          []string `json:"tags"`
@@ -86,6 +108,7 @@ type ProjectDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Type          string   `json:"type"`
 	CoverId       string   `json:"cover_id"`
 	Protocol      string   `json:"protocol"`
@@ -127,7 +150,7 @@ type ProjectService interface {
 }
 
 func NewProjectService(
-	user repository.User,
+	user userrepo.User,
 	repo repository.Project,
 	model repository.Model,
 	dataset repository.Dataset,
@@ -329,6 +352,10 @@ func (s projectService) toProjectDTO(p *domain.Project, dto *ProjectDTO) {
 		dto.Desc = p.Desc.ResourceDesc()
 	}
 
+	if p.Title != nil {
+		dto.Title = p.Title.ResourceTitle()
+	}
+
 }
 
 func (s projectService) toProjectSummaryDTO(p *domain.ProjectSummary, dto *ProjectSummaryDTO) {
@@ -346,6 +373,10 @@ func (s projectService) toProjectSummaryDTO(p *domain.ProjectSummary, dto *Proje
 
 	if p.Desc != nil {
 		dto.Desc = p.Desc.ResourceDesc()
+	}
+
+	if p.Title != nil {
+		dto.Title = p.Title.ResourceTitle()
 	}
 
 	if p.Level != nil {

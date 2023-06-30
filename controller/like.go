@@ -10,12 +10,13 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForLikeController(
 	rg *gin.RouterGroup,
 	repo repository.Like,
-	user repository.User,
+	user userrepo.User,
 	proj repository.Project,
 	model repository.Model,
 	dataset repository.Dataset,
@@ -47,19 +48,19 @@ type LikeController struct {
 	dataset repository.Dataset
 }
 
-// @Title Create
-// @Description create a like
-// @Tags  Like
-// @Param	body	body 	likeCreateRequest	true	"body of creating like"
-// @Accept json
-// @Success 201
-// @Failure 400 bad_request_body    can't parse request body
-// @Failure 401 bad_request_param   some parameter of body is invalid
-// @Failure 402 not_allowed         can't add yourself as your like
-// @Failure 403 resource_not_exists the target of like does not exist
-// @Failure 404 duplicate_creating  add like again
-// @Failure 500 system_error        system error
-// @Router /v1/user/like [post]
+//	@Title			Create
+//	@Description	create a like
+//	@Tags			Like
+//	@Param			body	body	likeCreateRequest	true	"body of creating like"
+//	@Accept			json
+//	@Success		201
+//	@Failure		400	bad_request_body	can't	parse		request		body
+//	@Failure		401	bad_request_param	some	parameter	of			body	is		invalid
+//	@Failure		402	not_allowed			can't	add			yourself	as		your	like
+//	@Failure		403	resource_not_exists	the		target		of			like	does	not	exist
+//	@Failure		404	duplicate_creating	add		like		again
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/user/like [post]
 func (ctl *LikeController) Create(ctx *gin.Context) {
 	req := likeCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -92,18 +93,18 @@ func (ctl *LikeController) Create(ctx *gin.Context) {
 	}
 }
 
-// @Title Delete
-// @Description delete a like
-// @Tags  Like
-// @Param	body	body 	likeDeleteRequest	true	"body of deleting like"
-// @Accept json
-// @Success 204
-// @Failure 400 bad_request_body    can't parse request body
-// @Failure 401 bad_request_param   some parameter of body is invalid
-// @Failure 402 not_allowed         can't add yourself as your like
-// @Failure 403 resource_not_exists the target of like does not exist
-// @Failure 500 system_error        system error
-// @Router /v1/user/like [delete]
+//	@Title			Delete
+//	@Description	delete a like
+//	@Tags			Like
+//	@Param			body	body	likeDeleteRequest	true	"body of deleting like"
+//	@Accept			json
+//	@Success		204
+//	@Failure		400	bad_request_body	can't	parse		request		body
+//	@Failure		401	bad_request_param	some	parameter	of			body	is		invalid
+//	@Failure		402	not_allowed			can't	add			yourself	as		your	like
+//	@Failure		403	resource_not_exists	the		target		of			like	does	not	exist
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/user/like [delete]
 func (ctl *LikeController) Delete(ctx *gin.Context) {
 	req := likeDeleteRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -136,14 +137,14 @@ func (ctl *LikeController) Delete(ctx *gin.Context) {
 	}
 }
 
-// @Title List
-// @Description list likes
-// @Tags  Like
-// @Param	account	path	string	true	"the account the likes belong to"
-// @Accept json
-// @Success 200 {object} app.LikeDTO
-// @Failure 500 system_error        system error
-// @Router /v1/user/like/{account} [get]
+//	@Title			List
+//	@Description	list likes
+//	@Tags			Like
+//	@Param			account	path	string	true	"the account the likes belong to"
+//	@Accept			json
+//	@Success		200	{object}		app.LikeDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/user/like/{account} [get]
 func (ctl *LikeController) List(ctx *gin.Context) {
 	// TODO: list by page
 	account, err := domain.NewAccount(ctx.Param("account"))

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"io"
 
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
@@ -9,8 +10,9 @@ import (
 )
 
 const (
-	temp_account    = "wukong_icbc"
-	temp_account_hf = "wukong_hf"
+	tempAccountHF       = "wukong_hf"
+	tempAccountVQAHF    = "vqa_hf"
+	tempAccountLuoJiaHF = "luojia_hf"
 )
 
 type describePictureResp struct {
@@ -21,12 +23,14 @@ type pictureGenerateRequest struct {
 	Desc string `json:"desc"`
 }
 
-func (req *pictureGenerateRequest) validate() error {
-	if req.Desc == "" {
-		return errors.New("missing desc")
+func (req *pictureGenerateRequest) toCmd(user types.Account) (cmd app.GenPictureCmd, err error) {
+	if cmd.Desc, err = domain.NewDesc(req.Desc); err != nil {
+		return
 	}
 
-	return nil
+	cmd.User = user
+
+	return
 }
 
 type pictureGenerateResp struct {
@@ -68,6 +72,45 @@ type questionAskResp struct {
 
 type pictureUploadResp struct {
 	Path string `json:"path"`
+}
+
+type questionAskHFReq struct {
+	Picture  io.Reader `json:"picture"`
+	Question string    `json:"question"`
+}
+
+func (req *questionAskHFReq) toCmd() (
+	cmd app.VQAHFCmd, err error,
+) {
+	if cmd.User, err = types.NewAccount(tempAccountVQAHF); err != nil {
+		return
+	}
+
+	cmd.Picture = req.Picture
+
+	cmd.Ask = req.Question
+
+	err = cmd.Validate()
+
+	return
+}
+
+type luojiaHFReq struct {
+	Picture io.Reader `json:"picture"`
+}
+
+func (req *luojiaHFReq) toCmd() (
+	cmd app.LuoJiaHFCmd, err error,
+) {
+	if cmd.User, err = types.NewAccount(tempAccountLuoJiaHF); err != nil {
+		return
+	}
+
+	cmd.Picture = req.Picture
+
+	err = cmd.Validate()
+
+	return
 }
 
 type panguRequest struct {
@@ -123,34 +166,13 @@ func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
 	return
 }
 
-type wukongICBCRequest struct {
-	Desc  string `json:"desc"`
-	Style string `json:"style"`
-}
-
-func (req *wukongICBCRequest) toCmd() (cmd app.WuKongICBCCmd, err error) {
-	if cmd.User, err = types.NewAccount(temp_account); err != nil {
-		return
-	}
-
-	cmd.Style = req.Style
-
-	if cmd.Desc, err = domain.NewWuKongPictureDesc(req.Desc); err != nil {
-		return
-	}
-
-	err = cmd.Validate()
-
-	return
-}
-
 type wukongHFRequest struct {
 	Desc  string `json:"desc"`
 	Style string `json:"style"`
 }
 
 func (req *wukongHFRequest) toCmd() (cmd app.WuKongHFCmd, err error) {
-	if cmd.User, err = types.NewAccount(temp_account_hf); err != nil {
+	if cmd.User, err = types.NewAccount(tempAccountHF); err != nil {
 		return
 	}
 
@@ -263,4 +285,29 @@ type wukongPictureLink struct {
 
 type wukongDiggResp struct {
 	DiggCount int `json:"digg_count"`
+}
+
+type aiDetectorReq struct {
+	Lang string `json:"lang"`
+	Text string `json:"text"`
+}
+
+func (req aiDetectorReq) toCmd(user types.Account) (cmd app.AIDetectorCmd, err error) {
+	if cmd.Lang, err = domain.NewLang(req.Lang); err != nil {
+		return
+	}
+
+	if cmd.Text, err = domain.NewAIDetectorText(req.Text); err != nil {
+		return
+	}
+
+	cmd.User = user
+
+	err = cmd.Validate()
+
+	return
+}
+
+type aiDetectorResp struct {
+	IsMachine bool `json:"is_machine"`
 }

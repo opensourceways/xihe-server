@@ -68,12 +68,22 @@ func (ctl *accessController) initByToken(token, secret string) error {
 	return json.Unmarshal(d, ctl)
 }
 
+func verifyCSRFToken(tokenbyte, csrftoken []byte) (ok bool) {
+	token := string(tokenbyte)
+
+	return string(csrftoken) == token
+}
+
 func (ctl *accessController) refreshToken(expiry int64, secret string) (string, error) {
 	ctl.Expiry = utils.Expiry(expiry)
 	return ctl.newToken(secret)
 }
 
-func (ctl *accessController) verify(roles []string, addr string) error {
+func (ctl *accessController) genCSRFToken(token string) (ct string) {
+	return token
+}
+
+func (ctl *accessController) verify(roles []string) error {
 	if ctl.Expiry < utils.Now() {
 		return fmt.Errorf("token is expired")
 	}
@@ -82,12 +92,5 @@ func (ctl *accessController) verify(roles []string, addr string) error {
 		return fmt.Errorf("not allowed permissions")
 	}
 
-	/*
-		if ctl.RemoteAddr != addr {
-			// TODO: don't show the address
-			return fmt.Errorf("unmatched remote address, %s!=%s", ctl.RemoteAddr, addr)
-		}
-
-	*/
 	return nil
 }

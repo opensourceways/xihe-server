@@ -10,6 +10,10 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+const (
+	layout = "2006-01-02"
+)
+
 func LoadFromYaml(path string, cfg interface{}) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -30,11 +34,24 @@ func ToDate(n int64) string {
 		n = Now()
 	}
 
-	return time.Unix(n, 0).Format("2006-01-02")
+	return time.Unix(n, 0).Format(layout)
 }
 
 func Date() string {
-	return time.Now().Format("2006-01-02")
+	return time.Now().Format(layout)
+}
+
+func ToUnixTime(v string) (time.Time, error) {
+	t, err := time.Parse(layout, v)
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return t, nil
+}
+
+func ExpiryReduceSecond(expiry int64) time.Time {
+	return time.Now().Add(time.Duration(expiry-10) * time.Second)
 }
 
 func Expiry(expiry int64) int64 {

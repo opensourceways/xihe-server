@@ -27,6 +27,16 @@ func (s bigModelService) LuoJia(user types.Account) (v string, err error) {
 	return
 }
 
+func (s bigModelService) LuoJiaHF(cmd *LuoJiaHFCmd) (v string, err error) {
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelLuoJia)
+
+	if v, err = s.fm.LuoJiaHF(cmd.Picture); err != nil {
+		return
+	}
+
+	return
+}
+
 func (s bigModelService) ListLuoJiaRecord(user types.Account) (
 	dtos []LuoJiaRecordDTO, err error,
 ) {
@@ -35,9 +45,11 @@ func (s bigModelService) ListLuoJiaRecord(user types.Account) (
 		return
 	}
 
+	r := s.bigmodelService.LatestLuojiaList(v)
+
 	dtos = append(dtos, LuoJiaRecordDTO{
-		CreatedAt: utils.ToDate(v[0].CreatedAt),
-		Id:        v[0].Id,
+		CreatedAt: utils.ToDate(r.CreatedAt),
+		Id:        r.Id,
 	})
 
 	return

@@ -2,6 +2,7 @@ package service
 
 import (
 	"net/url"
+	"sort"
 	"strings"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
@@ -17,6 +18,9 @@ type BigModelService interface {
 	IsDigg(types.Account, []string) bool
 	LinkLikePublic(string, types.Account) (LinkLikePublicOpt, error)
 	IsPathCotain(string, []domain.WuKongPicture) bool
+
+	// luojia
+	LatestLuojiaList([]domain.LuoJiaRecord) domain.LuoJiaRecord
 }
 
 type bigModelService struct {
@@ -100,7 +104,11 @@ func (s *bigModelService) IsDigg(
 func (s *bigModelService) LinkLikePublic(link string, user types.Account) (
 	opt LinkLikePublicOpt, err error,
 ) {
-	obspath := toOBSPath(link)
+	obspath, err := toOBSPath(link)
+	if err != nil {
+		return
+	}
+
 	op, err := domain.NewOBSPath(obspath)
 	if err != nil {
 		return
@@ -132,11 +140,26 @@ func (s *bigModelService) IsPathCotain(path string, v []domain.WuKongPicture) bo
 	return false
 }
 
-func toOBSPath(link string) (obspath string) {
-	u, _ := url.QueryUnescape(link)
+func toOBSPath(link string) (string, error) {
+	u, err := url.QueryUnescape(link)
+	if err != nil {
+		return "", err
+	}
 
 	t := strings.Split(u, ".ovaijisuan.com:443/")[1]
-	obspath = strings.Split(t, "?AWSAccessKeyId")[0]
+	obspath := strings.Split(t, "?AWSAccessKeyId")[0]
+
+	return obspath, nil
+}
+
+func (s *bigModelService) LatestLuojiaList(v []domain.LuoJiaRecord) (r domain.LuoJiaRecord) {
+	sort.Slice(v, func(i, j int) bool {
+		return v[i].CreatedAt < v[j].CreatedAt
+	})
+
+	if len(v) > 0 {
+		return v[len(v)-1]
+	}
 
 	return
 }

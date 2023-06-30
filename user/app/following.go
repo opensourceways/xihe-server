@@ -1,27 +1,8 @@
 package app
 
 import (
-	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/user/domain"
 )
-
-type FollowsListCmd struct {
-	User domain.Account
-
-	repository.FollowFindOption
-}
-
-type FollowsDTO struct {
-	Total int         `json:"total"`
-	Data  []FollowDTO `json:"data"`
-}
-
-type FollowDTO struct {
-	Account    string `json:"account"`
-	AvatarId   string `json:"avatar_id"`
-	Bio        string `json:"bio"`
-	IsFollower bool   `json:"is_follower"`
-}
 
 func (s userService) AddFollowing(f *domain.FollowerInfo) error {
 	err := s.repo.AddFollowing(f)
@@ -67,19 +48,4 @@ func (s userService) ListFollowing(cmd *FollowsListCmd) (
 	dto.Data = dtos
 
 	return
-}
-
-func (s userService) toFollowDTO(f *domain.FollowerUserInfo, dto *FollowDTO) {
-	*dto = FollowDTO{
-		Account:    f.Account.Account(),
-		IsFollower: f.IsFollower,
-	}
-
-	if f.Bio != nil {
-		dto.Bio = f.Bio.Bio()
-	}
-
-	if f.AvatarId != nil {
-		dto.AvatarId = f.AvatarId.AvatarId()
-	}
 }

@@ -1,7 +1,11 @@
 package domain
 
-import types "github.com/opensourceways/xihe-server/domain"
+import (
+	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/utils"
+)
 
+// luojia
 type UserLuoJiaRecord struct {
 	User types.Account
 
@@ -18,6 +22,7 @@ type LuoJiaRecordIndex struct {
 	Id   string
 }
 
+// wukong
 type WuKongPicture struct {
 	Id        string
 	Owner     types.Account
@@ -42,4 +47,27 @@ func (r *WuKongPicture) IsOfficial() bool {
 
 func (r *WuKongPicture) SetDefaultDiggs() {
 	r.Diggs = []string{}
+}
+
+// ai detector
+type AIDetectorInput struct {
+	Lang Lang
+	Text AIDetectorText
+}
+
+func (r AIDetectorInput) IsTextLengthOK() bool {
+	if r.Lang.IsEN() {
+		return utils.StrLen(r.Text.AIDetectorText()) <= 2000
+	}
+
+	if r.Lang.IsZH() {
+		return utils.StrLen(r.Text.AIDetectorText()) <= 2000
+	}
+
+	return false
+}
+
+// taichu
+type GenPictureInput struct {
+	Desc Desc
 }

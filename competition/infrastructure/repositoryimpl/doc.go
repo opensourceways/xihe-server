@@ -16,25 +16,28 @@ const (
 	fieldAccount     = "account"
 	fieldCompetitors = "competitors"
 	fieldLeader      = "leader"
+	fieldStatus      = "status"
+	fieldTags        = "tags"
 )
 
 type dCompetition struct {
-	Id         string `bson:"id"              json:"id"`
-	Name       string `bson:"name"            json:"name"`
-	Desc       string `bson:"desc"            json:"desc"`
-	Host       string `bson:"host"            json:"host"`
-	Type       string `bson:"type"            json:"type"`
-	Phase      string `bson:"phase"           json:"phase"`
-	Status     string `bson:"status"          json:"status"`
-	Duration   string `bson:"duration"        json:"duration"`
-	Doc        string `bson:"doc"             json:"doc"`
-	Forum      string `bson:"forum"           json:"forum"`
-	Poster     string `bson:"poster"          json:"poster"`
-	Winners    string `bson:"winners"         json:"winners"`
-	DatasetDoc string `bson:"dataset_doc"     json:"dataset_doc"`
-	DatasetURL string `bson:"dataset_url"     json:"dataset_url"`
-	Bonus      int    `bson:"bonus"           json:"bonus"`
-	SmallerOk  bool   `bson:"order"           json:"order"`
+	Id         string   `bson:"id"              json:"id"`
+	Name       string   `bson:"name"            json:"name"`
+	Desc       string   `bson:"desc"            json:"desc"`
+	Host       string   `bson:"host"            json:"host"`
+	Type       string   `bson:"type"            json:"type"`
+	Tags       []string `bson:"tags"            json:"tags"`
+	Phase      string   `bson:"phase"           json:"phase"`
+	Status     string   `bson:"status"          json:"status"`
+	Duration   string   `bson:"duration"        json:"duration"`
+	Doc        string   `bson:"doc"             json:"doc"`
+	Forum      string   `bson:"forum"           json:"forum"`
+	Poster     string   `bson:"poster"          json:"poster"`
+	Winners    string   `bson:"winners"         json:"winners"`
+	DatasetDoc string   `bson:"dataset_doc"     json:"dataset_doc"`
+	DatasetURL string   `bson:"dataset_url"     json:"dataset_url"`
+	Bonus      int      `bson:"bonus"           json:"bonus"`
+	SmallerOk  bool     `bson:"order"           json:"order"`
 }
 
 type dWork struct {

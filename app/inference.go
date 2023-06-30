@@ -8,6 +8,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 	"github.com/sirupsen/logrus"
 )
@@ -222,7 +223,7 @@ type InferenceMessageService interface {
 
 func NewInferenceMessageService(
 	repo repository.Inference,
-	user repository.User,
+	user userrepo.User,
 	manager inference.Inference,
 ) InferenceMessageService {
 	return inferenceMessageService{
@@ -234,7 +235,7 @@ func NewInferenceMessageService(
 
 type inferenceMessageService struct {
 	repo    repository.Inference
-	user    repository.User
+	user    userrepo.User
 	manager inference.Inference
 }
 

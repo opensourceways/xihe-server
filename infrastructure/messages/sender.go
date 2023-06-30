@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/utils"
@@ -21,15 +22,15 @@ func NewMessageSender() sender {
 type sender struct{}
 
 // Following
-func (s sender) AddFollowing(msg *domain.FollowerInfo) error {
+func (s sender) AddFollowing(msg *userdomain.FollowerInfo) error {
 	return s.sendFollowing(msg, actionAdd)
 }
 
-func (s sender) RemoveFollowing(msg *domain.FollowerInfo) error {
+func (s sender) RemoveFollowing(msg *userdomain.FollowerInfo) error {
 	return s.sendFollowing(msg, actionRemove)
 }
 
-func (s sender) sendFollowing(msg *domain.FollowerInfo, action string) error {
+func (s sender) sendFollowing(msg *userdomain.FollowerInfo, action string) error {
 	v := msgFollower{
 		Action:   action,
 		User:     msg.User.Account(),

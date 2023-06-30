@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	resourceProject = "project"
-	resourceDataset = "dataset"
-	resourceModel   = "model"
+	ResourceProject = "project"
+	ResourceDataset = "dataset"
+	ResourceModel   = "model"
 
 	SortTypeUpdateTime    = "update_time"
 	SortTypeFirstLetter   = "first_letter"
@@ -27,9 +27,9 @@ var (
 		"good":     1,
 	}
 
-	ResourceTypeProject = resourceType(resourceProject)
-	ResourceTypeModel   = resourceType(resourceModel)
-	ResourceTypeDataset = resourceType(resourceDataset)
+	ResourceTypeProject = resourceType(ResourceProject)
+	ResourceTypeModel   = resourceType(ResourceModel)
+	ResourceTypeDataset = resourceType(ResourceDataset)
 )
 
 // DomainValue
@@ -80,15 +80,45 @@ func (r resourceName) FirstLetterOfName() byte {
 	return string(r)[0]
 }
 
+// ResourceTitle
+type ResourceTitle interface {
+	ResourceTitle() string
+	DomainValue
+}
+
+func NewResourceTitle(v string) (ResourceTitle, error) {
+	if v == "" {
+		return resourceTitle(v), nil
+	}
+
+	max := config.MaxTitleLength
+	min := config.MinTitleLength
+	if n := utils.StrLen(v); n > max || n < min {
+		return nil, fmt.Errorf("title's length should be between %d to %d", min, max)
+	}
+
+	return resourceTitle(v), nil
+}
+
+type resourceTitle string
+
+func (r resourceTitle) ResourceTitle() string {
+	return string(r)
+}
+
+func (r resourceTitle) DomainValue() string {
+	return string(r)
+}
+
 // ResourceType
 type ResourceType interface {
 	ResourceType() string
 }
 
 func NewResourceType(v string) (ResourceType, error) {
-	b := v == resourceProject ||
-		v == resourceModel ||
-		v == resourceDataset
+	b := v == ResourceProject ||
+		v == ResourceModel ||
+		v == ResourceDataset
 	if b {
 		return resourceType(v), nil
 	}

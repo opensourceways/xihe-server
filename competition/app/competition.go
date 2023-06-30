@@ -109,6 +109,7 @@ func (s *competitionService) List(cmd *CompetitionListCMD) (
 
 	return s.listCompetitions(&repository.CompetitionListOption{
 		Status: cmd.Status,
+		Tag:    cmd.Tag,
 	})
 }
 
@@ -137,7 +138,7 @@ func (s *competitionService) getCompetitionsUserApplied(cmd *CompetitionListCMD)
 	[]CompetitionSummaryDTO, error,
 ) {
 	cs, err := s.playerRepo.FindCompetitionsUserApplied(cmd.User)
-	if err != nil {
+	if err != nil || len(cs) == 0 {
 		return nil, err
 	}
 

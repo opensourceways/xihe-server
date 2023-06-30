@@ -11,7 +11,9 @@ func searchOptionToListDO(
 	do.Name = opt.Name
 
 	if opt.RepoType != nil {
-		do.RepoType = opt.RepoType.RepoType()
+		for i := range opt.RepoType {
+			do.RepoType = append(do.RepoType, opt.RepoType[i].RepoType())
+		}
 	}
 
 	return

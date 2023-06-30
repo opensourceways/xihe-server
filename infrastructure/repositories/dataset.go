@@ -191,6 +191,7 @@ func (impl dataset) toDatasetDO(d *domain.Dataset) DatasetDO {
 		CreatedAt: d.CreatedAt,
 		UpdatedAt: d.UpdatedAt,
 		Version:   d.Version,
+		Title:     d.Title.ResourceTitle(),
 	}
 
 	if d.Desc != nil {
@@ -207,6 +208,7 @@ type DatasetDO struct {
 	Name          string
 	FL            byte
 	Desc          string
+	Title         string
 	Protocol      string
 	RepoType      string
 	RepoId        string
@@ -237,6 +239,10 @@ func (do *DatasetDO) toDataset(r *domain.Dataset) (err error) {
 		return
 	}
 
+	if r.Title, err = domain.NewResourceTitle(do.Title); err != nil {
+		return
+	}
+
 	if r.RepoType, err = domain.NewRepoType(do.RepoType); err != nil {
 		return
 	}
@@ -255,6 +261,7 @@ func (do *DatasetDO) toDataset(r *domain.Dataset) (err error) {
 
 	r.RepoId = do.RepoId
 	r.Tags = do.Tags
+	r.TagKinds = do.TagKinds
 	r.Version = do.Version
 	r.CreatedAt = do.CreatedAt
 	r.UpdatedAt = do.UpdatedAt

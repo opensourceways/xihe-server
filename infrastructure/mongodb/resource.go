@@ -252,8 +252,8 @@ func listResourceWithoutSort(
 			"cond": func() bson.M {
 				conds := bson.A{}
 
-				if do.RepoType != "" {
-					conds = append(conds, eqCondForArrayElem(
+				if do.RepoType != nil {
+					conds = append(conds, inCondForArrayElem(
 						fieldRepoType, do.RepoType,
 					))
 				}
@@ -297,7 +297,6 @@ func listGlobalResourceWithoutSort(
 	fields []string, result interface{},
 ) error {
 	fieldItemsRef := "$" + fieldItems
-
 	project := bson.M{
 		fieldItems: bson.M{"$filter": bson.M{
 			"input": fieldItemsRef,
@@ -310,8 +309,8 @@ func listGlobalResourceWithoutSort(
 					))
 				}
 
-				if do.RepoType != "" {
-					conds = append(conds, eqCondForArrayElem(
+				if do.RepoType != nil {
+					conds = append(conds, inCondForArrayElem(
 						fieldRepoType, do.RepoType,
 					))
 				}

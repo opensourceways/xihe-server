@@ -61,13 +61,10 @@ func (req *relatedResourceRemoveRequest) toCmd() (
 }
 
 func convertToRelatedResource(data interface{}) (r app.ResourceDTO) {
-	switch data.(type) {
+	switch v := data.(type) {
 	case domain.Model:
-		v := data.(domain.Model)
 		r.Id = v.Id
 		r.Owner.Name = v.Owner.Account()
-		//r.Owner.AvatarId =
-
 		r.Name = v.Name.ResourceName()
 		r.Type = domain.ResourceTypeModel.ResourceType()
 		r.UpdateAt = utils.ToDate(v.UpdatedAt)
@@ -75,11 +72,8 @@ func convertToRelatedResource(data interface{}) (r app.ResourceDTO) {
 		r.DownloadCount = v.DownloadCount
 
 	case domain.Dataset:
-		v := data.(domain.Dataset)
 		r.Id = v.Id
 		r.Owner.Name = v.Owner.Account()
-		//r.Owner.AvatarId =
-
 		r.Name = v.Name.ResourceName()
 		r.Type = domain.ResourceTypeDataset.ResourceType()
 		r.UpdateAt = utils.ToDate(v.UpdatedAt)

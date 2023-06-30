@@ -41,14 +41,19 @@ type BigModel interface {
 	GenPictures(types.Account, string) ([]string, error)
 	Ask(domain.Question, string) (string, error)
 	VQAUploadPicture(f io.Reader, u types.Account, fileName string) error
+	AskHF(f io.Reader, u types.Account, ask string) (string, error)
 
 	// luojia
 	LuoJiaUploadPicture(f io.Reader, u types.Account) error
 	LuoJia(string) (string, error)
+	LuoJiaHF(io.Reader) (string, error)
 
 	// pangu
 	PanGu(string) (string, error)
 
 	// codegeex
 	CodeGeex(*CodeGeexReq) (CodeGeexResp, error)
+
+	// ai detector
+	AIDetector(domain.AIDetectorInput) (bool, error)
 }

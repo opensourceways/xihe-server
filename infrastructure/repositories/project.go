@@ -176,6 +176,9 @@ func (impl project) toProjectDO(p *domain.Project) ProjectDO {
 		do.Desc = p.Desc.ResourceDesc()
 	}
 
+	if p.Title != nil {
+		do.Title = p.Title.ResourceTitle()
+	}
 	return do
 }
 
@@ -185,6 +188,7 @@ type ProjectDO struct {
 	Name          string
 	FL            byte
 	Desc          string
+	Title         string
 	Type          string
 	Level         int
 	CoverId       string
@@ -220,6 +224,10 @@ func (do *ProjectDO) toProject(r *domain.Project) (err error) {
 		return
 	}
 
+	if r.Title, err = domain.NewResourceTitle(do.Title); err != nil {
+		return
+	}
+
 	if r.Type, err = domain.NewProjType(do.Type); err != nil {
 		return
 	}
@@ -251,6 +259,7 @@ func (do *ProjectDO) toProject(r *domain.Project) (err error) {
 	r.Level = domain.NewResourceLevelByNum(do.Level)
 	r.RepoId = do.RepoId
 	r.Tags = do.Tags
+	r.TagKinds = do.TagKinds
 	r.Version = do.Version
 	r.CreatedAt = do.CreatedAt
 	r.UpdatedAt = do.UpdatedAt

@@ -24,11 +24,11 @@ func (s bigModelService) DescribePictureHF(
 }
 
 func (s bigModelService) GenPicture(
-	user types.Account, desc string,
+	cmd GenPictureCmd,
 ) (link string, code string, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelGenPicture)
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelGenPicture)
 
-	if link, err = s.fm.GenPicture(user, desc); err != nil {
+	if link, err = s.fm.GenPicture(cmd.User, cmd.Desc.Desc()); err != nil {
 		code = s.setCode(err)
 	}
 
@@ -36,11 +36,11 @@ func (s bigModelService) GenPicture(
 }
 
 func (s bigModelService) GenPictures(
-	user types.Account, desc string,
+	cmd GenPictureCmd,
 ) (links []string, code string, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelGenPicture)
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelGenPicture)
 
-	if links, err = s.fm.GenPictures(user, desc); err != nil {
+	if links, err = s.fm.GenPictures(cmd.User, cmd.Desc.Desc()); err != nil {
 		code = s.setCode(err)
 	}
 
@@ -61,4 +61,14 @@ func (s bigModelService) Ask(
 
 func (s bigModelService) VQAUploadPicture(f io.Reader, user types.Account, fileName string) error {
 	return s.fm.VQAUploadPicture(f, user, fileName)
+}
+
+func (s bigModelService) VQAHF(cmd *VQAHFCmd) (v string, code string, err error) {
+	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelVQA)
+
+	if v, err = s.fm.AskHF(cmd.Picture, cmd.User, cmd.Ask); err != nil {
+		code = s.setCode(err)
+	}
+
+	return
 }

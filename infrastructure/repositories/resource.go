@@ -7,7 +7,7 @@ import (
 
 type ResourceListDO struct {
 	Name         string
-	RepoType     string
+	RepoType     []string
 	PageNum      int
 	CountPerPage int
 }
@@ -20,7 +20,9 @@ func toResourceListDO(r *repository.ResourceListOption) ResourceListDO {
 	}
 
 	if r.RepoType != nil {
-		do.RepoType = r.RepoType.RepoType()
+		for i := range r.RepoType {
+			do.RepoType = append(do.RepoType, r.RepoType[i].RepoType())
+		}
 	}
 
 	return do
@@ -119,9 +121,7 @@ func (do *ResourceSummaryDO) toProject() (s domain.ResourceSummary, err error) {
 		return
 	}
 
-	err = do.convert(&s)
-
-	return
+	return s, do.convert(&s)
 }
 
 func (do *ResourceSummaryDO) toModel() (s domain.ResourceSummary, err error) {
@@ -129,9 +129,7 @@ func (do *ResourceSummaryDO) toModel() (s domain.ResourceSummary, err error) {
 		return
 	}
 
-	err = do.convert(&s)
-
-	return
+	return s, do.convert(&s)
 }
 
 func (do *ResourceSummaryDO) toDataset() (s domain.ResourceSummary, err error) {
@@ -139,9 +137,7 @@ func (do *ResourceSummaryDO) toDataset() (s domain.ResourceSummary, err error) {
 		return
 	}
 
-	err = do.convert(&s)
-
-	return
+	return s, do.convert(&s)
 }
 
 func (do *ResourceSummaryDO) convert(s *domain.ResourceSummary) (err error) {

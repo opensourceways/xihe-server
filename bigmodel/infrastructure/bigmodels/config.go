@@ -60,8 +60,10 @@ type CloudConfig struct {
 
 type Endpoints struct {
 	VQA              string `json:"vqa"                required:"true"`
+	VQAHF            string `json:"vqa_hf"             required:"true"`
 	Pangu            string `json:"pangu"              required:"true"`
 	LuoJia           string `json:"luojia"             required:"true"`
+	LuoJiaHF         string `json:"luojia_hf"          required:"true"`
 	WuKong           string `json:"wukong"             required:"true"`
 	WuKong4IMG       string `json:"wukong_4img"        required:"true"`
 	WuKongHF         string `json:"wukong_hf"          required:"true"`
@@ -70,6 +72,7 @@ type Endpoints struct {
 	DescPictureHF    string `json:"desc_picture_hf"    required:"true"`
 	SinglePicture    string `json:"signle_picture"     required:"true"`
 	MultiplePictures string `json:"multiple_pictures"  required:"true"`
+	AIDetector       string `json:"ai_detector"        required:"true"`
 }
 
 func (e *Endpoints) validate() (err error) {
@@ -105,7 +108,13 @@ func (e *Endpoints) validate() (err error) {
 		return
 	}
 
-	_, err = e.parse(e.MultiplePictures)
+	if _, err = e.parse(e.MultiplePictures); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.AIDetector); err != nil {
+		return
+	}
 
 	return
 }

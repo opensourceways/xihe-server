@@ -14,14 +14,14 @@ type ResourceSearchOption struct {
 	// because the Name can be subpart of the real resource name
 	Name     string
 	TopNum   int
-	RepoType domain.RepoType
+	RepoType []domain.RepoType
 }
 
 type ResourceListOption struct {
 	// can't define Name as domain.ResourceName
 	// because the Name can be subpart of the real resource name
 	Name     string
-	RepoType domain.RepoType
+	RepoType []domain.RepoType
 
 	PageNum      int
 	CountPerPage int

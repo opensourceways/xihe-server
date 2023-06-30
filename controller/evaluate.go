@@ -26,7 +26,7 @@ func AddRouterForEvaluateController(
 		train: train,
 	}
 
-	rg.POST("/v1/evaluate/project/:pid/training/:tid/evaluate", ctl.Create)
+	rg.POST("/v1/evaluate/project/:pid/training/:tid/evaluate", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.GET("/v1/evaluate/project/:pid/training/:tid/evaluate/:id", ctl.Watch)
 }
 
@@ -37,18 +37,18 @@ type EvaluateController struct {
 	train repository.Training
 }
 
-// @Summary Create
-// @Description create evaluate
-// @Tags  Evaluate
-// @Param	pid	path 	string			true	"project id"
-// @Param	tid	path 	string			true	"training id"
-// @Param	body	body 	EvaluateCreateRequest	true	"body of creating inference"
-// @Accept json
-// @Success 201 {object} app.EvaluateDTO
-// @Failure 400 bad_request_body    can't parse request body
-// @Failure 401 bad_request_param   some parameter of body is invalid
-// @Failure 500 system_error        system error
-// @Router /v1/evaluate/project/{pid}/training/{tid}/evaluate [post]
+//	@Summary		Create
+//	@Description	create evaluate
+//	@Tags			Evaluate
+//	@Param			pid		path	string					true	"project id"
+//	@Param			tid		path	string					true	"training id"
+//	@Param			body	body	EvaluateCreateRequest	true	"body of creating inference"
+//	@Accept			json
+//	@Success		201	{object}			app.EvaluateDTO
+//	@Failure		400	bad_request_body	can't	parse		request	body
+//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/evaluate/project/{pid}/training/{tid}/evaluate [post]
 func (ctl *EvaluateController) Create(ctx *gin.Context) {
 	req := EvaluateCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -130,20 +130,20 @@ func (ctl *EvaluateController) createStandard(
 	}
 }
 
-// @Summary Watch
-// @Description watch evaluate
-// @Tags  Evaluate
-// @Param	pid	path 	string		true	"project id"
-// @Param	tid	path 	string		true	"training id"
-// @Param	id	path 	string		true	"evaluate id"
-// @Accept json
-// @Success 201 {object} app.EvaluateDTO
-// @Failure 400 bad_request_body    can't parse request body
-// @Failure 401 bad_request_param   some parameter of body is invalid
-// @Failure 500 system_error        system error
-// @Router /v1/evaluate/project/{pid}/training/{tid}/evaluate/{id} [get]
+//	@Summary		Watch
+//	@Description	watch evaluate
+//	@Tags			Evaluate
+//	@Param			pid	path	string	true	"project id"
+//	@Param			tid	path	string	true	"training id"
+//	@Param			id	path	string	true	"evaluate id"
+//	@Accept			json
+//	@Success		201	{object}			app.EvaluateDTO
+//	@Failure		400	bad_request_body	can't	parse		request	body
+//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/evaluate/project/{pid}/training/{tid}/evaluate/{id} [get]
 func (ctl *EvaluateController) Watch(ctx *gin.Context) {
-	pl, token, ok := ctl.checkTokenForWebsocket(ctx)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
@@ -157,9 +157,9 @@ func (ctl *EvaluateController) Watch(ctx *gin.Context) {
 
 	// setup websocket
 	upgrader := websocket.Upgrader{
-		Subprotocols: []string{token},
+		Subprotocols: []string{csrftoken},
 		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == token
+			return r.Header.Get(headerSecWebsocket) == csrftoken
 		},
 	}
 

@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -14,8 +15,12 @@ type ModelCreateCmd struct {
 	Owner    domain.Account
 	Name     domain.ResourceName
 	Desc     domain.ResourceDesc
+	Title    domain.ResourceTitle
 	RepoType domain.RepoType
 	Protocol domain.ProtocolName
+	Tags     []string
+	TagKinds []string
+	All      []domain.DomainTags
 }
 
 func (cmd *ModelCreateCmd) Validate() error {
@@ -31,9 +36,26 @@ func (cmd *ModelCreateCmd) Validate() error {
 	return nil
 }
 
+func (cmd *ModelCreateCmd) genTagKinds(tags []string) []string {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	r := make([]string, 0, len(cmd.All))
+
+	for i := range cmd.All {
+		if v := cmd.All[i].GetKindsOfTags(tags); len(v) > 0 {
+			r = append(r, v...)
+		}
+	}
+
+	return r
+}
+
 func (cmd *ModelCreateCmd) toModel(v *domain.Model) {
 	now := utils.Now()
 
+	normTags := []string{cmd.Protocol.ProtocolName()}
 	*v = domain.Model{
 		Owner:     cmd.Owner,
 		Protocol:  cmd.Protocol,
@@ -42,9 +64,10 @@ func (cmd *ModelCreateCmd) toModel(v *domain.Model) {
 		ModelModifiableProperty: domain.ModelModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     cmd.Desc,
+			Title:    cmd.Title,
 			RepoType: cmd.RepoType,
-			Tags:     []string{cmd.Protocol.ProtocolName()},
-			TagKinds: []string{},
+			Tags:     append(normTags, cmd.Tags...),
+			TagKinds: cmd.genTagKinds(cmd.Tags),
 		},
 	}
 }
@@ -59,6 +82,7 @@ type ModelSummaryDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Tags          []string `json:"tags"`
 	UpdatedAt     string   `json:"updated_at"`
 	LikeCount     int      `json:"like_count"`
@@ -70,6 +94,7 @@ type ModelDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Protocol      string   `json:"protocol"`
 	RepoType      string   `json:"repo_type"`
 	RepoId        string   `json:"repo_id"`
@@ -103,7 +128,7 @@ type ModelService interface {
 }
 
 func NewModelService(
-	user repository.User,
+	user userrepo.User,
 	repo repository.Model,
 	proj repository.Project,
 	dataset repository.Dataset,
@@ -289,6 +314,10 @@ func (s modelService) toModelDTO(m *domain.Model, dto *ModelDTO) {
 		dto.Desc = m.Desc.ResourceDesc()
 	}
 
+	if m.Title != nil {
+		dto.Title = m.Title.ResourceTitle()
+	}
+
 }
 
 func (s modelService) toModelSummaryDTO(m *domain.ModelSummary, dto *ModelSummaryDTO) {
@@ -304,6 +333,10 @@ func (s modelService) toModelSummaryDTO(m *domain.ModelSummary, dto *ModelSummar
 
 	if m.Desc != nil {
 		dto.Desc = m.Desc.ResourceDesc()
+	}
+
+	if m.Title != nil {
+		dto.Title = m.Title.ResourceTitle()
 	}
 
 }

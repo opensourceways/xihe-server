@@ -8,6 +8,7 @@ import (
 type CompetitionListOption struct {
 	CompetitionIds []string
 	Status         domain.CompetitionStatus
+	Tag            domain.CompetitionTag
 }
 
 type Competition interface {

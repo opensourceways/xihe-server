@@ -8,8 +8,9 @@ const (
 	ErrorCodeAIQuestionSubmissionExpiry         = "aiquestion_submission_expiry"
 	ErrorCodeAIQuestionSubmissionUnmatchedTimes = "aiquestion_submission_unmatched_times"
 
-	ErrorBigModelSensitiveInfo = "bigmodel_sensitive_info"
-	ErrorBigModelRecourseBusy  = "bigmodel_resource_busy"
+	ErrorBigModelSensitiveInfo     = "bigmodel_sensitive_info"
+	ErrorBigModelRecourseBusy      = "bigmodel_resource_busy"
+	ErrorBigModelConcurrentRequest = "bigmodel_concurrent_request"
 
 	ErrorWuKongNoPicture        = "bigmodel_no_wukong_picture"
 	ErrorWuKongInvalidId        = "wukong_invalid_id"

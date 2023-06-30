@@ -197,6 +197,10 @@ func (impl model) toModelDO(m *domain.Model) ModelDO {
 		do.Desc = m.Desc.ResourceDesc()
 	}
 
+	if m.Title != nil {
+		do.Title = m.Title.ResourceTitle()
+	}
+
 	return do
 }
 
@@ -206,6 +210,7 @@ type ModelDO struct {
 	Name          string
 	FL            byte
 	Desc          string
+	Title         string
 	Protocol      string
 	RepoType      string
 	RepoId        string
@@ -236,6 +241,10 @@ func (do *ModelDO) toModel(r *domain.Model) (err error) {
 		return
 	}
 
+	if r.Title, err = domain.NewResourceTitle(do.Title); err != nil {
+		return
+	}
+
 	if r.RepoType, err = domain.NewRepoType(do.RepoType); err != nil {
 		return
 	}
@@ -254,6 +263,7 @@ func (do *ModelDO) toModel(r *domain.Model) (err error) {
 
 	r.RepoId = do.RepoId
 	r.Tags = do.Tags
+	r.TagKinds = do.TagKinds
 	r.Version = do.Version
 	r.CreatedAt = do.CreatedAt
 	r.UpdatedAt = do.UpdatedAt

@@ -3,20 +3,25 @@ package controller
 import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 type projectCreateRequest struct {
-	Owner    string `json:"owner" required:"true"`
-	Name     string `json:"name" required:"true"`
-	Desc     string `json:"desc"`
-	Type     string `json:"type" required:"true"`
-	CoverId  string `json:"cover_id" required:"true"`
-	Protocol string `json:"protocol" required:"true"`
-	Training string `json:"training" required:"true"`
-	RepoType string `json:"repo_type" required:"true"`
+	Owner    string   `json:"owner" required:"true"`
+	Name     string   `json:"name" required:"true"`
+	Desc     string   `json:"desc"`
+	Type     string   `json:"type" required:"true"`
+	CoverId  string   `json:"cover_id" required:"true"`
+	Protocol string   `json:"protocol" required:"true"`
+	Training string   `json:"training" required:"true"`
+	RepoType string   `json:"repo_type" required:"true"`
+	Title    string   `json:"title"`
+	Tags     []string `json:"tags"`
 }
 
-func (p *projectCreateRequest) toCmd() (cmd app.ProjectCreateCmd, err error) {
+func (p *projectCreateRequest) toCmd(
+	validTags []domain.DomainTags,
+) (cmd app.ProjectCreateCmd, err error) {
 	if cmd.Owner, err = domain.NewAccount(p.Owner); err != nil {
 		return
 	}
@@ -49,6 +54,27 @@ func (p *projectCreateRequest) toCmd() (cmd app.ProjectCreateCmd, err error) {
 		return
 	}
 
+	if p.Title == "" {
+		p.Title = p.Name
+	}
+
+	if cmd.Title, err = domain.NewResourceTitle(p.Title); err != nil {
+		return
+	}
+
+	tags := sets.NewString()
+	for i := range validTags {
+		for _, item := range validTags[i].Items {
+			tags.Insert(item.Items...)
+		}
+	}
+
+	if len(p.Tags) > 0 && !tags.HasAll(p.Tags...) {
+		return
+	}
+	cmd.Tags = p.Tags
+	cmd.All = validTags
+
 	err = cmd.Validate()
 
 	return
@@ -57,6 +83,7 @@ func (p *projectCreateRequest) toCmd() (cmd app.ProjectCreateCmd, err error) {
 type projectUpdateRequest struct {
 	Name     *string `json:"name"`
 	Desc     *string `json:"desc"`
+	Title    *string `json:"title"`
 	RepoType *string `json:"type"`
 	CoverId  *string `json:"cover_id"`
 }
@@ -70,6 +97,12 @@ func (p *projectUpdateRequest) toCmd() (cmd app.ProjectUpdateCmd, err error) {
 
 	if p.Desc != nil {
 		if cmd.Desc, err = domain.NewResourceDesc(*p.Desc); err != nil {
+			return
+		}
+	}
+
+	if p.Title != nil {
+		if cmd.Title, err = domain.NewResourceTitle(*p.Title); err != nil {
 			return
 		}
 	}

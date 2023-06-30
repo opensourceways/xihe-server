@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -14,8 +15,12 @@ type DatasetCreateCmd struct {
 	Owner    domain.Account
 	Name     domain.ResourceName
 	Desc     domain.ResourceDesc
+	Title    domain.ResourceTitle
 	RepoType domain.RepoType
 	Protocol domain.ProtocolName
+	Tags     []string
+	TagKinds []string
+	All      []domain.DomainTags
 }
 
 func (cmd *DatasetCreateCmd) Validate() error {
@@ -31,9 +36,25 @@ func (cmd *DatasetCreateCmd) Validate() error {
 	return nil
 }
 
+func (cmd *DatasetCreateCmd) genTagKinds(tags []string) []string {
+	if len(tags) == 0 {
+		return nil
+	}
+
+	r := make([]string, 0, len(cmd.All))
+
+	for i := range cmd.All {
+		if v := cmd.All[i].GetKindsOfTags(tags); len(v) > 0 {
+			r = append(r, v...)
+		}
+	}
+
+	return r
+}
+
 func (cmd *DatasetCreateCmd) toDataset(v *domain.Dataset) {
 	now := utils.Now()
-
+	normTags := []string{cmd.Protocol.ProtocolName()}
 	*v = domain.Dataset{
 		Owner:     cmd.Owner,
 		Protocol:  cmd.Protocol,
@@ -42,9 +63,10 @@ func (cmd *DatasetCreateCmd) toDataset(v *domain.Dataset) {
 		DatasetModifiableProperty: domain.DatasetModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     cmd.Desc,
+			Title:    cmd.Title,
 			RepoType: cmd.RepoType,
-			Tags:     []string{cmd.Protocol.ProtocolName()},
-			TagKinds: []string{},
+			Tags:     append(normTags, cmd.Tags...),
+			TagKinds: cmd.genTagKinds(cmd.Tags),
 		},
 	}
 }
@@ -59,6 +81,7 @@ type DatasetSummaryDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Tags          []string `json:"tags"`
 	UpdatedAt     string   `json:"updated_at"`
 	LikeCount     int      `json:"like_count"`
@@ -70,6 +93,7 @@ type DatasetDTO struct {
 	Owner         string   `json:"owner"`
 	Name          string   `json:"name"`
 	Desc          string   `json:"desc"`
+	Title         string   `json:"title"`
 	Protocol      string   `json:"protocol"`
 	RepoType      string   `json:"repo_type"`
 	RepoId        string   `json:"repo_id"`
@@ -100,7 +124,7 @@ type DatasetService interface {
 }
 
 func NewDatasetService(
-	user repository.User,
+	user userrepo.User,
 	repo repository.Dataset,
 	proj repository.Project,
 	model repository.Model,
@@ -285,6 +309,10 @@ func (s datasetService) toDatasetDTO(d *domain.Dataset, dto *DatasetDTO) {
 	if d.Desc != nil {
 		dto.Desc = d.Desc.ResourceDesc()
 	}
+
+	if d.Title != nil {
+		dto.Title = d.Title.ResourceTitle()
+	}
 }
 
 func (s datasetService) toDatasetSummaryDTO(d *domain.DatasetSummary, dto *DatasetSummaryDTO) {
@@ -300,6 +328,10 @@ func (s datasetService) toDatasetSummaryDTO(d *domain.DatasetSummary, dto *Datas
 
 	if d.Desc != nil {
 		dto.Desc = d.Desc.ResourceDesc()
+	}
+
+	if d.Title != nil {
+		dto.Title = d.Title.ResourceTitle()
 	}
 
 }

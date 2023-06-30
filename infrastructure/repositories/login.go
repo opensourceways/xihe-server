@@ -27,9 +27,7 @@ func (impl login) Get(account domain.Account) (r domain.Login, err error) {
 		return
 	}
 
-	err = do.toLogin(&r)
-
-	return
+	return r, do.toLogin(&r)
 }
 
 func (impl login) Save(u *domain.Login) (err error) {
@@ -42,16 +40,18 @@ func (impl login) Save(u *domain.Login) (err error) {
 
 func (impl login) toLoginDO(u *domain.Login) LoginDO {
 	return LoginDO{
-		Account:     u.Account.Account(),
-		Info:        u.Info,
-		AccessToken: u.AccessToken,
+		Account: u.Account.Account(),
+		Info:    u.Info,
+		Email:   u.Email.Email(),
+		UserId:  u.UserId,
 	}
 }
 
 type LoginDO struct {
-	Account     string
-	Info        string
-	AccessToken string
+	Account string
+	Info    string
+	Email   string
+	UserId  string
 }
 
 func (do *LoginDO) toLogin(r *domain.Login) (err error) {
@@ -59,8 +59,12 @@ func (do *LoginDO) toLogin(r *domain.Login) (err error) {
 		return
 	}
 
+	if r.Email, err = domain.NewEmail(do.Email); err != nil {
+		return
+	}
+
 	r.Info = do.Info
-	r.AccessToken = do.AccessToken
+	r.UserId = do.UserId
 
 	return
 }

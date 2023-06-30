@@ -77,6 +77,20 @@ func (c collection) PushElemToLimitedArray(
 	return cli.pushElemToLimitedArray(ctx, c.name, array, keep, filterOfDoc, value)
 }
 
+func (c collection) AddToSimpleArray(
+	ctx context.Context, array string,
+	filterOfDoc, value interface{},
+) error {
+	return cli.addToSimpleArray(ctx, c.name, array, filterOfDoc, value)
+}
+
+func (c collection) RemoveFromSimpleArray(
+	ctx context.Context, array string,
+	filterOfDoc, value interface{},
+) error {
+	return cli.removeFromSimpleArray(ctx, c.name, array, filterOfDoc, value)
+}
+
 func (c collection) PullArrayElem(
 	ctx context.Context, array string,
 	filterOfDoc, filterOfArray bson.M,

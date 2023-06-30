@@ -12,18 +12,18 @@ import (
 )
 
 func NewUserRegRepo(m mongodbClient) repository.UserReg {
-	return &userRepoImpl{m}
+	return &userRegRepoImpl{m}
 }
 
-type userRepoImpl struct {
+type userRegRepoImpl struct {
 	cli mongodbClient
 }
 
-func (impl *userRepoImpl) AddUserRegInfo(u *domain.UserRegInfo) error {
+func (impl *userRegRepoImpl) AddUserRegInfo(u *domain.UserRegInfo) error {
 	return impl.newUserRegInfo(u)
 }
 
-func (impl *userRepoImpl) newUserRegInfo(u *domain.UserRegInfo) error {
+func (impl *userRegRepoImpl) newUserRegInfo(u *domain.UserRegInfo) error {
 	doc, err := impl.genUserRegInfo(u)
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (impl *userRepoImpl) newUserRegInfo(u *domain.UserRegInfo) error {
 	return err
 }
 
-func (impl *userRepoImpl) UpdateUserRegInfo(u *domain.UserRegInfo, version int) error {
+func (impl *userRegRepoImpl) UpdateUserRegInfo(u *domain.UserRegInfo, version int) error {
 	doc, err := impl.genUserRegInfo(u)
 	if err != nil {
 		return err
@@ -72,7 +72,7 @@ func (impl *userRepoImpl) UpdateUserRegInfo(u *domain.UserRegInfo, version int) 
 	return err
 }
 
-func (impl *userRepoImpl) GetUserRegInfo(user types.Account) (u domain.UserRegInfo, err error) {
+func (impl *userRegRepoImpl) GetUserRegInfo(user types.Account) (u domain.UserRegInfo, err error) {
 	var v DUserRegInfo
 
 	f := func(ctx context.Context) error {
@@ -96,14 +96,14 @@ func (impl *userRepoImpl) GetUserRegInfo(user types.Account) (u domain.UserRegIn
 	return
 }
 
-func (impl *userRepoImpl) genUserRegInfo(u *domain.UserRegInfo) (bson.M, error) {
+func (impl *userRegRepoImpl) genUserRegInfo(u *domain.UserRegInfo) (bson.M, error) {
 	var d DUserRegInfo
 	toUserRegInfoDoc(u, &d)
 
 	return genDoc(d)
 }
 
-func (impl *userRepoImpl) docFilter(fieldName, value string) bson.M {
+func (impl *userRegRepoImpl) docFilter(fieldName, value string) bson.M {
 	return bson.M{
 		fieldName: value,
 	}

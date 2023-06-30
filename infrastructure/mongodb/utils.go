@@ -79,7 +79,9 @@ func genDoc(doc interface{}) (m bson.M, err error) {
 		return
 	}
 
-	err = json.Unmarshal(v, &m)
+	if err = json.Unmarshal(v, &m); err != nil {
+		return
+	}
 
 	return
 }
@@ -116,9 +118,7 @@ func (cli *client) newDocIfNotExist(
 		return "", errDocExists
 	}
 
-	v, _ := toUID(r.UpsertedID)
-
-	return v, nil
+	return toUID(r.UpsertedID)
 }
 
 func (cli *client) replaceDoc(
@@ -139,8 +139,7 @@ func (cli *client) replaceDoc(
 		return "", nil
 	}
 
-	v, _ := toUID(r.UpsertedID)
-	return v, nil
+	return toUID(r.UpsertedID)
 }
 
 func (cli *client) updateDoc(

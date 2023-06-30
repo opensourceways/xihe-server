@@ -3,11 +3,13 @@ package repositoryimpl
 import (
 	"context"
 	"errors"
+	"sort"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/repository"
 	commoninfra "github.com/opensourceways/xihe-server/common/infrastructure"
 	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/utils"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
@@ -57,6 +59,8 @@ func (impl *wukongPictureRepoImpl) ListPublicsByUserName(user types.Account) (
 	if err != nil {
 		return nil, 0, err
 	}
+
+	sortWuKongPictureByTime(v)
 
 	return v, version, nil
 }
@@ -330,6 +334,8 @@ func (impl *wukongPictureRepoImpl) GetPublicsGlobal() (r []domain.WuKongPicture,
 		}
 	}
 
+	sortWuKongPictureByTime(r)
+
 	return
 }
 
@@ -345,6 +351,8 @@ func (impl *wukongPictureRepoImpl) GetOfficialPublicsGlobal() (r []domain.WuKong
 			r = append(r, d[i])
 		}
 	}
+
+	sortWuKongPictureByTime(d)
 
 	return
 }
@@ -451,4 +459,13 @@ func toPictureItemDoc(d *domain.WuKongPicture) (bson.M, error) {
 	}
 
 	return genDoc(p)
+}
+
+func sortWuKongPictureByTime(p []domain.WuKongPicture) {
+	sort.Slice(p, func(i, j int) bool {
+		ti, _ := utils.ToUnixTime(p[i].CreatedAt)
+		tj, _ := utils.ToUnixTime(p[j].CreatedAt)
+
+		return ti.After(tj)
+	})
 }

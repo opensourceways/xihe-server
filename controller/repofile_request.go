@@ -7,6 +7,10 @@ type RepoFileCreateRequest struct {
 	Base64Encoded bool   `json:"base64_encoded"`
 }
 
+type ContainFileInfo struct {
+	HasFile bool `json:"has_file"`
+}
+
 func (req *RepoFileCreateRequest) toContent() (cmd app.RepoFileContent) {
 	cmd.Content = &req.Content
 	cmd.IsEncoded = req.Base64Encoded

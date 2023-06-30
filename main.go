@@ -29,7 +29,7 @@ func (o *options) Validate() error {
 	return o.service.Validate()
 }
 
-func gatherOptions(fs *flag.FlagSet, args ...string) options {
+func gatherOptions(fs *flag.FlagSet, args ...string) (options, error) {
 	var o options
 
 	o.service.AddFlags(fs)
@@ -39,18 +39,23 @@ func gatherOptions(fs *flag.FlagSet, args ...string) options {
 		"whether to enable debug model.",
 	)
 
-	fs.Parse(args)
-	return o
+	err := fs.Parse(args)
+
+	return o, err
 }
 
 func main() {
 	logrusutil.ComponentInit("xihe")
 	log := logrus.NewEntry(logrus.StandardLogger())
 
-	o := gatherOptions(
+	o, err := gatherOptions(
 		flag.NewFlagSet(os.Args[0], flag.ExitOnError),
 		os.Args[1:]...,
 	)
+	if err != nil {
+		logrus.Fatalf("new options failed, err:%s", err.Error())
+	}
+
 	if err := o.Validate(); err != nil {
 		logrus.Fatalf("Invalid options, err:%s", err.Error())
 	}

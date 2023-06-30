@@ -14,6 +14,7 @@ import (
 type ProjectUpdateCmd struct {
 	Name     domain.ResourceName
 	Desc     domain.ResourceDesc
+	Title    domain.ResourceTitle
 	RepoType domain.RepoType
 	CoverId  domain.CoverId
 }
@@ -35,6 +36,11 @@ func (cmd *ProjectUpdateCmd) toProject(
 
 	if cmd.Desc != nil && !domain.IsSameDomainValue(cmd.Desc, p.Desc) {
 		p.Desc = cmd.Desc
+		f()
+	}
+
+	if cmd.Title != nil && !domain.IsSameDomainValue(cmd.Title, p.Title) {
+		p.Title = cmd.Title
 		f()
 	}
 

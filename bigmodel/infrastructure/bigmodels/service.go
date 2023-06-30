@@ -39,6 +39,7 @@ func Init(cfg *Config) error {
 	fm.codegeexInfo = newCodeGeexInfo(cfg)
 	fm.pictureGenInfo = newPictureGenInfo(cfg)
 	fm.pictureDescInfo = newPictureDescInfo(cfg)
+	fm.aiDetectorInfo = newAIDetectorInfo(cfg)
 
 	fm.wukongInfo, err = newWuKongInfo(cfg)
 
@@ -63,6 +64,7 @@ type service struct {
 	codegeexInfo    codegeexInfo
 	pictureGenInfo  pictureGenInfo
 	pictureDescInfo pictureDescInfo
+	aiDetectorInfo  aiDetectorInfo
 }
 
 func (s *service) token() (string, error) {
@@ -110,7 +112,9 @@ func genToken(cfg *CloudConfig) (string, error) {
 
 	t := resp.Header.Get("x-subject-token")
 
-	resp.Body.Close()
+	if err = resp.Body.Close(); err != nil {
+		return "", err
+	}
 
 	return t, nil
 }

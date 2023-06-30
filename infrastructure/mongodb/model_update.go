@@ -167,7 +167,7 @@ func (col model) listResource(
 
 func (col model) summaryFields() []string {
 	return []string{
-		fieldId, fieldName, fieldDesc, fieldTags, fieldFirstLetter,
+		fieldId, fieldName, fieldDesc, fieldTitle, fieldTags, fieldFirstLetter,
 		fieldUpdatedAt, fieldLikeCount, fieldDownloadCount, fieldLevel,
 	}
 }
@@ -179,6 +179,7 @@ func (col model) toModelSummaryDO(owner string, item *modelItem, do *repositorie
 		Name:          item.Name,
 		Desc:          item.Desc,
 		Tags:          item.Tags,
+		Title:         item.Title,
 		UpdatedAt:     item.UpdatedAt,
 		LikeCount:     item.LikeCount,
 		DownloadCount: item.DownloadCount,

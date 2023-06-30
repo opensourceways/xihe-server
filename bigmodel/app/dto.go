@@ -8,6 +8,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 type DescribePictureCmd struct {
@@ -15,6 +16,33 @@ type DescribePictureCmd struct {
 	Picture io.Reader
 	Name    string
 	Length  int64
+}
+
+type VQAHFCmd struct {
+	User    types.Account
+	Picture io.Reader
+	Ask     string
+}
+
+func (cmd *VQAHFCmd) Validate() error {
+	if cmd.Picture == nil || cmd.Ask == "" {
+		return errors.New("invalid cmd")
+	}
+
+	return nil
+}
+
+type LuoJiaHFCmd struct {
+	User    userdomain.Account
+	Picture io.Reader
+}
+
+func (cmd *LuoJiaHFCmd) Validate() error {
+	if cmd.Picture == nil {
+		return errors.New("invalid cmd")
+	}
+
+	return nil
 }
 
 type CodeGeexDTO = bigmodel.CodeGeexResp
@@ -69,12 +97,6 @@ func (cmd *WuKongCmd) Validate() error {
 	}
 
 	return nil
-}
-
-type WuKongICBCCmd struct {
-	WuKongCmd
-
-	User types.Account
 }
 
 type WuKongHFCmd struct {
@@ -192,4 +214,29 @@ type wukongPictureDTO struct {
 
 type WuKongRankDTO struct {
 	Rank int `json:"rank"`
+}
+
+type AIDetectorCmd struct {
+	User types.Account         `json:"user"`
+	Lang domain.Lang           `json:"lang"`
+	Text domain.AIDetectorText `json:"text"`
+}
+
+func (cmd AIDetectorCmd) Validate() error {
+	input := domain.AIDetectorInput{
+		Lang: cmd.Lang,
+		Text: cmd.Text,
+	}
+
+	if !input.IsTextLengthOK() {
+		return errors.New("text length too long")
+	}
+
+	return nil
+}
+
+// taichu
+type GenPictureCmd struct {
+	User types.Account `json:"user"`
+	Desc domain.Desc   `json:"desc"`
 }

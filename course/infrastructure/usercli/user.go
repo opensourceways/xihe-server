@@ -8,12 +8,12 @@ import (
 	userDomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
-func NewUserCli(c userApp.UserService) user.User {
+func NewUserCli(c userApp.RegService) user.User {
 	return &userImpl{c}
 }
 
 type userImpl struct {
-	srv userApp.UserService
+	srv userApp.RegService
 }
 
 func (impl *userImpl) AddUserRegInfo(s *domain.Student) (err error) {

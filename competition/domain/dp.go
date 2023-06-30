@@ -22,6 +22,10 @@ const (
 	competitionIdentityDeveloper = "developer"
 
 	competitionSubmissionStatusSuccess = "success"
+
+	competitionTagElectricity = "electricity"
+	competitionTagLearn       = "learn"
+	competitionTagChallenge   = "challenge"
 )
 
 var (
@@ -181,7 +185,6 @@ func (r competitionBonus) CompetitionBonus() int {
 	return int(r)
 }
 
-//
 type CompetitionHost interface {
 	CompetitionHost() string
 }
@@ -402,4 +405,27 @@ func (r teamRole) IsLeader() bool {
 
 func TeamLeaderRole() string {
 	return competitionTeamRoleLeader
+}
+
+// CompetitionTag
+type CompetitionTag interface {
+	CompetitionTag() string
+}
+
+func NewCompetitionTag(v string) (CompetitionTag, error) {
+	b := v == competitionTagChallenge ||
+		v == competitionTagElectricity ||
+		v == competitionTagLearn
+
+	if b {
+		return competitionTag(v), nil
+	}
+
+	return nil, errors.New("invalid competition tags")
+}
+
+type competitionTag string
+
+func (r competitionTag) CompetitionTag() string {
+	return string(r)
 }

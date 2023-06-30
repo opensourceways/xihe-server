@@ -7,11 +7,12 @@ import (
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForSearchController(
 	rg *gin.RouterGroup,
-	user repository.User,
+	user userrepo.User,
 	proj repository.Project,
 	model repository.Model,
 	dataset repository.Dataset,
@@ -29,14 +30,14 @@ type SearchController struct {
 	s app.SearchService
 }
 
-// @Title Search
-// @Description search resource and user
-// @Tags  Search
-// @Param	name	query	string	true	"name of resource or user"
-// @Accept json
-// @Success 200 {object} app.SearchDTO
-// @Failure 500 system_error        system error
-// @Router /v1/search [get]
+//	@Title			Search
+//	@Description	search resource and user
+//	@Tags			Search
+//	@Param			name	query	string	true	"name of resource or user"
+//	@Accept			json
+//	@Success		200	{object}		app.SearchDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/search [get]
 func (ctl *SearchController) List(ctx *gin.Context) {
 	name := ctl.getQueryParameter(ctx, "name")
 	if name == "" {
