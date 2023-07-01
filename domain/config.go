@@ -6,10 +6,10 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
-var config Config
+var DomainConfig Config
 
 func Init(cfg *Config) {
-	config = *cfg
+	DomainConfig = *cfg
 }
 
 type Config struct {
@@ -124,7 +124,7 @@ func (cfg *Config) hasPlatform(v string) bool {
 	return cfg.trainingPlatform.Has(v)
 }
 
-func (cfg *Config) hasAvatarURL(v string) bool {
+func (cfg *Config) HasAvatarURL(v string) bool {
 	return cfg.avatarURL.Has(v)
 }
 

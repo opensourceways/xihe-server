@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	libutil "github.com/opensourceways/community-robot-lib/utils"
+	codomain "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -114,7 +115,7 @@ func NewBio(v string) (Bio, error) {
 		return dpBio(v), nil
 	}
 
-	if utils.StrLen(v) > 200 { // TODO: to config
+	if utils.StrLen(v) > codomain.DomainConfig.MaxBioLength {
 		return nil, errors.New("invalid bio")
 	}
 
@@ -164,6 +165,10 @@ func NewAvatarId(v string) (AvatarId, error) {
 
 	if _, err := url.Parse(v); err != nil {
 		return nil, errors.New("invalid avatar")
+	}
+
+	if !codomain.DomainConfig.HasAvatarURL(v) {
+		v = codomain.DomainConfig.AvatarURL[0]
 	}
 
 	return dpAvatarId(v), nil

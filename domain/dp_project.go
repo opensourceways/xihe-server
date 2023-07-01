@@ -33,7 +33,7 @@ type CoverId interface {
 }
 
 func NewConverId(v string) (CoverId, error) {
-	if !config.hasCover(v) {
+	if !DomainConfig.hasCover(v) {
 		return nil, errors.New("invalid cover id")
 	}
 
@@ -52,7 +52,7 @@ type ProtocolName interface {
 }
 
 func NewProtocolName(v string) (ProtocolName, error) {
-	if !config.hasProtocol(v) {
+	if !DomainConfig.hasProtocol(v) {
 		return nil, errors.New("unsupported protocol")
 	}
 
@@ -71,7 +71,7 @@ type ProjType interface {
 }
 
 func NewProjType(v string) (ProjType, error) {
-	if !config.hasProjectType(v) {
+	if !DomainConfig.hasProjectType(v) {
 		return nil, errors.New("unsupported project type")
 	}
 
@@ -90,7 +90,7 @@ type TrainingPlatform interface {
 }
 
 func NewTrainingPlatform(v string) (TrainingPlatform, error) {
-	if !config.hasPlatform(v) {
+	if !DomainConfig.hasPlatform(v) {
 		return nil, errors.New("unsupport training platform")
 	}
 

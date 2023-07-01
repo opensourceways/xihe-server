@@ -27,7 +27,7 @@ type FinetuneParameter interface {
 func NewFinetuneParameter(model, task string, hyperparameters map[string]string) (
 	FinetuneParameter, error,
 ) {
-	cfg, ok := config.Finetunes[model]
+	cfg, ok := DomainConfig.Finetunes[model]
 	if !ok {
 		return nil, errors.New("invalid model")
 	}

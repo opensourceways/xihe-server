@@ -27,7 +27,7 @@ type Project struct {
 }
 
 func (p *Project) MaxRelatedResourceNum() int {
-	return config.MaxRelatedResourceNum
+	return DomainConfig.MaxRelatedResourceNum
 }
 
 func (p *Project) IsPrivate() bool {

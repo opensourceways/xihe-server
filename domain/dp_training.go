@@ -22,8 +22,8 @@ type TrainingName interface {
 }
 
 func NewTrainingName(v string) (TrainingName, error) {
-	max := config.MaxTrainingNameLength
-	min := config.MinTrainingNameLength
+	max := DomainConfig.MaxTrainingNameLength
+	min := DomainConfig.MinTrainingNameLength
 
 	if n := len(v); n > max || n < min {
 		return nil, fmt.Errorf("name's length should be between %d to %d", min, max)
@@ -52,7 +52,7 @@ func NewTrainingDesc(v string) (TrainingDesc, error) {
 		return trainingDesc(v), nil
 	}
 
-	max := config.MaxTrainingDescLength
+	max := DomainConfig.MaxTrainingDescLength
 	if utils.StrLen(v) > max {
 		return nil, fmt.Errorf("the length of desc should be less than %d", max)
 	}

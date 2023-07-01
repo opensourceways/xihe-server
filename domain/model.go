@@ -24,7 +24,7 @@ type Model struct {
 }
 
 func (m *Model) MaxRelatedResourceNum() int {
-	return config.MaxRelatedResourceNum
+	return DomainConfig.MaxRelatedResourceNum
 }
 
 func (m *Model) IsPrivate() bool {

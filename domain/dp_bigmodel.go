@@ -62,7 +62,7 @@ func NewWuKongPictureDesc(v string) (WuKongPictureDesc, error) {
 		return nil, errors.New("no desc")
 	}
 
-	if max := config.WuKongPictureMaxDescLength; utils.StrLen(v) > max {
+	if max := DomainConfig.WuKongPictureMaxDescLength; utils.StrLen(v) > max {
 		return nil, fmt.Errorf(
 			"the length of desc should be less than %d", max,
 		)

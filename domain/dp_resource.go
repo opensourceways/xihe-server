@@ -56,8 +56,8 @@ type ResourceName interface {
 }
 
 func NewResourceName(v string) (ResourceName, error) {
-	max := config.MaxNameLength
-	min := config.MinNameLength
+	max := DomainConfig.MaxNameLength
+	min := DomainConfig.MinNameLength
 
 	if n := len(v); n > max || n < min {
 		return nil, fmt.Errorf("name's length should be between %d to %d", min, max)
@@ -91,8 +91,8 @@ func NewResourceTitle(v string) (ResourceTitle, error) {
 		return resourceTitle(v), nil
 	}
 
-	max := config.MaxTitleLength
-	min := config.MinTitleLength
+	max := DomainConfig.MaxTitleLength
+	min := DomainConfig.MinTitleLength
 	if n := utils.StrLen(v); n > max || n < min {
 		return nil, fmt.Errorf("title's length should be between %d to %d", min, max)
 	}
@@ -144,7 +144,7 @@ func NewResourceDesc(v string) (ResourceDesc, error) {
 		return resourceDesc(v), nil
 	}
 
-	if max := config.MaxDescLength; utils.StrLen(v) > max {
+	if max := DomainConfig.MaxDescLength; utils.StrLen(v) > max {
 		return nil, fmt.Errorf(
 			"the length of desc should be less than %d", max,
 		)

@@ -86,7 +86,7 @@ func NewBio(v string) (Bio, error) {
 		return dpBio(v), nil
 	}
 
-	if utils.StrLen(v) > config.MaxBioLength {
+	if utils.StrLen(v) > DomainConfig.MaxBioLength {
 		return nil, errors.New("invalid bio")
 	}
 
@@ -138,8 +138,8 @@ func NewAvatarId(v string) (AvatarId, error) {
 		return nil, errors.New("invalid avatar")
 	}
 
-	if !config.hasAvatarURL(v) {
-		v = config.AvatarURL[0]
+	if !DomainConfig.HasAvatarURL(v) {
+		v = DomainConfig.AvatarURL[0]
 	}
 
 	return dpAvatarId(v), nil
