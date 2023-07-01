@@ -9,7 +9,7 @@ import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	"github.com/opensourceways/xihe-server/app"
-	asyncrepoimol "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
+	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
@@ -143,7 +143,7 @@ type PostgresqlConfig struct {
 	DB pgsql.Config `json:"db" required:"true"`
 
 	Cloud cloudrepoimpl.Config
-	Async asyncrepoimol.Config
+	Async asyncrepoimpl.Config
 }
 
 type Redis struct {

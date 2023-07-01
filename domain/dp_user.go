@@ -138,6 +138,10 @@ func NewAvatarId(v string) (AvatarId, error) {
 		return nil, errors.New("invalid avatar")
 	}
 
+	if !config.hasAvatarURL(v) {
+		v = config.AvatarURL[0]
+	}
+
 	return dpAvatarId(v), nil
 }
 

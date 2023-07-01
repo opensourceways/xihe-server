@@ -17,6 +17,7 @@ type Config struct {
 	protocols        sets.String
 	projectType      sets.String
 	trainingPlatform sets.String
+	avatarURL        sets.String
 
 	MaxBioLength          int `json:"max_bio_length"`
 	MaxNameLength         int `json:"max_name_length"`
@@ -31,6 +32,7 @@ type Config struct {
 	Protocols        []string `json:"protocols"         required:"true"`
 	ProjectType      []string `json:"project_type"      required:"true"`
 	TrainingPlatform []string `json:"training_platform" required:"true"`
+	AvatarURL        []string `json:"avatar_url"        required:"true"`
 
 	MaxTrainingNameLength int `json:"max_training_name_length"`
 	MinTrainingNameLength int `json:"min_training_name_length"`
@@ -101,6 +103,7 @@ func (r *Config) Validate() error {
 	r.protocols = sets.NewString(r.Protocols...)
 	r.projectType = sets.NewString(r.ProjectType...)
 	r.trainingPlatform = sets.NewString(r.TrainingPlatform...)
+	r.avatarURL = sets.NewString(r.AvatarURL...)
 
 	return nil
 }
@@ -119,6 +122,10 @@ func (cfg *Config) hasProjectType(v string) bool {
 
 func (cfg *Config) hasPlatform(v string) bool {
 	return cfg.trainingPlatform.Has(v)
+}
+
+func (cfg *Config) hasAvatarURL(v string) bool {
+	return cfg.avatarURL.Has(v)
 }
 
 type FinetuneParameterConfig struct {
