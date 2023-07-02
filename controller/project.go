@@ -584,6 +584,15 @@ func (ctl *ProjectController) Fork(ctx *gin.Context) {
 		return
 	}
 
+	if proj.IsOnline() {
+		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
+			errorResourceNotExists,
+			"can't fork online project",
+		))
+
+		return
+	}
+
 	pr := ctl.newPlatformRepository(
 		pl.PlatformToken, pl.PlatformUserNamespaceId,
 	)
