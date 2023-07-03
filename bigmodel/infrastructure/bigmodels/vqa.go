@@ -70,7 +70,7 @@ func (s *service) Ask(q domain.Question, f string) (string, error) {
 	}
 
 	opt := questionOpt{
-		Picture:  f,
+		Picture:  filepath.Join("vqa", f),
 		Question: q.Question(),
 	}
 
