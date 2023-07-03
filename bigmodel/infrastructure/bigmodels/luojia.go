@@ -55,7 +55,7 @@ func (s *service) LuoJiaUploadPicture(f io.Reader, user types.Account) error {
 	return s.obs.createObject(
 		f,
 		s.luojiaInfo.bucket,
-		fmt.Sprintf("infer/%s/input.png", user.Account()),
+		fmt.Sprintf("luojianet/infer/%s/input.png", user.Account()),
 	)
 }
 

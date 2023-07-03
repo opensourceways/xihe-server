@@ -104,7 +104,7 @@ func (s *service) Ask(q domain.Question, f string) (string, error) {
 }
 
 func (s *service) VQAUploadPicture(f io.Reader, user types.Account, fileName string) error {
-	return s.obs.createObject(f, s.vqaInfo.bucket, filepath.Join(user.Account(), fileName))
+	return s.obs.createObject(f, s.vqaInfo.bucket, filepath.Join("vqa", user.Account(), fileName))
 }
 
 func (s *service) AskHF(f io.Reader, user types.Account, ask string) (string, error) {
