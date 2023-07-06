@@ -1,7 +1,7 @@
 package poolimpl
 
 import (
-	"github.com/panjf2000/ants"
+	"github.com/panjf2000/ants/v2"
 
 	"github.com/opensourceways/xihe-server/async-server/domain/pool"
 )

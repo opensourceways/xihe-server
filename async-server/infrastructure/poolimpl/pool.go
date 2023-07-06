@@ -1,6 +1,6 @@
 package poolimpl
 
-import "github.com/panjf2000/ants"
+import "github.com/panjf2000/ants/v2"
 
 var gpool *ants.Pool
 
