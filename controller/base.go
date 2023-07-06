@@ -18,7 +18,7 @@ import (
 
 const (
 	sessionPrivateToken = "PRIVATE-TOKEN"
-	xcsrfToken          = "CSRF-Token"
+	csrfToken          = "CSRF-Token"
 	headerSecWebsocket  = "Sec-Websocket-Protocol"
 
 	roleIndividuals = "individuals"
@@ -219,7 +219,16 @@ func (ctl baseController) setRespSessionToken(ctx *gin.Context, token string) {
 }
 
 func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token string) {
-	ctx.Header(xcsrfToken, token)
+	cookie := &http.Cookie{
+		Name:     csrfToken,
+		Value:    token,
+		Path:     "/",
+		Expires:  utils.ExpiryReduceSecond(apiConfig.TokenExpiry),
+		HttpOnly: false,
+		SameSite: http.SameSiteStrictMode,
+	}
+
+	http.SetCookie(ctx.Writer, cookie)
 }
 
 func (ctl baseController) setRespToken(ctx *gin.Context, token string, csrftoken string) {
@@ -271,7 +280,12 @@ func (ctl *baseController) getSessionToken(ctx *gin.Context) (token string) {
 }
 
 func (ctl *baseController) getCSRFToken(ctx *gin.Context) (token string) {
-	return ctx.GetHeader(xcsrfToken)
+	cookie, err := ctx.Request.Cookie(csrfToken)
+	if err != nil {
+		return
+	}
+
+	return cookie.Value
 }
 
 func (ctl *baseController) getTokenForWebsocket(ctx *gin.Context) (csrftoken string) {
