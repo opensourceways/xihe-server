@@ -11,12 +11,12 @@ require (
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.11
 	github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb
 	github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db
-	github.com/opensourceways/xihe-finetune v0.0.0-20230106042033-e2993e0d37f8
+	github.com/opensourceways/xihe-finetune v0.0.0-20230703130658-2d606e66b81d
 	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26
-	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20230320085555-183262889af1
-	github.com/opensourceways/xihe-training-center v0.0.0-20230112032258-ab5e153148d2
+	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20230703131431-fce5fcec1fc8
+	github.com/opensourceways/xihe-training-center v0.0.0-20230703124658-67fdc0c1cc65
 	github.com/panjf2000/ants v1.2.1
-	github.com/sirupsen/logrus v1.9.0
+	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/files v1.0.0
 	github.com/swaggo/gin-swagger v1.5.3
 	github.com/swaggo/swag v1.8.10
