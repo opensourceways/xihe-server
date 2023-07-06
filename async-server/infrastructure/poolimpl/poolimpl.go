@@ -1,9 +1,8 @@
 package poolimpl
 
 import (
-	"github.com/panjf2000/ants"
-
 	"github.com/opensourceways/xihe-server/async-server/domain/pool"
+	"github.com/panjf2000/ants"
 )
 
 func NewPoolImpl() pool.Pool {
