@@ -19,7 +19,7 @@ func AddRouterForCloudController(
 	}
 
 	rg.GET("/v1/cloud", ctl.List)
-	rg.POST("/v1/cloud/subscribe", ctl.Subscribe)
+	rg.POST("/v1/cloud/subscribe", checkUserEmailMiddleware(&ctl.baseController), ctl.Subscribe)
 	rg.GET("/v1/cloud/:cid", ctl.Get)
 	rg.GET("/v1/cloud/pod/:cid", ctl.GetHttp)
 }
