@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/domain/training"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForTrainingController(
@@ -116,6 +118,9 @@ func (ctl *TrainingController) Create(ctx *gin.Context) {
 		return
 	}
 
+	utils.DoLog("", pl.Account, "create training",
+		fmt.Sprintf("projectid: %s, trainingid: %s", ctx.Param("pid"), v), "success")
+
 	ctx.JSON(http.StatusCreated, newResponseData(trainingCreateResp{v}))
 }
 
@@ -143,6 +148,9 @@ func (ctl *TrainingController) Recreate(ctx *gin.Context) {
 		return
 	}
 
+	utils.DoLog("", info.Project.Owner.Account(), "recreate training",
+		fmt.Sprintf("projectid: %s, trainingid: %s", info.Project.Id, info.TrainingId), "success")
+
 	ctx.JSON(http.StatusCreated, newResponseData(trainingCreateResp{v}))
 }
 
@@ -167,6 +175,9 @@ func (ctl *TrainingController) Delete(ctx *gin.Context) {
 		return
 	}
 
+	utils.DoLog("", info.Project.Owner.Account(), "delete training",
+		fmt.Sprintf("projectid: %s, trainingid: %s", info.Project.Id, info.TrainingId), "success")
+
 	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
@@ -190,6 +201,9 @@ func (ctl *TrainingController) Terminate(ctx *gin.Context) {
 
 		return
 	}
+
+	utils.DoLog("", info.Project.Owner.Account(), "terminate training",
+		fmt.Sprintf("projectid: %s, trainingid: %s", info.Project.Id, info.TrainingId), "success")
 
 	ctx.JSON(http.StatusAccepted, newResponseData("success"))
 }

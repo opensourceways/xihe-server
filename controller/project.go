@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForProjectController(
@@ -178,6 +180,9 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 		return
 	}
 
+	utils.DoLog("", pl.DomainAccount().Account(), "create project",
+		fmt.Sprintf("%s/%s", d.Owner, d.Name), "success")
+
 	ctx.JSON(http.StatusCreated, newResponseData(d))
 }
 
@@ -237,6 +242,9 @@ func (ctl *ProjectController) Delete(ctx *gin.Context) {
 	if err := ctl.s.Delete(&proj, pr); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
+		utils.DoLog("", pl.DomainAccount().Account(), "delete project",
+			fmt.Sprintf("%s/%s", proj.Owner, proj.Name), "success")
+
 		ctx.JSON(http.StatusNoContent, newResponseData("success"))
 	}
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/opensourceways/xihe-server/cloud/app"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForCloudController(
@@ -89,6 +90,8 @@ func (ctl *CloudController) Subscribe(ctx *gin.Context) {
 	if code, err := ctl.s.SubscribeCloud(&cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
+		utils.DoLog("", pl.Account, "create jupyter", cmd.CloudId, "success")
+
 		ctl.sendRespOfPost(ctx, "success")
 	}
 }

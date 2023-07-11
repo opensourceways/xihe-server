@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForInferenceController(
@@ -158,6 +160,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 		return
 	}
+
+	utils.DoLog("", pl.Account, "create gradio",
+		fmt.Sprintf("projectid: %s", v.Id), "success")
 
 	if dto.Error != "" || dto.AccessURL != "" {
 		ws.WriteJSON(newResponseData(dto))

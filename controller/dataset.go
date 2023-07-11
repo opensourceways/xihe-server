@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,6 +11,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForDatasetController(
@@ -166,6 +168,9 @@ func (ctl *DatasetController) Create(ctx *gin.Context) {
 		return
 	}
 
+	utils.DoLog("", pl.DomainAccount().Account(), "create dataset",
+		fmt.Sprintf("%s/%s", d.Owner, d.Name), "success")
+
 	ctx.JSON(http.StatusOK, newResponseData(d))
 }
 
@@ -225,6 +230,10 @@ func (ctl *DatasetController) Delete(ctx *gin.Context) {
 	if err := ctl.s.Delete(&d, pr); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
+
+		utils.DoLog("", pl.DomainAccount().Account(), "delete dataset",
+			fmt.Sprintf("%s/%s", d.Owner, d.Name), "success")
+
 		ctx.JSON(http.StatusNoContent, newResponseData("success"))
 	}
 }

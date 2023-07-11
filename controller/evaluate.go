@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForEvaluateController(
@@ -74,8 +76,14 @@ func (ctl *EvaluateController) Create(ctx *gin.Context) {
 	case domain.EvaluateTypeCustom:
 		ctl.createCustom(ctx, &index)
 
+		utils.DoLog("", pl.Account, "create aim", // TODO: check if ok
+			fmt.Sprintf("custom type, projectid: %s, trainingid: %s", index.Project.Id, index.TrainingId), "success")
+
 	case domain.EvaluateTypeStandard:
 		ctl.createStandard(ctx, &index, &req)
+
+		utils.DoLog("", pl.Account, "create aim", // TODO: check if ok
+			fmt.Sprintf("standard type, projectid: %s, trainingid: %s", index.Project.Id, index.TrainingId), "success")
 
 	default:
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(

@@ -13,6 +13,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 type oldUserTokenPayload struct {
@@ -115,8 +116,13 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		}
 
 		if user, err = ctl.newUser(ctx, info); err != nil {
+
+			utils.DoLog(user.Id, user.Account, "logup", "", "failed")
+
 			return
 		}
+
+		utils.DoLog(user.Id, user.Account, "logup", "", "success")
 	}
 
 	if err := ctl.newLogin(ctx, info); err != nil {
@@ -138,6 +144,8 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 
 		return
 	}
+
+	utils.DoLog(user.Id, user.Account, "login", "", "success")
 
 	ctl.setRespToken(ctx, token, csrftoken)
 	ctx.JSON(http.StatusOK, newResponseData(user))
@@ -250,6 +258,8 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
+		utils.DoLog(info.UserId, "", "logout", "", "failed")
+
 		return
 	}
 
@@ -263,6 +273,8 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 	}
 
 	ctl.cleanSession(ctx)
+
+	utils.DoLog(info.UserId, "", "logout", "", "success")
 
 	info.Info = string(v)
 	ctx.JSON(http.StatusOK, newResponseData(info))

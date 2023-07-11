@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForBigModelController(
@@ -707,6 +709,9 @@ func (ctl *BigModelController) WuKongAsync(ctx *gin.Context) {
 	if code, err := ctl.s.WuKongInferenceAsync(pl.DomainAccount(), &cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
+		utils.DoLog("", pl.Account, "create wukong picture generate task",
+			fmt.Sprintf("imageQuantity: %d", req.ImgQuantity), "success")
+
 		ctl.sendRespOfPost(ctx, "")
 	}
 }
@@ -851,6 +856,10 @@ func (ctl *BigModelController) CancelLike(ctx *gin.Context) {
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
+
+		utils.DoLog("", pl.Account, "delete wukong like picture",
+			fmt.Sprintf("pictureid: %s", ctx.Param("id")), "success")
+
 		ctl.sendRespOfDelete(ctx)
 	}
 }
@@ -875,6 +884,10 @@ func (ctl *BigModelController) CancelPublic(ctx *gin.Context) {
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
+
+		utils.DoLog("", pl.Account, "delete wukong public picture",
+			fmt.Sprintf("pictureid: %s", ctx.Param("id")), "success")
+
 		ctl.sendRespOfDelete(ctx)
 	}
 }
