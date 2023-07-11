@@ -38,11 +38,11 @@ func (m *Model) ResourceIndex() ResourceIndex {
 	}
 }
 
-func (m *Model) ResourceObject() ResourceObject {
+func (m *Model) ResourceObject() (ResourceObject, RepoType) {
 	return ResourceObject{
 		Type:          ResourceTypeModel,
 		ResourceIndex: m.ResourceIndex(),
-	}
+	}, m.RepoType
 }
 
 func (m *Model) RelatedResources() []ResourceObjects {

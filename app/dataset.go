@@ -178,8 +178,8 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 	s.toDatasetDTO(&d, &dto)
 
 	// add activity
-	r := d.ResourceObject()
-	ua := genActivityForCreatingResource(r, d.DatasetModifiableProperty.RepoType)
+	r, repoType := d.ResourceObject()
+	ua := genActivityForCreatingResource(r, repoType)
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, d.Name)
@@ -193,7 +193,7 @@ func (s datasetService) Delete(r *domain.Dataset, pr platform.Repository) (err e
 		return
 	}
 
-	obj := r.ResourceObject()
+	obj, repoType := r.ResourceObject()
 
 	// step2: message
 	if resources := r.RelatedResources(); len(resources) > 0 {
@@ -212,7 +212,7 @@ func (s datasetService) Delete(r *domain.Dataset, pr platform.Repository) (err e
 	}
 
 	// add activity
-	ua := genActivityForDeletingResource(&obj)
+	ua := genActivityForDeletingResource(&obj, repoType)
 
 	// ignore the error
 	_ = s.activity.Save(&ua)

@@ -182,8 +182,8 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 	s.toModelDTO(&m, &dto)
 
 	// add activity
-	r := m.ResourceObject()
-	ua := genActivityForCreatingResource(r, m.ModelModifiableProperty.RepoType)
+	r, repoType := m.ResourceObject()
+	ua := genActivityForCreatingResource(r, repoType)
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, m.Name)
@@ -197,7 +197,7 @@ func (s modelService) Delete(r *domain.Model, pr platform.Repository) (err error
 		return
 	}
 
-	obj := r.ResourceObject()
+	obj, repoType := r.ResourceObject()
 
 	// step2: message
 	if resources := r.RelatedResources(); len(resources) > 0 {
@@ -216,7 +216,7 @@ func (s modelService) Delete(r *domain.Model, pr platform.Repository) (err error
 	}
 
 	// add activity
-	ua := genActivityForDeletingResource(&obj)
+	ua := genActivityForDeletingResource(&obj, repoType)
 
 	// ignore the error
 	_ = s.activity.Save(&ua)

@@ -115,12 +115,13 @@ func genActivityForCreatingResource(obj domain.ResourceObject, repotype domain.R
 	}
 }
 
-func genActivityForDeletingResource(obj *domain.ResourceObject) domain.UserActivity {
+func genActivityForDeletingResource(obj *domain.ResourceObject, repoType domain.RepoType) domain.UserActivity {
 	return domain.UserActivity{
 		Owner: obj.Owner,
 		Activity: domain.Activity{
 			Type:           domain.ActivityTypeDelete,
 			Time:           utils.Now(),
+			RepoType:       repoType,
 			ResourceObject: *obj,
 		},
 	}

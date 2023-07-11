@@ -206,8 +206,8 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	s.toProjectDTO(&p, &dto)
 
 	// add activity
-	r := p.ResourceObject()
-	ua := genActivityForCreatingResource(r, p.ProjectModifiableProperty.RepoType)
+	r, repoType := p.ResourceObject()
+	ua := genActivityForCreatingResource(r, repoType)
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, p.Name)
@@ -221,7 +221,7 @@ func (s projectService) Delete(r *domain.Project, pr platform.Repository) (err e
 		return
 	}
 
-	obj := r.ResourceObject()
+	obj, repoType := r.ResourceObject()
 
 	// step2:
 	if resources := r.RelatedResources(); len(resources) > 0 {
@@ -240,7 +240,7 @@ func (s projectService) Delete(r *domain.Project, pr platform.Repository) (err e
 	}
 
 	// add activity
-	ua := genActivityForDeletingResource(&obj)
+	ua := genActivityForDeletingResource(&obj, repoType)
 
 	// ignore the error
 	_ = s.activity.Save(&ua)

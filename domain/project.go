@@ -45,11 +45,11 @@ func (p *Project) ResourceIndex() ResourceIndex {
 	}
 }
 
-func (p *Project) ResourceObject() ResourceObject {
+func (p *Project) ResourceObject() (ResourceObject, RepoType) {
 	return ResourceObject{
 		Type:          ResourceTypeProject,
 		ResourceIndex: p.ResourceIndex(),
-	}
+	}, p.RepoType
 }
 
 func (p *Project) RelatedResources() []ResourceObjects {

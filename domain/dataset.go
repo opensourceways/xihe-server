@@ -34,11 +34,11 @@ func (d *Dataset) ResourceIndex() ResourceIndex {
 	}
 }
 
-func (d *Dataset) ResourceObject() ResourceObject {
+func (d *Dataset) ResourceObject() (ResourceObject, RepoType) {
 	return ResourceObject{
 		Type:          ResourceTypeDataset,
 		ResourceIndex: d.ResourceIndex(),
-	}
+	}, d.RepoType
 }
 
 func (d *Dataset) RelatedResources() []ResourceObjects {
