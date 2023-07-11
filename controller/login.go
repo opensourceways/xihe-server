@@ -64,7 +64,7 @@ func AddRouterForLoginController(
 ) {
 	pc := LoginController{
 		auth: auth,
-		us:   userapp.NewUserService(repo, ps, sender),
+		us:   userapp.NewUserService(repo, ps, sender, encryptHelperToken),
 		ls:   app.NewLoginService(login),
 	}
 

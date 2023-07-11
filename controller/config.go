@@ -17,10 +17,11 @@ const (
 )
 
 var (
-	apiConfig         APIConfig
-	encryptHelper     utils.SymmetricEncryption
-	encryptHelperCSRF utils.SymmetricEncryption
-	log               *logrus.Entry
+	apiConfig          APIConfig
+	encryptHelper      utils.SymmetricEncryption
+	encryptHelperCSRF  utils.SymmetricEncryption
+	encryptHelperToken utils.SymmetricEncryption
+	log                *logrus.Entry
 )
 
 func Init(cfg *APIConfig, l *logrus.Entry) error {
@@ -37,8 +38,14 @@ func Init(cfg *APIConfig, l *logrus.Entry) error {
 		return err
 	}
 
+	tokene, err := utils.NewSymmetricEncryption(cfg.EncryptionKeyForGitlabToken, "")
+	if err != nil {
+		return err
+	}
+
 	encryptHelper = e
 	encryptHelperCSRF = csrfe
+	encryptHelperToken = tokene
 
 	return nil
 }
@@ -49,6 +56,7 @@ type APIConfig struct {
 	TokenExpiry                    int64  `json:"token_expiry"                required:"true"`
 	EncryptionKey                  string `json:"encryption_key"              required:"true"`
 	EncryptionKeyForCSRF           string `json:"encryption_key_csrf"         required:"true"`
+	EncryptionKeyForGitlabToken    string `json:"encryption_key_gitlab_token" required:"true"`
 	DefaultPassword                string `json:"default_password"            required:"true"`
 	MaxTrainingRecordNum           int    `json:"max_training_record_num"     required:"true"`
 	InferenceDir                   string `json:"inference_dir"`

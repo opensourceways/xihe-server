@@ -24,7 +24,7 @@ func AddRouterForUserController(
 	sender message.Sender,
 ) {
 
-	us := userapp.NewUserService(repo, ps, sender)
+	us := userapp.NewUserService(repo, ps, sender, encryptHelperToken)
 
 	ctl := UserController{
 		auth: auth,

@@ -6,16 +6,16 @@ import (
 
 	sdk "github.com/xanzy/go-gitlab"
 
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain/platform"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 var (
 	admin     *administrator
 	obsHelper *obsService
 
-	endpoint         string
-	defaultBranch    string
+	endpoint        string
+	defaultBranch   string
 	graphqlEndpoint string
 
 	maxFileCount int

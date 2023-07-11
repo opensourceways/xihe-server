@@ -118,7 +118,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 		maxRetry:         cfg.MaxRetry,
 		trainingEndpoint: cfg.TrainingEndpoint,
 
-		user: userapp.NewUserService(userRepo, nil, nil),
+		user: userapp.NewUserService(userRepo, nil, nil, nil),
 
 		project: app.NewProjectMessageService(
 			repositories.NewProjectRepository(

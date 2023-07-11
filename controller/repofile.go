@@ -28,7 +28,7 @@ func AddRouterForRepoFileController(
 ) {
 	ctl := RepoFileController{
 		s:       app.NewRepoFileService(p, sender),
-		us:      uapp.NewUserService(ru, pu, sender),
+		us:      uapp.NewUserService(ru, pu, sender, encryptHelperToken),
 		model:   model,
 		project: project,
 		dataset: dataset,

@@ -1,11 +1,14 @@
 package app
 
 import (
+	"encoding/hex"
+
 	"github.com/opensourceways/xihe-server/domain/message"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 type UserService interface {
@@ -33,18 +36,21 @@ func NewUserService(
 	repo repository.User,
 	ps platform.User,
 	sender message.Sender,
+	encryption utils.SymmetricEncryption,
 ) UserService {
 	return userService{
-		ps:     ps,
-		repo:   repo,
-		sender: sender,
+		ps:         ps,
+		repo:       repo,
+		sender:     sender,
+		encryption: encryption,
 	}
 }
 
 type userService struct {
-	ps     platform.User
-	repo   repository.User
-	sender message.Sender
+	ps         platform.User
+	repo       repository.User
+	sender     message.Sender
+	encryption utils.SymmetricEncryption
 }
 
 func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
@@ -69,6 +75,14 @@ func (s userService) GetByAccount(account domain.Account) (dto UserDTO, err erro
 	v, err := s.repo.GetByAccount(account)
 	if err != nil {
 		return
+	}
+
+	if v.PlatformToken != "" {
+		token := v.PlatformToken
+		v.PlatformToken, err = s.decryptToken(token)
+		if err != nil {
+			return
+		}
 	}
 
 	s.toUserDTO(&v, &dto)
@@ -123,6 +137,7 @@ func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (dto P
 		Name:     cmd.Account,
 		Password: cmd.Password,
 	})
+
 	if err != nil {
 		return
 	}
@@ -135,7 +150,12 @@ func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (dto P
 		return
 	}
 
-	dto.PlatformToken = token
+	eToken, err := s.encryptToken(token)
+	if err != nil {
+		return
+	}
+
+	dto.PlatformToken = eToken
 
 	return
 }
@@ -181,4 +201,26 @@ func (s userService) toUserDTO(u *domain.User, dto *UserDTO) {
 	dto.Platform.Token = u.PlatformToken
 	dto.Platform.UserId = u.PlatformUser.Id
 	dto.Platform.NamespaceId = u.PlatformUser.NamespaceId
+}
+
+func (s userService) encryptToken(d string) (string, error) {
+	t, err := s.encryption.Encrypt([]byte(d))
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(t), nil
+}
+
+func (s userService) decryptToken(d string) (string, error) {
+	tb, err := hex.DecodeString(d)
+	if err != nil {
+		return "", err
+	}
+
+	dtoken, err := s.encryption.Decrypt(tb)
+	if err != nil {
+		return "", err
+	}
+
+	return string(dtoken), nil
 }
