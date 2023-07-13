@@ -73,10 +73,13 @@ type likeService struct {
 }
 
 func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
+	var repotype domain.RepoType
 	if isprivate, ok := s.rs.IsPrivate(
 		cmd.ResourceOwner, cmd.ResourceType, cmd.ResourceId,
 	); !ok || isprivate {
 		return errors.New("cannot like private or not exsit resource")
+	} else {
+		repotype, _ = domain.NewRepoType(domain.RepoTypePublic)
 	}
 
 	now := utils.Now()
@@ -102,6 +105,7 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 		Activity: domain.Activity{
 			Type:           domain.ActivityTypeLike,
 			Time:           now,
+			RepoType:       repotype,
 			ResourceObject: v.ResourceObject,
 		},
 	}
