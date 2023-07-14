@@ -104,14 +104,17 @@ func (m *administrator) RefreshToken(userId string) (string, error) {
 		return "", err
 	}
 
-	tokens, _, err := m.cli.Users.GetAllImpersonationTokens(uid, nil, nil)
+	opt := sdk.ListPersonalAccessTokensOptions{
+		UserID: &uid,
+	}
+	tokens, _, err := m.cli.PersonalAccessTokens.ListPersonalAccessTokens(&opt)
 	if err != nil {
 		return "", nil
 	}
 
 	for _, token := range tokens {
 		if token.Active {
-			_, err := m.cli.Users.RevokeImpersonationToken(uid, token.ID)
+			_, err := m.cli.PersonalAccessTokens.RevokePersonalAccessToken(token.ID)
 			if err != nil {
 				return "", err
 			}
