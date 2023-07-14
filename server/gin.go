@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/community-robot-lib/interrupts"
 	"github.com/sirupsen/logrus"
@@ -44,27 +42,10 @@ import (
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
-func newStore(cfg *config.Redis) (redis.Store, error) {
-	return redis.NewStore(cfg.DB.IdleSize, cfg.DB.NetWork, cfg.DB.Address, cfg.DB.Password, []byte(cfg.DB.KeyPair))
-}
-
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
-	store, err := newStore(&cfg.Redis)
-	if err != nil {
-		panic(err)
-	}
-
-	store.Options(sessions.Options{
-		Path:     "/",
-		MaxAge:   int(cfg.API.TokenExpiry - 60),
-		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
-	})
-
 	r := gin.New()
 	r.Use(gin.Recovery())
 	r.Use(logRequest())
-	r.Use(sessions.Sessions("xihe-session", store))
 
 	setRouter(r, cfg)
 

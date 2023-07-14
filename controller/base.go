@@ -2,24 +2,27 @@ package controller
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
-	sessionPrivateToken = "PRIVATE-TOKEN"
+	PrivateToken       = "PRIVATE-TOKEN"
 	csrfToken          = "CSRF-Token"
-	headerSecWebsocket  = "Sec-Websocket-Protocol"
+	encodeUsername     = "encode-username"
+	headerSecWebsocket = "Sec-Websocket-Protocol"
 
 	roleIndividuals = "individuals"
 	fileReadme      = "README.md"
@@ -64,7 +67,9 @@ func (ctl baseController) newApiToken(ctx *gin.Context, pl interface{}) (
 	return
 }
 
-func (ctl baseController) checkToken(ctx *gin.Context, token string, pl interface{}) (ac accessController, tokenbyte []byte, ok bool) {
+func (ctl baseController) checkToken(
+	ctx *gin.Context, token string, pl interface{},
+) (ac accessController, tokenbyte []byte, ok bool) {
 	tokenbyte, err := ctl.decryptData(token)
 	if err != nil {
 		ctx.JSON(
@@ -101,7 +106,9 @@ func (ctl baseController) checkToken(ctx *gin.Context, token string, pl interfac
 	return
 }
 
-func (ctl baseController) checkCSRFToken(ctx *gin.Context, tokenbyte []byte, csrftoken string) (ok bool) {
+func (ctl baseController) checkCSRFToken(
+	ctx *gin.Context, tokenbyte []byte, csrftoken string,
+) (ok bool) {
 	csrfbyte, err := ctl.decryptDataForCSRF(csrftoken)
 	if err != nil {
 		ctx.JSON(
@@ -160,7 +167,21 @@ func (ctl baseController) checkApiToken(
 	}
 
 	token, csrftoken = ctl.refreshDoubleToken(ac)
-	ctl.setRespToken(ctx, token, csrftoken)
+
+	payload, err := toOldUserTokenPayload(pl)
+	if err != nil {
+		return
+	}
+
+	ctl.setRespToken(ctx, token, csrftoken, payload.Account)
+
+	return
+}
+
+func toOldUserTokenPayload(pl interface{}) (payload oldUserTokenPayload, err error) {
+	if err = json.Unmarshal([]byte(fmt.Sprintf("%v", pl)), &payload); err != nil {
+		return
+	}
 
 	return
 }
@@ -186,8 +207,15 @@ func (ctl baseController) checkUserApiTokenBase(
 ) (
 	pl oldUserTokenPayload, visitor bool, ok bool,
 ) {
-	token := ctl.getSessionToken(ctx)
-	csrftoken := ctl.getCSRFToken(ctx)
+	token, err := ctl.getCookieToken(ctx)
+	if err != nil {
+		return
+	}
+
+	csrftoken, err := ctl.getCSRFToken(ctx)
+	if err != nil {
+		return
+	}
 
 	if token == "" || csrftoken == "" {
 		if allowVistor {
@@ -208,32 +236,63 @@ func (ctl baseController) checkUserApiTokenBase(
 	return
 }
 
-func (ctl baseController) setRespSessionToken(ctx *gin.Context, token string) {
-	session := sessions.Default(ctx)
+func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username string) error {
+	// encrpt username
+	u, err := ctl.encryptData(username)
+	if err != nil {
+		return err
+	}
 
-	session.Delete(sessionPrivateToken)
+	// insert redis
+	if err = ctl.newRepo().Insert(u, token); err != nil {
+		return err
+	}
 
-	session.Set(sessionPrivateToken, token)
+	// set expire time for old token
+	var ok, oldusername = false, ""
+	o, exist := ctx.Get(encodeUsername)
+	if exist {
+		if oldusername, ok = o.(string); !ok {
+			return errors.New("encode username illegal")
+		}
+	}
 
-	session.Save()
+	if err = ctl.newRepo().Expire(oldusername, 3); err != nil {
+		return err
+	}
+
+	// set cookie
+	setCookie(ctx, PrivateToken, u, true)
+
+	return nil
 }
 
 func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token string) {
+	setCookie(ctx, csrfToken, token, false)
+}
+
+func setCookie(ctx *gin.Context, key, val string, httpOnly bool) {
 	cookie := &http.Cookie{
-		Name:     csrfToken,
-		Value:    token,
+		Name:     key,
+		Value:    val,
 		Path:     "/",
 		Expires:  utils.ExpiryReduceSecond(apiConfig.TokenExpiry),
-		HttpOnly: false,
+		HttpOnly: httpOnly,
+		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
 	}
 
 	http.SetCookie(ctx.Writer, cookie)
 }
 
-func (ctl baseController) setRespToken(ctx *gin.Context, token string, csrftoken string) {
+func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, username string) error {
 	ctl.setRespCSRFToken(ctx, csrftoken)
-	ctl.setRespSessionToken(ctx, token)
+
+	if err := ctl.setRespCookieToken(ctx, token, username); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (ctl *baseController) checkTokenForWebsocket(
@@ -266,35 +325,50 @@ func (ctl *baseController) checkTokenForWebsocket(
 	return
 }
 
-func (ctl *baseController) getSessionToken(ctx *gin.Context) (token string) {
-	session := sessions.Default(ctx)
-
-	v := session.Get(sessionPrivateToken)
-	if v == nil {
-		token = ""
-	} else {
-		token = v.(string)
+func (ctl *baseController) getCookieToken(ctx *gin.Context) (string, error) {
+	// get encode username
+	u, err := getCookieValue(ctx, PrivateToken)
+	if err != nil {
+		return "", err
 	}
 
-	return
+	// insert encode username to context
+	ctx.Set(encodeUsername, u)
+
+	// get token from redis
+	token, err := ctl.newRepo().Get(u)
+	if err != nil {
+		return "", err
+	}
+
+	return token, err
 }
 
-func (ctl *baseController) getCSRFToken(ctx *gin.Context) (token string) {
-	cookie, err := ctx.Request.Cookie(csrfToken)
+func (ctl *baseController) getCSRFToken(ctx *gin.Context) (string, error) {
+	return getCookieValue(ctx, csrfToken)
+}
+
+func getCookieValue(ctx *gin.Context, key string) (string, error) {
+	cookie, err := ctx.Request.Cookie(key)
 	if err != nil {
-		return
+		return "", err
 	}
 
-	return cookie.Value
+	return cookie.Value, nil
 }
 
 func (ctl *baseController) getTokenForWebsocket(ctx *gin.Context) (csrftoken string) {
 	return ctx.GetHeader(headerSecWebsocket)
 }
 
-func (ctl *baseController) getToken(ctx *gin.Context) (token, csrftoken string) {
-	token = ctl.getSessionToken(ctx)
-	csrftoken = ctl.getCSRFToken(ctx)
+func (ctl *baseController) getToken(ctx *gin.Context) (token, csrftoken string, err error) {
+	if token, err = ctl.getCookieToken(ctx); err != nil {
+		return
+	}
+
+	if csrftoken, err = ctl.getCSRFToken(ctx); err != nil {
+		return
+	}
 
 	return
 }
@@ -336,13 +410,6 @@ func (ctl baseController) checkCSRFTokenForWebSocket(
 	ok = true
 
 	return
-}
-
-func (ctl baseController) cleanSession(ctx *gin.Context) {
-	session := sessions.Default(ctx)
-
-	session.Delete(sessionPrivateToken)
-	session.Save()
 }
 
 func (ctl baseController) getRemoteAddr(ctx *gin.Context) (string, error) {
@@ -521,4 +588,8 @@ func (ctl baseController) getListGlobalResourceParameter(
 	cmd.SortType = v.SortType
 
 	return
+}
+
+func (ctl baseController) newRepo() repositories.Access {
+	return repositories.NewAccessRepo(int(apiConfig.TokenExpiry - 10))
 }

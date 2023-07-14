@@ -10,6 +10,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -115,7 +116,12 @@ func main() {
 
 	// postgresql
 	if err := pgsql.Init(&cfg.Postgresql.DB); err != nil {
-		logrus.Fatalf("init db, err:%s", err.Error())
+		logrus.Fatalf("init postgresql failed, err:%s", err.Error())
+	}
+
+	// redis
+	if err := redis.Init(&cfg.Redis.DB); err != nil {
+		logrus.Fatalf("init redis failed, err:%s", err.Error())
 	}
 
 	// cfg

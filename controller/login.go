@@ -116,7 +116,6 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		}
 
 		if user, err = ctl.newUser(ctx, info); err != nil {
-
 			utils.DoLog(user.Id, user.Account, "logup", "", "failed")
 
 			return
@@ -145,9 +144,16 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		return
 	}
 
+	if err = ctl.setRespToken(ctx, token, csrftoken, user.Account); err != nil {
+		ctl.sendRespWithInternalError(
+			ctx, newResponseCodeError(errorSystemError, err),
+		)
+
+		return
+	}
+
 	utils.DoLog(user.Id, user.Account, "login", "", "success")
 
-	ctl.setRespToken(ctx, token, csrftoken)
 	ctx.JSON(http.StatusOK, newResponseData(user))
 }
 
@@ -271,8 +277,6 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 
 		return
 	}
-
-	ctl.cleanSession(ctx)
 
 	utils.DoLog(info.UserId, "", "logout", "", "success")
 
