@@ -16,6 +16,7 @@ type UserService interface {
 	Create(*UserCreateCmd) (UserDTO, error)
 	CreatePlatformAccount(*CreatePlatformAccountCmd) (PlatformInfoDTO, error)
 	UpdatePlateformInfo(*UpdatePlateformInfoCmd) error
+	UpdatePlateformToken(*UpdatePlateformTokenCmd) error
 	NewPlatformAccountWithUpdate(*CreatePlatformAccountCmd) error
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
 
@@ -29,6 +30,8 @@ type UserService interface {
 	AddFollower(*domain.FollowerInfo) error
 	RemoveFollower(*domain.FollowerInfo) error
 	ListFollower(*FollowsListCmd) (FollowsDTO, error)
+
+	RefreshGitlabToken(*RefreshTokenCmd) error
 }
 
 // ps: platform user service
@@ -137,7 +140,6 @@ func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (dto P
 		Name:     cmd.Account,
 		Password: cmd.Password,
 	})
-
 	if err != nil {
 		return
 	}
@@ -171,6 +173,24 @@ func (s userService) UpdatePlateformInfo(cmd *UpdatePlateformInfoCmd) (err error
 	u.PlatformUser = cmd.PlatformUser
 	u.PlatformToken = cmd.PlatformToken
 	u.Email = cmd.Email
+
+	// update userinfo
+	if _, err = s.repo.Save(&u); err != nil {
+		return
+	}
+
+	return
+}
+
+func (s userService) UpdatePlateformToken(cmd *UpdatePlateformTokenCmd) (err error) {
+	// get userinfo
+	u, err := s.repo.GetByAccount(cmd.User)
+	if err != nil {
+		return
+	}
+
+	// update token
+	u.PlatformToken = cmd.PlatformToken
 
 	// update userinfo
 	if _, err = s.repo.Save(&u); err != nil {
@@ -223,4 +243,33 @@ func (s userService) decryptToken(d string) (string, error) {
 	}
 
 	return string(dtoken), nil
+}
+
+func (s userService) RefreshGitlabToken(cmd *RefreshTokenCmd) (err error) {
+	token, err := s.ps.RefreshToken(cmd.Id)
+	if err != nil {
+		return
+	}
+
+	eToken, err := s.encryptToken(token)
+	if err != nil {
+		return
+	}
+
+	updatecmd := &UpdatePlateformTokenCmd{
+		User:          cmd.Account,
+		PlatformToken: eToken,
+	}
+
+	for i := 0; i <= 5; i++ {
+		if err = s.UpdatePlateformToken(updatecmd); err != nil {
+			if !typerepo.IsErrorConcurrentUpdating(err) {
+				return
+			}
+		} else {
+			break
+		}
+	}
+
+	return
 }

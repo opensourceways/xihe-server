@@ -45,7 +45,9 @@ func AddRouterForUserController(
 	rg.GET("/v1/user/following/:account", ctl.ListFollowing)
 
 	rg.GET("/v1/user/follower/:account", ctl.ListFollower)
+
 	rg.GET("/v1/user/:account/gitlab", checkUserEmailMiddleware(&ctl.baseController), ctl.GitlabToken)
+	rg.GET("/v1/user/:account/gitlab/refresh", checkUserEmailMiddleware(&ctl.baseController), ctl.RefreshGitlabToken)
 
 	// email
 	rg.GET("/v1/user/check_email", checkUserEmailMiddleware(&ctl.baseController))
@@ -245,6 +247,86 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 	} else {
 		resp(&u, true)
 	}
+}
+
+//	@Title			RefreshGitlabToken
+//	@Description	refresh platform token of user
+//	@Tags			User
+//	@Param			account	path	string	true	"account"
+//	@Accept			json
+//	@Success		200	{object}			success
+//	@Failure		400	bad_request_param	account	is	invalid
+//	@Failure		401	not_allowed			can't	get	info	of	other	user
+//	@Router			/{account}/gitlab/refresh [get]
+func (ctl *UserController) RefreshGitlabToken(ctx *gin.Context) {
+	account, err := domain.NewAccount(ctx.Param("account"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	if pl.isNotMe(account) {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorNotAllowed,
+			"can't refresh token of other user",
+		))
+
+		return
+	}
+
+	user, _ := ctl.s.GetByAccount(pl.DomainAccount())
+
+	cmd := userapp.RefreshTokenCmd{
+		Account:     pl.DomainAccount(),
+		Id:          user.Platform.UserId,
+		NamespaceId: user.Platform.NamespaceId,
+	}
+
+	if err := ctl.s.RefreshGitlabToken(&cmd); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseError(err))
+
+		return
+	}
+
+	usernew, err := ctl.s.GetByAccount(pl.DomainAccount())
+
+	// create new token
+	f := func() (token, csrftoken string) {
+
+		if err != nil {
+			return
+		}
+
+		payload := oldUserTokenPayload{
+			Account:                 usernew.Account,
+			Email:                   usernew.Email,
+			PlatformToken:           usernew.Platform.Token,
+			PlatformUserNamespaceId: usernew.Platform.NamespaceId,
+		}
+
+		token, csrftoken, err = ctl.newApiToken(ctx, payload)
+		if err != nil {
+			return
+		}
+
+		return
+	}
+
+	token, csrftoken := f()
+
+	if token != "" {
+		ctl.setRespToken(ctx, token, csrftoken)
+	}
+
+	ctl.sendRespOfPost(ctx, "success")
 }
 
 //	@Title			GitLabToken

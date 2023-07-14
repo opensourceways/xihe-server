@@ -143,3 +143,14 @@ type UpdatePlateformInfoCmd struct {
 	User  domain.Account
 	Email domain.Email
 }
+
+type UpdatePlateformTokenCmd struct {
+	User          domain.Account
+	PlatformToken string
+}
+
+type RefreshTokenCmd struct {
+	Account     domain.Account
+	Id          string
+	NamespaceId string
+}

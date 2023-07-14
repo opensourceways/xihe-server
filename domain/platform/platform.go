@@ -16,6 +16,7 @@ type UserOption struct {
 type User interface {
 	New(UserOption) (userdomain.PlatformUser, error)
 	NewToken(userdomain.PlatformUser) (string, error)
+	RefreshToken(string) (string, error)
 }
 
 type RepoOption struct {

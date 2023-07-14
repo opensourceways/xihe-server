@@ -97,3 +97,41 @@ func (m *administrator) NewToken(u userdomain.PlatformUser) (string, error) {
 
 	return v.Token, nil
 }
+
+func (m *administrator) RefreshToken(userId string) (string, error) {
+	uid, err := strconv.Atoi(userId)
+	if err != nil {
+		return "", err
+	}
+
+	tokens, _, err := m.cli.Users.GetAllImpersonationTokens(uid, nil, nil)
+	if err != nil {
+		return "", nil
+	}
+
+	for _, token := range tokens {
+		if token.Active {
+			_, err := m.cli.Users.RevokeImpersonationToken(uid, token.ID)
+			if err != nil {
+				return "", err
+			}
+		}
+
+	}
+
+	name := "___"
+	scope := []string{"api"}
+
+	v, _, err := m.cli.Users.CreatePersonalAccessToken(
+		uid, &sdk.CreatePersonalAccessTokenOptions{
+			Name:   &name,
+			Scopes: &scope,
+		},
+	)
+
+	if err != nil {
+		return "", err
+	}
+
+	return v.Token, nil
+}
