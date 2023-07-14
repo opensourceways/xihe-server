@@ -280,6 +280,8 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 
 	utils.DoLog(info.UserId, "", "logout", "", "success")
 
+	ctl.cleanCookie(ctx)
+
 	info.Info = string(v)
 	ctx.JSON(http.StatusOK, newResponseData(info))
 }

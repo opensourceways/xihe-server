@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 
@@ -262,21 +263,21 @@ func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username s
 	}
 
 	// set cookie
-	setCookie(ctx, PrivateToken, u, true)
+	setCookie(ctx, PrivateToken, u, true, utils.ExpiryReduceSecond(apiConfig.TokenExpiry))
 
 	return nil
 }
 
 func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token string) {
-	setCookie(ctx, csrfToken, token, false)
+	setCookie(ctx, csrfToken, token, false, utils.ExpiryReduceSecond(apiConfig.TokenExpiry))
 }
 
-func setCookie(ctx *gin.Context, key, val string, httpOnly bool) {
+func setCookie(ctx *gin.Context, key, val string, httpOnly bool, expireTime time.Time) {
 	cookie := &http.Cookie{
 		Name:     key,
 		Value:    val,
 		Path:     "/",
-		Expires:  utils.ExpiryReduceSecond(apiConfig.TokenExpiry),
+		Expires:  expireTime,
 		HttpOnly: httpOnly,
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
@@ -458,6 +459,11 @@ func (ctl baseController) decryptDataForCSRF(s string) ([]byte, error) {
 	}
 
 	return encryptHelperCSRF.Decrypt(dst)
+}
+
+func (ctl baseController) cleanCookie(ctx *gin.Context) {
+	setCookie(ctx, PrivateToken, "", true, time.Now().AddDate(0, 0, -1))
+	setCookie(ctx, csrfToken, "", false, time.Now().AddDate(0, 0, -1))
 }
 
 func (ctl baseController) getQueryParameter(ctx *gin.Context, key string) string {
