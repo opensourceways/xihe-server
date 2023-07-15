@@ -18,7 +18,7 @@ func NewDBRedis(expiration int) dbRedis {
 func (r dbRedis) Create(
 	ctx context.Context, key string, value interface{},
 ) *redis.StatusCmd {
-	return client.Set(ctx, key, value, 500*time.Second)		// TODO to config
+	return client.Set(ctx, key, value, r.Expiration*time.Second)
 }
 
 func (r dbRedis) Get(
@@ -36,7 +36,7 @@ func (r dbRedis) Delete(
 func (r dbRedis) Expire(
 	ctx context.Context, key string, expire time.Duration,
 ) *redis.BoolCmd {
-	return client.Expire(ctx, key, 3*time.Second)	// TODO to config
+	return client.Expire(ctx, key, 3*time.Second)
 }
 
 func DB() *redis.Client {
