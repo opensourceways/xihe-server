@@ -89,6 +89,8 @@ func NewWuKongPictureDesc(v string) (WuKongPictureDesc, error) {
 		)
 	}
 
+	v = utils.XSSFilter(v)
+
 	return wukongPictureDesc(v), nil
 }
 
@@ -156,6 +158,10 @@ type OBSPath interface {
 }
 
 func NewOBSPath(v string) (OBSPath, error) {
+	if !utils.IsPath(v) {
+		return nil, errors.New("invalid obspath")
+	}
+
 	return obspath(v), nil
 }
 
@@ -177,6 +183,8 @@ func NewAIDetectorText(v string) (AIDetectorText, error) {
 	if v == "" {
 		return nil, errors.New("invalid AI detector text")
 	}
+
+	v = utils.XSSFilter(v)
 
 	return aidetectortext(v), nil
 }
@@ -230,6 +238,8 @@ func NewDesc(v string) (Desc, error) {
 	if b {
 		return nil, errors.New("invalid desc")
 	}
+
+	v = utils.XSSFilter(v)
 
 	return desc(v), nil
 }

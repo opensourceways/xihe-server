@@ -233,7 +233,7 @@ func (s bigModelService) GetWuKongLastTaskResp(user types.Account) (dtos []wukon
 func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 	pid string, code string, err error,
 ) {
-	meta, p, err := s.fm.CheckWuKongPictureTempToLike(cmd.User, cmd.OBSPath)
+	meta, p, err := s.fm.CheckWuKongPictureTempToLike(cmd.User, cmd.OBSPath.OBSPath())
 	if err != nil {
 		code = ErrorWuKongInvalidPath
 
@@ -258,7 +258,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 		return
 	}
 
-	if err = s.fm.MoveWuKongPictureToDir(p, cmd.OBSPath); err != nil {
+	if err = s.fm.MoveWuKongPictureToDir(p, cmd.OBSPath.OBSPath()); err != nil {
 		return
 	}
 
@@ -393,7 +393,7 @@ func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCm
 	pid string, code string, err error,
 ) {
 	// gen meta and public path
-	meta, publicPath, err := s.fm.CheckWuKongPictureToPublic(cmd.User, cmd.OBSPath)
+	meta, publicPath, err := s.fm.CheckWuKongPictureToPublic(cmd.User, cmd.OBSPath.OBSPath())
 	if err != nil {
 		code = ErrorWuKongInvalidPath
 
@@ -414,7 +414,7 @@ func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCm
 	}
 
 	// copy picture from public dir to like dir on obs
-	if err = s.fm.MoveWuKongPictureToDir(publicPath, cmd.OBSPath); err != nil {
+	if err = s.fm.MoveWuKongPictureToDir(publicPath, cmd.OBSPath.OBSPath()); err != nil {
 		code = ErrorCodeSytem
 
 		return

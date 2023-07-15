@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
@@ -53,10 +54,8 @@ func (req *questionAskRequest) toCmd() (
 		return
 	}
 
-	if req.Picture == "" {
-		err = errors.New("missing picture")
-
-		// TODO doesnot allow chinese name for picture
+	if req.Picture == "" || !utils.IsSafeFileName(req.Picture) {
+		err = errors.New("invalid picture")
 
 		return
 	}
@@ -195,11 +194,14 @@ type wukongAddLikeFromTempRequest struct {
 	OBSPath string `json:"obspath" binding:"required"`
 }
 
-func (req *wukongAddLikeFromTempRequest) toCmd(user types.Account) app.WuKongAddLikeFromTempCmd {
-	return app.WuKongAddLikeFromTempCmd{
-		User:    user,
-		OBSPath: req.OBSPath,
+func (req *wukongAddLikeFromTempRequest) toCmd(user types.Account) (cmd app.WuKongAddLikeFromTempCmd, err error) {
+	if cmd.OBSPath, err = domain.NewOBSPath(req.OBSPath); err != nil {
+		return
 	}
+
+	cmd.User = user
+
+	return
 }
 
 type wukongAddLikeFromPublicRequest struct {
@@ -207,22 +209,33 @@ type wukongAddLikeFromPublicRequest struct {
 	Id    string `json:"id" binding:"required"`
 }
 
-func (req *wukongAddLikeFromPublicRequest) toCmd(user types.Account) app.WuKongAddLikeFromPublicCmd {
-	owner, _ := types.NewAccount(req.Owner)
-	return app.WuKongAddLikeFromPublicCmd{
+func (req *wukongAddLikeFromPublicRequest) toCmd(user types.Account) (
+	cmd app.WuKongAddLikeFromPublicCmd, err error,
+) {
+	owner, err := types.NewAccount(req.Owner)
+	if err != nil {
+		return
+	}
+
+	cmd = app.WuKongAddLikeFromPublicCmd{
 		Owner: owner,
 		User:  user,
 		Id:    req.Id,
 	}
+
+	return
 }
 
 type wukongAddPublicFromTempRequest wukongAddLikeFromTempRequest
 
-func (req *wukongAddPublicFromTempRequest) toCmd(user types.Account) app.WuKongAddPublicFromTempCmd {
-	return app.WuKongAddPublicFromTempCmd{
-		User:    user,
-		OBSPath: req.OBSPath,
+func (req *wukongAddPublicFromTempRequest) toCmd(user types.Account) (cmd app.WuKongAddPublicFromTempCmd, err error) {
+	if cmd.OBSPath, err = domain.NewOBSPath(req.OBSPath); err != nil {
+		return
 	}
+
+	cmd.User = user
+
+	return
 }
 
 type wukongAddPublicFromLikeRequest struct {

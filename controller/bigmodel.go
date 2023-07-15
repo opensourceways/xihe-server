@@ -35,7 +35,6 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/pangu", ctl.PanGu)
 	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
 	rg.POST("/v1/bigmodel/luojia_hf", ctl.LuoJiaHF)
-	rg.POST("/v1/bigmodel/codegeex", ctl.CodeGeex)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
 	rg.POST("/v1/bigmodel/wukong_hf", ctl.WuKongHF)
 	rg.POST("/v1/bigmodel/wukong_async", ctl.WuKongAsync)
@@ -149,6 +148,12 @@ func (ctl *BigModelController) DescribePictureHF(ctx *gin.Context) {
 		Length:  f.Size,
 	}
 
+	if err = cmd.Validate(); err != nil {
+		ctl.sendBadRequestParamWithMsg(ctx, err.Error())
+
+		return
+	}
+
 	v, err := ctl.s.DescribePictureHF(&cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
@@ -193,14 +198,14 @@ func (ctl *BigModelController) GenSinglePicture(ctx *gin.Context) {
 	}
 }
 
-//	@Title			GenMultiplePictures
-//	@Description	generate multiple pictures based on a text
-//	@Tags			BigModel
-//	@Param			body	body	pictureGenerateRequest	true	"body of generating picture"
-//	@Accept			json
-//	@Success		201	{object}		multiplePicturesGenerateResp
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/bigmodel/multiple_pictures [post]
+// @Title			GenMultiplePictures
+// @Description	generate multiple pictures based on a text
+// @Tags			BigModel
+// @Param			body	body	pictureGenerateRequest	true	"body of generating picture"
+// @Accept			json
+// @Success		201	{object}		multiplePicturesGenerateResp
+// @Failure		500	system_error	system	error
+// @Router			/v1/bigmodel/multiple_pictures [post]
 func (ctl *BigModelController) GenMultiplePictures(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -452,50 +457,14 @@ func (ctl *BigModelController) ListLuoJiaRecord(ctx *gin.Context) {
 	}
 }
 
-//	@Title			CodeGeex
-//	@Description	codegeex big model
-//	@Tags			BigModel
-//	@Param			body	body	CodeGeexRequest	true	"codegeex body"
-//	@Accept			json
-//	@Success		201	{object}		app.CodeGeexDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/bigmodel/codegeex [post]
-func (ctl *BigModelController) CodeGeex(ctx *gin.Context) {
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
-	if !ok {
-		return
-	}
-
-	req := CodeGeexRequest{}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctl.sendBadRequestBody(ctx)
-
-		return
-	}
-
-	cmd, err := req.toCmd()
-	if err != nil {
-		ctl.sendBadRequestParam(ctx, err)
-
-		return
-	}
-
-	v, code, err := ctl.s.CodeGeex(pl.DomainAccount(), &cmd)
-	if err != nil {
-		ctl.sendCodeMessage(ctx, code, err)
-	} else {
-		ctl.sendRespOfPost(ctx, v)
-	}
-}
-
-//	@Title			VQAUploadPicture
-//	@Description	upload a picture for vqa
-//	@Tags			BigModel
-//	@Param			picture	formData	file	true	"picture"
-//	@Accept			json
-//	@Success		201	{object}		pictureUploadResp
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/bigmodel/vqa_upload_picture [post]
+// @Title			VQAUploadPicture
+// @Description	upload a picture for vqa
+// @Tags			BigModel
+// @Param			picture	formData	file	true	"picture"
+// @Accept			json
+// @Success		201	{object}		pictureUploadResp
+// @Failure		500	system_error	system	error
+// @Router			/v1/bigmodel/vqa_upload_picture [post]
 func (ctl *BigModelController) VQAUploadPicture(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -818,7 +787,13 @@ func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 	}
 
 	if errTemp == nil {
-		cmd := reqTemp.toCmd(pl.DomainAccount())
+		cmd, err := reqTemp.toCmd(pl.DomainAccount())
+		if err != nil {
+			ctl.sendBadRequestParam(ctx, err)
+
+			return
+		}
+
 		if pid, code, err := ctl.s.AddLikeFromTempPicture(&cmd); err != nil {
 			ctl.sendCodeMessage(ctx, code, err)
 		} else {
@@ -827,7 +802,13 @@ func (ctl *BigModelController) AddLike(ctx *gin.Context) {
 	}
 
 	if errPublic == nil {
-		cmd := reqPublic.toCmd(pl.DomainAccount())
+		cmd, err := reqPublic.toCmd(pl.DomainAccount())
+		if err != nil {
+			ctl.sendBadRequestParam(ctx, err)
+
+			return
+		}
+
 		if pid, code, err := ctl.s.AddLikeFromPublicPicture(&cmd); err != nil {
 			ctl.sendCodeMessage(ctx, code, err)
 		} else {
@@ -913,13 +894,13 @@ func (ctl *BigModelController) ListLike(ctx *gin.Context) {
 	}
 }
 
-//	@Title			AddDigg
-//	@Description	add digg to wukong picture
-//	@Tags			BigModel
-//	@Accept			json
-//	@Success		202	{object}		wukongDiggResp
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/bigmodel/wukong/digg [post]
+// @Title			AddDigg
+// @Description	add digg to wukong picture
+// @Tags			BigModel
+// @Accept			json
+// @Success		202	{object}		wukongDiggResp
+// @Failure		500	system_error	system	error
+// @Router			/v1/bigmodel/wukong/digg [post]
 func (ctl *BigModelController) AddDigg(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -998,11 +979,18 @@ func (ctl *BigModelController) AddPublic(ctx *gin.Context) {
 	errPublic := ctx.ShouldBindBodyWith(&reqPublic, binding.JSON)
 	if errTemp != nil && errPublic != nil {
 		ctl.sendBadRequest(ctx, respBadRequestBody)
+
 		return
 	}
 
 	if errTemp == nil {
-		cmd := reqTemp.toCmd(pl.DomainAccount())
+		cmd, err := reqTemp.toCmd(pl.DomainAccount())
+		if err != nil {
+			ctl.sendBadRequestParam(ctx, err)
+
+			return
+		}
+
 		if pid, code, err := ctl.s.AddPublicFromTempPicture(&cmd); err != nil {
 			ctl.sendCodeMessage(ctx, code, err)
 		} else {
@@ -1014,6 +1002,7 @@ func (ctl *BigModelController) AddPublic(ctx *gin.Context) {
 
 	if errPublic == nil {
 		cmd := reqPublic.toCmd(pl.DomainAccount())
+
 		if pid, code, err := ctl.s.AddPublicFromLikePicture(&cmd); err != nil {
 			ctl.sendCodeMessage(ctx, code, err)
 		} else {

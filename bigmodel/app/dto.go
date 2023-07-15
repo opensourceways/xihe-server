@@ -9,6 +9,8 @@ import (
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 type DescribePictureCmd struct {
@@ -16,6 +18,14 @@ type DescribePictureCmd struct {
 	Picture io.Reader
 	Name    string
 	Length  int64
+}
+
+func (cmd *DescribePictureCmd) Validate() error {
+	if !utils.IsSafeFileName(cmd.Name) {
+		return errors.New("file name invalid")
+	}
+
+	return nil
 }
 
 type VQAHFCmd struct {
@@ -28,6 +38,8 @@ func (cmd *VQAHFCmd) Validate() error {
 	if cmd.Picture == nil || cmd.Ask == "" {
 		return errors.New("invalid cmd")
 	}
+
+	cmd.Ask = utils.XSSFilter(cmd.Ask)
 
 	return nil
 }
@@ -92,9 +104,7 @@ type WuKongCmd struct {
 }
 
 func (cmd *WuKongCmd) Validate() error {
-	if cmd.Desc == nil {
-		return errors.New("invalid cmd")
-	}
+	cmd.Style = utils.XSSFilter(cmd.Style)
 
 	return nil
 }
@@ -107,6 +117,8 @@ type WuKongHFCmd struct {
 }
 
 func (cmd *WuKongHFCmd) Validate() error {
+	cmd.WuKongCmd.Style = utils.XSSFilter(cmd.WuKongCmd.Style)
+	
 	b := cmd.User == nil ||
 		cmd.User.Account() != "wukong_hf" ||
 		cmd.Desc == nil
@@ -122,7 +134,7 @@ type WuKongPicturesListCmd = repository.WuKongPictureListOption
 
 type WuKongAddLikeFromTempCmd struct {
 	User    types.Account
-	OBSPath string
+	OBSPath bigmodeldomain.OBSPath
 }
 
 type WuKongAddLikeFromPublicCmd struct {
