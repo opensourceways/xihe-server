@@ -278,6 +278,25 @@ func (ctl *TrainingController) setModelsInput(
 		}
 	}
 
+	for i := range v {
+		item := &v[i]
+		rname := domain.ResourceName(item.Name)
+
+		model, err := ctl.model.GetByName(item.Owner, rname)
+		if err != nil {
+			return
+		}
+
+		if model.IsPrivate() {
+			ok = false
+			ctx.JSON(http.StatusBadRequest, respBadRequestParam(
+				errors.New("can't use other people's private model"),
+			))
+
+			return
+		}
+	}
+
 	cmd.Inputs = append(cmd.Inputs, tinputs...)
 	ok = true
 
@@ -342,6 +361,25 @@ func (ctl *TrainingController) setDatasetsInput(
 		if v.RepoId, ok = ids[index(v.User, inputs[i].Name)]; !ok {
 			ctx.JSON(http.StatusBadRequest, respBadRequestParam(
 				errors.New("can't find repo id"),
+			))
+
+			return
+		}
+	}
+
+	for i := range v {
+		item := &v[i]
+		rname := domain.ResourceName(item.Name)
+
+		dataset, err := ctl.dataset.GetByName(item.Owner, rname)
+		if err != nil {
+			return
+		}
+
+		if dataset.IsPrivate() {
+			ok = false
+			ctx.JSON(http.StatusBadRequest, respBadRequestParam(
+				errors.New("can't use other people's private dataset"),
 			))
 
 			return
