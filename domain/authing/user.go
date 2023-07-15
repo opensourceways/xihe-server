@@ -1,7 +1,7 @@
 package authing
 
 import (
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/user/domain"
 )
 
 type UserInfo struct {

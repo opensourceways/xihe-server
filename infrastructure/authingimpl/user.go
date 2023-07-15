@@ -8,7 +8,7 @@ import (
 
 	"github.com/opensourceways/community-robot-lib/utils"
 
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 )
 

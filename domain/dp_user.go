@@ -2,12 +2,9 @@ package domain
 
 import (
 	"errors"
-	"net/url"
 	"strings"
 
 	libutil "github.com/opensourceways/community-robot-lib/utils"
-
-	"github.com/opensourceways/xihe-server/utils"
 )
 
 // Account
@@ -74,35 +71,6 @@ func (r dpPassword) Password() string {
 	return string(r)
 }
 
-// Bio
-type Bio interface {
-	Bio() string
-
-	DomainValue
-}
-
-func NewBio(v string) (Bio, error) {
-	if v == "" {
-		return dpBio(v), nil
-	}
-
-	if utils.StrLen(v) > DomainConfig.MaxBioLength {
-		return nil, errors.New("invalid bio")
-	}
-
-	return dpBio(v), nil
-}
-
-type dpBio string
-
-func (r dpBio) Bio() string {
-	return string(r)
-}
-
-func (r dpBio) DomainValue() string {
-	return string(r)
-}
-
 // Email
 type Email interface {
 	Email() string
@@ -119,38 +87,5 @@ func NewEmail(v string) (Email, error) {
 type dpEmail string
 
 func (r dpEmail) Email() string {
-	return string(r)
-}
-
-// AvatarId
-type AvatarId interface {
-	AvatarId() string
-
-	DomainValue
-}
-
-func NewAvatarId(v string) (AvatarId, error) {
-	if v == "" {
-		return dpAvatarId(v), nil
-	}
-
-	if _, err := url.Parse(v); err != nil {
-		return nil, errors.New("invalid avatar")
-	}
-
-	if !DomainConfig.HasAvatarURL(v) {
-		v = DomainConfig.AvatarURL[0]
-	}
-
-	return dpAvatarId(v), nil
-}
-
-type dpAvatarId string
-
-func (r dpAvatarId) AvatarId() string {
-	return string(r)
-}
-
-func (r dpAvatarId) DomainValue() string {
 	return string(r)
 }
