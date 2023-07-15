@@ -326,33 +326,33 @@ func (ctl *baseController) checkTokenForWebsocket(
 	return
 }
 
-func (ctl *baseController) getCookieToken(ctx *gin.Context) (string, error) {
+func (ctl *baseController) getCookieToken(ctx *gin.Context) (token string, err error) { // TODO add return value exist
 	// get encode username
 	u, err := getCookieValue(ctx, PrivateToken)
 	if err != nil {
-		return "", err
+		return "", nil
 	}
 
 	// insert encode username to context
 	ctx.Set(encodeUsername, u)
 
 	// get token from redis
-	token, err := ctl.newRepo().Get(u)
+	token, err = ctl.newRepo().Get(u)
 	if err != nil {
-		return "", err
+		return "", nil
 	}
 
-	return token, err
+	return
 }
 
-func (ctl *baseController) getCSRFToken(ctx *gin.Context) (string, error) {
+func (ctl *baseController) getCSRFToken(ctx *gin.Context) (string, error) { // TODO add return value exist
 	return getCookieValue(ctx, csrfToken)
 }
 
 func getCookieValue(ctx *gin.Context, key string) (string, error) {
 	cookie, err := ctx.Request.Cookie(key)
 	if err != nil {
-		return "", err
+		return "", nil
 	}
 
 	return cookie.Value, nil
