@@ -329,7 +329,9 @@ func (impl *wukongPictureRepoImpl) GetPublicsGlobal() (r []domain.WuKongPicture,
 	var c int
 	for i := range v {
 		for j := range v[i].Publics {
-			v[i].Publics[j].toWuKongPicture(&r[c])
+			if err = v[i].Publics[j].toWuKongPicture(&r[c]); err != nil {
+				return
+			}
 			c++
 		}
 	}

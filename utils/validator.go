@@ -7,11 +7,11 @@ import (
 
 // validator
 func IsSafeFileName(name string) bool {
-	return isMatchRegex(name, "^[a-zA-Z0-9-_\\.]+$")
+	return isMatchRegex("^[a-zA-Z0-9-_\\.]+$", name)
 }
 
 func IsPath(url string) bool {
-	return isMatchRegex(url, "[\\w-]+(/[\\w-./?%&=]*)?")
+	return isMatchRegex("[\\w-]+(/[\\w-./?%&=]*)?", url)
 }
 
 func isMatchRegex(pattern string, v string) bool {
