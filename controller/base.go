@@ -224,7 +224,7 @@ func (ctl baseController) checkUserApiTokenBase(
 			ok = true
 		} else {
 			ctx.JSON(
-				http.StatusBadRequest,
+				http.StatusUnauthorized,
 				newResponseCodeMsg(errorBadRequestHeader, "no token"),
 			)
 		}
@@ -313,7 +313,7 @@ func (ctl *baseController) checkTokenForWebsocket(
 			ok = true
 		} else {
 			ctx.JSON(
-				http.StatusBadRequest,
+				http.StatusUnauthorized,
 				newResponseCodeMsg(errorBadRequestHeader, "no token"),
 			)
 		}
