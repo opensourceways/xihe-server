@@ -108,7 +108,7 @@ func main() {
 
 	// mongo
 	m := &cfg.Mongodb
-	if err := mongodb.Initialize(m.DBConn, m.DBName); err != nil {
+	if err := mongodb.Initialize(m.DBConn, m.DBName, m.DBCert); err != nil {
 		logrus.Fatalf("initialize mongodb failed, err:%s", err.Error())
 	}
 
