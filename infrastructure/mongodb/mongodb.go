@@ -2,6 +2,9 @@ package mongodb
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
+	"io/ioutil"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,20 +13,28 @@ import (
 
 var cli *client
 
-func Initialize(conn, dbName string) error {
-	c, err := mongo.NewClient(options.Client().ApplyURI(conn))
+func Initialize(conn, dbName, dbCert string) error {
+	ca, err := ioutil.ReadFile(dbCert)
 	if err != nil {
 		return err
 	}
 
-	if err = withContext(c.Connect); err != nil {
+	pool := x509.NewCertPool()
+	ok := pool.AppendCertsFromPEM([]byte(ca))
+	if !ok {
 		return err
 	}
 
-	// verify if database connection is created successfully
-	err = withContext(func(ctx context.Context) error {
-		return c.Ping(ctx, nil)
-	})
+	tlsConfig := &tls.Config{
+		RootCAs:            pool,
+		InsecureSkipVerify: true,
+	}
+
+	uri := conn
+	clientOpt := options.Client().ApplyURI(uri)
+	clientOpt.SetTLSConfig(tlsConfig)
+
+	c, err := mongo.Connect(context.TODO(), clientOpt)
 	if err != nil {
 		return err
 	}

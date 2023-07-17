@@ -136,6 +136,7 @@ func (cfg *Config) Validate() error {
 type Mongodb struct {
 	DBName      string             `json:"db_name"       required:"true"`
 	DBConn      string             `json:"db_conn"       required:"true"`
+	DBCert      string             `json:"db_cert"       required:"true"`
 	Collections MongodbCollections `json:"collections"   required:"true"`
 }
 
