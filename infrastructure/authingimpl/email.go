@@ -173,7 +173,7 @@ func (impl *user) verifyBindEmail(token, email, passCode, userid string) (code s
 }
 
 func errorReturn(err error) (code string) {
-	logrus.Debugf("email error:", err)
+	logrus.Debugf("email error: %s", err.Error())
 
 	if err == nil {
 		return
@@ -190,7 +190,7 @@ func errorReturn(err error) (code string) {
 		code = errorEmailDuplicateBind
 	}
 
-	if strings.Contains(errinfo, "E00016") {
+	if strings.Contains(errinfo, "E00016") || strings.Contains(errinfo, "已绑定邮箱\\\\") {
 		code = ErrorUserDuplicateBind
 		return
 	}
