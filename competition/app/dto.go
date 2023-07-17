@@ -28,6 +28,12 @@ func (cmd *CompetitorApplyCmd) Validate() error {
 		return errors.New("invalid cmd")
 	}
 
+	for i := range cmd.Detail {
+		if utils.StrLen(cmd.Detail[i]) > 20 {
+			return errors.New("invalid detail")
+		}
+	}
+
 	return nil
 }
 
@@ -43,6 +49,14 @@ type CompetitionSubmitCMD struct {
 	FileName      string
 	Data          io.Reader
 	User          types.Account
+}
+
+func (cmd *CompetitionSubmitCMD) Validate() error {
+	if len(cmd.FileName) > 0 && !utils.IsSafeFileName(cmd.FileName) {
+		return errors.New("invalid file name")
+	}
+
+	return nil
 }
 
 type CompetitionAddReleatedProjectCMD struct {

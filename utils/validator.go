@@ -14,6 +14,10 @@ func IsPath(url string) bool {
 	return isMatchRegex("[\\w-]+(/[\\w-./?%&=]*)?", url)
 }
 
+func IsChinesePhone(phone string) bool {
+	return isMatchRegex("^1\\d{10}$", phone)
+}
+
 func isMatchRegex(pattern string, v string) bool {
 	matched, err := regexp.MatchString(pattern, v)
 	if err != nil {

@@ -22,6 +22,12 @@ func (cmd *PlayerApplyCmd) Validate() error {
 		return errors.New("invalid cmd")
 	}
 
+	for i := range cmd.Detail {
+		if utils.StrLen(cmd.Detail[i]) > 20 {
+			return errors.New("invalid detail")
+		}
+	}
+
 	return nil
 }
 
@@ -239,6 +245,14 @@ type GetSubmissionCmd struct {
 }
 
 type RecordAddCmd domain.Record
+
+func (cmd *RecordAddCmd) Validate() error {
+	if len(cmd.Cid) > 15 || len(cmd.PointId) > 15 {
+		return errors.New("invalid cid or pointid")
+	}
+
+	return nil
+}
 
 func (cmd *RecordAddCmd) toRecord() (p domain.Record) {
 	return *(*domain.Record)(cmd)

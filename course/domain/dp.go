@@ -3,6 +3,8 @@ package domain
 import (
 	"errors"
 	"net/url"
+
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
@@ -34,7 +36,7 @@ type StudentName interface {
 }
 
 func NewStudentName(v string) (StudentName, error) {
-	if v == "" {
+	if v == "" || len(v) > 30 {
 		return nil, errors.New("empty value")
 	}
 
@@ -53,6 +55,10 @@ type City interface {
 }
 
 func NewCity(v string) (City, error) {
+	if utils.StrLen(v) > 20 {
+		return nil, errors.New("invalid city")
+	}
+
 	return city(v), nil
 }
 
@@ -68,6 +74,10 @@ type Phone interface {
 }
 
 func NewPhone(v string) (Phone, error) {
+	if len(v) > 0 && !utils.IsChinesePhone(v) {
+		return nil, errors.New("invalid phone number")
+	}
+
 	return phone(v), nil
 }
 
@@ -107,6 +117,12 @@ type Province interface {
 }
 
 func NewProvince(v string) (Province, error) {
+	if utils.StrLen(v) > 15 {
+		return nil, errors.New("invalid province")
+	}
+
+	v = utils.XSSFilter(v)
+
 	return province(v), nil
 }
 
@@ -538,9 +554,10 @@ type SectionId interface {
 }
 
 func NewSectionId(v string) (SectionId, error) {
-	if v == "" {
+	if v == "" || len(v) > 15 {
 		return nil, errors.New("empty section id")
 	}
+
 	return sectionId(v), nil
 }
 
@@ -556,7 +573,7 @@ type LessonId interface {
 }
 
 func NewLessonId(v string) (LessonId, error) {
-	if v == "" {
+	if v == "" || len(v) > 15 {
 		return nil, errors.New("empty lesson id")
 	}
 	return lessonId(v), nil

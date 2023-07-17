@@ -86,19 +86,23 @@ func toGetCmd(cid string, user types.Account) (cmd app.CourseGetCmd) {
 func (req *PlayRecordRequest) toRecordCmd(cid string, user types.Account) (
 	cmd app.RecordAddCmd, err error,
 ) {
-	cmd.Cid = cid
 	if cmd.SectionId, err = domain.NewSectionId(req.SectionId); err != nil {
 		return
 	}
+
 	if cmd.LessonId, err = domain.NewLessonId(req.LessonId); err != nil {
 		return
 	}
 
+	cmd.Cid = cid
 	cmd.PointId = req.PointId
 	cmd.User = user
-
 	cmd.PlayCount = req.PlayCount
 	cmd.FinishCount = req.FinishCount
+
+	if err = cmd.Validate(); err != nil {
+		return
+	}
 
 	return
 }

@@ -334,6 +334,13 @@ func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 		Data:          p,
 		User:          pl.DomainAccount(),
 	}
+
+	if err = cmd.Validate(); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody, err.Error(),
+		))
+	}
+
 	if v, code, err := ctl.s.Submit(cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
