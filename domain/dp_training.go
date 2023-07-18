@@ -57,6 +57,8 @@ func NewTrainingDesc(v string) (TrainingDesc, error) {
 		return nil, fmt.Errorf("the length of desc should be less than %d", max)
 	}
 
+	v = utils.XSSFilter(v)
+
 	return trainingDesc(v), nil
 }
 

@@ -62,6 +62,14 @@ type RepoFileCreateCmd struct {
 
 type RepoFileUpdateCmd = RepoFileCreateCmd
 
+func (cmd *RepoFileCreateCmd) Validate() error {
+	if cmd.RepoFileContent.IsOverSize() {
+		return errors.New("file size exceeds the limit")
+	}
+
+	return nil
+}
+
 func (s *repoFileService) Create(u *platform.UserInfo, cmd *RepoFileCreateCmd) error {
 	return s.rf.Create(u, &cmd.RepoFileInfo, &cmd.RepoFileContent)
 }

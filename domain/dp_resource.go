@@ -150,6 +150,8 @@ func NewResourceDesc(v string) (ResourceDesc, error) {
 		)
 	}
 
+	v = utils.XSSFilter(v)
+
 	return resourceDesc(v), nil
 }
 

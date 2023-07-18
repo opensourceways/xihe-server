@@ -73,6 +73,7 @@ type likeService struct {
 }
 
 func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
+	// check if resource is private
 	var repotype domain.RepoType
 	if isprivate, ok := s.rs.IsPrivate(
 		cmd.ResourceOwner, cmd.ResourceType, cmd.ResourceId,
@@ -82,6 +83,22 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 		repotype, _ = domain.NewRepoType(domain.RepoTypePublic)
 	}
 
+	// check if resource has liked
+	hasLiked, err := s.repo.HasLike(owner, &domain.ResourceObject{
+		Type: cmd.ResourceType,
+		ResourceIndex: domain.ResourceIndex{
+			Owner: cmd.ResourceOwner,
+			Id: cmd.ResourceId,
+		},
+	}); 
+	if err != nil {
+		return err
+	}
+	if hasLiked {
+		return errors.New("cannot like resource you had liked")
+	}
+
+	// add like to like repo
 	now := utils.Now()
 
 	obj := domain.ResourceObject{Type: cmd.ResourceType}
@@ -113,7 +130,7 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 		return err
 	}
 
-	// send event
+	// increase like in resource
 	_ = s.sender.AddLike(&v.Like.ResourceObject)
 
 	return nil
@@ -124,6 +141,29 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 	obj.Owner = cmd.ResourceOwner
 	obj.Id = cmd.ResourceId
 
+	// check if resource is private
+	if isprivate, ok := s.rs.IsPrivate(
+		cmd.ResourceOwner, cmd.ResourceType, cmd.ResourceId,
+	); !ok || isprivate {
+		return errors.New("cannot like private or not exsit resource")
+	}
+
+	// check if resource has liked
+	hasLiked, err := s.repo.HasLike(owner, &domain.ResourceObject{
+		Type: cmd.ResourceType,
+		ResourceIndex: domain.ResourceIndex{
+			Owner: cmd.ResourceOwner,
+			Id: cmd.ResourceId,
+		},
+	}); 
+	if err != nil {
+		return err
+	}
+	if !hasLiked {
+		return errors.New("cannot remove like resource you had liked")
+	}
+
+	// remove like
 	v := domain.UserLike{
 		Owner: owner,
 		Like:  domain.Like{ResourceObject: obj},
@@ -133,7 +173,7 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 		return err
 	}
 
-	// send event
+	// reduce like count in resource
 	_ = s.sender.RemoveLike(&v.Like.ResourceObject)
 
 	return nil

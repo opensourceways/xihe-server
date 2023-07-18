@@ -1,6 +1,7 @@
 package platform
 
 import (
+	"encoding/base64"
 	"io"
 
 	"github.com/opensourceways/xihe-server/domain"
@@ -86,4 +87,15 @@ type RepoFile interface {
 	GenLFSDownloadURL(sha string) (string, error)
 	GetDirFileInfo(u *UserInfo, d *RepoDirFile) (sha string, exist bool, err error)
 	DownloadRepo(u *UserInfo, repoId string, handle func(io.Reader, int64)) error
+}
+
+func (r *RepoFileContent) IsOverSize() bool {
+	var decodeSize int
+	if r.IsEncoded {
+		decodeSize = base64.StdEncoding.DecodedLen(len(*r.Content))
+	} else {
+		decodeSize = len(*r.Content)
+	}
+
+	return decodeSize > 200*1024	// TODO 200KB to config
 }
