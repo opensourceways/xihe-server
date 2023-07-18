@@ -7,7 +7,7 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/websocket v1.5.0
-	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.21.12+incompatible
+	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.22.11+incompatible
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.11
 	github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb
 	github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db
@@ -17,9 +17,9 @@ require (
 	github.com/opensourceways/xihe-training-center v0.0.0-20230703124658-67fdc0c1cc65
 	github.com/panjf2000/ants/v2 v2.5.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/swaggo/files v1.0.0
-	github.com/swaggo/gin-swagger v1.5.3
-	github.com/swaggo/swag v1.8.10
+	github.com/swaggo/files v1.0.1
+	github.com/swaggo/gin-swagger v1.6.0
+	github.com/swaggo/swag v1.8.12
 	github.com/xanzy/go-gitlab v0.73.1
 	go.mongodb.org/mongo-driver v1.10.0
 	gorm.io/driver/postgres v1.5.0
