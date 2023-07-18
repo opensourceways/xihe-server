@@ -94,6 +94,14 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 		RepoFileInfo:    info,
 		RepoFileContent: req.toContent(),
 	}
+	if err = cmd.Validate(); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+	
 	u := pl.PlatformUserInfo()
 
 	if err = ctl.s.Create(&u, &cmd); err != nil {
@@ -143,8 +151,15 @@ func (ctl *RepoFileController) Update(ctx *gin.Context) {
 		RepoFileInfo:    info,
 		RepoFileContent: req.toContent(),
 	}
-	u := pl.PlatformUserInfo()
+	if err = cmd.Validate(); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
 
+		return
+	}
+
+	u := pl.PlatformUserInfo()
 	if err = ctl.s.Update(&u, &cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 

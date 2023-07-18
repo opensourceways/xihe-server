@@ -8,6 +8,7 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForSearchController(
@@ -46,6 +47,8 @@ func (ctl *SearchController) List(ctx *gin.Context) {
 		))
 
 	}
+
+	name = utils.XSSFilter(name)
 
 	data := ctl.s.Search(name)
 	ctx.JSON(http.StatusOK, newResponseData(data))

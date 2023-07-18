@@ -122,14 +122,22 @@ func (ctl *EvaluateController) createStandard(
 
 		return
 	}
-	dto, err := ctl.s.CreateStandard(&app.StandardEvaluateCreateCmd{
+
+	cmd := app.StandardEvaluateCreateCmd{
 		TrainingIndex: *index,
 		LogPath:       job.LogPath,
 
 		MomentumScope:     req.MomentumScope,
 		BatchSizeScope:    req.BatchSizeScope,
 		LearningRateScope: req.LearningRateScope,
-	})
+	}
+	if err = cmd.Validate(); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, err.Error(),
+		))
+	}
+
+	dto, err := ctl.s.CreateStandard(&cmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
