@@ -93,6 +93,12 @@ func (ctl *BigModelController) DescribePicture(ctx *gin.Context) {
 
 	defer p.Close()
 
+	if !utils.IsPictureName(f.Filename) {
+		ctl.sendBadRequestParamWithMsg(ctx, "image format not allowed")
+
+		return
+	}
+
 	v, err := ctl.s.DescribePicture(pl.DomainAccount(), p, f.Filename, f.Size)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
@@ -363,6 +369,12 @@ func (ctl *BigModelController) LuoJiaUploadPicture(ctx *gin.Context) {
 	}
 
 	defer p.Close()
+
+	if !utils.IsPictureName(f.Filename) {
+		ctl.sendBadRequestParamWithMsg(ctx, "image format not allowed")
+
+		return
+	}
 
 	if err := ctl.s.LuoJiaUploadPicture(p, pl.DomainAccount()); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

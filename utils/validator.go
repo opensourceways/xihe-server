@@ -2,7 +2,9 @@ package utils
 
 import (
 	"html/template"
+	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 // validator
@@ -16,6 +18,22 @@ func IsPath(url string) bool {
 
 func IsChinesePhone(phone string) bool {
 	return isMatchRegex("^1\\d{10}$", phone)
+}
+
+func IsPictureName(pictureName string) bool {
+	ext := filepath.Ext(pictureName)
+	ext = strings.ToLower(ext)
+
+	allowedExtensions := []string{".jpg", ".jpeg", ".png"}
+	allowed := false
+	for _, allowedExt := range allowedExtensions {
+		if ext == allowedExt {
+			allowed = true
+			break
+		}
+	}
+
+	return allowed
 }
 
 func isMatchRegex(pattern string, v string) bool {
