@@ -345,8 +345,9 @@ func (ctl *baseController) getCookieToken(ctx *gin.Context) (token string, err e
 	return
 }
 
-func (ctl *baseController) getCSRFToken(ctx *gin.Context) (string, error) { // TODO add return value exist
-	return getCookieValue(ctx, csrfToken)
+func (ctl *baseController) getCSRFToken(ctx *gin.Context) (string, error) {
+	v := ctx.GetHeader(csrfToken)
+	return v, nil
 }
 
 func getCookieValue(ctx *gin.Context, key string) (string, error) {
