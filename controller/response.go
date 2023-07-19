@@ -64,6 +64,9 @@ func newResponseError(err error) responseData {
 
 	case app.ErrorPreviewLFSFile:
 		code = errorPreviewLFSFile
+	
+	default:
+		
 	}
 
 	return responseData{

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
@@ -174,7 +175,9 @@ func (ctl baseController) checkApiToken(
 		return
 	}
 
-	ctl.setRespToken(ctx, token, csrftoken, payload.Account)
+	if err := ctl.setRespToken(ctx, token, csrftoken, payload.Account); err != nil {
+		logrus.Debugf("set resp token error: %s", err.Error())
+	}
 
 	return
 }
