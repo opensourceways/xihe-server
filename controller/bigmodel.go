@@ -25,18 +25,14 @@ func AddRouterForBigModelController(
 	}
 
 	rg.POST("/v1/bigmodel/describe_picture", ctl.DescribePicture)
-	rg.POST("/v1/bigmodel/describe_picture_hf", ctl.DescribePictureHF)
 	rg.POST("/v1/bigmodel/single_picture", ctl.GenSinglePicture)
 	rg.POST("/v1/bigmodel/multiple_pictures", ctl.GenMultiplePictures)
 	rg.POST("/v1/bigmodel/vqa_upload_picture", ctl.VQAUploadPicture)
 	rg.POST("/v1/bigmodel/luojia_upload_picture", ctl.LuoJiaUploadPicture)
 	rg.POST("/v1/bigmodel/ask", ctl.Ask)
-	rg.POST("/v1/bigmodel/ask_hf", ctl.AskHF)
 	rg.POST("/v1/bigmodel/pangu", ctl.PanGu)
 	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
-	rg.POST("/v1/bigmodel/luojia_hf", ctl.LuoJiaHF)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
-	rg.POST("/v1/bigmodel/wukong_hf", ctl.WuKongHF)
 	rg.POST("/v1/bigmodel/wukong_async", ctl.WuKongAsync)
 	rg.GET("/v1/bigmodel/wukong/rank", ctl.WuKongRank)
 	rg.GET("/v1/bigmodel/wukong/task", ctl.WuKongLastFinisedTask)
@@ -98,63 +94,6 @@ func (ctl *BigModelController) DescribePicture(ctx *gin.Context) {
 	defer p.Close()
 
 	v, err := ctl.s.DescribePicture(pl.DomainAccount(), p, f.Filename, f.Size)
-	if err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
-	} else {
-		ctl.sendRespOfPost(ctx, describePictureResp{v})
-	}
-}
-
-//	@Title			DescribePicture
-//	@Description	describe a picture for hf
-//	@Tags			BigModel
-//	@Param			picture	formData	file	true	"picture"
-//	@Accept			json
-//	@Success		201	{object}		describePictureResp
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/bigmodel/describe_picture_hf [post]
-func (ctl *BigModelController) DescribePictureHF(ctx *gin.Context) {
-	pl, _, ok := ctl.checkUserApiToken(ctx, true)
-	if !ok {
-		return
-	}
-
-	f, err := ctx.FormFile("picture")
-	if err != nil {
-		ctl.sendBadRequestParam(ctx, err)
-
-		return
-	}
-
-	if f.Size > apiConfig.MaxPictureSizeToDescribe {
-		ctl.sendBadRequestParamWithMsg(ctx, "too big picture")
-
-		return
-	}
-
-	p, err := f.Open()
-	if err != nil {
-		ctl.sendBadRequestParamWithMsg(ctx, "can't get picture")
-
-		return
-	}
-
-	defer p.Close()
-
-	cmd := app.DescribePictureCmd{
-		User:    pl.DomainAccount(),
-		Picture: p,
-		Name:    f.Filename,
-		Length:  f.Size,
-	}
-
-	if err = cmd.Validate(); err != nil {
-		ctl.sendBadRequestParamWithMsg(ctx, err.Error())
-
-		return
-	}
-
-	v, err := ctl.s.DescribePictureHF(&cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
@@ -273,65 +212,6 @@ func (ctl *BigModelController) Ask(ctx *gin.Context) {
 	}
 }
 
-//	@Title			AskHF
-//	@Description	vqa for hf
-//	@Tags			BigModel
-//	@Param			picture	formData	file	true	"picture"
-//	@Accept			json
-//	@Success		201	{object}		describePictureResp
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/bigmodel/ask_hf [post]
-func (ctl *BigModelController) AskHF(ctx *gin.Context) {
-	_, _, ok := ctl.checkUserApiToken(ctx, true)
-	if !ok {
-		return
-	}
-
-	req := questionAskHFReq{}
-
-	// get picture
-	f, err := ctx.FormFile("picture")
-	if err != nil {
-		ctl.sendBadRequestParam(ctx, err)
-
-		return
-	}
-
-	if f.Size > apiConfig.MaxPictureSizeToDescribe {
-		ctl.sendBadRequestParamWithMsg(ctx, "too big picture")
-
-		return
-	}
-
-	p, err := f.Open()
-	if err != nil {
-		ctl.sendBadRequestParamWithMsg(ctx, "can't get picture")
-
-		return
-	}
-
-	defer p.Close()
-
-	req.Picture = p
-
-	// get question
-	req.Question = ctx.PostForm("question")
-
-	var cmd app.VQAHFCmd
-	if cmd, err = req.toCmd(); err != nil {
-		ctl.sendBadRequestParam(ctx, err)
-
-		return
-	}
-
-	v, code, err := ctl.s.VQAHF(&cmd)
-	if err != nil {
-		ctl.sendCodeMessage(ctx, code, err)
-	} else {
-		ctl.sendRespOfPost(ctx, questionAskResp{v})
-	}
-}
-
 //	@Title			PanGu
 //	@Description	pan-gu big model
 //	@Tags			BigModel
@@ -375,62 +255,6 @@ func (ctl *BigModelController) LuoJia(ctx *gin.Context) {
 	}
 
 	if v, err := ctl.s.LuoJia(pl.DomainAccount()); err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
-	} else {
-		ctl.sendRespOfPost(ctx, luojiaResp{v})
-	}
-}
-
-//	@Title			LuoJiaHF
-//	@Description	luojia for hf
-//	@Tags			BigModel
-//	@Param			picture	formData	file	true	"picture"
-//	@Accept			json
-//	@Success		201	{object}		describePictureResp
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/bigmodel/luojia_hf [post]
-func (ctl *BigModelController) LuoJiaHF(ctx *gin.Context) {
-	_, _, ok := ctl.checkUserApiToken(ctx, true)
-	if !ok {
-		return
-	}
-
-	req := luojiaHFReq{}
-
-	// get picture
-	f, err := ctx.FormFile("picture")
-	if err != nil {
-		ctl.sendBadRequestParam(ctx, err)
-
-		return
-	}
-
-	if f.Size > apiConfig.MaxPictureSizeToDescribe {
-		ctl.sendBadRequestParamWithMsg(ctx, "too big picture")
-
-		return
-	}
-
-	p, err := f.Open()
-	if err != nil {
-		ctl.sendBadRequestParamWithMsg(ctx, "can't get picture")
-
-		return
-	}
-
-	defer p.Close()
-
-	req.Picture = p
-
-	var cmd app.LuoJiaHFCmd
-	if cmd, err = req.toCmd(); err != nil {
-		ctl.sendBadRequestParam(ctx, err)
-
-		return
-	}
-
-	v, err := ctl.s.LuoJiaHF(&cmd)
-	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
 		ctl.sendRespOfPost(ctx, luojiaResp{v})
@@ -605,42 +429,6 @@ func (ctl *BigModelController) WuKong(ctx *gin.Context) {
 	}
 
 	if v, code, err := ctl.s.WuKong(pl.DomainAccount(), &cmd); err != nil {
-		ctl.sendCodeMessage(ctx, code, err)
-	} else {
-		ctl.sendRespOfPost(ctx, wukongPicturesGenerateResp{v})
-	}
-}
-
-//	@Title			WuKong
-//	@Description	generates pictures by WuKong-hf
-//	@Tags			BigModel
-//	@Param			body	body	wukongHFRequest	true	"body of wukong"
-//	@Accept			json
-//	@Success		201	{object}				wukongPicturesGenerateResp
-//	@Failure		500	system_error			system	error
-//	@Failure		404	bigmodel_sensitive_info	picture	error
-//	@Router			/v1/bigmodel/wukong_hf [post]
-func (ctl *BigModelController) WuKongHF(ctx *gin.Context) {
-	_, _, ok := ctl.checkUserApiToken(ctx, true)
-	if !ok {
-		return
-	}
-
-	req := wukongHFRequest{}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctl.sendBadRequestBody(ctx)
-
-		return
-	}
-
-	cmd, err := req.toCmd()
-	if err != nil {
-		ctl.sendBadRequestParam(ctx, err)
-
-		return
-	}
-
-	if v, code, err := ctl.s.WuKongHF(&cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, wukongPicturesGenerateResp{v})
