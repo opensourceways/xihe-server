@@ -329,6 +329,12 @@ func (ctl *BigModelController) VQAUploadPicture(ctx *gin.Context) {
 
 	defer p.Close()
 
+	if !utils.IsPictureName(f.Filename) {
+		ctl.sendBadRequestParamWithMsg(ctx, "image format not allowed")
+
+		return
+	}
+
 	if err := ctl.s.VQAUploadPicture(p, pl.DomainAccount(), f.Filename); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
