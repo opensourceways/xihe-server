@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/domain"
@@ -27,6 +29,10 @@ var (
 func Init(cfg *APIConfig, l *logrus.Entry) error {
 	log = l
 	apiConfig = *cfg
+
+	fmt.Printf("cfg.EncryptionKey: %v\n", cfg.EncryptionKey)
+	fmt.Printf("cfg.EncryptionKeyForCSRF: %v\n", cfg.EncryptionKeyForCSRF)
+	fmt.Printf("cfg.EncryptionKeyForGitlabToken: %v\n", cfg.EncryptionKeyForGitlabToken)
 
 	e, err := utils.NewSymmetricEncryption(cfg.EncryptionKey, "")
 	if err != nil {
