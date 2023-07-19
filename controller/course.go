@@ -126,6 +126,11 @@ func (ctl *CourseController) List(ctx *gin.Context) {
 	}
 
 	if !visitor && ctl.getQueryParameter(ctx, "mine") == "true" {
+		_, _, ok := ctl.checkUserApiToken(ctx, false)
+		if !ok {
+			return
+		}
+
 		cmd.User = pl.DomainAccount()
 	}
 

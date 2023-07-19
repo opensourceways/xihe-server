@@ -150,6 +150,11 @@ func (ctl *CompetitionController) List(ctx *gin.Context) {
 	}
 
 	if !visitor && ctl.getQueryParameter(ctx, "mine") != "" {
+		_, _, ok := ctl.checkUserApiToken(ctx, false)
+		if !ok {
+			return
+		}
+
 		cmd.User = pl.DomainAccount()
 	}
 
