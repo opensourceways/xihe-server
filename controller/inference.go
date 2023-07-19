@@ -114,7 +114,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	viewOther := visitor || pl.isNotMe(owner)
 
-	if viewOther && v.IsPrivate() {
+	if v.IsPrivate() {
 		ws.WriteJSON(
 			newResponseCodeMsg(
 				errorNotAllowed,
