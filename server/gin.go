@@ -126,12 +126,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		),
 	)
 
-	evaluate := repositories.NewEvaluateRepository(
-		mongodb.NewEvaluateMapper(
-			collections.Evaluate,
-		),
-	)
-
 	tags := repositories.NewTagsRepository(
 		mongodb.NewTagsMapper(collections.Tag),
 	)
@@ -259,10 +253,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 		controller.AddRouterForInferenceController(
 			v1, gitlabRepo, inference, proj, sender,
-		)
-
-		controller.AddRouterForEvaluateController(
-			v1, evaluate, training, sender,
 		)
 
 		controller.AddRouterForSearchController(
