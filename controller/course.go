@@ -120,12 +120,12 @@ func (ctl *CourseController) List(ctx *gin.Context) {
 
 	}
 
-	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
 
-	if !visitor && ctl.getQueryParameter(ctx, "mine") == "true" {
+	if ctl.getQueryParameter(ctx, "mine") == "true" {
 		_, _, ok := ctl.checkUserApiToken(ctx, false)
 		if !ok {
 			return

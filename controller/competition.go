@@ -144,12 +144,12 @@ func (ctl *CompetitionController) List(ctx *gin.Context) {
 		cmd.Tag = tag
 	}
 
-	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
 
-	if !visitor && ctl.getQueryParameter(ctx, "mine") != "" {
+	if ctl.getQueryParameter(ctx, "mine") != "" {
 		_, _, ok := ctl.checkUserApiToken(ctx, false)
 		if !ok {
 			return
