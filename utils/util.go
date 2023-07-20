@@ -1,12 +1,14 @@
 package utils
 
 import (
+	"crypto/rand"
 	"io/ioutil"
-	"math/rand"
+	"math/big"
 	"os"
 	"time"
 	"unicode/utf8"
 
+	"github.com/sirupsen/logrus"
 	"sigs.k8s.io/yaml"
 )
 
@@ -71,14 +73,16 @@ func StrLen(s string) int {
 }
 
 func GenRandoms(max, total int) []int {
-	// set seed
-	rand.Seed(time.Now().UnixNano())
-
 	i := 0
 	m := make(map[int]struct{})
 	r := make([]int, total)
 	for {
-		n := rand.Intn(max) + 1
+		randInt, err := rand.Int(rand.Reader, big.NewInt(int64(max+1)))
+		if err != nil {
+			logrus.Debugf("Error generating random number: %s", err)
+			return nil
+		}
+		n := int(randInt.Int64())
 
 		if _, ok := m[n]; !ok {
 			m[n] = struct{}{}
