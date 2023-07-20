@@ -2,14 +2,15 @@ package app
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
-	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -104,6 +105,10 @@ type WuKongCmd struct {
 }
 
 func (cmd *WuKongCmd) Validate() error {
+	if max := 4*4; utils.StrLen(cmd.Style) > max {
+		return fmt.Errorf("style should less than %d", max)
+	}
+
 	cmd.Style = utils.XSSFilter(cmd.Style)
 
 	return nil
