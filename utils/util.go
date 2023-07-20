@@ -3,7 +3,6 @@ package utils
 import (
 	"io/ioutil"
 	"math/rand"
-	"os"
 	"time"
 	"unicode/utf8"
 
@@ -20,9 +19,9 @@ func LoadFromYaml(path string, cfg interface{}) error {
 		return err
 	}
 
-	content := []byte(os.ExpandEnv(string(b)))
+	//content := []byte(os.ExpandEnv(string(b)))
 
-	return yaml.Unmarshal(content, cfg)
+	return yaml.Unmarshal(b, cfg)
 }
 
 func Now() int64 {
