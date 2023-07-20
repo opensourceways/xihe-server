@@ -160,7 +160,7 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 		return err
 	}
 	if !hasLiked {
-		return errors.New("cannot remove like resource you had liked")
+		return errors.New("cannot remove like resource you are not like")
 	}
 
 	// remove like
