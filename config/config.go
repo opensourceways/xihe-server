@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/opensourceways/community-robot-lib/mq"
-	"github.com/opensourceways/community-robot-lib/utils"
+	"github.com/opensourceways/xihe-server/utils"
 
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
