@@ -101,7 +101,7 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 
 		return
 	}
-	
+
 	u := pl.PlatformUserInfo()
 
 	if err = ctl.s.Create(&u, &cmd); err != nil {
@@ -110,7 +110,7 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, newResponseData("successful"))
+	ctx.JSON(http.StatusCreated, newResponseData("success"))
 }
 
 //	@Summary		Update
@@ -166,7 +166,7 @@ func (ctl *RepoFileController) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusAccepted, newResponseData("successful"))
+	ctx.JSON(http.StatusAccepted, newResponseData("success"))
 }
 
 //	@Summary		Delete
@@ -202,7 +202,7 @@ func (ctl *RepoFileController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, newResponseData("successful"))
+	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
 //	@Summary		DeleteDir
@@ -238,7 +238,7 @@ func (ctl *RepoFileController) DeleteDir(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, newResponseData("successful"))
+	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
 //	@Summary		Download

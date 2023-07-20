@@ -3,9 +3,18 @@ package platform
 import (
 	"encoding/base64"
 	"io"
+	"strings"
 
 	"github.com/opensourceways/xihe-server/domain"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
+)
+
+const (
+	fileSuffixExe = ".exe"
+	fileSuffixBat = ".bat"
+	fileSuffixCom = ".com"
+	fileSuffixSo  = ".so"
+	fileSuffixDll = ".dll"
 )
 
 type UserOption struct {
@@ -97,5 +106,24 @@ func (r *RepoFileContent) IsOverSize() bool {
 		decodeSize = len(*r.Content)
 	}
 
-	return decodeSize > 200*1024	// TODO 200KB to config
+	return decodeSize > 200*1024 // TODO 200KB to config
+}
+
+func (r *RepoFileInfo) BlacklistFilter() bool {
+	var bList = []string{
+		fileSuffixBat,
+		fileSuffixCom,
+		fileSuffixDll,
+		fileSuffixExe,
+		fileSuffixSo,
+	}
+
+	for _, b := range bList {
+		if strings.HasSuffix(r.Path.FilePath(), b) {
+			return true
+		}
+
+	}
+
+	return false
 }

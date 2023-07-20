@@ -67,6 +67,9 @@ func (cmd *RepoFileCreateCmd) Validate() error {
 		return errors.New("file size exceeds the limit")
 	}
 
+	if cmd.RepoFileInfo.BlacklistFilter() {
+		return errors.New("can not upload file of this format")
+	}
 	return nil
 }
 
