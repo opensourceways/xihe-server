@@ -323,11 +323,11 @@ type Province interface {
 }
 
 func NewProvince(v string) (Province, error) {
+	v = utils.XSSFilter(v)
+
 	if utils.StrLen(v) > 15 {
 		return nil, errors.New("invalid province")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return province(v), nil
 }
@@ -344,11 +344,11 @@ type City interface {
 }
 
 func NewCity(v string) (City, error) {
+	v = utils.XSSFilter(v)
+
 	if utils.StrLen(v) > 20 {
 		return nil, errors.New("invalid city")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return city(v), nil
 }
@@ -365,11 +365,11 @@ type CompetitorName interface {
 }
 
 func NewCompetitorName(v string) (CompetitorName, error) {
+	v = utils.XSSFilter(v)
+
 	if v == "" || len(v) > 30 {
 		return nil, errors.New("invalid competitor name")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return competitorName(v), nil
 }
@@ -386,11 +386,11 @@ type TeamName interface {
 }
 
 func NewTeamName(v string) (TeamName, error) {
+	v = utils.XSSFilter(v)
+
 	if v == "" || utils.StrLen(v) > 15 || len(v) > 40 {
 		return nil, errors.New("invalid team name")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return teamName(v), nil
 }

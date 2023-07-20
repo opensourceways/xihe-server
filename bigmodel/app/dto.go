@@ -105,11 +105,11 @@ type WuKongCmd struct {
 }
 
 func (cmd *WuKongCmd) Validate() error {
+	cmd.Style = utils.XSSFilter(cmd.Style)
+
 	if max := 4*4; utils.StrLen(cmd.Style) > max {
 		return fmt.Errorf("style should less than %d", max)
 	}
-
-	cmd.Style = utils.XSSFilter(cmd.Style)
 
 	return nil
 }

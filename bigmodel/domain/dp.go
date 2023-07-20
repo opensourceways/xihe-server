@@ -83,13 +83,13 @@ func NewWuKongPictureDesc(v string) (WuKongPictureDesc, error) {
 		return nil, errors.New("no desc")
 	}
 
+	v = utils.XSSFilter(v)
+
 	if max := 55; utils.StrLen(v) > max { // TODO config
 		return nil, fmt.Errorf(
 			"the length of desc should be less than %d", max,
 		)
 	}
-
-	v = utils.XSSFilter(v)
 
 	return wukongPictureDesc(v), nil
 }
@@ -232,14 +232,14 @@ type Desc interface {
 }
 
 func NewDesc(v string) (Desc, error) {
+	v = utils.XSSFilter(v)
+
 	b := v == "" ||
 		utils.StrLen(v) > 30
 
 	if b {
 		return nil, errors.New("invalid desc")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return desc(v), nil
 }

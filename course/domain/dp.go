@@ -118,11 +118,11 @@ type Province interface {
 }
 
 func NewProvince(v string) (Province, error) {
+	v = utils.XSSFilter(v)
+
 	if utils.StrLen(v) > 15 {
 		return nil, errors.New("invalid province")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return province(v), nil
 }
