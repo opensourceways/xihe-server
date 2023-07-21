@@ -556,8 +556,8 @@ type SectionId interface {
 }
 
 func NewSectionId(v string) (SectionId, error) {
-	if v == "" || len(v) > 15 {
-		return nil, errors.New("empty section id")
+	if v == "" || len(v) > 50 {
+		return nil, errors.New("invalid section id")
 	}
 
 	return sectionId(v), nil
@@ -575,8 +575,8 @@ type LessonId interface {
 }
 
 func NewLessonId(v string) (LessonId, error) {
-	if v == "" || len(v) > 15 {
-		return nil, errors.New("empty lesson id")
+	if v == "" || len(v) > 50 {
+		return nil, errors.New("invalid lesson id")
 	}
 	return lessonId(v), nil
 }
