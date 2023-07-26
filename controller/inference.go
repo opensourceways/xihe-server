@@ -33,7 +33,7 @@ func AddRouterForInferenceController(
 	ctl.inferenceDir, _ = domain.NewDirectory(apiConfig.InferenceDir)
 	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
 
-	rg.GET("/v1/inference/project/:owner/:pid", ctl.Create)
+	rg.GET("/v1/inference/project/:owner/:pid", checkUserName(&ctl.baseController), ctl.Create)
 }
 
 type InferenceController struct {

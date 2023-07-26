@@ -6,6 +6,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	cloudAllowedUserName = "MindSpore"
+)
+
 func checkUserEmailMiddleware(ctl *baseController) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pl, _, ok := ctl.checkUserApiTokenNoRefresh(ctx, false)
@@ -28,5 +32,27 @@ func checkUserEmailMiddleware(ctl *baseController) gin.HandlerFunc {
 
 		ctx.Next()
 
+	}
+}
+
+func checkUserName(ctl *baseController) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		pl, _, ok := ctl.checkUserApiTokenNoRefresh(ctx, false)
+		if !ok {
+			ctx.Abort()
+
+			return
+		}
+
+		if !pl.isAllowedUserName(cloudAllowedUserName) {
+			ctl.sendCodeMessage(
+				ctx, "user_no_permission",
+				errors.New("no this interface permission"),
+			)
+
+			ctx.Abort()
+
+			return
+		}
 	}
 }

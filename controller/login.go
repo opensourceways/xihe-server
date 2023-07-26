@@ -51,6 +51,10 @@ func (pl *oldUserTokenPayload) hasEmail() bool {
 	return pl.Email != "" && pl.PlatformToken != ""
 }
 
+func (pl *oldUserTokenPayload) isAllowedUserName(username string) bool {
+	return pl.Account == username
+}
+
 type newUserTokenPayload struct {
 	AccessToken string `json:"access_token"`
 }
