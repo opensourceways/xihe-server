@@ -108,7 +108,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	}
 
 	if owner.Account() != inferenceAllowedUserName {
-		ws.WriteJSON(newResponseError(err))
+		ws.WriteJSON(
+			newResponseCodeMsg(errorNotAllowed, "resource not allowed"),
+		)
 
 		log.Error("inference failed: resource account not allowed")
 
