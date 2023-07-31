@@ -5,7 +5,7 @@ import (
 	"sort"
 
 	"github.com/opensourceways/xihe-server/competition/domain"
-	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/competition/domain/repository"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -58,21 +58,23 @@ func (s *competitionService) getRankingList(
 	return dtos
 }
 
-func (s *competitionService) GetSubmissions(cid string, user types.Account) (
+func (s *competitionService) GetSubmissions(cmd *CompetitionGetCmd) (
 	dto CompetitionSubmissionsDTO, err error,
 ) {
-	competition, err := s.repo.FindCompetition(cid)
+	competition, err := s.repo.FindCompetition(&repository.CompetitionGetOption{
+		CompetitionId: cmd.CompetitionId,
+	})
 	if err != nil {
 		return
 	}
 
-	p, _, err := s.playerRepo.FindPlayer(cid, user)
+	p, _, err := s.playerRepo.FindPlayer(cmd.CompetitionId, cmd.User)
 	if err != nil {
 		return
 	}
 
 	w, _, err := s.workRepo.FindWork(
-		domain.NewWorkIndex(cid, p.Id), competition.Phase,
+		domain.NewWorkIndex(cmd.CompetitionId, p.Id), competition.Phase,
 	)
 	if err != nil {
 		if repoerr.IsErrorResourceNotExists(err) {
@@ -111,7 +113,9 @@ func (s *competitionService) GetSubmissions(cid string, user types.Account) (
 func (s *competitionService) AddRelatedProject(cmd *CompetitionAddReleatedProjectCMD) (
 	code string, err error,
 ) {
-	competition, err := s.repo.FindCompetition(cmd.Id)
+	competition, err := s.repo.FindCompetition(&repository.CompetitionGetOption{
+		CompetitionId: cmd.Id,
+	})
 	if err != nil {
 		return
 	}
@@ -164,7 +168,10 @@ func (s *competitionService) AddRelatedProject(cmd *CompetitionAddReleatedProjec
 func (s *competitionService) Submit(cmd *CompetitionSubmitCMD) (
 	dto CompetitionSubmissionDTO, code string, err error,
 ) {
-	competition, err := s.repo.FindCompetition(cmd.CompetitionId)
+	competition, err := s.repo.FindCompetition(&repository.CompetitionGetOption{
+		CompetitionId: cmd.CompetitionId,
+		Lang:          cmd.Lang,
+	})
 	if err != nil {
 		return
 	}

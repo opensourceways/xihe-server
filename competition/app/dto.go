@@ -14,9 +14,13 @@ type CompetitionListCMD struct {
 	Status domain.CompetitionStatus
 	User   types.Account
 	Tag    domain.CompetitionTag
+	Lang   domain.Language
 }
 
-type CompetitorApplyCmd domain.Competitor
+type CompetitorApplyCmd struct {
+	domain.Competitor
+	Lang domain.Language
+}
 
 func (cmd *CompetitorApplyCmd) Validate() error {
 	b := cmd.Account != nil &&
@@ -39,7 +43,16 @@ func (cmd *CompetitorApplyCmd) Validate() error {
 
 func (cmd *CompetitorApplyCmd) toPlayer(cid string) (p domain.Player) {
 	p.CompetitionId = cid
-	p.Leader = *(*domain.Competitor)(cmd)
+	p.Leader = *&domain.Competitor{
+		Account:  cmd.Account,
+		Name:     cmd.Name,
+		City:     cmd.City,
+		Email:    cmd.Email,
+		Phone:    cmd.Phone,
+		Identity: cmd.Identity,
+		Province: cmd.Province,
+		Detail:   cmd.Detail,
+	}
 
 	return
 }
@@ -49,6 +62,7 @@ type CompetitionSubmitCMD struct {
 	FileName      string
 	Data          io.Reader
 	User          types.Account
+	Lang          domain.Language
 }
 
 func (cmd *CompetitionSubmitCMD) Validate() error {
@@ -63,6 +77,7 @@ type CompetitionAddReleatedProjectCMD struct {
 	Id      string
 	User    types.Account
 	Project types.ResourceSummary
+	Lang    domain.Language
 }
 
 func (cmd *CompetitionAddReleatedProjectCMD) repo() string {
@@ -80,6 +95,7 @@ type CompetitionSummaryDTO struct {
 	Poster          string   `json:"poster"`
 	Duration        string   `json:"duration"`
 	Tags            []string `json:"tags"`
+	Lang            string   `json:"lang"`
 }
 
 type CompetitionDTO struct {
@@ -176,6 +192,7 @@ func (s competitionService) toCompetitionSummaryDTO(
 		Poster:          c.Poster.URL(),
 		Duration:        c.Duration.CompetitionDuration(),
 		CompetitorCount: competitorsCount,
+		Lang:            c.Lang.Language(),
 	}
 
 	for _, v := range c.Tags {
@@ -205,3 +222,15 @@ type CmdToChangeCompetitionTeamName = CompetitionTeamCreateCmd
 type CmdToTransferTeamLeader = CompetitionTeamJoinCmd
 
 type CmdToDeleteTeamMember = CompetitionTeamJoinCmd
+
+type CompetitionGetCmd struct {
+	CompetitionId string
+	Lang          domain.Language
+	User          types.Account
+}
+
+type CompetitionGetSubmissionCmd struct {
+	Id      string
+	User    types.Account
+	Project types.ResourceSummary
+}

@@ -11,7 +11,9 @@ import (
 )
 
 func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code string, err error) {
-	competition, err := s.repo.FindCompetition(cid)
+	competition, err := s.repo.FindCompetition(&repository.CompetitionGetOption{
+		CompetitionId: cid,
+	})
 	if err != nil {
 		return
 	}

@@ -9,10 +9,16 @@ type CompetitionListOption struct {
 	CompetitionIds []string
 	Status         domain.CompetitionStatus
 	Tag            domain.CompetitionTag
+	Lang           domain.Language
+}
+
+type CompetitionGetOption struct {
+	CompetitionId string
+	Lang          domain.Language
 }
 
 type Competition interface {
-	FindCompetition(cid string) (domain.Competition, error)
+	FindCompetition(*CompetitionGetOption) (domain.Competition, error)
 	FindCompetitions(*CompetitionListOption) ([]domain.CompetitionSummary, error)
 
 	FindScoreOrder(cid string) (domain.CompetitionScoreOrder, error)

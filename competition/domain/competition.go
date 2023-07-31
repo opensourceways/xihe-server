@@ -10,6 +10,7 @@ type CompetitionSummary struct {
 	Duration CompetitionDuration
 	Poster   URL
 	Tags     []CompetitionTag
+	Lang     Language
 }
 
 type Competition struct {

@@ -96,12 +96,27 @@ func (ctl *CompetitionController) Get(ctx *gin.Context) {
 		return
 	}
 
+	cmd := app.CompetitionGetCmd{}
 	var user types.Account
 	if !visitor {
 		user = pl.DomainAccount()
+		cmd.User = user
 	}
 
-	data, err := ctl.s.Get(ctx.Param("id"), user)
+	var err error
+	if str := ctl.getQueryParameter(ctx, "lang"); str != "" {
+		cmd.Lang, err = domain.NewLanguage(str)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+				errorBadRequestParam, err,
+			))
+
+			return
+		}
+	}
+
+	cmd.CompetitionId = ctx.Param("id")
+	data, err := ctl.s.Get(&cmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
@@ -142,6 +157,17 @@ func (ctl *CompetitionController) List(ctx *gin.Context) {
 			return
 		}
 		cmd.Tag = tag
+	}
+
+	if str := ctl.getQueryParameter(ctx, "lang"); str != "" {
+		cmd.Lang, err = domain.NewLanguage(str)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+				errorBadRequestParam, err,
+			))
+
+			return
+		}
 	}
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, true)
@@ -290,7 +316,10 @@ func (ctl *CompetitionController) GetSubmissions(ctx *gin.Context) {
 		return
 	}
 
-	data, err := ctl.s.GetSubmissions(ctx.Param("id"), pl.DomainAccount())
+	cmd := app.CompetitionGetCmd{}
+	cmd.User = pl.DomainAccount()
+
+	data, err := ctl.s.GetSubmissions(&cmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {

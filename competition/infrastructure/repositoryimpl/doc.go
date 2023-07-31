@@ -18,6 +18,7 @@ const (
 	fieldLeader      = "leader"
 	fieldStatus      = "status"
 	fieldTags        = "tags"
+	fieldLanguage    = "language"
 )
 
 type dCompetition struct {
@@ -38,6 +39,7 @@ type dCompetition struct {
 	DatasetURL string   `bson:"dataset_url"     json:"dataset_url"`
 	Bonus      int      `bson:"bonus"           json:"bonus"`
 	SmallerOk  bool     `bson:"order"           json:"order"`
+	Language   string   `bson:"language"        json:"language"`
 }
 
 type dWork struct {

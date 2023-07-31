@@ -34,6 +34,10 @@ func (doc *dCompetition) toCompetitionSummary(c *domain.CompetitionSummary) (err
 		return
 	}
 
+	if c.Lang, err = domain.NewLanguage(doc.Language); err != nil {
+		return
+	}
+
 	var t domain.CompetitionTag
 	for _, v := range doc.Tags {
 		if t, err = domain.NewCompetitionTag(v); err != nil {

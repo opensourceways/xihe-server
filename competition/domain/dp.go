@@ -451,3 +451,30 @@ type competitionTag string
 func (r competitionTag) CompetitionTag() string {
 	return string(r)
 }
+
+const (
+	languageEN = "en"
+	languageCN = "cn"
+)
+
+// Language
+type Language interface {
+	Language() string
+}
+
+func NewLanguage(v string) (Language, error) {
+	b := v == languageEN ||
+		v == languageCN
+
+	if b {
+		return dpLanguage(v), nil
+	}
+
+	return nil, errors.New("invalid competition status")
+}
+
+type dpLanguage string
+
+func (r dpLanguage) Language() string {
+	return string(r)
+}
