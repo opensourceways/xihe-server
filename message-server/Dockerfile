@@ -6,8 +6,11 @@ RUN cd /go/src/github.com/opensourceways/xihe-server/message-server && GO111MODU
 
 # copy binary config and utils
 FROM alpine:latest
-WORKDIR /opt/app/
 
-COPY  --from=BUILDER /go/src/github.com/opensourceways/xihe-server/message-server/message-server /opt/app
+RUN adduser mindspore -u 5000 -D
+USER mindspore
+WORKDIR /home/mindspore/app
 
-ENTRYPOINT ["/opt/app/message-server"]
+COPY  --from=BUILDER /go/src/github.com/opensourceways/xihe-server/message-server/message-server /home/mindspore/app
+
+ENTRYPOINT ["/home/mindspore/app/message-server"]

@@ -6,10 +6,13 @@ RUN cd /go/src/github.com/opensourceways/xihe-server/async-server && GO111MODULE
 
 # copy binary config and utils
 FROM alpine:latest
-WORKDIR /opt/app/
+
+RUN adduser mindspore -u 5000 -D
+USER mindspore
+WORKDIR /home/mindspore/app
 
 ENV BIGMODEL_WUKONGHF="test"
 
-COPY  --from=BUILDER /go/src/github.com/opensourceways/xihe-server/async-server/async-server /opt/app
+COPY  --from=BUILDER /go/src/github.com/opensourceways/xihe-server/async-server/async-server /home/mindspore/app
 
-ENTRYPOINT ["/opt/app/async-server"]
+ENTRYPOINT ["/home/mindspore/app/async-server"]
