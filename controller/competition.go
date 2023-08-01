@@ -318,6 +318,7 @@ func (ctl *CompetitionController) GetSubmissions(ctx *gin.Context) {
 
 	cmd := app.CompetitionGetCmd{}
 	cmd.User = pl.DomainAccount()
+	cmd.CompetitionId = ctx.Param("id")
 
 	data, err := ctl.s.GetSubmissions(&cmd)
 	if err != nil {
