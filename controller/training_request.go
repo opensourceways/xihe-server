@@ -215,7 +215,7 @@ func (ctl *TrainingController) setProjectInfo(
 }
 
 func (ctl *TrainingController) setModelsInput(
-	ctx *gin.Context, cmd *app.TrainingCreateCmd,
+	ctx *gin.Context, cmd *app.TrainingCreateCmd, a domain.Account,
 	inputs []TrainingRef,
 ) (ok bool) {
 	p := make([]repository.ResourceSummaryListOption, 0, len(inputs))
@@ -287,10 +287,10 @@ func (ctl *TrainingController) setModelsInput(
 			return
 		}
 
-		if model.IsPrivate() {
+		if model.IsPrivate() && item.Owner.Account() != a.Account() {
 			ok = false
 			ctx.JSON(http.StatusBadRequest, respBadRequestParam(
-				errors.New("can't use other people's private model"),
+				errors.New("invalid model"),
 			))
 
 			return
@@ -304,7 +304,7 @@ func (ctl *TrainingController) setModelsInput(
 }
 
 func (ctl *TrainingController) setDatasetsInput(
-	ctx *gin.Context, cmd *app.TrainingCreateCmd,
+	ctx *gin.Context, cmd *app.TrainingCreateCmd, a domain.Account,
 	inputs []TrainingRef,
 ) (ok bool) {
 	p := make([]repository.ResourceSummaryListOption, 0, len(inputs))
@@ -376,10 +376,10 @@ func (ctl *TrainingController) setDatasetsInput(
 			return
 		}
 
-		if dataset.IsPrivate() {
+		if dataset.IsPrivate() && item.Owner.Account() != a.Account() {
 			ok = false
 			ctx.JSON(http.StatusBadRequest, respBadRequestParam(
-				errors.New("can't use other people's private dataset"),
+				errors.New("invalid dataset"),
 			))
 
 			return
