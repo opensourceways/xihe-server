@@ -2,9 +2,7 @@ package controller
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"strconv"
@@ -170,21 +168,13 @@ func (ctl baseController) checkApiToken(
 
 	token, csrftoken = ctl.refreshDoubleToken(ac)
 
-	payload, err := toOldUserTokenPayload(pl)
-	if err != nil {
-		return
+	payload, good := ac.Payload.(*oldUserTokenPayload)
+	if !good {
+		return good
 	}
 
 	if err := ctl.setRespToken(ctx, token, csrftoken, payload.Account); err != nil {
 		logrus.Debugf("set resp token error: %s", err.Error())
-	}
-
-	return
-}
-
-func toOldUserTokenPayload(pl interface{}) (payload oldUserTokenPayload, err error) {
-	if err = json.Unmarshal([]byte(fmt.Sprintf("%v", pl)), &payload); err != nil {
-		return
 	}
 
 	return
