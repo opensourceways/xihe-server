@@ -454,7 +454,7 @@ func (r competitionTag) CompetitionTag() string {
 
 const (
 	languageEN = "en"
-	languageCN = "cn"
+	languageZH = "zh"
 )
 
 // Language
@@ -464,7 +464,7 @@ type Language interface {
 
 func NewLanguage(v string) (Language, error) {
 	b := v == languageEN ||
-		v == languageCN
+		v == languageZH
 
 	if b {
 		return dpLanguage(v), nil
