@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/opensourceways/xihe-server/utils"
@@ -37,8 +38,14 @@ type StudentName interface {
 }
 
 func NewStudentName(v string) (StudentName, error) {
-	if v == "" || len(v) > 30 {
+	if v == "" {
 		return nil, errors.New("empty value")
+	}
+
+	v = utils.XSSFilter(v)
+
+	if max := 20; utils.StrLen(v) > max {
+		return nil, fmt.Errorf("the length of name should be less than %d", max)
 	}
 
 	return studentName(v), nil

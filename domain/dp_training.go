@@ -90,10 +90,14 @@ type Directory interface {
 }
 
 func NewDirectory(v string) (Directory, error) {
-	v = utils.XSSFilter(v)
-
 	if v == "" {
 		return directory(rootDirectory), nil
+	}
+
+	v = utils.XSSFilter(v)
+
+	if max := 50; utils.StrLen(v) > max {
+		return nil, fmt.Errorf("the length of directory should be less than %d", max)
 	}
 
 	if !reDirectory.MatchString(v) {
@@ -119,10 +123,14 @@ type FilePath interface {
 }
 
 func NewFilePath(v string) (FilePath, error) {
-	v = utils.XSSFilter(v)
-
 	if v == "" {
 		return nil, errors.New("empty file path")
+	}
+
+	v = utils.XSSFilter(v)
+
+	if max := 50; utils.StrLen(v) > max {
+		return nil, fmt.Errorf("the length of file path should be less than %d", max)
 	}
 
 	dir := filepath.Dir(v)
@@ -241,14 +249,13 @@ type CustomizedKey interface {
 }
 
 func NewCustomizedKey(v string) (CustomizedKey, error) {
-	v = utils.XSSFilter(v)
-
 	if v == "" {
 		return nil, errors.New("empty key")
 	}
 
-	max := 20
-	if len(v) > max {
+	v = utils.XSSFilter(v)
+
+	if max := 20; utils.StrLen(v) > max {
 		return nil, fmt.Errorf("the length of key should be less than %d", max)
 	}
 
@@ -269,8 +276,7 @@ type CustomizedValue interface {
 func NewCustomizedValue(v string) (CustomizedValue, error) {
 	v = utils.XSSFilter(v)
 
-	max := 40
-	if len(v) > max {
+	if max := 40; utils.StrLen(v) > max {
 		return nil, fmt.Errorf("the length of value should be less than %d", max)
 	}
 
@@ -291,8 +297,7 @@ type InputeFilePath interface {
 func NewInputeFilePath(v string) (InputeFilePath, error) {
 	v = utils.XSSFilter(v)
 
-	max := 50
-	if len(v) > max {
+	if max := 50; utils.StrLen(v) > max {
 		return nil, fmt.Errorf("the length of file path should be less than %d", max)
 	}
 
