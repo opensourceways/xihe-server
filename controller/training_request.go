@@ -110,11 +110,9 @@ func (c *Compute) toCompute() (r domain.Compute, err error) {
 		return
 	}
 
-	if r.Flavor, err = domain.NewComputeFlavor(c.Flavor); err != nil {
+	if r.Flavor, r.Version, err = domain.NewComputeFlavorVersion(c.Flavor, c.Type, c.Version); err != nil {
 		return
 	}
-
-	r.Version, err = domain.NewComputeVersion(c.Version)
 
 	return
 }
@@ -180,7 +178,9 @@ func (t *TrainingRef) toInput(r *domain.Input) (name domain.ResourceName, err er
 		return
 	}
 
-	r.File = t.File
+	if r.File, err = domain.NewInputeFilePath(t.File); err != nil {
+		return
+	}
 
 	return
 }

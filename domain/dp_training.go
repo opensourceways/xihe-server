@@ -9,7 +9,20 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-const rootDirectory = ""
+const (
+	rootDirectory = ""
+
+	computeTypeAscend = "Ascend-Powered-Engine"
+	computeTypeMPI    = "MPI"
+
+	computeFlaverAscend = "modelarts.kat1.xlarge.public"
+	computeFlaverGPU    = "modelarts.p3.large.public"
+
+	computeVersionCudaMS13   = "mindspore_1.3.0-cuda_10.1-py_3.7-ubuntu_1804-x86_64"
+	computeVersionCannMS17   = "mindspore_1.7.0-cann_5.1.0-py_3.7-euler_2.8.3-aarch64"
+	computeVersionCannMS19_1 = "mindspore_1.9.0-cann_6.0.RC1-py_3.7-ubuntu_18.04-amd64"
+	computeVersionCannMS19_2 = "mindspore_1.9.0-cann_6.0.RC1-py_3.9-ubuntu_18.04-amd64"
+)
 
 var (
 	reDirectory = regexp.MustCompile("^[a-zA-Z0-9_/-]+$")
@@ -22,6 +35,8 @@ type TrainingName interface {
 }
 
 func NewTrainingName(v string) (TrainingName, error) {
+	v = utils.XSSFilter(v)
+
 	max := DomainConfig.MaxTrainingNameLength
 	min := DomainConfig.MinTrainingNameLength
 
@@ -75,6 +90,8 @@ type Directory interface {
 }
 
 func NewDirectory(v string) (Directory, error) {
+	v = utils.XSSFilter(v)
+
 	if v == "" {
 		return directory(rootDirectory), nil
 	}
@@ -102,6 +119,8 @@ type FilePath interface {
 }
 
 func NewFilePath(v string) (FilePath, error) {
+	v = utils.XSSFilter(v)
+
 	if v == "" {
 		return nil, errors.New("empty file path")
 	}
@@ -138,6 +157,12 @@ func NewComputeType(v string) (ComputeType, error) {
 		return nil, errors.New("empty compute type")
 	}
 
+	b := v == computeTypeAscend ||
+		v == computeTypeMPI
+	if !b {
+		return nil, errors.New("invalid compute type")
+	}
+
 	return computeType(v), nil
 }
 
@@ -157,6 +182,15 @@ func NewComputeVersion(v string) (ComputeVersion, error) {
 		return nil, errors.New("empty compute version")
 	}
 
+	b := v == computeVersionCudaMS13 ||
+		v == computeVersionCannMS17 ||
+		v == computeVersionCannMS19_1 ||
+		v == computeVersionCannMS19_2
+
+	if !b {
+		return nil, errors.New("invalid compute type")
+	}
+
 	return computeVersion(v), nil
 }
 
@@ -171,12 +205,28 @@ type ComputeFlavor interface {
 	ComputeFlavor() string
 }
 
-func NewComputeFlavor(v string) (ComputeFlavor, error) {
-	if v == "" {
-		return nil, errors.New("empty compute flavor")
+func NewComputeFlavorVersion(flaver string, t string, version string) (ComputeFlavor, ComputeVersion, error) {
+	if flaver == "" || t == "" {
+		return nil, nil, errors.New("empty compute flavor or version")
 	}
 
-	return computeFlavor(v), nil
+	b1 := t == computeTypeAscend && flaver == computeFlaverAscend
+	b2 := t == computeTypeMPI && flaver == computeFlaverGPU
+	if b1 {
+		b1 = version == computeVersionCannMS17 ||
+			version == computeVersionCannMS19_1 ||
+			version == computeVersionCannMS19_2
+	}
+
+	if b2 {
+		b2 = version == computeVersionCudaMS13
+	}
+
+	if b1 || b2 {
+		return computeFlavor(flaver), computeVersion(version), nil
+	}
+
+	return nil, nil, errors.New("invalid compute flaver or version")
 }
 
 type computeFlavor string
@@ -191,8 +241,15 @@ type CustomizedKey interface {
 }
 
 func NewCustomizedKey(v string) (CustomizedKey, error) {
+	v = utils.XSSFilter(v)
+
 	if v == "" {
 		return nil, errors.New("empty key")
+	}
+
+	max := 20
+	if len(v) > max {
+		return nil, fmt.Errorf("the length of key should be less than %d", max)
 	}
 
 	return customizedKey(v), nil
@@ -210,11 +267,40 @@ type CustomizedValue interface {
 }
 
 func NewCustomizedValue(v string) (CustomizedValue, error) {
+	v = utils.XSSFilter(v)
+
+	max := 40
+	if len(v) > max {
+		return nil, fmt.Errorf("the length of value should be less than %d", max)
+	}
+
 	return customizedValue(v), nil
 }
 
 type customizedValue string
 
 func (r customizedValue) CustomizedValue() string {
+	return string(r)
+}
+
+// InputFilePath
+type InputeFilePath interface {
+	InputeFilePath() string
+}
+
+func NewInputeFilePath(v string) (InputeFilePath, error) {
+	v = utils.XSSFilter(v)
+
+	max := 50
+	if len(v) > max {
+		return nil, fmt.Errorf("the length of file path should be less than %d", max)
+	}
+
+	return inputeFilePath(v), nil
+}
+
+type inputeFilePath string
+
+func (r inputeFilePath) InputeFilePath() string {
 	return string(r)
 }
