@@ -58,7 +58,7 @@ func (cfg *Config) SetDefault() {
 	}
 
 	if cfg.MaxDescLength <= 0 {
-		cfg.MaxDescLength = 100
+		cfg.MaxDescLength = 200
 	}
 
 	if cfg.MaxRelatedResourceNum <= 0 {

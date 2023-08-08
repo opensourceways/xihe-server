@@ -1,6 +1,10 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+
+	"github.com/opensourceways/xihe-server/utils"
+)
 
 type Finetune struct {
 	Id        string
@@ -59,6 +63,12 @@ func NewFinetuneParameter(model, task string, hyperparameters map[string]string)
 
 		if v == "" {
 			toDeleteSlice = append(toDeleteSlice, k)
+		}
+
+		if !(utils.IsPositiveFloatPoint(v) ||
+			utils.IsPositiveInterger(v) ||
+			utils.IsPositiveInterger(v)) {
+			return nil, errors.New("invalid hyperparameter")
 		}
 	}
 	for _, v := range toDeleteSlice {

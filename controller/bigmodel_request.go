@@ -54,7 +54,7 @@ func (req *questionAskRequest) toCmd() (
 		return
 	}
 
-	if req.Picture == "" || !utils.IsSafeFileName(req.Picture) {
+	if req.Picture == "" || !utils.IsPictureName(req.Picture) {
 		err = errors.New("invalid picture")
 
 		return

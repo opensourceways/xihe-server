@@ -66,7 +66,12 @@ type CompetitionSubmitCMD struct {
 }
 
 func (cmd *CompetitionSubmitCMD) Validate() error {
-	if len(cmd.FileName) > 0 && !utils.IsSafeFileName(cmd.FileName) {
+
+	if length := utils.StrLen(cmd.FileName); length > 30 || length < 1 {
+		return errors.New("invalid file name")
+	}
+
+	if !utils.IsTxt(cmd.FileName) {
 		return errors.New("invalid file name")
 	}
 

@@ -352,6 +352,14 @@ func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 		return
 	}
 
+	if f.Size > apiConfig.MaxCompetitionSubmmitFileSzie {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, "too big picture",
+		))
+
+		return
+	}
+
 	p, err := f.Open()
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
