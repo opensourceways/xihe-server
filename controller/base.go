@@ -457,6 +457,18 @@ func (ctl baseController) decryptDataForCSRF(s string) ([]byte, error) {
 
 func (ctl baseController) cleanCookie(ctx *gin.Context) {
 	setCookie(ctx, PrivateToken, "", true, time.Now().AddDate(0, 0, -1))
+	t, ok := ctx.Get(encodeUsername)
+	if !ok {
+		logrus.Warnf("context get encode username failed")
+	}
+
+	u, ok2 := t.(string)
+	if !ok2 {
+		logrus.Warnf("encode username convert error")
+	}
+
+	ctl.newRepo().Expire(u, 0)
+	
 	setCookie(ctx, csrfToken, "", false, time.Now().AddDate(0, 0, -1))
 }
 
