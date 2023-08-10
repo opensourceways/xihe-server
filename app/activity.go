@@ -1,6 +1,8 @@
 package app
 
 import (
+	"errors"
+
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
@@ -81,7 +83,12 @@ func (s activityService) list(owner domain.Account, all bool) (
 	_ = sortAndSet(orders, func(i int) error {
 		item := &activities[i]
 
-		if all || item.IsPublic() {
+		p, ok := s.rs.IsPrivate(item.Owner, item.ResourceObject.Type, item.ResourceObject.Id)
+		if !ok {
+			return errors.New("invalid repo")
+		}
+
+		if all || !p {
 			if r, ok := rm[item.String()]; ok {
 				dtos[j] = ActivityDTO{
 					Type:     item.Type.ActivityType(),
@@ -121,8 +128,8 @@ func genActivityForDeletingResource(obj *domain.ResourceObject, repoType domain.
 		Activity: domain.Activity{
 			Type:           domain.ActivityTypeDelete,
 			Time:           utils.Now(),
-			RepoType:       repoType,
 			ResourceObject: *obj,
+			RepoType:       repoType,
 		},
 	}
 }
