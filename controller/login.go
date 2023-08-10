@@ -246,7 +246,7 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 		return
 	}
 
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	pl, _, ok := ctl.checkUserApiTokenNoRefresh(ctx, false)
 	if !ok {
 		return
 	}
