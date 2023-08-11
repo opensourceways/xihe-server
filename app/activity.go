@@ -1,8 +1,6 @@
 package app
 
 import (
-	"errors"
-
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
@@ -84,11 +82,8 @@ func (s activityService) list(owner domain.Account, all bool) (
 		item := &activities[i]
 
 		p, ok := s.rs.IsPrivate(item.Owner, item.ResourceObject.Type, item.ResourceObject.Id)
-		if !ok {
-			return errors.New("invalid repo")
-		}
 
-		if all || !p {
+		if ok && (all || !p) {
 			if r, ok := rm[item.String()]; ok {
 				dtos[j] = ActivityDTO{
 					Type:     item.Type.ActivityType(),
