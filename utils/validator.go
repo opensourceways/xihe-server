@@ -21,7 +21,7 @@ const (
 	ReChinesePhone = "^1\\d{10}$"
 
 	// name
-	ReUserName = "^[a-zA-Z0-9_-]{3,20}$"
+	ReUserName = "^[a-zA-Z0-9_-]+$"
 )
 
 // validator
@@ -50,6 +50,10 @@ func IsChinesePhone(phone string) bool {
 }
 
 func IsUserName(name string) bool {
+	if length := StrLen(name); length > 20 || length < 3 {
+		return false
+	}
+
 	return isMatchRegex(ReUserName, name)
 }
 
