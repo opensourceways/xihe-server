@@ -22,11 +22,12 @@ import (
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
+	competitionusercli "github.com/opensourceways/xihe-server/competition/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
 	courserepo "github.com/opensourceways/xihe-server/course/infrastructure/repositoryimpl"
-	usercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
+	courseusercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -165,10 +166,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		competitionrepo.NewWorkRepo(mongodb.NewCollection(collections.CompetitionWork)),
 		competitionrepo.NewPlayerRepo(mongodb.NewCollection(collections.CompetitionPlayer)),
 		sender, uploader,
+		competitionusercli.NewUserCli(userRegService),
 	)
 
 	courseAppService := courseapp.NewCourseService(
-		usercli.NewUserCli(userRegService),
+		courseusercli.NewUserCli(userRegService),
 		proj,
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
@@ -260,7 +262,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForCompetitionController(
-			v1, competitionAppService, proj,
+			v1, competitionAppService, userRegService, proj,
 		)
 
 		controller.AddRouterForChallengeController(

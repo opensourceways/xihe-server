@@ -10,15 +10,18 @@ import (
 	"github.com/opensourceways/xihe-server/competition/domain"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 )
 
 func AddRouterForCompetitionController(
 	rg *gin.RouterGroup,
 	s app.CompetitionService,
+	us userapp.RegService,
 	project repository.Project,
 ) {
 	ctl := CompetitionController{
 		s:       s,
+		us:      us,
 		project: project,
 	}
 
@@ -27,6 +30,7 @@ func AddRouterForCompetitionController(
 	rg.GET("/v1/competition/:id/team", ctl.GetMyTeam)
 	rg.GET("/v1/competition/:id/ranking", ctl.GetRankingList)
 	rg.GET("/v1/competition/:id/submissions", ctl.GetSubmissions)
+	rg.GET("/v1/competition/reginfo", ctl.GetRegisterInfo)
 	rg.POST("/v1/competition/:id/team", ctl.CreateTeam)
 	rg.POST("/v1/competition/:id/submissions", ctl.Submit)
 	rg.POST("/v1/competition/:id/competitor", ctl.Apply)
@@ -43,6 +47,7 @@ type CompetitionController struct {
 	baseController
 
 	s       app.CompetitionService
+	us      userapp.RegService
 	project repository.Project
 }
 
@@ -595,5 +600,26 @@ func (ctl *CompetitionController) Dissolve(ctx *gin.Context) {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
 		ctl.sendRespOfPut(ctx, "success")
+	}
+}
+
+//	@Summary		GetRegisterInfo
+//	@Description	get register info
+//	@Tags			Competition
+//	@Accept			json
+//	@Success		200	{object}		app.UserRegisterInfoDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/competition/reginfo [get]
+func (ctl *CompetitionController) GetRegisterInfo(ctx *gin.Context) {
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	if data, err := ctl.us.GetUserRegInfo(pl.DomainAccount()); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, data)
 	}
 }

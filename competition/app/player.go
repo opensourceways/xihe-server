@@ -37,6 +37,10 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 		}
 	}
 
+	if err = s.userCli.AddUserRegInfo(&p.Leader); err != nil {
+		return
+	}
+
 	return
 }
 
