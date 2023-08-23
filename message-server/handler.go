@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -492,10 +491,6 @@ func (h *handler) retry(f func(bool) error, interval time.Duration) (err error) 
 	time.Sleep(interval)
 
 	return f(true)
-}
-
-func (h *handler) errMaxRetry(err error) error {
-	return fmt.Errorf("exceed max retry num, last err:%v", err)
 }
 
 func isResourceNotExists(err error) bool {

@@ -490,15 +490,6 @@ func (cli *client) updateArrayElemCount(
 	return r.ModifiedCount > 0, nil
 }
 
-func (cli *client) isArrayElemExists(
-	ctx context.Context, collection string, filterOfDoc bson.M,
-	array string, value interface{},
-) (bool, error) {
-	filterOfDoc[array] = bson.M{mongoCmdAll: bson.A{value}}
-
-	return cli.containsArrayElem(ctx, collection, filterOfDoc)
-}
-
 func (cli *client) isArrayDocExists(
 	ctx context.Context, collection string,
 	filterOfDoc bson.M, array string, filterOfArray bson.M,

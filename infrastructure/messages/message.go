@@ -31,12 +31,6 @@ type msgLike struct {
 	Resource resourceObject `json:"resource"`
 }
 
-type msgTraining struct {
-	User       string `json:"user"`
-	ProjectId  string `json:"pid"`
-	TrainingId string `json:"rid"`
-}
-
 type msgFinetune struct {
 	User string `json:"user"`
 	Id   string `json:"id"`

@@ -40,11 +40,6 @@ func (q *questionResp) answer() (string, error) {
 	return "", errors.New(q.Msg)
 }
 
-type questionHFOpt struct {
-	File     *bytes.Buffer `json:"file"`
-	Question string        `json:"question"`
-}
-
 type vqaInfo struct {
 	endpoint   string
 	endpointHF string
