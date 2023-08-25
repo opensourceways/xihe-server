@@ -16,10 +16,6 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-const (
-	inferenceAllowedUserName = "MindSpore"
-)
-
 func AddRouterForInferenceController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
@@ -103,16 +99,6 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		)
 
 		log.Errorf("inference failed: new account, err:%s", err.Error())
-
-		return
-	}
-
-	if owner.Account() != inferenceAllowedUserName {
-		ws.WriteJSON(
-			newResponseCodeMsg(errorNotAllowed, "resource not allowed"),
-		)
-
-		log.Error("inference failed: resource account not allowed")
 
 		return
 	}
