@@ -178,6 +178,8 @@ type MongodbCollections struct {
 	CourseWork        string `json:"course_work"            required:"true"`
 	CourseRecord      string `json:"course_record"          required:"true"`
 	CloudConf         string `json:"cloud_conf"             required:"true"`
+	ApiApply          string `json:"api_apply"              required:"true"`
+	ApiInfo           string `json:"api_info"              required:"true"`
 }
 
 type MQ struct {

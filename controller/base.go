@@ -21,6 +21,7 @@ import (
 const (
 	PrivateToken       = "PRIVATE-TOKEN"
 	csrfToken          = "CSRF-Token"
+	Token              = "token"
 	encodeUsername     = "encode-username"
 	headerSecWebsocket = "Sec-Websocket-Protocol"
 
@@ -468,7 +469,7 @@ func (ctl baseController) cleanCookie(ctx *gin.Context) {
 	}
 
 	ctl.newRepo().Expire(u, 0)
-	
+
 	setCookie(ctx, csrfToken, "", false, time.Now().AddDate(0, 0, -1))
 }
 
@@ -604,4 +605,29 @@ func (ctl baseController) getListGlobalResourceParameter(
 
 func (ctl baseController) newRepo() repositories.Access {
 	return repositories.NewAccessRepo(int(apiConfig.TokenExpiry - 10))
+}
+
+func (ctl baseController) checkBigmodelApiToken(ctx *gin.Context) (user string, ok bool) {
+	v := ctx.GetHeader(Token)
+	deToken, err := ctl.decryptData(v)
+	if err != nil {
+		return
+	}
+
+	strs := strings.Split(string(deToken), "+")
+	user = strs[0]
+
+	time, err := strconv.ParseInt(strs[1], 10, 64)
+	if err != nil {
+		return
+	}
+
+	if utils.Now()-time > 5184000 {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, "token expire",
+		))
+		return
+	}
+
+	return user, true
 }

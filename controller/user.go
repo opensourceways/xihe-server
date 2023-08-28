@@ -22,6 +22,7 @@ func AddRouterForUserController(
 	auth authing.User,
 	login app.LoginService,
 	sender message.Sender,
+	register userapp.RegService,
 ) {
 
 	us := userapp.NewUserService(repo, ps, sender, encryptHelperToken)
@@ -34,6 +35,7 @@ func AddRouterForUserController(
 			auth, userlogincli.NewLoginCli(login),
 			us,
 		),
+		register: register,
 	}
 
 	rg.POST("/v1/user", ctl.Create) // TODO: delete
@@ -53,15 +55,18 @@ func AddRouterForUserController(
 	rg.GET("/v1/user/check_email", checkUserEmailMiddleware(&ctl.baseController))
 	rg.POST("/v1/user/email/sendbind", ctl.SendBindEmail)
 	rg.POST("/v1/user/email/bind", ctl.BindEmail)
+
+	rg.GET("/v1/user/info/:account", ctl.GetInfo)
 }
 
 type UserController struct {
 	baseController
 
-	repo  userrepo.User
-	auth  authing.User
-	s     userapp.UserService
-	email userapp.EmailService
+	repo     userrepo.User
+	auth     authing.User
+	s        userapp.UserService
+	email    userapp.EmailService
+	register userapp.RegService
 }
 
 // @Summary		Create
@@ -484,4 +489,26 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 
 		ctl.sendRespOfPost(ctx, "success")
 	}
+}
+
+// @Summary		GetInfo
+// @Description	get user apply info
+// @Tags			User
+// @Param			body	body	userCreateRequest	true	"body of creating user"
+// @Accept			json
+// @Success		200	{object}			app.UserDTO
+// @Failure		400	bad_request_body	can't	parse	request	body
+// @Router			/v1/user/info/{account} [get]
+func (ctl *UserController) GetInfo(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	v, err := ctl.register.GetUserRegInfo(pl.DomainAccount())
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	}
+
+	ctx.JSON(http.StatusOK, newResponseData(v))
 }

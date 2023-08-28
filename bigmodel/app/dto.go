@@ -107,7 +107,7 @@ type WuKongCmd struct {
 func (cmd *WuKongCmd) Validate() error {
 	cmd.Style = utils.XSSFilter(cmd.Style)
 
-	if max := 4*4; utils.StrLen(cmd.Style) > max {
+	if max := 4 * 4; utils.StrLen(cmd.Style) > max {
 		return fmt.Errorf("style should less than %d", max)
 	}
 
@@ -123,10 +123,29 @@ type WuKongHFCmd struct {
 
 func (cmd *WuKongHFCmd) Validate() error {
 	cmd.WuKongCmd.Style = utils.XSSFilter(cmd.WuKongCmd.Style)
-	
+
 	b := cmd.User == nil ||
 		cmd.User.Account() != "wukong_hf" ||
 		cmd.Desc == nil
+
+	if b {
+		return errors.New("invalid cmd")
+	}
+
+	return nil
+}
+
+type WuKongApiCmd struct {
+	WuKongCmd
+
+	EndPointType string
+	User         types.Account
+}
+
+func (cmd *WuKongApiCmd) Validate() error {
+	cmd.WuKongCmd.Style = utils.XSSFilter(cmd.WuKongCmd.Style)
+
+	b := cmd.Desc == nil
 
 	if b {
 		return errors.New("invalid cmd")
@@ -256,4 +275,54 @@ func (cmd AIDetectorCmd) Validate() error {
 type GenPictureCmd struct {
 	User types.Account `json:"user"`
 	Desc domain.Desc   `json:"desc"`
+}
+
+type ApplyRecordGetCmd struct {
+	User      types.Account
+	ModelName domain.ModelName
+}
+
+type ApiApplyRecordDTO struct {
+	User      string `json:"user"`
+	Name      string `json:"name"`
+	Endpoint  string `json:"endpoint"`
+	Token     string `json:"token"`
+	ApplyAt   string `json:"apply_at"`
+	ModelName string `json:"model_name"`
+	Enabled   bool   `json:"enabled"`
+}
+
+func (s bigModelService) toApiApplyRecordDTO(
+	v *domain.UserApiRecord,
+	dto *ApiApplyRecordDTO,
+	info domain.ApiInfo,
+) {
+	*dto = ApiApplyRecordDTO{
+		User:      v.User.Account(),
+		Name:      info.Name,
+		ApplyAt:   v.ApplyAt,
+		Token:     v.Token,
+		ModelName: v.ModelName.ModelName(),
+		Enabled:   v.Enabled,
+		Endpoint:  info.Endpoint,
+	}
+}
+
+type ApiInfoDTO struct {
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Endpoint string `json:"endpoint"`
+	Doc      string `json:"doc"`
+}
+
+func (s bigModelService) toApiInfoDTO(
+	v *domain.ApiInfo,
+	dto *ApiInfoDTO,
+) {
+	*dto = ApiInfoDTO{
+		Id:       v.Id,
+		Name:     v.Name,
+		Endpoint: v.Endpoint,
+		Doc:      v.Doc.URL(),
+	}
 }

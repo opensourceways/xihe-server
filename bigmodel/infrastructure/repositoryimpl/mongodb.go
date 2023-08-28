@@ -50,6 +50,8 @@ type mongodbClient interface {
 	ModifyArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray, updateCmd bson.M, op string) (bool, error)
 
 	InCondForArrayElem(key string, value interface{}) bson.M
+
+	UpdateIncDoc(ctx context.Context, filterOfDoc, update bson.M, version int) error
 }
 
 func withContext(f func(context.Context) error) error {

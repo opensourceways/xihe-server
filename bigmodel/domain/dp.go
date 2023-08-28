@@ -15,6 +15,7 @@ const (
 	bigmodelWuKong        = "wukong"
 	bigmodelWuKong4Img    = "wukong_4img"
 	bigmodelWuKongHF      = "wukong_hf"
+	bigmodelWuKongUser    = "wukong_user"
 	bigmodelCodeGeex      = "codegeex"
 	bigmodelGenPicture    = "gen_picture"
 	bigmodelDescPicture   = "desc_picture"
@@ -23,6 +24,8 @@ const (
 
 	langZH = "zh"
 	langEN = "en"
+
+	modelNameWukong = "wukong"
 )
 
 var (
@@ -32,6 +35,7 @@ var (
 	BigmodelWuKong        = BigmodelType(bigmodelWuKong)
 	BigmodelWuKong4Img    = BigmodelType(bigmodelWuKong4Img)
 	BigmodelWuKongHF      = BigmodelType(bigmodelWuKongHF)
+	BigmodelWuKongUser    = BigmodelType(bigmodelWuKongUser)
 	BigmodelCodeGeex      = BigmodelType(bigmodelCodeGeex)
 	BigmodelGenPicture    = BigmodelType(bigmodelGenPicture)
 	BigmodelDescPicture   = BigmodelType(bigmodelDescPicture)
@@ -248,4 +252,23 @@ type desc string
 
 func (r desc) Desc() string {
 	return string(r)
+}
+
+// Model Name
+type ModelName interface {
+	ModelName() string
+}
+
+func NewModelName(v string) (ModelName, error) {
+	b := v == modelNameWukong
+	if !b {
+		return nil, errors.New("invalid model name")
+	}
+	return modelName(v), nil
+}
+
+type modelName string
+
+func (m modelName) ModelName() string {
+	return string(m)
 }

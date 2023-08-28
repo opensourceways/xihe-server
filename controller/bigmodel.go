@@ -13,15 +13,19 @@ import (
 
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
+	types "github.com/opensourceways/xihe-server/domain"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForBigModelController(
 	rg *gin.RouterGroup,
 	s app.BigModelService,
+	us userapp.RegService,
 ) {
 	ctl := BigModelController{
-		s: s,
+		s:  s,
+		us: us,
 	}
 
 	rg.POST("/v1/bigmodel/describe_picture", ctl.DescribePicture)
@@ -49,12 +53,19 @@ func AddRouterForBigModelController(
 	rg.DELETE("/v1/bigmodel/wukong/digg", ctl.CancelDigg)
 	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
 	rg.POST("/v1/bigmodel/ai_detector", ctl.AIDetector)
+
+	rg.POST("/v1/bigmodel/api/apply/:model", ctl.ApplyApi)
+	rg.GET("/v1/bigmodel/api/get", ctl.GetUserApplyRecord)
+	rg.GET("/v1/bigmodel/api/apply/:model", ctl.IsApplied)
+	rg.POST("/v1/bigmodel/api/wukong", ctl.WukongAPI)
+	rg.GET("/v1/bigmodel/apiinfo/get/:model", ctl.GetApiInfo)
 }
 
 type BigModelController struct {
 	baseController
 
-	s app.BigModelService
+	s  app.BigModelService
+	us userapp.RegService
 }
 
 //	@Title			DescribePicture
@@ -143,14 +154,14 @@ func (ctl *BigModelController) GenSinglePicture(ctx *gin.Context) {
 	}
 }
 
-// @Title			GenMultiplePictures
-// @Description	generate multiple pictures based on a text
-// @Tags			BigModel
-// @Param			body	body	pictureGenerateRequest	true	"body of generating picture"
-// @Accept			json
-// @Success		201	{object}		multiplePicturesGenerateResp
-// @Failure		500	system_error	system	error
-// @Router			/v1/bigmodel/multiple_pictures [post]
+//	@Title			GenMultiplePictures
+//	@Description	generate multiple pictures based on a text
+//	@Tags			BigModel
+//	@Param			body	body	pictureGenerateRequest	true	"body of generating picture"
+//	@Accept			json
+//	@Success		201	{object}		multiplePicturesGenerateResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/multiple_pictures [post]
 func (ctl *BigModelController) GenMultiplePictures(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -287,14 +298,14 @@ func (ctl *BigModelController) ListLuoJiaRecord(ctx *gin.Context) {
 	}
 }
 
-// @Title			VQAUploadPicture
-// @Description	upload a picture for vqa
-// @Tags			BigModel
-// @Param			picture	formData	file	true	"picture"
-// @Accept			json
-// @Success		201	{object}		pictureUploadResp
-// @Failure		500	system_error	system	error
-// @Router			/v1/bigmodel/vqa_upload_picture [post]
+//	@Title			VQAUploadPicture
+//	@Description	upload a picture for vqa
+//	@Tags			BigModel
+//	@Param			picture	formData	file	true	"picture"
+//	@Accept			json
+//	@Success		201	{object}		pictureUploadResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/vqa_upload_picture [post]
 func (ctl *BigModelController) VQAUploadPicture(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -700,13 +711,13 @@ func (ctl *BigModelController) ListLike(ctx *gin.Context) {
 	}
 }
 
-// @Title			AddDigg
-// @Description	add digg to wukong picture
-// @Tags			BigModel
-// @Accept			json
-// @Success		202	{object}		wukongDiggResp
-// @Failure		500	system_error	system	error
-// @Router			/v1/bigmodel/wukong/digg [post]
+//	@Title			AddDigg
+//	@Description	add digg to wukong picture
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		202	{object}		wukongDiggResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/wukong/digg [post]
 func (ctl *BigModelController) AddDigg(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -963,5 +974,197 @@ func (ctl *BigModelController) AIDetector(ctx *gin.Context) {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPost(ctx, aiDetectorResp{ismachine})
+	}
+}
+
+//	@Title			ApplyApi
+//	@Description	generates pictures by WuKong-hf
+//	@Tags			BigModel
+//	@Param			body	body	wukongHFRequest	true	"body of wukong"
+//	@Accept			json
+//	@Success		201	{object}				wukongPicturesGenerateResp
+//	@Failure		500	system_error			system	error
+//	@Failure		404	bigmodel_sensitive_info	picture	error
+//	@Router			/v1/bigmodel/api/apply/{model} [post]
+func (ctl *BigModelController) ApplyApi(ctx *gin.Context) {
+	model, err := domain.NewModelName(ctx.Param("model"))
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	b, err := ctl.s.IsApplyModel(pl.DomainAccount(), model)
+	if b || err != nil {
+		ctl.sendBadRequestParamWithMsg(ctx, "already applied")
+		return
+	}
+
+	req := applyApiReq{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, respBadRequestBody)
+
+		return
+	}
+
+	cmd, err := req.toCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	v := pl.Account + "+" + strconv.FormatInt(utils.Now(), 10)
+	token, err := ctl.encryptData(v)
+	if err != nil {
+		return
+	}
+
+	if err = ctl.us.UpsertUserRegInfo(&cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	}
+
+	if err := ctl.s.ApplyApi(pl.DomainAccount(), model, token); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfPost(ctx, "success")
+	}
+}
+
+//	@Title			WuKong
+//	@Description	generates pictures by WuKong
+//	@Tags			BigModel
+//	@Param			body	body	wukongRequest	true	"body of wukong"
+//	@Accept			json
+//	@Success		201	{object}		wukongPicturesGenerateResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/api/{model} [post]
+func (ctl *BigModelController) WukongAPI(ctx *gin.Context) {
+	user, ok := ctl.checkBigmodelApiToken(ctx)
+	if !ok {
+		return
+	}
+	ac, err := types.NewAccount(user)
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+	model, err := domain.NewModelName("wukong")
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	_, err = ctl.s.GetApplyRecordByModel(ac, model)
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	req := wukongApiRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	if v, code, err := ctl.s.WukongApi(ac, model, &cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPost(ctx, wukongPicturesGenerateResp{v})
+	}
+}
+
+//	@Title			GetUserApplyRecord
+//	@Description	get user apply record
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		app.ApiApplyRecordDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/api/get/ [get]
+func (ctl *BigModelController) GetUserApplyRecord(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
+	v, err := ctl.s.GetApplyRecordByUser(pl.DomainAccount())
+
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfGet(ctx, v)
+	}
+}
+
+//	@Title			IsApplied
+//	@Description	is user applied for api
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		isApplyResp
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/api/apply/{model} [get]
+func (ctl *BigModelController) IsApplied(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
+	model, err := domain.NewModelName(ctx.Param("model"))
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	b, err := ctl.s.IsApplyModel(pl.DomainAccount(), model)
+	resp := isApplyResp{
+		IsApply: b,
+	}
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfGet(ctx, resp)
+	}
+}
+
+//	@Title			GetApiInfo
+//	@Description	get api info
+//	@Tags			BigModel
+//	@Accept			json
+//	@Success		200	{object}		app.ApiInfoDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/apiinfo/get/{model} [get]
+func (ctl *BigModelController) GetApiInfo(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+
+	model, err := domain.NewModelName(ctx.Param("model"))
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+	b, err := ctl.s.IsApplyModel(pl.DomainAccount(), model)
+
+	if err != nil || !b {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	v, err := ctl.s.GetApiInfo(model)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfGet(ctx, v)
 	}
 }

@@ -67,6 +67,7 @@ type Endpoints struct {
 	WuKong           string `json:"wukong"             required:"true"`
 	WuKong4IMG       string `json:"wukong_4img"        required:"true"`
 	WuKongHF         string `json:"wukong_hf"          required:"true"`
+	WuKongUser       string `json:"wukong_user"        required:"true"`
 	CodeGeex         string `json:"codegeex"           required:"true"`
 	DescPicture      string `json:"desc_picture"       required:"true"`
 	DescPictureHF    string `json:"desc_picture_hf"    required:"true"`
@@ -181,4 +182,8 @@ func (cfg *WuKong) validate() error {
 	}
 
 	return nil
+}
+
+type ApiService struct {
+	TokenExpire string
 }

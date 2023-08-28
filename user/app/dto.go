@@ -5,6 +5,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 // user
@@ -153,4 +154,23 @@ type RefreshTokenCmd struct {
 	Account     domain.Account
 	Id          string
 	NamespaceId string
+}
+
+func (cmd *UserRegisterInfoCmd) Validate() error {
+	b := cmd.Account != nil &&
+		cmd.Name != nil &&
+		cmd.Email != nil &&
+		cmd.Identity != nil
+
+	if !b {
+		return errors.New("invalid cmd")
+	}
+
+	for i := range cmd.Detail {
+		if utils.StrLen(cmd.Detail[i]) > 20 {
+			return errors.New("invalid detail")
+		}
+	}
+
+	return nil
 }

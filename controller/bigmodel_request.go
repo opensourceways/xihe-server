@@ -7,6 +7,8 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	types "github.com/opensourceways/xihe-server/domain"
+	userapp "github.com/opensourceways/xihe-server/user/app"
+	userd "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -186,6 +188,23 @@ func (req *wukongHFRequest) toCmd() (cmd app.WuKongHFCmd, err error) {
 	return
 }
 
+type wukongApiRequest struct {
+	Desc  string `json:"desc"`
+	Style string `json:"style"`
+}
+
+func (req *wukongApiRequest) toCmd() (cmd app.WuKongApiCmd, err error) {
+	cmd.Style = req.Style
+
+	if cmd.Desc, err = domain.NewWuKongPictureDesc(req.Desc); err != nil {
+		return
+	}
+
+	err = cmd.Validate()
+
+	return
+}
+
 type wukongPicturesGenerateResp struct {
 	Pictures map[string]string `json:"pictures"`
 }
@@ -323,4 +342,51 @@ func (req aiDetectorReq) toCmd(user types.Account) (cmd app.AIDetectorCmd, err e
 
 type aiDetectorResp struct {
 	IsMachine bool `json:"is_machine"`
+}
+
+type applyApiReq struct {
+	Name     string            `json:"name"`
+	City     string            `json:"city"`
+	Email    string            `json:"email"`
+	Phone    string            `json:"phone"`
+	Identity string            `json:"identity"`
+	Province string            `json:"province"`
+	Detail   map[string]string `json:"detail"`
+}
+
+func (req *applyApiReq) toCmd(user types.Account) (cmd userapp.UserRegisterInfoCmd, err error) {
+	if cmd.Name, err = userd.NewName(req.Name); err != nil {
+		return
+	}
+
+	if cmd.City, err = userd.NewCity(req.City); err != nil {
+		return
+	}
+
+	if cmd.Email, err = userd.NewEmail(req.Email); err != nil {
+		return
+	}
+
+	if cmd.Phone, err = userd.NewPhone(req.Phone); err != nil {
+		return
+	}
+
+	if cmd.Identity, err = userd.NewIdentity(req.Identity); err != nil {
+		return
+	}
+
+	if cmd.Province, err = userd.NewProvince(req.Province); err != nil {
+		return
+	}
+
+	cmd.Detail = req.Detail
+	cmd.Account = user
+
+	err = cmd.Validate()
+
+	return
+}
+
+type isApplyResp struct {
+	IsApply bool `json:"is_apply"`
 }

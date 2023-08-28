@@ -184,8 +184,10 @@ type Name interface {
 }
 
 func NewName(v string) (Name, error) {
-	if v == "" {
-		return nil, errors.New("empty value")
+	v = utils.XSSFilter(v)
+
+	if v == "" || utils.StrLen(v) > 30 {
+		return nil, errors.New("invalid name")
 	}
 
 	return name(v), nil

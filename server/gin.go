@@ -191,6 +191,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		bigmodelrepo.NewWuKongPictureRepo(mongodb.NewCollection(collections.WuKongPicture)),
 		bigmodelasynccli.NewAsyncCli(asyncAppService),
 		sender,
+		bigmodelrepo.NewApiService(mongodb.NewCollection(collections.ApiApply)),
+		bigmodelrepo.NewApiInfo(mongodb.NewCollection(collections.ApiInfo)),
+		userRegService,
 	)
 
 	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, sender)
@@ -218,7 +221,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 		controller.AddRouterForUserController(
 			v1, user, gitlabUser,
-			authingUser, loginService, sender,
+			authingUser, loginService, sender, userRegService,
 		)
 
 		controller.AddRouterForLoginController(
@@ -238,7 +241,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForBigModelController(
-			v1, bigmodelAppService,
+			v1, bigmodelAppService, userRegService,
 		)
 
 		controller.AddRouterForTrainingController(

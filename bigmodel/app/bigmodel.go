@@ -16,6 +16,8 @@ import (
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
+	crepository "github.com/opensourceways/xihe-server/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -62,6 +64,16 @@ type BigModelService interface {
 	CancelDiggPicture(*WuKongCancelDiggCmd) (int, error)
 	ReGenerateDownloadURL(types.Account, string) (string, string, error)
 
+	//api service
+	ApplyApi(types.Account, domain.ModelName, string) error
+	WukongApi(types.Account, domain.ModelName, *WuKongApiCmd) (map[string]string, string, error)
+	GetApplyRecordByModel(types.Account, domain.ModelName) (ApiApplyRecordDTO, error)
+	GetApplyRecordByUser(types.Account) ([]ApiApplyRecordDTO, error)
+	IsApplyModel(types.Account, domain.ModelName) (bool, error)
+
+	//api info
+	GetApiInfo(model domain.ModelName) (ApiInfoDTO, error)
+
 	// ai detector
 	AIDetector(*AIDetectorCmd) (string, bool, error)
 }
@@ -74,6 +86,9 @@ func NewBigModelService(
 	wukongPicture repository.WuKongPicture,
 	asynccli async.AsyncTask,
 	sender message.AsyncMessageProducer,
+	apiService repository.ApiService,
+	apiInfo repository.ApiInfo,
+	userService userapp.RegService,
 ) BigModelService {
 	return bigModelService{
 		fm:              fm,
@@ -85,6 +100,9 @@ func NewBigModelService(
 		asynccli:        asynccli,
 		wukongSampleId:  fm.GetWuKongSampleId(),
 		bigmodelService: service.NewBigModelService(fm, wukongPicture),
+		apiService:      apiService,
+		apiInfo:         apiInfo,
+		userService:     userService,
 	}
 }
 
@@ -97,6 +115,9 @@ type bigModelService struct {
 	wukong        repository.WuKong
 	wukongPicture repository.WuKongPicture
 	asynccli      async.AsyncTask
+	apiService    repository.ApiService
+	apiInfo       repository.ApiInfo
+	userService   userapp.RegService
 
 	bigmodelService service.BigModelService
 
@@ -146,6 +167,21 @@ func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
 	if err != nil {
 		code = s.setCode(err)
 	}
+
+	return
+}
+
+func (s bigModelService) WukongApi(
+	user types.Account, model domain.ModelName, cmd *WuKongApiCmd,
+) (links map[string]string, code string, err error) {
+	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
+	links, err = s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, string(domain.BigmodelWuKongUser))
+	if err != nil {
+		code = s.setCode(err)
+	}
+
+	a, _ := s.apiService.GetApiByUserModel(user, model)
+	err = s.apiService.AddApiCallCount(user, model, a.Version)
 
 	return
 }
@@ -666,5 +702,76 @@ func (s bigModelService) ReGenerateDownloadURL(
 		)
 	}
 
+	return
+}
+
+func (s bigModelService) ApplyApi(user types.Account, model domain.ModelName, token string) (err error) {
+	now := utils.Now()
+	date := utils.ToDate(now)
+
+	a := domain.UserApiRecord{
+		User:      user,
+		ModelName: model,
+		Token:     token,
+		ApplyAt:   date,
+		UpdateAt:  date,
+		Enabled:   true,
+	}
+	err = s.apiService.ApplyApi(&a)
+	return
+}
+
+func (s bigModelService) GetApplyRecordByModel(user types.Account, model domain.ModelName) (a ApiApplyRecordDTO, err error) {
+	v, err := s.apiService.GetApiByUserModel(user, model)
+	if err != nil {
+		return
+	}
+	if !v.Enabled {
+		err = errors.New("invalid token")
+	}
+
+	a = ApiApplyRecordDTO{
+		User:      v.User.Account(),
+		ApplyAt:   v.ApplyAt,
+		Token:     v.Token,
+		ModelName: v.ModelName.ModelName(),
+	}
+
+	return
+}
+
+func (s bigModelService) GetApplyRecordByUser(user types.Account) ([]ApiApplyRecordDTO, error) {
+	v, err := s.apiService.GetApiByUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	d := make([]ApiApplyRecordDTO, len(v))
+	j := 0
+	for i := range v {
+		if v[i].Enabled {
+			a, _ := s.apiInfo.GetApiInfo(v[i].ModelName)
+			s.toApiApplyRecordDTO(&v[i], &d[j], a)
+			j++
+		}
+	}
+
+	return d, nil
+}
+
+func (s bigModelService) IsApplyModel(user types.Account, model domain.ModelName) (bool, error) {
+	_, err := s.apiService.GetApiByUserModel(user, model)
+	if err != nil && crepository.IsErrorResourceNotExists(err) {
+		return false, nil
+	}
+	return true, err
+}
+
+func (s bigModelService) GetApiInfo(model domain.ModelName) (a ApiInfoDTO, err error) {
+	v, err := s.apiInfo.GetApiInfo(model)
+	if err != nil {
+		return
+	}
+	s.toApiInfoDTO(&v, &a)
 	return
 }
