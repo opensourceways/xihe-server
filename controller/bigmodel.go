@@ -1022,12 +1022,16 @@ func (ctl *BigModelController) ApplyApi(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
+	enToken, err := ctl.encryptDataForToken(token)
+	if err != nil {
+		return
+	}
 
 	if err = ctl.us.UpsertUserRegInfo(&cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	}
 
-	if err := ctl.s.ApplyApi(pl.DomainAccount(), model, token); err != nil {
+	if err := ctl.s.ApplyApi(pl.DomainAccount(), model, enToken); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfPost(ctx, "success")
@@ -1098,6 +1102,14 @@ func (ctl *BigModelController) GetUserApplyRecord(ctx *gin.Context) {
 	}
 
 	v, err := ctl.s.GetApplyRecordByUser(pl.DomainAccount())
+
+	for i := range v {
+		deToken, err := ctl.decryptDataForToken(v[i].Token)
+		if err != nil {
+			return
+		}
+		v[i].Token = string(deToken)
+	}
 
 	if err != nil {
 		ctl.sendCodeMessage(ctx, "", err)

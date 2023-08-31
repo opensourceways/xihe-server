@@ -1,9 +1,9 @@
 package app
 
 import (
-	"github.com/opensourceways/xihe-server/user/domain/repository"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
+	"github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 type RegService interface {

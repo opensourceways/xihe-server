@@ -21,11 +21,12 @@ type apiServiceRepoImpl struct {
 func (impl *apiServiceRepoImpl) ApplyApi(d *domain.UserApiRecord) error {
 	doc, err := toApiApplyDoc(d)
 	doc[fieldVersion] = 1
+	filter := bson.M{fieldModelName: d.ModelName, fieldUserName: d.User.Account()}
 
 	f := func(ctx context.Context) error {
 		_, err = impl.cli.NewDocIfNotExist(
 			ctx,
-			bson.M{},
+			filter,
 			doc,
 		)
 		return err

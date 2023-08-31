@@ -456,6 +456,24 @@ func (ctl baseController) decryptDataForCSRF(s string) ([]byte, error) {
 	return encryptHelperCSRF.Decrypt(dst)
 }
 
+// crypt for database
+func (ctl baseController) encryptDataForToken(d string) (string, error) {
+	t, err := encryptHelperToken.Encrypt([]byte(d))
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(t), nil
+}
+
+func (ctl baseController) decryptDataForToken(s string) ([]byte, error) {
+	dst, err := hex.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return encryptHelperToken.Decrypt(dst)
+}
+
 func (ctl baseController) cleanCookie(ctx *gin.Context) {
 	setCookie(ctx, PrivateToken, "", true, time.Now().AddDate(0, 0, -1))
 	t, ok := ctx.Get(encodeUsername)
