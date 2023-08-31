@@ -28,12 +28,12 @@ func AddRouterForBigModelController(
 		us: us,
 	}
 
-	rg.POST("/v1/bigmodel/describe_picture", ctl.DescribePicture)
-	rg.POST("/v1/bigmodel/single_picture", ctl.GenSinglePicture)
-	rg.POST("/v1/bigmodel/multiple_pictures", ctl.GenMultiplePictures)
-	rg.POST("/v1/bigmodel/vqa_upload_picture", ctl.VQAUploadPicture)
+	// rg.POST("/v1/bigmodel/describe_picture", ctl.DescribePicture)
+	// rg.POST("/v1/bigmodel/single_picture", ctl.GenSinglePicture)
+	// rg.POST("/v1/bigmodel/multiple_pictures", ctl.GenMultiplePictures)
+	// rg.POST("/v1/bigmodel/vqa_upload_picture", ctl.VQAUploadPicture)
 	rg.POST("/v1/bigmodel/luojia_upload_picture", ctl.LuoJiaUploadPicture)
-	rg.POST("/v1/bigmodel/ask", ctl.Ask)
+	// rg.POST("/v1/bigmodel/ask", ctl.Ask)
 	rg.POST("/v1/bigmodel/pangu", ctl.PanGu)
 	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
