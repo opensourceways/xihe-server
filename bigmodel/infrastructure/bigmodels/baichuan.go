@@ -15,6 +15,7 @@ type baichuanInfo struct {
 
 type baichuanRequest struct {
 	Prompt            string  `json:"prompt"`
+	Sampling          bool    `json:"sampling"`
 	TopK              int     `json:"top_k"`
 	TopP              float64 `json:"top_p"`
 	Temperature       float64 `json:"temperature"`
@@ -24,18 +25,14 @@ type baichuanRequest struct {
 type baichuanResponse struct {
 	Code   int    `json:"code"`
 	Msg    string `json:"msg"`
-	Result result `json:"result"`
+	Result []struct {
+		TextGenerationText []string `json:"text_generation_text"`
+	} `json:"result"`
 }
 
 func (req baichuanResponse) getText() string {
-	return req.Result.TextGenerationText[0]
+	return req.Result[0].TextGenerationText[0]
 }
-
-type result struct {
-	TextGenerationText textGenerationText `json:"text_generation_text"`
-}
-
-type textGenerationText []string
 
 func newBaiChuanInfo(cfg *Config) (info baichuanInfo, err error) {
 
@@ -61,7 +58,7 @@ func (s *service) BaiChuan(input *domain.BaiChuanInput) (code, r string, err err
 
 	// call bigmodel baichuan
 	var resp baichuanResponse
-	f := func (e string) (err error) {
+	f := func(e string) (err error) {
 		resp, err = s.genBaiChuan(e, input)
 
 		return
@@ -122,6 +119,7 @@ func (s *service) genBaiChuan(
 func toBaiChuanReq(d *domain.BaiChuanInput) baichuanRequest {
 	return baichuanRequest{
 		Prompt:            d.Text.BaiChuanText(),
+		Sampling:          d.Sampling,
 		TopK:              d.TopK.TopK(),
 		TopP:              d.TopP.TopP(),
 		Temperature:       d.Temperature.Temperature(),

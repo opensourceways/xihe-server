@@ -1005,6 +1005,7 @@ func (ctl *BigModelController) BaiChuan(ctx *gin.Context) {
 
 		return
 	}
+
 	code, dto, err := ctl.s.BaiChuan(&cmd)
 	if err != nil {
 		ctl.sendCodeMessage(ctx, code, err)

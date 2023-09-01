@@ -1,6 +1,8 @@
 package app
 
-import "github.com/opensourceways/xihe-server/bigmodel/domain"
+import (
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
+)
 
 func (s bigModelService) BaiChuan(cmd *BaiChuanCmd) (code string, dto BaiChuanDTO, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelBaiChuan)
@@ -12,6 +14,7 @@ func (s bigModelService) BaiChuan(cmd *BaiChuanCmd) (code string, dto BaiChuanDT
 		Temperature:       cmd.Temperature,
 		RepetitionPenalty: cmd.RepetitionPenalty,
 	}
+
 	if code, dto.Text, err = s.fm.BaiChuan(input); err != nil {
 		return
 	}
