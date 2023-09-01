@@ -56,4 +56,7 @@ type BigModel interface {
 
 	// ai detector
 	AIDetector(domain.AIDetectorInput) (bool, error)
+
+	// baichuan2
+	BaiChuan(*domain.BaiChuanInput) (string, string, error)
 }

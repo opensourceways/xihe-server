@@ -53,6 +53,7 @@ func AddRouterForBigModelController(
 	rg.DELETE("/v1/bigmodel/wukong/digg", ctl.CancelDigg)
 	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
 	rg.POST("/v1/bigmodel/ai_detector", ctl.AIDetector)
+	rg.POST("/v1/bigmodel/baichuan", ctl.BaiChuan)
 
 	rg.POST("/v1/bigmodel/api/apply/:model", ctl.ApplyApi)
 	rg.GET("/v1/bigmodel/api/get", ctl.GetUserApplyRecord)
@@ -948,7 +949,7 @@ func (ctl *BigModelController) GenDownloadURL(ctx *gin.Context) {
 //	@Accept			json
 //	@Success		202	{object}		aiDetectorResp
 //	@Failure		500	system_error	system	error
-//	@Router			/v1/bigmodel/wukong/link [put]
+//	@Router			/v1/bigmodel/ai_detector [post]
 func (ctl *BigModelController) AIDetector(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -976,6 +977,42 @@ func (ctl *BigModelController) AIDetector(ctx *gin.Context) {
 		ctl.sendRespOfPost(ctx, aiDetectorResp{ismachine})
 	}
 }
+
+//	@Title			BaiChuan
+//	@Description	conversational AI
+//	@Tags			BigModel
+//	@Param			body	body	baichuanReq	true	"body of baichuan"
+//	@Accept			json
+//	@Success		202	{object}		BaiChuanDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/baichuan [post]
+func (ctl *BigModelController) BaiChuan(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := baichuanReq{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
+
+		return
+	}
+
+	cmd, err := req.toCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+	code, dto, err := ctl.s.BaiChuan(&cmd)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctl.sendRespOfPost(ctx, dto)
+	}
+}
+
 
 //	@Title			ApplyApi
 //	@Description	generates pictures by WuKong-hf

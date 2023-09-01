@@ -21,6 +21,7 @@ const (
 	bigmodelDescPicture   = "desc_picture"
 	bigmodelDescPictureHF = "desc_picture_hf"
 	bigmodelAIDetector    = "ai_detector"
+	bigmodelBaiChuan           = "baichuan"
 
 	langZH = "zh"
 	langEN = "en"
@@ -41,6 +42,7 @@ var (
 	BigmodelDescPicture   = BigmodelType(bigmodelDescPicture)
 	BigmodelDescPictureHF = BigmodelType(bigmodelDescPictureHF)
 	BigmodelAIDetector    = BigmodelType(bigmodelAIDetector)
+	BigmodelBaiChuan           = BigmodelType(bigmodelBaiChuan)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
@@ -272,3 +274,102 @@ type modelName string
 func (m modelName) ModelName() string {
 	return string(m)
 }
+
+// baichuan text
+type BaiChuanText interface {
+	BaiChuanText() string
+}
+
+type baiChuanText string
+
+func NewBaiChuanText(v string) (BaiChuanText, error) {
+	if v == "" {
+		return nil, errors.New("no baichuan text")
+	}
+
+	if max:= 1000; utils.StrLen(v) > max { // TODO: to config
+		return nil, errors.New("invalid baichuan text")
+	}
+
+	return baiChuanText(v), nil
+}
+
+func (g baiChuanText) BaiChuanText() string {
+	return string(g)
+}
+
+// top k
+type TopK interface {
+	TopK() int
+}
+
+type top_k int
+
+func NewTopK(v int) (TopK, error) {
+	if min,max:=0,10; v < min || v > max {
+		return nil, errors.New("invalid top_k")
+	}
+
+	return top_k(v), nil
+}
+
+func (t top_k) TopK() int {
+	return int(t)
+}
+
+// top p
+type TopP interface {
+	TopP() float64
+}
+
+type top_p float64
+
+func NewTopP(v float64) (TopP, error) {
+	if min, max := 0.00, 1.00; v < min || v > max {
+		return nil, errors.New("invalid top_p")
+	}
+
+	return top_p(v), nil
+}
+
+func (t top_p) TopP() float64 {
+	return float64(t)
+}
+
+// temperature
+type Temperature interface {
+	Temperature() float64
+}
+
+type temperature float64
+
+func NewTemperature(v float64) (Temperature, error) {
+	if min:= 0.00; v < min {
+		return nil, errors.New("invalid temperature")
+	}
+
+	return temperature(v), nil
+}
+
+func (t temperature) Temperature() float64 {
+	return float64(t)
+}
+
+// repetition penalty
+type RepetitionPenalty interface {
+	RepetitionPenalty() float64
+}
+
+type repetitionPenalty float64
+
+func NewRepetitionPenalty(v float64) (RepetitionPenalty, error) {
+	if min:= 0.00; v < min {
+		return nil, errors.New("invalid repetitionPenalty")
+	}
+
+	return repetitionPenalty(v), nil
+}
+
+func (t repetitionPenalty) RepetitionPenalty() float64 {
+	return float64(t)
+} 

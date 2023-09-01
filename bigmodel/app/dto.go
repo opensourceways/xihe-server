@@ -326,3 +326,25 @@ func (s bigModelService) toApiInfoDTO(
 		Doc:      v.Doc.URL(),
 	}
 }
+
+// baichuan
+type BaiChuanCmd struct {
+	User              types.Account
+	Sampling		  bool
+	Text              domain.BaiChuanText
+	TopK              domain.TopK
+	TopP              domain.TopP
+	Temperature       domain.Temperature
+	RepetitionPenalty domain.RepetitionPenalty
+}
+
+func (cmd *BaiChuanCmd) SetDefault() {
+	cmd.TopK, _ = domain.NewTopK(3)
+	cmd.TopP, _ = domain.NewTopP(0.95)
+	cmd.Temperature, _ = domain.NewTemperature(1)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1.1)
+}
+
+type BaiChuanDTO struct {
+	Text string `json:"text"`
+}

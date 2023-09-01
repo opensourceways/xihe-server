@@ -76,6 +76,9 @@ type BigModelService interface {
 
 	// ai detector
 	AIDetector(*AIDetectorCmd) (string, bool, error)
+
+	// baichuan
+	BaiChuan(*BaiChuanCmd) (string, BaiChuanDTO, error)
 }
 
 func NewBigModelService(

@@ -390,3 +390,44 @@ func (req *applyApiReq) toCmd(user types.Account) (cmd userapp.UserRegisterInfoC
 type isApplyResp struct {
 	IsApply bool `json:"is_apply"`
 }
+
+// baichuan
+type baichuanReq struct {
+	Text              string  `json:"text"`
+	Sampling          bool    `json:"sampling"`
+	TopK              int     `json:"top_k"`
+	TopP              float64 `json:"top_p"`
+	Temperature       float64 `json:"temperature"`
+	RepetitionPenalty float64 `json:"repetition_penalty"`
+}
+
+func (req *baichuanReq) toCmd(user types.Account) (cmd app.BaiChuanCmd, err error) {
+	if cmd.Text, err = domain.NewBaiChuanText(req.Text); err != nil {
+		return
+	}
+
+	if req.Sampling {
+		if cmd.TopK, err = domain.NewTopK(req.TopK); err != nil {
+			return
+		}
+	
+		if cmd.TopP, err = domain.NewTopP(req.TopP); err != nil {
+			return
+		}
+	
+		if cmd.Temperature, err = domain.NewTemperature(req.Temperature); err != nil {
+			return
+		}
+	
+		if cmd.RepetitionPenalty, err = domain.NewRepetitionPenalty(req.RepetitionPenalty); err != nil {
+			return
+		}
+	} else {
+		cmd.SetDefault()
+	}
+
+	cmd.User = user
+	cmd.Sampling = req.Sampling
+
+	return
+}

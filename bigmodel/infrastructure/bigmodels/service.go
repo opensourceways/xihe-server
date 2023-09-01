@@ -40,8 +40,8 @@ func Init(cfg *Config) error {
 	fm.pictureGenInfo = newPictureGenInfo(cfg)
 	fm.pictureDescInfo = newPictureDescInfo(cfg)
 	fm.aiDetectorInfo = newAIDetectorInfo(cfg)
-
 	fm.wukongInfo, err = newWuKongInfo(cfg)
+	fm.baichuanInfo, err = newBaiChuanInfo(cfg)
 
 	return err
 }
@@ -65,6 +65,7 @@ type service struct {
 	pictureGenInfo  pictureGenInfo
 	pictureDescInfo pictureDescInfo
 	aiDetectorInfo  aiDetectorInfo
+	baichuanInfo         baichuanInfo
 }
 
 func (s *service) token() (string, error) {

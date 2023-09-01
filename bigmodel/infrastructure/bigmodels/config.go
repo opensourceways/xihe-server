@@ -74,6 +74,7 @@ type Endpoints struct {
 	SinglePicture    string `json:"signle_picture"     required:"true"`
 	MultiplePictures string `json:"multiple_pictures"  required:"true"`
 	AIDetector       string `json:"ai_detector"        required:"true"`
+	BaiChuan         string `json:"baichuan"           required:"true"`
 }
 
 func (e *Endpoints) validate() (err error) {
@@ -114,6 +115,10 @@ func (e *Endpoints) validate() (err error) {
 	}
 
 	if _, err = e.parse(e.AIDetector); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.BaiChuan); err != nil {
 		return
 	}
 
@@ -186,4 +191,7 @@ func (cfg *WuKong) validate() error {
 
 type ApiService struct {
 	TokenExpire string
+}
+
+type BaiChuan struct {
 }
