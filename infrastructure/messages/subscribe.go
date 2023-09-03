@@ -5,8 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/opensourceways/community-robot-lib/kafka"
-	"github.com/opensourceways/community-robot-lib/mq"
+	kfklib "github.com/opensourceways/kafka-lib/agent"
 	"github.com/sirupsen/logrus"
 
 	bigmoddelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
@@ -17,122 +16,96 @@ import (
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
+const (
+	handlerNameBigModel        = "bigmodel"
+	handlerNameFollowing       = "following"
+	handlerNameLike            = "like"
+	handlerNameFork            = "fork"
+	handlerNameDownload        = "download"
+	handlerNameRelatedResource = "related_resource"
+	handlerNameTraining        = "training"
+	handlerNameFinetune        = "finetune"
+	handlerNameInference       = "inference"
+	handlerNameEvaluate        = "evaluate"
+	handlerNameCloud           = "cloud"
+)
+
 func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) error {
-	subscribers := make(map[string]mq.Subscriber)
-
-	defer func() {
-		for k, s := range subscribers {
-			if err := s.Unsubscribe(); err != nil {
-				log.Errorf("failed to unsubscribe for topic:%s, err:%v", k, err)
-			}
-		}
-	}()
-
-	// register following
-	s, err := registerHandlerForFollowing(handler)
-	if err != nil {
+	// following
+	if err := registerHandler(
+		topics.Following, handlerNameFollowing, handlerForFollowing(handler),
+	); err != nil {
 		return err
 	}
-	if s != nil {
-		subscribers[s.Topic()] = s
-	}
 
-	// register like
-	s, err = registerHandlerForLike(handler)
-	if err != nil {
+	// like
+	if err := registerHandler(
+		topics.Like, handlerNameLike, handlerForLike(handler),
+	); err != nil {
 		return err
 	}
-	if s != nil {
-		subscribers[s.Topic()] = s
-	}
 
-	// register fork
-	s, err = registerHandlerForFork(handler)
-	if err != nil {
+	// fork
+	if err := registerHandler(
+		topics.Fork, handlerNameFork, handlerForFork(handler),
+	); err != nil {
 		return err
 	}
-	if s != nil {
-		subscribers[s.Topic()] = s
-	}
 
-	// register download
-	s, err = registerHandlerForDownload(handler)
-	if err != nil {
+	// download
+	if err := registerHandler(
+		topics.Download, handlerNameDownload, handlerForDownload(handler),
+	); err != nil {
 		return err
 	}
-	if s != nil {
-		subscribers[s.Topic()] = s
-	} else {
-		log.Infof("does not subscribe download")
-	}
 
-	// register related resource
-	s, err = registerHandlerForRelatedResource(handler)
-	if err != nil {
+	// related resource
+	if err := registerHandler(
+		topics.RelatedResource, handlerNameRelatedResource, handlerForRelatedResource(handler),
+	); err != nil {
 		return err
-	}
-	if s != nil {
-		subscribers[s.Topic()] = s
 	}
 
 	// training
-	s, err = registerHandlerForTraining(handler)
-	if err != nil {
+	if err := registerHandler(
+		topics.Training, handlerNameTraining, handlerForTraining(handler),
+	); err != nil {
 		return err
-	}
-	if s != nil {
-		subscribers[s.Topic()] = s
 	}
 
 	// finetune
-	s, err = registerHandlerForFinetune(handler)
-	if err != nil {
+	if err := registerHandler(
+		topics.Finetune, handlerNameFinetune, handlerForFinetune(handler),
+	); err != nil {
 		return err
-	}
-	if s != nil {
-		subscribers[s.Topic()] = s
-	} else {
-		log.Infof("does not subscribe finetune")
 	}
 
 	// inference
-	s, err = registerHandlerForInference(handler)
-	if err != nil {
+	if err := registerHandler(
+		topics.Inference, handlerNameInference, handlerForInference(handler),
+	); err != nil {
 		return err
-	}
-	if s != nil {
-		subscribers[s.Topic()] = s
 	}
 
 	// evaluate
-	s, err = registerHandlerForEvaluate(handler)
-	if err != nil {
+	if err := registerHandler(
+		topics.Evaluate, handlerNameEvaluate, handlerForEvaluate(handler),
+	); err != nil {
 		return err
-	}
-	if s != nil {
-		subscribers[s.Topic()] = s
 	}
 
 	// cloud
-	s, err = registerHandlerForCloud(handler)
-	if err != nil {
+	if err := registerHandler(
+		topics.Cloud, handlerNameCloud, handlerForCloud(handler),
+	); err != nil {
 		return err
-	}
-	if s != nil {
-		subscribers[s.Topic()] = s
 	}
 
 	// bigmodel
-	if s, err = registerHandlerForBigModel(handler); err != nil {
+	if err := registerHandler(
+		topics.BigModel, handlerNameBigModel, handlerForBigModel(handler),
+	); err != nil {
 		return err
-	}
-	if s != nil {
-		subscribers[s.Topic()] = s
-	}
-
-	// register end
-	if len(subscribers) == 0 {
-		return nil
 	}
 
 	<-ctx.Done()
@@ -140,21 +113,16 @@ func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) erro
 	return nil
 }
 
-func registerHandlerForFollowing(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.FollowingHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Following, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
+func handlerForFollowing(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := msgFollower{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
 
-		body := msgFollower{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.FollowingHandler)
+		if !ok {
+			return errors.New("internal error, FollowingHandler assert error")
 		}
 
 		f := &userdomain.FollowerInfo{}
@@ -168,31 +136,26 @@ func registerHandlerForFollowing(handler interface{}) (mq.Subscriber, error) {
 
 		switch body.Action {
 		case actionAdd:
-			return h.HandleEventAddFollowing(f)
+			return hd.HandleEventAddFollowing(f)
 
 		case actionRemove:
-			return h.HandleEventRemoveFollowing(f)
+			return hd.HandleEventRemoveFollowing(f)
 		}
 
 		return nil
-	})
+	}
 }
 
-func registerHandlerForLike(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.LikeHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Like, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
+func handlerForLike(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := msgLike{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
 
-		body := msgLike{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.LikeHandler)
+		if !ok {
+			return errors.New("internal error, LikeHandler assert error")
 		}
 
 		like := &domain.ResourceObject{}
@@ -202,31 +165,26 @@ func registerHandlerForLike(handler interface{}) (mq.Subscriber, error) {
 
 		switch body.Action {
 		case actionAdd:
-			return h.HandleEventAddLike(like)
+			return hd.HandleEventAddLike(like)
 
 		case actionRemove:
-			return h.HandleEventRemoveLike(like)
+			return hd.HandleEventRemoveLike(like)
 		}
 
-		return nil
-	})
+		return
+	}
 }
 
-func registerHandlerForFork(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.ForkHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Fork, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
+func handlerForFork(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := resourceIndex{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
 
-		body := resourceIndex{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.ForkHandler)
+		if !ok {
+			return errors.New("internal error, ForkHandler assert error")
 		}
 
 		index := new(domain.ResourceIndex)
@@ -234,25 +192,20 @@ func registerHandlerForFork(handler interface{}) (mq.Subscriber, error) {
 			return
 		}
 
-		return h.HandleEventFork(index)
-	})
+		return hd.HandleEventFork(index)
+	}
 }
 
-func registerHandlerForDownload(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.DownloadHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Download, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
+func handlerForDownload(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := resourceObject{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
 
-		body := resourceObject{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.DownloadHandler)
+		if !ok {
+			return errors.New("internal error, DownloadHandler assert error")
 		}
 
 		obj := new(domain.ResourceObject)
@@ -260,54 +213,44 @@ func registerHandlerForDownload(handler interface{}) (mq.Subscriber, error) {
 			return
 		}
 
-		return h.HandleEventDownload(obj)
-	})
+		return hd.HandleEventDownload(obj)
+	}
 }
 
-func registerHandlerForRelatedResource(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.RelatedResourceHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.RelatedResource, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
+func handlerForRelatedResource(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := msgRelatedResources{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
 
-		body := msgRelatedResources{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.RelatedResourceHandler)
+		if !ok {
+			return errors.New("internal error, RelatedResourceHandler assert error")
 		}
 
 		switch body.Action {
 		case actionAdd:
-			return body.handle(h.HandleEventAddRelatedResource)
+			return body.handle(hd.HandleEventAddRelatedResource)
 
 		case actionRemove:
-			return body.handle(h.HandleEventRemoveRelatedResource)
+			return body.handle(hd.HandleEventRemoveRelatedResource)
 		}
 
 		return nil
-	})
+	}
 }
 
-func registerHandlerForTraining(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.TrainingHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Training, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
+func handlerForTraining(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := message.MsgTraining{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
 
-		body := message.MsgTraining{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.TrainingHandler)
+		if !ok {
+			return errors.New("internal error, TrainingHandler assert error")
 		}
 
 		if body.Details["project_id"] == "" || body.Details["training_id"] == "" {
@@ -324,25 +267,20 @@ func registerHandlerForTraining(handler interface{}) (mq.Subscriber, error) {
 		v.Project.Id = body.Details["project_id"]
 		v.TrainingId = body.Details["training_id"]
 
-		return h.HandleEventCreateTraining(&v)
-	})
+		return hd.HandleEventCreateTraining(&v)
+	}
 }
 
-func registerHandlerForFinetune(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.FinetuneHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Finetune, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
+func handlerForFinetune(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := msgFinetune{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
 
-		body := msgFinetune{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.FinetuneHandler)
+		if !ok {
+			return errors.New("internal error, FinetuneHandler assert error")
 		}
 
 		if body.Id == "" {
@@ -356,25 +294,20 @@ func registerHandlerForFinetune(handler interface{}) (mq.Subscriber, error) {
 			return
 		}
 
-		return h.HandleEventCreateFinetune(&v)
-	})
+		return hd.HandleEventCreateFinetune(&v)
+	}
 }
 
-func registerHandlerForInference(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.InferenceHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Inference, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
+func handlerForInference(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := msgInference{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
 
-		body := msgInference{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.InferenceHandler)
+		if !ok {
+			return errors.New("internal error, InferenceHandler assert error")
 		}
 
 		v := domain.InferenceIndex{}
@@ -400,10 +333,10 @@ func registerHandlerForInference(handler interface{}) (mq.Subscriber, error) {
 
 		switch body.Action {
 		case actionCreate:
-			return h.HandleEventCreateInference(&info)
+			return hd.HandleEventCreateInference(&info)
 
 		case actionExtend:
-			return h.HandleEventExtendInferenceSurvivalTime(
+			return hd.HandleEventExtendInferenceSurvivalTime(
 				&message.InferenceExtendInfo{
 					InferenceInfo: info,
 					Expiry:        body.Expiry,
@@ -412,24 +345,19 @@ func registerHandlerForInference(handler interface{}) (mq.Subscriber, error) {
 		}
 
 		return nil
-	})
+	}
 }
 
-func registerHandlerForEvaluate(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(message.EvaluateHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Evaluate, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
-			return
+func handlerForEvaluate(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) (err error) {
+		body := msgEvaluate{}
+		if err := json.Unmarshal(b, &body); err != nil {
+			return err
 		}
 
-		body := msgEvaluate{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(message.EvaluateHandler)
+		if !ok {
+			return errors.New("internal error, CloudMessageHandler assert error")
 		}
 
 		v := message.EvaluateInfo{}
@@ -444,30 +372,25 @@ func registerHandlerForEvaluate(handler interface{}) (mq.Subscriber, error) {
 		v.Project.Id = body.ProjectId
 		v.TrainingId = body.TrainingId
 
-		return h.HandleEventCreateEvaluate(&v)
-	})
+		return hd.HandleEventCreateEvaluate(&v)
+	}
 }
 
-func registerHandlerForCloud(handler interface{}) (mq.Subscriber, error) {
-	h, ok := handler.(cloudmsg.CloudMessageHandler)
-	if !ok {
-		return nil, nil
-	}
-
-	return kafka.Subscribe(topics.Cloud, func(e mq.Event) (err error) {
-		msg := e.Message()
-		if msg == nil {
-			return
+func handlerForCloud(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) error {
+		body := msgPodCreate{}
+		if err := json.Unmarshal(b, &body); err != nil {
+			return err
 		}
 
-		body := msgPodCreate{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		hd, ok := handler.(cloudmsg.CloudMessageHandler)
+		if !ok {
+			return errors.New("internal error, CloudMessageHandler assert error")
 		}
 
 		user, err := domain.NewAccount(body.User)
 		if err != nil {
-			return
+			return err
 		}
 
 		v := cloudtypes.PodInfo{
@@ -479,49 +402,48 @@ func registerHandlerForCloud(handler interface{}) (mq.Subscriber, error) {
 		}
 		v.SetDefaultExpiry()
 
-		return h.HandleEventPodSubscribe(&v)
-	})
+		return hd.HandleEventPodSubscribe(&v)
+	}
 }
 
-func registerHandlerForBigModel(handler interface{}) (mq.Subscriber, error) {
-
-	return kafka.Subscribe(topics.BigModel, func(e mq.Event) (err error) {
-
-		msg := e.Message()
-		if msg == nil {
-			return
-		}
-
+func handlerForBigModel(handler interface{}) kfklib.Handler {
+	return func(b []byte, h map[string]string) error {
 		body := bigmoddelmsg.MsgTask{}
-		if err = json.Unmarshal(msg.Body, &body); err != nil {
-			return
+		if err := json.Unmarshal(b, &body); err != nil {
+			return err
 		}
 
-		h, ok := handler.(BigModelMessageHandler)
+		hd, ok := handler.(BigModelMessageHandler)
 		if !ok {
-			return
+			return errors.New("internal error, BigModelMessageHandler assert error")
 		}
 
 		switch body.Type {
 		case bigmoddelmsg.MsgTypeWuKongAsyncTaskFinish:
 
-			return h.HandleEventBigModelWuKongAsyncTaskFinish(&body)
+			return hd.HandleEventBigModelWuKongAsyncTaskFinish(&body)
 
 		case bigmoddelmsg.MsgTypeWuKongAsyncTaskStart:
 
-			return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
+			return hd.HandleEventBigModelWuKongAsyncTaskStart(&body)
 
 		case bigmoddelmsg.MsgTypeWuKongInferenceStart:
 
-			return h.HandleEventBigModelWuKongInferenceStart(&body)
+			return hd.HandleEventBigModelWuKongInferenceStart(&body)
 
 		case bigmoddelmsg.MsgTypeWuKongInferenceError:
 
-			return h.HandleEventBigModelWuKongInferenceError(&body)
+			return hd.HandleEventBigModelWuKongInferenceError(&body)
 
 		}
 
-		return
+		return nil
+	}
 
-	})
+}
+
+func registerHandler(topic, handlerName string, h kfklib.Handler) error {
+	return kfklib.SubscribeWithStrategyOfRetry(
+		handlerName+"-"+topic, h, []string{topic}, 3,
+	)
 }

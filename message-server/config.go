@@ -1,13 +1,15 @@
 package main
 
 import (
-	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/opensourceways/community-robot-lib/utils"
 
+	kfklib "github.com/opensourceways/kafka-lib/agent"
+	redislib "github.com/opensourceways/redis-lib"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
@@ -27,6 +29,7 @@ type configuration struct {
 	Postgresql PostgresqlConfig     `json:"postgresql"   required:"true"`
 	Domain     domain.Config        `json:"domain"       required:"true"`
 	MQ         config.MQ            `json:"mq"           required:"true"`
+	Redis      redis.Config         `json:"redis"        required:"true"`
 }
 
 type PostgresqlConfig struct {
@@ -36,9 +39,24 @@ type PostgresqlConfig struct {
 	asyncconf asyncrepoimpl.Config
 }
 
-func (cfg *configuration) getMQConfig() mq.MQConfig {
-	return mq.MQConfig{
-		Addresses: cfg.MQ.ParseAddress(),
+// func (cfg *configuration) getMQConfig() mq.MQConfig {
+// 	return mq.MQConfig{
+// 		Addresses: cfg.MQ.ParseAddress(),
+// 	}
+// }
+
+func (cfg *configuration) getKfkConfig() kfklib.Config {
+	return kfklib.Config{
+		Address: cfg.MQ.Address,
+	}
+}
+
+func (cfg *configuration) getRedisConfig() redislib.Config {
+	return redislib.Config{
+		Address: cfg.Redis.Address,
+		Password: cfg.Redis.Password,
+		DB: 0,
+		Timeout: 100000000,
 	}
 }
 
