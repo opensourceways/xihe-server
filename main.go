@@ -6,6 +6,8 @@ import (
 
 	"github.com/opensourceways/community-robot-lib/logrusutil"
 	liboptions "github.com/opensourceways/community-robot-lib/options"
+	kfklib "github.com/opensourceways/kafka-lib/agent"
+	redislib "github.com/opensourceways/redis-lib"
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
@@ -16,7 +18,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
-	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/server"
 )
@@ -100,11 +101,17 @@ func main() {
 	}
 
 	// mq
-	if err := messages.Init(cfg.GetMQConfig(), log, cfg.MQ.Topics); err != nil {
+	kfkCfg := cfg.GetKfkConfig()
+	redisCfg := cfg.GetRedisConfig()
+	err = redislib.Init(&redisCfg)
+	if err != nil {
+		log.Fatalf("initialize redis of kafka failed, err:%v", err)
+	}
+	if err := kfklib.Init(&kfkCfg, log, redislib.DAO(), "xihe-kafka-queue"); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
-	defer messages.Exit(log)
+	defer kfklib.Exit()
 
 	// mongo
 	m := &cfg.Mongodb

@@ -3,8 +3,7 @@ package messages
 import (
 	"encoding/json"
 
-	"github.com/opensourceways/community-robot-lib/kafka"
-	"github.com/opensourceways/community-robot-lib/mq"
+	kfklib "github.com/opensourceways/kafka-lib/agent"
 
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/domain"
@@ -237,7 +236,7 @@ func (s sender) send(topic string, v interface{}) error {
 		return err
 	}
 
-	return kafka.Publish(topic, &mq.Message{
-		Body: body,
-	})
+	return kfklib.Publish(
+		topic, nil, body,
+	)
 }
