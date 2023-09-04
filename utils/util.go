@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	layout = "2006-01-02"
+	layout     = "2006-01-02"
+	timeLayout = "2006-01-02 15:04:05"
 )
 
 func LoadFromYaml(path string, cfg interface{}) error {
@@ -41,6 +42,16 @@ func ToDate(n int64) string {
 
 func Date() string {
 	return time.Now().Format(layout)
+}
+
+func DateAndTime(n int64) (string, string) {
+	if n <= 0 {
+		return "", ""
+	}
+
+	t := time.Unix(n, 0)
+
+	return t.Format(layout), t.Format(timeLayout)
 }
 
 func ToUnixTime(v string) (time.Time, error) {
