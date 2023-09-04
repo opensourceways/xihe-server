@@ -39,12 +39,6 @@ type PostgresqlConfig struct {
 	asyncconf asyncrepoimpl.Config
 }
 
-// func (cfg *configuration) getMQConfig() mq.MQConfig {
-// 	return mq.MQConfig{
-// 		Addresses: cfg.MQ.ParseAddress(),
-// 	}
-// }
-
 func (cfg *configuration) getKfkConfig() kfklib.Config {
 	return kfklib.Config{
 		Address: cfg.MQ.Address,
@@ -53,10 +47,10 @@ func (cfg *configuration) getKfkConfig() kfklib.Config {
 
 func (cfg *configuration) getRedisConfig() redislib.Config {
 	return redislib.Config{
-		Address: cfg.Redis.Address,
+		Address:  cfg.Redis.Address,
 		Password: cfg.Redis.Password,
-		DB: 0,
-		Timeout: 100000000,
+		DB:       cfg.Redis.DB,
+		Timeout:  cfg.Redis.Timeout,
 	}
 }
 
@@ -70,6 +64,7 @@ func (cfg *configuration) configItems() []interface{} {
 		&cfg.Postgresql.asyncconf,
 		&cfg.Domain,
 		&cfg.MQ,
+		&cfg.Redis,
 	}
 }
 

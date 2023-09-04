@@ -18,8 +18,6 @@ import (
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
-	kfklib "github.com/opensourceways/kafka-lib/agent"
-	redislib "github.com/opensourceways/redis-lib"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
@@ -84,17 +82,15 @@ func main() {
 	}
 
 	// mq
-	kfkCfg := cfg.getKfkConfig()
-	redisCfg := cfg.getRedisConfig()
-	err = redislib.Init(&redisCfg)
-	if err != nil {
-		log.Fatalf("initialize redis of kafka failed, err:%v", err)
-	}
-	if err := kfklib.Init(&kfkCfg, log, redislib.DAO(), "xihe-kafka-queue"); err != nil {
+	if err = messages.InitKfkLib(
+		cfg.getKfkConfig(),
+		cfg.getRedisConfig(),
+		log, cfg.MQ.Topics,
+	); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
-	defer kfklib.Exit()
+	defer messages.KfkLibExit()
 
 	// mongo
 	m := &cfg.Mongodb
