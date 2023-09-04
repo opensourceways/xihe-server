@@ -1,8 +1,8 @@
 package redis
 
 type Config struct {
-	IdleSize int    `json:"idle_size" required:"true"`
-	NetWork  string `json:"network"   required:"true"`
+	IdleSize int    `json:"idle_size"`
+	NetWork  string `json:"network"`
 	Address  string `json:"address"   required:"true"`
 	Password string `json:"password"  required:"true"`
 	KeyPair  string `json:"key_pair"  required:"true"`
