@@ -42,6 +42,7 @@ type PostgresqlConfig struct {
 func (cfg *configuration) getKfkConfig() kfklib.Config {
 	return kfklib.Config{
 		Address: cfg.MQ.Address,
+		Version: cfg.MQ.Version,
 	}
 }
 
