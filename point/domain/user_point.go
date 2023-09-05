@@ -4,6 +4,10 @@ import (
 	common "github.com/opensourceways/xihe-server/domain"
 )
 
+type PointsCalculator interface {
+	Calc(total, pointsOfDay, pointsOfItem int) int
+}
+
 // UserPoint
 type UserPoint struct {
 	User    common.Account
@@ -13,10 +17,10 @@ type UserPoint struct {
 	Version int
 }
 
-func (entity *UserPoint) AddPointItem(t string, detail *PointDetail, r *PointRule) *PointItem {
+func (entity *UserPoint) AddPointItem(t string, detail *PointDetail, r PointsCalculator) *PointItem {
 	item := entity.poitItem(t)
 
-	v := r.calc(item.count() + 1)
+	v := r.Calc(entity.Total, entity.pointsOfDay(), item.points())
 	if v == 0 {
 		return nil
 	}
@@ -27,6 +31,15 @@ func (entity *UserPoint) AddPointItem(t string, detail *PointDetail, r *PointRul
 	item.add(detail)
 
 	return item
+}
+
+func (entity *UserPoint) pointsOfDay() int {
+	n := 0
+	for i := range entity.Items {
+		n += entity.Items[i].points()
+	}
+
+	return n
 }
 
 func (entity *UserPoint) poitItem(t string) *PointItem {
@@ -49,12 +62,17 @@ type PointItem struct {
 	Details []PointDetail
 }
 
-func (item *PointItem) count() int {
+func (item *PointItem) points() int {
 	if item == nil {
 		return 0
 	}
 
-	return len(item.Details)
+	n := 0
+	for i := range item.Details {
+		n += item.Details[i].Point
+	}
+
+	return n
 }
 
 func (item *PointItem) add(p *PointDetail) {
@@ -69,29 +87,29 @@ type PointDetail struct {
 	Point int    `json:"point"`
 }
 
-// PointRule
-type PointRule struct {
+// PointItemRule
+type PointItemRule struct {
 	Type           string
 	Desc           string
 	CreatedAt      string
-	Point          int
-	MaxTimesPerDay int
+	PointsPerOnce  int
+	MaxPointsOfDay int
 }
 
-// times is the count which the action happened and it starts from 1.
-func (r *PointRule) calc(times int) int {
-	if times > r.MaxTimesPerDay {
+// points is the one that user has got on this item
+func (r *PointItemRule) Calc(points int) int {
+	if points >= r.MaxPointsOfDay {
 		return 0
 	}
 
-	return r.Point
+	return r.PointsPerOnce
 }
 
 /*
-type PointRules []PointRule
+type PointItemRules []PointRule
 
 // times is the count which the action happened and it starts from 1.
-func (val PointRules) Calc(t string, times int) int {
+func (val PointItemRules) Calc(t string, times int) int {
 	for i := range val {
 		if val[i].Type == t {
 			return val[i].calc(times)

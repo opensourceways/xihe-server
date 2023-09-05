@@ -4,6 +4,7 @@ import (
 	common "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/point/domain"
 	"github.com/opensourceways/xihe-server/point/domain/repository"
+	"github.com/opensourceways/xihe-server/point/domain/service"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -11,13 +12,12 @@ const minValueOfInvlidTime = 24 * 3600 // second
 
 type userPointAppService struct {
 	repo repository.UserPoint
-	rule repository.PointRule
 }
 
 func (s userPointAppService) AddPointItem(cmd *CmdToAddPointItem) error {
-	rule, err := s.rule.Find(cmd.Type)
-	if err != nil {
-		return err
+	calculator := service.PointsRuleService().Calculator(cmd.Type)
+	if calculator == nil {
+		return nil
 	}
 
 	date, time := cmd.dateAndTime()
@@ -39,7 +39,7 @@ func (s userPointAppService) AddPointItem(cmd *CmdToAddPointItem) error {
 		Desc: cmd.Desc,
 	}
 
-	item := up.AddPointItem(cmd.Type, &detail, &rule)
+	item := up.AddPointItem(cmd.Type, &detail, calculator)
 	if item == nil {
 		return nil
 	}
