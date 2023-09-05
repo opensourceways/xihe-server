@@ -76,11 +76,15 @@ func main() {
 	}
 
 	// mq
-	if err := messages.Init(cfg.GetMQConfig(), log, cfg.MQ.Topics); err != nil {
+	if err = messages.InitKfkLib(
+		cfg.GetKfkConfig(),
+		cfg.GetRedisConfig(),
+		log, cfg.MQ.Topics,
+	); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
-	defer messages.Exit(log)
+	defer messages.KfkLibExit()
 
 	// postgresql
 	if err := pgsql.Init(&cfg.Postgresql.DB); err != nil {
