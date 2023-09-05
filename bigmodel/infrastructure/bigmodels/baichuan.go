@@ -14,7 +14,7 @@ type baichuanInfo struct {
 }
 
 type baichuanRequest struct {
-	Prompt            string  `json:"prompt"`
+	Inputs            string  `json:"inputs"`
 	Sampling          bool    `json:"sampling"`
 	TopK              int     `json:"top_k"`
 	TopP              float64 `json:"top_p"`
@@ -118,7 +118,7 @@ func (s *service) genBaiChuan(
 
 func toBaiChuanReq(d *domain.BaiChuanInput) baichuanRequest {
 	return baichuanRequest{
-		Prompt:            d.Text.BaiChuanText(),
+		Inputs:            d.Text.BaiChuanText(),
 		Sampling:          d.Sampling,
 		TopK:              d.TopK.TopK(),
 		TopP:              d.TopP.TopP(),

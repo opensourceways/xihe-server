@@ -53,7 +53,7 @@ func AddRouterForBigModelController(
 	rg.DELETE("/v1/bigmodel/wukong/digg", ctl.CancelDigg)
 	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
 	rg.POST("/v1/bigmodel/ai_detector", ctl.AIDetector)
-	rg.POST("/v1/bigmodel/baichuan", ctl.BaiChuan)
+	rg.POST("/v1/bigmodel/baichuan2_7b_chat", ctl.BaiChuan)
 
 	rg.POST("/v1/bigmodel/api/apply/:model", ctl.ApplyApi)
 	rg.GET("/v1/bigmodel/api/get", ctl.GetUserApplyRecord)
