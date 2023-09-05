@@ -29,6 +29,10 @@ import (
 
 var reIpPort = regexp.MustCompile(`^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}:[1-9][0-9]*$`)
 
+const (
+	kafkaDeaultVersion = "2.1.0"
+)
+
 func LoadConfig(path string, cfg interface{}) error {
 	if err := utils.LoadFromYaml(path, cfg); err != nil {
 		return err
@@ -84,6 +88,7 @@ func (cfg *Config) GetMQConfig() mq.MQConfig {
 func (cfg *Config) GetKfkConfig() kfklib.Config {
 	return kfklib.Config{
 		Address: cfg.MQ.Address,
+		Version: cfg.MQ.Version,
 	}
 }
 
@@ -201,6 +206,7 @@ type MongodbCollections struct {
 
 type MQ struct {
 	Address string          `json:"address" required:"true"`
+	Version string          `json:"version"`
 	Topics  messages.Topics `json:"topics"  required:"true"`
 }
 
@@ -210,6 +216,12 @@ func (cfg *MQ) Validate() error {
 	}
 
 	return nil
+}
+
+func (cfg *MQ) SetDefault() {
+	if cfg.Version == "" {
+		cfg.Version = kafkaDeaultVersion
+	}
 }
 
 func (cfg *MQ) ParseAddress() []string {
