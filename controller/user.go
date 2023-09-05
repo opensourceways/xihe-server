@@ -202,10 +202,11 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 		return
 	}
 
-	resp := func(u *userapp.UserDTO, isFollower bool) {
+	resp := func(u *userapp.UserDTO, points int, isFollower bool) {
 		ctx.JSON(http.StatusOK, newResponseData(
 			userDetail{
 				UserDTO:    u,
+				Points:     points,
 				IsFollower: isFollower,
 			}),
 		)
@@ -222,7 +223,7 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 			ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		} else {
 			u.Email = ""
-			resp(&u, false)
+			resp(&u, 0, false)
 		}
 
 		return
@@ -234,17 +235,17 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 			ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		} else {
 			u.Email = ""
-			resp(&u, isFollower)
+			resp(&u, 0, isFollower)
 		}
 
 		return
 	}
 
 	// get user own info
-	if u, err := ctl.s.GetByAccount(pl.DomainAccount()); err != nil {
+	if u, err := ctl.s.UserInfo(pl.DomainAccount()); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
-		resp(&u, true)
+		resp(&u.UserDTO, u.Points, true)
 	}
 }
 

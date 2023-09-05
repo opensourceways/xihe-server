@@ -8228,6 +8228,9 @@ const docTemplate = `{
                 },
                 "is_follower": {
                     "type": "boolean"
+                },
+                "points": {
+                    "type": "integer"
                 }
             }
         },

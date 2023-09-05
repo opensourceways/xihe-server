@@ -1719,6 +1719,8 @@ definitions:
         type: string
       is_follower:
         type: boolean
+      points:
+        type: integer
     type: object
   controller.wukongAddLikeResp:
     properties:
