@@ -5,7 +5,9 @@ import (
 )
 
 type PointsCalculator interface {
-	Calc(total, pointsOfDay, pointsOfItem int) int
+	// pointsOfDay is the total points that user has got that day
+	// pointsOfItem is the points that user has got on the item that day
+	Calc(pointsOfDay, pointsOfItem int) int
 }
 
 // UserPoints
@@ -20,7 +22,7 @@ type UserPoints struct {
 func (entity *UserPoints) AddPointsItem(t string, detail *PointsDetail, r PointsCalculator) *PointsItem {
 	item := entity.poitsItem(t)
 
-	v := r.Calc(entity.Total, entity.pointsOfDay(), item.points())
+	v := r.Calc(entity.pointsOfDay(), item.points())
 	if v == 0 {
 		return nil
 	}

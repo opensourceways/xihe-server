@@ -57,19 +57,21 @@ type calculator struct {
 	r *domain.PointsItemRule
 }
 
-// total is points that user has got until now
 // pointsOfDay is the total points that user has got that day
 // pointsOfItem is the points that user has got on the item that day
-func (c calculator) Calc(total, pointsOfDay, pointsOfItem int) int {
+func (c calculator) Calc(pointsOfDay, pointsOfItem int) int {
 	if pointsOfDay >= instance.maxPointsOfDay {
 		return 0
 	}
 
 	v := c.r.Calc(pointsOfItem)
-
-	if pointsOfDay+v <= instance.maxPointsOfDay {
-		return v
+	if v == 0 {
+		return 0
 	}
 
-	return 0
+	if n := instance.maxPointsOfDay - pointsOfDay; v >= n {
+		return n
+	}
+
+	return v
 }
