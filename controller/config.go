@@ -50,6 +50,10 @@ func Init(cfg *APIConfig, l *logrus.Entry) error {
 	return nil
 }
 
+func EncryptHelperToken() utils.SymmetricEncryption {
+	return encryptHelperToken
+}
+
 type APIConfig struct {
 	Tags                           Tags   `json:"tags"                        required:"true"`
 	TokenKey                       string `json:"token_key"                   required:"true"`
@@ -113,7 +117,6 @@ func (cfg *APIConfig) SetDefault() {
 	if cfg.MaxCompetitionSubmmitFileSzie <= 0 {
 		cfg.MaxCompetitionSubmmitFileSzie = 10 * 1024 * 1024
 	}
-	
 }
 
 func (cfg *APIConfig) Validate() (err error) {

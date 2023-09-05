@@ -202,6 +202,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, sender)
 
+	userAppService := userapp.NewUserService(
+		user, gitlabUser, sender, nil, controller.EncryptHelperToken(),
+	)
+
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	{
 		controller.AddRouterForProjectController(
@@ -220,12 +224,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForUserController(
-			v1, user, gitlabUser,
-			authingUser, loginService, sender, userRegService,
+			v1, userAppService, user,
+			authingUser, loginService, userRegService,
 		)
 
 		controller.AddRouterForLoginController(
-			v1, user, gitlabUser, authingUser, login, sender,
+			v1, userAppService, authingUser, login,
 		)
 
 		controller.AddRouterForLikeController(
@@ -253,7 +257,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForRepoFileController(
-			v1, gitlabRepo, model, proj, dataset, sender, user, gitlabUser,
+			v1, gitlabRepo, model, proj, dataset, sender, userAppService,
 		)
 
 		controller.AddRouterForInferenceController(

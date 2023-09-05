@@ -40,6 +40,12 @@ func (cmd *UserCreateCmd) toUser() domain.User {
 	}
 }
 
+type UserInfoDTO struct {
+	Points int `json:"points"`
+
+	UserDTO
+}
+
 type UserDTO struct {
 	Id      string `json:"id"`
 	Email   string `json:"email"`

@@ -4,18 +4,18 @@ import (
 	"time"
 
 	common "github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/point/domain"
+	"github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-type CmdToAddPointItem struct {
+type CmdToAddPointsItem struct {
 	Account common.Account
 	Type    string
 	Desc    string
 	Time    int64
 }
 
-func (cmd *CmdToAddPointItem) dateAndTime() (string, string) {
+func (cmd *CmdToAddPointsItem) dateAndTime() (string, string) {
 	now := time.Now().Unix()
 
 	if cmd.Time > now || cmd.Time < (now-minValueOfInvlidTime) {
@@ -25,13 +25,13 @@ func (cmd *CmdToAddPointItem) dateAndTime() (string, string) {
 	return utils.DateAndTime(cmd.Time)
 }
 
-type UserPointDetailsDTO struct {
-	Total   int              `json:"total"`
-	Details []PointDetailDTO `json:"details"`
+type UserPointsDetailsDTO struct {
+	Total   int               `json:"total"`
+	Details []PointsDetailDTO `json:"details"`
 }
 
-type PointDetailDTO struct {
+type PointsDetailDTO struct {
 	Type string `json:"type"`
 
-	domain.PointDetail
+	domain.PointsDetail
 }

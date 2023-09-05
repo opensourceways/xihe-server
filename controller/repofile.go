@@ -13,7 +13,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	uapp "github.com/opensourceways/xihe-server/user/app"
-	urepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForRepoFileController(
@@ -23,12 +22,11 @@ func AddRouterForRepoFileController(
 	project repository.Project,
 	dataset repository.Dataset,
 	sender message.Sender,
-	ru urepo.User,
-	pu platform.User,
+	us uapp.UserService,
 ) {
 	ctl := RepoFileController{
 		s:       app.NewRepoFileService(p, sender),
-		us:      uapp.NewUserService(ru, pu, sender, encryptHelperToken),
+		us:      us,
 		model:   model,
 		project: project,
 		dataset: dataset,

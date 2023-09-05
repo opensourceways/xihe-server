@@ -8,11 +8,9 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
-	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
-	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -57,15 +55,13 @@ type newUserTokenPayload struct {
 
 func AddRouterForLoginController(
 	rg *gin.RouterGroup,
-	repo userrepo.User,
-	ps platform.User,
+	us userapp.UserService,
 	auth authing.User,
 	login repository.Login,
-	sender message.Sender,
 ) {
 	pc := LoginController{
 		auth: auth,
-		us:   userapp.NewUserService(repo, ps, sender, encryptHelperToken),
+		us:   us,
 		ls:   app.NewLoginService(login),
 	}
 

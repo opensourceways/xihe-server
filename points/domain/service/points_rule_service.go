@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/opensourceways/xihe-server/point/domain"
-	"github.com/opensourceways/xihe-server/point/domain/repository"
+	"github.com/opensourceways/xihe-server/points/domain"
+	"github.com/opensourceways/xihe-server/points/domain/repository"
 )
 
 var instance *pointsRuleService
@@ -11,14 +11,14 @@ func PointsRuleService() *pointsRuleService {
 	return instance
 }
 
-func InitPointsRuleService(repo repository.PointRule) (err error) {
+func InitPointsRuleService(repo repository.PointsRule) (err error) {
 	s := pointsRuleService{}
 
 	if s.maxPointsOfDay, err = repo.PointsOfDay(); err != nil {
 		return err
 	}
 
-	if s.rules, err = repo.FindAll(); err != nil {
+	if s.rules, err = repo.FindPointsItemRules(); err != nil {
 		return err
 	}
 
@@ -31,8 +31,8 @@ func InitPointsRuleService(repo repository.PointRule) (err error) {
 
 // pointsRuleService
 type pointsRuleService struct {
-	repo           repository.PointRule
-	rules          []domain.PointItemRule
+	repo           repository.PointsRule
+	rules          []domain.PointsItemRule
 	maxPointsOfDay int
 }
 
@@ -54,7 +54,7 @@ func (s *pointsRuleService) Calculator(ruleType string) domain.PointsCalculator 
 
 // calculator
 type calculator struct {
-	r *domain.PointItemRule
+	r *domain.PointsItemRule
 }
 
 // total is points that user has got until now

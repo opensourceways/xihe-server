@@ -983,7 +983,7 @@ func (ctl *BigModelController) AIDetector(ctx *gin.Context) {
 //	@Tags			BigModel
 //	@Param			body	body	baichuanReq	true	"body of baichuan"
 //	@Accept			json
-//	@Success		202	{object}		BaiChuanDTO
+//	@Success		202	{object}		app.BaiChuanDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/bigmodel/baichuan2_7b_chat [post]
 func (ctl *BigModelController) BaiChuan(ctx *gin.Context) {
@@ -1013,7 +1013,6 @@ func (ctl *BigModelController) BaiChuan(ctx *gin.Context) {
 		ctl.sendRespOfPost(ctx, dto)
 	}
 }
-
 
 //	@Title			ApplyApi
 //	@Description	generates pictures by WuKong-hf

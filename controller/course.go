@@ -90,7 +90,7 @@ func (ctl *CourseController) Apply(ctx *gin.Context) {
 //	@Param			type	query	string	false	"course type, such as ai, mindspore, foundation"
 //	@Param			mine	query	string	false	"just list courses of player, if it is set"
 //	@Accept			json
-//	@Success		200	{object}		app.CourseSummuryDTO
+//	@Success		200	{object}		app.CourseSummaryDTO
 //	@Failure		500	system_error	system	error
 //	@Router			/v1/course [get]
 func (ctl *CourseController) List(ctx *gin.Context) {

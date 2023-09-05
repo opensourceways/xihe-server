@@ -8,8 +8,6 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
-	"github.com/opensourceways/xihe-server/domain/message"
-	"github.com/opensourceways/xihe-server/domain/platform"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
@@ -17,16 +15,12 @@ import (
 
 func AddRouterForUserController(
 	rg *gin.RouterGroup,
+	us userapp.UserService,
 	repo userrepo.User,
-	ps platform.User,
 	auth authing.User,
 	login app.LoginService,
-	sender message.Sender,
 	register userapp.RegService,
 ) {
-
-	us := userapp.NewUserService(repo, ps, sender, encryptHelperToken)
-
 	ctl := UserController{
 		auth: auth,
 		repo: repo,
@@ -259,7 +253,7 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 // @Tags			User
 // @Param			account	path	string	true	"account"
 // @Accept			json
-// @Success		200	{object}			success
+// @Success		200
 // @Failure		400	bad_request_param	account	is	invalid
 // @Failure		401	not_allowed			can't	get	info	of	other	user
 // @Router			/{account}/gitlab/refresh [get]
