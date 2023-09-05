@@ -339,10 +339,10 @@ type BaiChuanCmd struct {
 }
 
 func (cmd *BaiChuanCmd) SetDefault() {
-	cmd.TopK, _ = domain.NewTopK(3)
-	cmd.TopP, _ = domain.NewTopP(0.95)
+	cmd.TopK, _ = domain.NewTopK(0)
+	cmd.TopP, _ = domain.NewTopP(1)
 	cmd.Temperature, _ = domain.NewTemperature(1)
-	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1.1)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1.05)
 }
 
 type BaiChuanDTO struct {
