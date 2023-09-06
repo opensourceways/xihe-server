@@ -330,7 +330,7 @@ func (s bigModelService) toApiInfoDTO(
 // baichuan
 type BaiChuanCmd struct {
 	User              types.Account
-	Sampling		  bool
+	Sampling          bool
 	Text              domain.BaiChuanText
 	TopK              domain.TopK
 	TopP              domain.TopP
@@ -339,9 +339,9 @@ type BaiChuanCmd struct {
 }
 
 func (cmd *BaiChuanCmd) SetDefault() {
-	cmd.TopK, _ = domain.NewTopK(0)
-	cmd.TopP, _ = domain.NewTopP(1)
-	cmd.Temperature, _ = domain.NewTemperature(1)
+	cmd.TopK, _ = domain.NewTopK(5)
+	cmd.TopP, _ = domain.NewTopP(0.85)
+	cmd.Temperature, _ = domain.NewTemperature(0.3)
 	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1.05)
 }
 
