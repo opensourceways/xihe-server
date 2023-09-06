@@ -8,6 +8,8 @@ import (
 	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/opensourceways/community-robot-lib/utils"
 
+	kfklib "github.com/opensourceways/kafka-lib/agent"
+	redislib "github.com/opensourceways/redis-lib"
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
@@ -76,6 +78,21 @@ type Config struct {
 func (cfg *Config) GetMQConfig() mq.MQConfig {
 	return mq.MQConfig{
 		Addresses: cfg.MQ.ParseAddress(),
+	}
+}
+
+func (cfg *Config) GetKfkConfig() kfklib.Config {
+	return kfklib.Config{
+		Address: cfg.MQ.Address,
+	}
+}
+
+func (cfg *Config) GetRedisConfig() redislib.Config {
+	return redislib.Config{
+		Address:  cfg.Redis.DB.Address,
+		Password: cfg.Redis.DB.Password,
+		DB:       cfg.Redis.DB.DB,
+		Timeout:  cfg.Redis.DB.Timeout,
 	}
 }
 
