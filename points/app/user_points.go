@@ -12,7 +12,7 @@ const minValueOfInvlidTime = 24 * 3600 // second
 type UserPointsAppService interface {
 	Points(account common.Account) (int, error)
 	GetPointsDetails(account common.Account) (dto UserPointsDetailsDTO, err error)
-	GetTaskCompletionInfo(account common.Account) ([]TasksCompletionInfoDTO, error)
+	TasksOfDay(account common.Account) ([]TasksCompletionInfoDTO, error)
 }
 
 func NewUserPointsAppService(
@@ -68,7 +68,7 @@ func (s *userPointsAppService) GetPointsDetails(account common.Account) (dto Use
 	return
 }
 
-func (s *userPointsAppService) GetTaskCompletionInfo(account common.Account) ([]TasksCompletionInfoDTO, error) {
+func (s *userPointsAppService) TasksOfDay(account common.Account) ([]TasksCompletionInfoDTO, error) {
 	tasks, err := s.tr.FindAllTasks()
 	if err != nil {
 		return nil, err
@@ -97,6 +97,8 @@ func (s *userPointsAppService) GetTaskCompletionInfo(account common.Account) ([]
 		j, ok := m[t.Kind]
 		if !ok {
 			j = len(r)
+			m[t.Kind] = j
+
 			r = append(r, TasksCompletionInfoDTO{Kind: t.Kind})
 		}
 

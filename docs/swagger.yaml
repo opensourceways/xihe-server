@@ -626,9 +626,9 @@ definitions:
         type: string
       points:
         type: integer
-      time:
+      task:
         type: string
-      type:
+      time:
         type: string
     type: object
   app.ProjectSummaryDTO:
@@ -784,6 +784,24 @@ definitions:
         type: array
       name:
         type: string
+    type: object
+  app.TaskCompletionInfoDTO:
+    properties:
+      completed:
+        type: boolean
+      name:
+        type: string
+      points:
+        type: integer
+    type: object
+  app.TasksCompletionInfoDTO:
+    properties:
+      kind:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/app.TaskCompletionInfoDTO'
+        type: array
     type: object
   app.TrainingSummaryDTO:
     properties:
@@ -2038,7 +2056,7 @@ paths:
             type: system_error
       tags:
       - BigModel
-  /v1/bigmodel/baichuan:
+  /v1/bigmodel/baichuan2_7b_chat:
     post:
       consumes:
       - application/json
@@ -5450,6 +5468,23 @@ paths:
           schema:
             type: system_error
       summary: get user points details
+      tags:
+      - UserPoints
+  /v1/user_points/tasks:
+    get:
+      consumes:
+      - application/json
+      description: tasks of day
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.TasksCompletionInfoDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: tasks of day
       tags:
       - UserPoints
 swagger: "2.0"
