@@ -17,6 +17,8 @@ import (
 )
 
 const (
+	retryNum = 3
+
 	handlerNameAddLike            = "add_like"
 	handlerNameAddFork            = "add_fork"
 	handlerNameAddDownload        = "add_download"
@@ -220,7 +222,8 @@ func registerHandlerForRelatedResource(handler interface{}) error {
 	}
 
 	return subscribe(
-		topics.RelatedResource, handlerNameAddRelatedResource, f)
+		topics.RelatedResource, handlerNameAddRelatedResource, f,
+	)
 }
 
 func registerHandlerForTraining(handler interface{}) error {
@@ -438,6 +441,6 @@ func registerHandlerForBigModel(handler interface{}) error {
 
 func subscribe(topicName string, handlerName string, handler kfklib.Handler) error {
 	return kfklib.SubscribeWithStrategyOfRetry(
-		handlerName, handler, []string{topicName}, 3,
+		handlerName, handler, []string{topicName}, retryNum,
 	)
 }
