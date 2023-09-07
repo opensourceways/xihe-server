@@ -48,5 +48,6 @@ func InitKfkLib(kfkCfg kfklib.Config, redisCfg redislib.Config, log kfkmq.Logger
 }
 
 func KfkLibExit() {
+	redislib.Close()
 	kfklib.Exit()
 }
