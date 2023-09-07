@@ -33,21 +33,12 @@ func Exit(log *logrus.Entry) {
 	}
 }
 
-func InitKfkLib(kfkCfg kfklib.Config, redisCfg redislib.Config, log kfkmq.Logger, topic Topics) (err error) {
+func InitKfkLib(kfkCfg kfklib.Config, log kfkmq.Logger, topic Topics) (err error) {
 	topics = topic
 
-	if err = redislib.Init(&redisCfg); err != nil {
-		return
-	}
-
-	if err = kfklib.Init(&kfkCfg, log, redislib.DAO(), kfkQueueName); err != nil {
-		return
-	}
-
-	return
+	return kfklib.Init(&kfkCfg, log, redislib.DAO(), kfkQueueName)
 }
 
 func KfkLibExit() {
-	redislib.Close()
 	kfklib.Exit()
 }
