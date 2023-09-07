@@ -17,17 +17,17 @@ import (
 )
 
 const (
-	handlerNameAddFollowing       = "add_following"
 	handlerNameAddLike            = "add_like"
 	handlerNameAddFork            = "add_fork"
 	handlerNameAddDownload        = "add_download"
+	handlerNameAddFollowing       = "add_following"
 	handlerNameAddRelatedResource = "add_related_resource"
+	handlerNameCreateCloud        = "create_cloud"
 	handlerNameCreateBigModel     = "create_bigmodel"
 	handlerNameCreateTraining     = "create_training"
 	handlerNameCreateFinetune     = "create_finetune"
-	handlerNameCreateInference    = "create_inference"
 	handlerNameCreateEvaluate     = "create_evaluate"
-	handlerNameCreateCloud        = "create_cloud"
+	handlerNameCreateInference    = "create_inference"
 )
 
 func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) (err error) {
@@ -202,24 +202,25 @@ func registerHandlerForRelatedResource(handler interface{}) error {
 		return nil
 	}
 
+	f := func(b []byte, hd map[string]string) (err error) {
+		body := msgRelatedResources{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
+
+		switch body.Action {
+		case actionAdd:
+			return body.handle(h.HandleEventAddRelatedResource)
+
+		case actionRemove:
+			return body.handle(h.HandleEventRemoveRelatedResource)
+		}
+
+		return nil
+	}
+
 	return subscribe(
-		topics.RelatedResource, handlerNameAddRelatedResource,
-		func(b []byte, hd map[string]string) (err error) {
-			body := msgRelatedResources{}
-			if err = json.Unmarshal(b, &body); err != nil {
-				return
-			}
-
-			switch body.Action {
-			case actionAdd:
-				return body.handle(h.HandleEventAddRelatedResource)
-
-			case actionRemove:
-				return body.handle(h.HandleEventRemoveRelatedResource)
-			}
-
-			return nil
-		})
+		topics.RelatedResource, handlerNameAddRelatedResource, f)
 }
 
 func registerHandlerForTraining(handler interface{}) error {
@@ -289,49 +290,50 @@ func registerHandlerForInference(handler interface{}) error {
 		return nil
 	}
 
-	return subscribe(topics.Inference, handlerNameCreateInference,
-		func(b []byte, m map[string]string) (err error) {
-			body := msgInference{}
-			if err = json.Unmarshal(b, &body); err != nil {
-				return
-			}
+	f := func(b []byte, m map[string]string) (err error) {
+		body := msgInference{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
 
-			v := domain.InferenceIndex{}
+		v := domain.InferenceIndex{}
 
-			if v.Project.Owner, err = domain.NewAccount(body.ProjectOwner); err != nil {
-				return
-			}
+		if v.Project.Owner, err = domain.NewAccount(body.ProjectOwner); err != nil {
+			return
+		}
 
-			v.Id = body.InferenceId
-			v.Project.Id = body.ProjectId
-			v.LastCommit = body.LastCommit
+		v.Id = body.InferenceId
+		v.Project.Id = body.ProjectId
+		v.LastCommit = body.LastCommit
 
-			info := domain.InferenceInfo{
-				InferenceIndex: v,
-			}
+		info := domain.InferenceInfo{
+			InferenceIndex: v,
+		}
 
-			info.ProjectName, err = domain.NewResourceName(body.ProjectName)
-			if err != nil {
-				return
-			}
+		info.ProjectName, err = domain.NewResourceName(body.ProjectName)
+		if err != nil {
+			return
+		}
 
-			info.ResourceLevel = body.ResourceLevel
+		info.ResourceLevel = body.ResourceLevel
 
-			switch body.Action {
-			case actionCreate:
-				return h.HandleEventCreateInference(&info)
+		switch body.Action {
+		case actionCreate:
+			return h.HandleEventCreateInference(&info)
 
-			case actionExtend:
-				return h.HandleEventExtendInferenceSurvivalTime(
-					&message.InferenceExtendInfo{
-						InferenceInfo: info,
-						Expiry:        body.Expiry,
-					},
-				)
-			}
+		case actionExtend:
+			return h.HandleEventExtendInferenceSurvivalTime(
+				&message.InferenceExtendInfo{
+					InferenceInfo: info,
+					Expiry:        body.Expiry,
+				},
+			)
+		}
 
-			return nil
-		})
+		return nil
+	}
+
+	return subscribe(topics.Inference, handlerNameCreateInference, f)
 }
 
 func registerHandlerForEvaluate(handler interface{}) error {
