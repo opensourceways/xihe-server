@@ -21,7 +21,7 @@ const (
 	bigmodelDescPicture   = "desc_picture"
 	bigmodelDescPictureHF = "desc_picture_hf"
 	bigmodelAIDetector    = "ai_detector"
-	bigmodelBaiChuan           = "baichuan"
+	bigmodelBaiChuan      = "baichuan"
 
 	langZH = "zh"
 	langEN = "en"
@@ -42,7 +42,7 @@ var (
 	BigmodelDescPicture   = BigmodelType(bigmodelDescPicture)
 	BigmodelDescPictureHF = BigmodelType(bigmodelDescPictureHF)
 	BigmodelAIDetector    = BigmodelType(bigmodelAIDetector)
-	BigmodelBaiChuan           = BigmodelType(bigmodelBaiChuan)
+	BigmodelBaiChuan      = BigmodelType(bigmodelBaiChuan)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
@@ -287,7 +287,7 @@ func NewBaiChuanText(v string) (BaiChuanText, error) {
 		return nil, errors.New("no baichuan text")
 	}
 
-	if max:= 1000; utils.StrLen(v) > max { // TODO: to config
+	if max := 1000; utils.StrLen(v) > max { // TODO: to config
 		return nil, errors.New("invalid baichuan text")
 	}
 
@@ -306,7 +306,7 @@ type TopK interface {
 type top_k int
 
 func NewTopK(v int) (TopK, error) {
-	if min,max:=0,10; v < min || v > max {
+	if min, max := 0, 10; v < min || v > max {
 		return nil, errors.New("invalid top_k")
 	}
 
@@ -344,7 +344,7 @@ type Temperature interface {
 type temperature float64
 
 func NewTemperature(v float64) (Temperature, error) {
-	if min:= 0.00; v < min {
+	if min := 0.00; v < min {
 		return nil, errors.New("invalid temperature")
 	}
 
@@ -363,7 +363,7 @@ type RepetitionPenalty interface {
 type repetitionPenalty float64
 
 func NewRepetitionPenalty(v float64) (RepetitionPenalty, error) {
-	if min:= 0.00; v < min {
+	if min := 0.00; v < min {
 		return nil, errors.New("invalid repetitionPenalty")
 	}
 
@@ -372,4 +372,4 @@ func NewRepetitionPenalty(v float64) (RepetitionPenalty, error) {
 
 func (t repetitionPenalty) RepetitionPenalty() float64 {
 	return float64(t)
-} 
+}

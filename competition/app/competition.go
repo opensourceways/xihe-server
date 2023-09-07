@@ -39,7 +39,7 @@ func NewCompetitionService(
 	repo repository.Competition,
 	workRepo repository.Work,
 	playerRepo repository.Player,
-	producer message.CalcScoreMessageProducer,
+	producer message.CompetitionMessageProducer,
 	uploader uploader.SubmissionFileUploader,
 	userCli user.User,
 ) *competitionService {
@@ -57,7 +57,7 @@ type competitionService struct {
 	repo             repository.Competition
 	workRepo         repository.Work
 	playerRepo       repository.Player
-	producer         message.CalcScoreMessageProducer
+	producer         message.CompetitionMessageProducer
 	submissionServie domain.SubmissionService
 	userCli          user.User
 }
