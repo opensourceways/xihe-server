@@ -6,6 +6,7 @@ import (
 	"github.com/opensourceways/xihe-server/competition/domain"
 	"github.com/opensourceways/xihe-server/competition/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/domain/message"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -38,6 +39,16 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 	}
 
 	if err = s.userCli.AddUserRegInfo(&p.Leader); err != nil {
+		return
+	}
+
+	// notify
+	info := message.ApplyCompetitionInfo{
+		Name: competition.Name.CompetitionName(),
+		User: p.Leader.Account.Account(),
+	}
+
+	if err = s.sender.ApplyCompetition(&info); err != nil {
 		return
 	}
 

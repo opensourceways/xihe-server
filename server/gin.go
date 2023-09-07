@@ -169,6 +169,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		competitionrepo.NewPlayerRepo(mongodb.NewCollection(collections.CompetitionPlayer)),
 		sender, uploader,
 		competitionusercli.NewUserCli(userRegService),
+		sender,
 	)
 
 	courseAppService := courseapp.NewCourseService(

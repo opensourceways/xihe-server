@@ -8,6 +8,10 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
+type PointMsg interface {
+	Convert() (p *CmdToAddPointsItem, err error)
+}
+
 type CmdToAddPointsItem struct {
 	Account common.Account
 	Task    string

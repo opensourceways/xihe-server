@@ -28,6 +28,8 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	pointapp "github.com/opensourceways/xihe-server/points/app"
+	pointinfra "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
@@ -182,6 +184,11 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 
 		async: asyncapp.NewAsyncMessageService(
 			asyncrepo.NewAsyncTaskRepo(&cfg.Postgresql.asyncconf),
+		),
+
+		point: pointapp.NewUserPointsAppMessageService(
+			pointinfra.TaskAdapter(),
+			pointinfra.UserPointsAdapter(),
 		),
 	}
 

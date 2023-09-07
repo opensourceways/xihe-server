@@ -13,6 +13,7 @@ import (
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
+	"github.com/opensourceways/xihe-server/points/app"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
@@ -30,6 +31,7 @@ const (
 	handlerNameCreateFinetune     = "create_finetune"
 	handlerNameCreateEvaluate     = "create_evaluate"
 	handlerNameCreateInference    = "create_inference"
+	handlerNamePoints             = "points"
 )
 
 func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) (err error) {
@@ -258,6 +260,31 @@ func registerHandlerForTraining(handler interface{}) error {
 	return subscribe(topics.Training, handlerNameCreateTraining, f)
 }
 
+func registerHandlerForPoints(handler interface{}) error {
+	h, ok := handler.(message.PointsHandler)
+	if !ok {
+		return nil
+	}
+
+	f := func(b []byte, m map[string]string) (err error) {
+		var msg app.PointMsg
+		if err = json.Unmarshal(b, &msg); err != nil {
+			return
+		}
+
+		p, err := msg.Convert()
+		if err != nil {
+			return err
+		}
+
+		h.HandlePoints(p)
+
+		return
+	}
+
+	return subscribeTopics([]string{topics.Competition}, handlerNamePoints, f)
+}
+
 func registerHandlerForFinetune(handler interface{}) error {
 	h, ok := handler.(message.FinetuneHandler)
 	if !ok {
@@ -442,5 +469,11 @@ func registerHandlerForBigModel(handler interface{}) error {
 func subscribe(topicName string, handlerName string, handler kfklib.Handler) error {
 	return kfklib.SubscribeWithStrategyOfRetry(
 		handlerName, handler, []string{topicName}, retryNum,
+	)
+}
+
+func subscribeTopics(topics []string, handlerName string, handler kfklib.Handler) error {
+	return kfklib.SubscribeWithStrategyOfRetry(
+		handlerName, handler, topics, retryNum,
 	)
 }

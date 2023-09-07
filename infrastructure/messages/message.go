@@ -1,8 +1,11 @@
 package messages
 
 import (
+	"fmt"
+
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
+	"github.com/opensourceways/xihe-server/points/app"
 )
 
 const (
@@ -17,6 +20,31 @@ type msgOperateLog struct {
 	User string            `json:"user"`
 	Type string            `json:"type"`
 	Info map[string]string `json:"info,omitempty"`
+}
+
+const MsgVer = 1
+
+type PointMsgBase struct {
+	User    string `json:"user_name"`
+	Time    int64  `json:"time"`
+	Version int    `json:"version"`
+}
+
+type msgApplyCompetition struct {
+	Name string `json:"name"`
+	PointMsgBase
+}
+
+func (msg *msgApplyCompetition) Convert() (p *app.CmdToAddPointsItem, err error) {
+	p.Account, err = domain.NewAccount(msg.User)
+	if err != nil {
+		return
+	}
+	p.Desc = fmt.Sprintf("User %s apply the %s competition", p.Account, msg.Name)
+	p.Time = msg.Time
+	p.Task = "ApplyCompetition"
+
+	return
 }
 
 type msgFollower struct {

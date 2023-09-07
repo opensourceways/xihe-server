@@ -168,6 +168,20 @@ func (s sender) sendRelatedResource(msg *message.RelatedResource, action string)
 	return s.send(topics.RelatedResource, &v)
 }
 
+// Evaluate
+func (s sender) ApplyCompetition(info *message.ApplyCompetitionInfo) error {
+	v := msgApplyCompetition{
+		Name: info.Name,
+		PointMsgBase: PointMsgBase{
+			User:    info.User,
+			Time:    utils.Now(),
+			Version: MsgVer,
+		},
+	}
+
+	return s.send(topics.Competition, &v)
+}
+
 // Competition
 func (s sender) CalcScore(info *message.SubmissionInfo) error {
 	v := msgSubmission{

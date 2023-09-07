@@ -17,4 +17,5 @@ type Topics struct {
 	Cloud           string `json:"cloud"            required:"true"`
 	Async           string `json:"async"            required:"true"`
 	BigModel        string `json:"bigmodel"         required:"true"`
+	Competition     string `json:"competition"         required:"true"`
 }

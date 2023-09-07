@@ -3,6 +3,7 @@ package message
 import (
 	bmdomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/points/app"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
@@ -10,6 +11,11 @@ type EvaluateInfo struct {
 	domain.EvaluateIndex
 	Type    string
 	OBSPath string
+}
+
+type ApplyCompetitionInfo struct {
+	Name string
+	User string
 }
 
 type InferenceExtendInfo struct {
@@ -55,6 +61,7 @@ type Sender interface {
 	ExtendInferenceSurvivalTime(*InferenceExtendInfo) error
 
 	CreateEvaluate(*EvaluateInfo) error
+	ApplyCompetition(*ApplyCompetitionInfo) error
 
 	CalcScore(*SubmissionInfo) error
 }
@@ -110,6 +117,10 @@ type TrainingHandler interface {
 
 type FinetuneHandler interface {
 	HandleEventCreateFinetune(*domain.FinetuneIndex) error
+}
+
+type PointsHandler interface {
+	HandlePoints(*app.CmdToAddPointsItem) error
 }
 
 type InferenceHandler interface {
