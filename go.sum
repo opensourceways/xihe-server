@@ -97,7 +97,6 @@ github.com/gabriel-vasile/mimetype v1.4.2/go.mod h1:zApsH/mKG4w07erKIaJPFiX0Tsq9
 github.com/getkin/kin-openapi v0.76.0/go.mod h1:660oXbgy5JFMKreazJaQTw7o+X00qeSyhcnluiMv+Xg=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/gin-contrib/gzip v0.0.6 h1:NjcunTcGAj5CO1gn4N8jHOSIeRFHIbn51z6K+xaN4d4=
-github.com/gin-contrib/gzip v0.0.6/go.mod h1:QOJlmV2xmayAjkNS2Y8NQsMneuRShOU/kjovCXNuzzk=
 github.com/gin-contrib/sse v0.1.0 h1:Y/yl/+YNO8GZSjAhjMsSuLt29uWRFHdHYUb5lYOV9qE=
 github.com/gin-contrib/sse v0.1.0/go.mod h1:RHrZQHXnP2xjPF+u1gW/2HnVO7nvIa9PG3Gm+fLHvGI=
 github.com/gin-gonic/gin v1.9.1 h1:4idEAncQnU5cB7BeOkPtxjfCSye0AAm1R0RVIqJ+Jmg=
@@ -323,8 +322,6 @@ github.com/onsi/gomega v1.23.0 h1:/oxKu9c2HVap+F3PfKort2Hw5DEU+HGlW8n+tguWsys=
 github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb h1:+G1/sm5wGn4nJS4yri3T3jujcty7PDuBjiIh2CP5k5c=
 github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb/go.mod h1:aeTHmjsRPhPpRuUDT95A5YFEFhGzc2OM7OL9HHjsmYM=
 github.com/opensourceways/go-gitee v0.0.0-20220714075315-cb246f1dfb96/go.mod h1:yvVsEMhp7frMblzN1sco4C7cRlnlpqkkn3O2JQNdRu0=
-github.com/opensourceways/kafka-lib v0.0.0-20230829033500-59e4578d4500 h1:uuyUsMhpQT4WkNsIk3rlZIkCHCNgtU/35IZj081AFpo=
-github.com/opensourceways/kafka-lib v0.0.0-20230829033500-59e4578d4500/go.mod h1:QdqMHorecJ6UC6dL9T1luvKMQm7jNMLOMCD1f/yNSqs=
 github.com/opensourceways/kafka-lib v0.0.0-20230905120934-4961d2b76841 h1:+t7oDeW8mnRvdSumxeySYYQpjK3HDFsieKIu25D/fpE=
 github.com/opensourceways/kafka-lib v0.0.0-20230905120934-4961d2b76841/go.mod h1:QdqMHorecJ6UC6dL9T1luvKMQm7jNMLOMCD1f/yNSqs=
 github.com/opensourceways/redis-lib v0.0.0-20230830095926-13d246a18179 h1:9YNcE9p1hPMuvhU4IywlCSs1t6LqrRJljXv3LNoqSDU=
