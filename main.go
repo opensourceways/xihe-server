@@ -19,8 +19,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
-	pointsservice "github.com/opensourceways/xihe-server/points/domain/service"
-	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	"github.com/opensourceways/xihe-server/server"
 )
 
@@ -73,13 +71,6 @@ func main() {
 	cfg := new(config.Config)
 	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
 		logrus.Fatalf("load config, err:%s", err.Error())
-	}
-
-	// points rule service
-	if err := pointsservice.InitPointsRuleService(pointsrepo.PointsRuleAdapter()); err != nil {
-		logrus.Errorf("init points rule service, err:%s", err.Error())
-
-		return
 	}
 
 	// bigmodel

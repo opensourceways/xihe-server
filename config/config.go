@@ -25,6 +25,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	points "github.com/opensourceways/xihe-server/points/domain"
 )
 
 var reIpPort = regexp.MustCompile(`^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}:[1-9][0-9]*$`)
@@ -77,6 +78,7 @@ type Config struct {
 	App         app.Config             `json:"app"          required:"true"`
 	API         controller.APIConfig   `json:"api"          required:"true"`
 	MQ          MQ                     `json:"mq"           required:"true"`
+	Points      points.Config          `json:"points"`
 }
 
 func (cfg *Config) GetMQConfig() mq.MQConfig {
@@ -118,6 +120,7 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.App,
 		&cfg.API,
 		&cfg.MQ,
+		&cfg.Points,
 	}
 }
 
