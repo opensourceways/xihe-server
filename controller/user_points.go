@@ -37,7 +37,7 @@ func (ctl *UserPointsController) PointsDetails(ctx *gin.Context) {
 		return
 	}
 
-	if v, err := ctl.s.GetPointsDetails(pl.DomainAccount()); err != nil {
+	if v, err := ctl.s.PointsDetails(pl.DomainAccount()); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, v)
