@@ -286,7 +286,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/bigmodel/baichuan": {
+        "/v1/bigmodel/baichuan2_7b_chat": {
             "post": {
                 "description": "conversational AI",
                 "consumes": [
@@ -5463,6 +5463,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/user_points/tasks": {
+            "get": {
+                "description": "tasks of day",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserPoints"
+                ],
+                "summary": "tasks of day",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.TasksCompletionInfoDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/{account}": {
             "get": {
                 "description": "get info of login",
@@ -6550,10 +6576,10 @@ const docTemplate = `{
                 "points": {
                     "type": "integer"
                 },
-                "time": {
+                "task": {
                     "type": "string"
                 },
-                "type": {
+                "time": {
                     "type": "string"
                 }
             }
@@ -6792,6 +6818,34 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "app.TaskCompletionInfoDTO": {
+            "type": "object",
+            "properties": {
+                "completed": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "points": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.TasksCompletionInfoDTO": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string"
+                },
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.TaskCompletionInfoDTO"
+                    }
                 }
             }
         },
