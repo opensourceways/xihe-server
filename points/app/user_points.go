@@ -5,22 +5,26 @@ import (
 	"github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/points/domain/repository"
 	"github.com/opensourceways/xihe-server/points/domain/service"
-	"github.com/opensourceways/xihe-server/utils"
+	//"github.com/opensourceways/xihe-server/utils"
 )
 
 const minValueOfInvlidTime = 24 * 3600 // second
 
 type UserPointsAppService interface {
 	AddPointsItem(cmd *CmdToAddPointsItem) error
-	GetTotal(account common.Account) (int, error)
+	Points(account common.Account) (int, error)
 	GetPointsDetails(account common.Account) (dto UserPointsDetailsDTO, err error)
+}
+
+func NewUserPointsAppService(repo repository.UserPoints) *userPointsAppService {
+	return &userPointsAppService{repo}
 }
 
 type userPointsAppService struct {
 	repo repository.UserPoints
 }
 
-func (s userPointsAppService) AddPointsItem(cmd *CmdToAddPointsItem) error {
+func (s *userPointsAppService) AddPointsItem(cmd *CmdToAddPointsItem) error {
 	calculator := service.PointsRuleService().Calculator(cmd.Type)
 	if calculator == nil {
 		return nil
@@ -53,7 +57,9 @@ func (s userPointsAppService) AddPointsItem(cmd *CmdToAddPointsItem) error {
 	return s.repo.SavePointsItem(&up, item)
 }
 
-func (s userPointsAppService) GetTotal(account common.Account) (int, error) {
+func (s *userPointsAppService) Points(account common.Account) (int, error) {
+	return 0, nil
+	/* TODO retrieve back
 	up, err := s.repo.Find(account, utils.Date())
 	if err != nil {
 		// if not exist
@@ -61,9 +67,10 @@ func (s userPointsAppService) GetTotal(account common.Account) (int, error) {
 	}
 
 	return up.Total, nil
+	*/
 }
 
-func (s userPointsAppService) GetPointsDetails(account common.Account) (dto UserPointsDetailsDTO, err error) {
+func (s *userPointsAppService) GetPointsDetails(account common.Account) (dto UserPointsDetailsDTO, err error) {
 	v, err := s.repo.FindAll(account)
 	if err != nil {
 		return
