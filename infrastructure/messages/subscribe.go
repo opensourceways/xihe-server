@@ -17,12 +17,12 @@ import (
 )
 
 const (
-	handlerNameCreateBigModel     = "create_bigmodel"
 	handlerNameAddFollowing       = "add_following"
 	handlerNameAddLike            = "add_like"
 	handlerNameAddFork            = "add_fork"
 	handlerNameAddDownload        = "add_download"
 	handlerNameAddRelatedResource = "add_related_resource"
+	handlerNameCreateBigModel     = "create_bigmodel"
 	handlerNameCreateTraining     = "create_training"
 	handlerNameCreateFinetune     = "create_finetune"
 	handlerNameCreateInference    = "create_inference"
@@ -228,29 +228,30 @@ func registerHandlerForTraining(handler interface{}) error {
 		return nil
 	}
 
-	return subscribe(topics.Training, handlerNameCreateTraining,
-		func(b []byte, hd map[string]string) (err error) {
-			body := message.MsgTraining{}
-			if err = json.Unmarshal(b, &body); err != nil {
-				return
-			}
+	f := func(b []byte, hd map[string]string) (err error) {
+		body := message.MsgTraining{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
 
-			if body.Details["project_id"] == "" || body.Details["training_id"] == "" {
-				err = errors.New("invalid message of training")
+		if body.Details["project_id"] == "" || body.Details["training_id"] == "" {
+			err = errors.New("invalid message of training")
 
-				return
-			}
+			return
+		}
 
-			v := domain.TrainingIndex{}
-			if v.Project.Owner, err = domain.NewAccount(body.Details["project_owner"]); err != nil {
-				return
-			}
+		v := domain.TrainingIndex{}
+		if v.Project.Owner, err = domain.NewAccount(body.Details["project_owner"]); err != nil {
+			return
+		}
 
-			v.Project.Id = body.Details["project_id"]
-			v.TrainingId = body.Details["training_id"]
+		v.Project.Id = body.Details["project_id"]
+		v.TrainingId = body.Details["training_id"]
 
-			return h.HandleEventCreateTraining(&v)
-		})
+		return h.HandleEventCreateTraining(&v)
+	}
+
+	return subscribe(topics.Training, handlerNameCreateTraining, f)
 }
 
 func registerHandlerForFinetune(handler interface{}) error {
@@ -259,26 +260,27 @@ func registerHandlerForFinetune(handler interface{}) error {
 		return nil
 	}
 
-	return subscribe(topics.Finetune, handlerNameCreateFinetune,
-		func(b []byte, m map[string]string) (err error) {
-			body := msgFinetune{}
-			if err = json.Unmarshal(b, &body); err != nil {
-				return
-			}
+	f := func(b []byte, m map[string]string) (err error) {
+		body := msgFinetune{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
 
-			if body.Id == "" {
-				err = errors.New("invalid message of finetune")
+		if body.Id == "" {
+			err = errors.New("invalid message of finetune")
 
-				return
-			}
+			return
+		}
 
-			v := domain.FinetuneIndex{Id: body.Id}
-			if v.Owner, err = domain.NewAccount(body.User); err != nil {
-				return
-			}
+		v := domain.FinetuneIndex{Id: body.Id}
+		if v.Owner, err = domain.NewAccount(body.User); err != nil {
+			return
+		}
 
-			return h.HandleEventCreateFinetune(&v)
-		})
+		return h.HandleEventCreateFinetune(&v)
+	}
+
+	return subscribe(topics.Finetune, handlerNameCreateFinetune, f)
 }
 
 func registerHandlerForInference(handler interface{}) error {
@@ -338,27 +340,28 @@ func registerHandlerForEvaluate(handler interface{}) error {
 		return nil
 	}
 
-	return subscribe(topics.Evaluate, handlerNameCreateEvaluate,
-		func(b []byte, m map[string]string) (err error) {
-			body := msgEvaluate{}
-			if err = json.Unmarshal(b, &body); err != nil {
-				return
-			}
+	f := func(b []byte, m map[string]string) (err error) {
+		body := msgEvaluate{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
 
-			v := message.EvaluateInfo{}
+		v := message.EvaluateInfo{}
 
-			if v.Project.Owner, err = domain.NewAccount(body.ProjectOwner); err != nil {
-				return
-			}
+		if v.Project.Owner, err = domain.NewAccount(body.ProjectOwner); err != nil {
+			return
+		}
 
-			v.Id = body.EvaluateId
-			v.Type = body.Type
-			v.OBSPath = body.OBSPath
-			v.Project.Id = body.ProjectId
-			v.TrainingId = body.TrainingId
+		v.Id = body.EvaluateId
+		v.Type = body.Type
+		v.OBSPath = body.OBSPath
+		v.Project.Id = body.ProjectId
+		v.TrainingId = body.TrainingId
 
-			return h.HandleEventCreateEvaluate(&v)
-		})
+		return h.HandleEventCreateEvaluate(&v)
+	}
+
+	return subscribe(topics.Evaluate, handlerNameCreateEvaluate, f)
 }
 
 func registerHandlerForCloud(handler interface{}) error {
@@ -367,66 +370,68 @@ func registerHandlerForCloud(handler interface{}) error {
 		return nil
 	}
 
-	return subscribe(topics.Cloud, handlerNameCreateCloud,
-		func(b []byte, m map[string]string) (err error) {
-			body := msgPodCreate{}
-			if err = json.Unmarshal(b, &body); err != nil {
-				return
-			}
+	f := func(b []byte, m map[string]string) (err error) {
+		body := msgPodCreate{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
 
-			user, err := domain.NewAccount(body.User)
-			if err != nil {
-				return
-			}
+		user, err := domain.NewAccount(body.User)
+		if err != nil {
+			return
+		}
 
-			v := cloudtypes.PodInfo{
-				Pod: cloudtypes.Pod{
-					Id:      body.PodId,
-					CloudId: body.CloudId,
-					Owner:   user,
-				},
-			}
-			v.SetDefaultExpiry()
+		v := cloudtypes.PodInfo{
+			Pod: cloudtypes.Pod{
+				Id:      body.PodId,
+				CloudId: body.CloudId,
+				Owner:   user,
+			},
+		}
+		v.SetDefaultExpiry()
 
-			return h.HandleEventPodSubscribe(&v)
-		})
+		return h.HandleEventPodSubscribe(&v)
+	}
+
+	return subscribe(topics.Cloud, handlerNameCreateCloud, f)
 }
 
 func registerHandlerForBigModel(handler interface{}) error {
 
-	return subscribe(topics.BigModel, handlerNameCreateBigModel,
-		func(b []byte, m map[string]string) (err error) {
-			body := bigmoddelmsg.MsgTask{}
-			if err = json.Unmarshal(b, &body); err != nil {
-				return
-			}
-
-			h, ok := handler.(BigModelMessageHandler)
-			if !ok {
-				return
-			}
-
-			switch body.Type {
-			case bigmoddelmsg.MsgTypeWuKongAsyncTaskFinish:
-
-				return h.HandleEventBigModelWuKongAsyncTaskFinish(&body)
-
-			case bigmoddelmsg.MsgTypeWuKongAsyncTaskStart:
-
-				return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
-
-			case bigmoddelmsg.MsgTypeWuKongInferenceStart:
-
-				return h.HandleEventBigModelWuKongInferenceStart(&body)
-
-			case bigmoddelmsg.MsgTypeWuKongInferenceError:
-
-				return h.HandleEventBigModelWuKongInferenceError(&body)
-
-			}
-
+	f := func(b []byte, m map[string]string) (err error) {
+		body := bigmoddelmsg.MsgTask{}
+		if err = json.Unmarshal(b, &body); err != nil {
 			return
-		})
+		}
+
+		h, ok := handler.(BigModelMessageHandler)
+		if !ok {
+			return
+		}
+
+		switch body.Type {
+		case bigmoddelmsg.MsgTypeWuKongAsyncTaskFinish:
+
+			return h.HandleEventBigModelWuKongAsyncTaskFinish(&body)
+
+		case bigmoddelmsg.MsgTypeWuKongAsyncTaskStart:
+
+			return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
+
+		case bigmoddelmsg.MsgTypeWuKongInferenceStart:
+
+			return h.HandleEventBigModelWuKongInferenceStart(&body)
+
+		case bigmoddelmsg.MsgTypeWuKongInferenceError:
+
+			return h.HandleEventBigModelWuKongInferenceError(&body)
+
+		}
+
+		return
+	}
+
+	return subscribe(topics.BigModel, handlerNameCreateBigModel, f)
 }
 
 func subscribe(topicName string, handlerName string, handler kfklib.Handler) error {
