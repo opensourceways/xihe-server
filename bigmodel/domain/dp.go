@@ -21,7 +21,7 @@ const (
 	bigmodelDescPicture   = "desc_picture"
 	bigmodelDescPictureHF = "desc_picture_hf"
 	bigmodelAIDetector    = "ai_detector"
-	bigmodelBaiChuan           = "baichuan"
+	bigmodelBaiChuan      = "baichuan"
 
 	langZH = "zh"
 	langEN = "en"
@@ -42,7 +42,7 @@ var (
 	BigmodelDescPicture   = BigmodelType(bigmodelDescPicture)
 	BigmodelDescPictureHF = BigmodelType(bigmodelDescPictureHF)
 	BigmodelAIDetector    = BigmodelType(bigmodelAIDetector)
-	BigmodelBaiChuan           = BigmodelType(bigmodelBaiChuan)
+	BigmodelBaiChuan      = BigmodelType(bigmodelBaiChuan)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
@@ -372,4 +372,4 @@ func NewRepetitionPenalty(v float64) (RepetitionPenalty, error) {
 
 func (t repetitionPenalty) RepetitionPenalty() float64 {
 	return float64(t)
-} 
+}

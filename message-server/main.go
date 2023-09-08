@@ -137,6 +137,8 @@ func pointsSubscribesMessage(topics *messages.Topics) error {
 		),
 		[]string{
 			topics.SignIn.Topic,
+			topics.PublicPicture.Topic,
+			topics.ApplyCompetition.Topic,
 		},
 	)
 }

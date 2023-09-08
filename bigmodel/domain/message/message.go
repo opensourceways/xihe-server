@@ -6,6 +6,7 @@ import (
 
 	comsg "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain/message"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
@@ -15,12 +16,14 @@ const (
 	MsgTypeWuKongAsyncTaskFinish = "msg_type_wukong_async_task_finish"
 )
 
+// normal msessage
 type MsgTask comsg.MsgNormal
 
 type AsyncMessageProducer interface {
 	message.Sender
 
 	SendBigModelMsg(*MsgTask) error
+	SendBigmodelPublicMsg(*MsgTask) error
 }
 
 func (msg *MsgTask) WuKongInferenceStart(user, desc, style, taskType string) {
@@ -73,5 +76,13 @@ func (msg *MsgTask) WuKongAsyncInferenceFinish(tid uint64, user string, links ma
 			"status":  "finished",
 			"links":   strings.TrimRight(ls, ","),
 		},
+	}
+}
+
+func (msg *MsgTask) GenWuKongPublicPictureMsg(user string) {
+	*msg = MsgTask{
+		User:      user,
+		Details:   nil,
+		CreatedAt: utils.Now(),
 	}
 }
