@@ -145,7 +145,8 @@ type PointsDetail struct {
 // Task
 type Task struct {
 	Name string
-	Kind string //Novice, EveryDay, Activity
+	Kind string // Novice, EveryDay, Activity
+	Addr string // The website address of task
 	Rule Rule
 }
 

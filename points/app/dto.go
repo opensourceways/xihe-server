@@ -44,6 +44,7 @@ type TasksCompletionInfoDTO struct {
 func (dto *TasksCompletionInfoDTO) add(t *domain.Task, completed bool) {
 	dto.Tasks = append(dto.Tasks, TaskCompletionInfoDTO{
 		Name:      t.Name,
+		Addr:      t.Addr,
 		Points:    t.Rule.PointsPerOnce,
 		Completed: completed,
 	})
@@ -51,6 +52,7 @@ func (dto *TasksCompletionInfoDTO) add(t *domain.Task, completed bool) {
 
 type TaskCompletionInfoDTO struct {
 	Name      string `json:"name"`
+	Addr      string `json:"addr"`
 	Points    int    `json:"points"`
 	Completed bool   `json:"completed"`
 }

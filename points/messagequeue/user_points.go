@@ -15,14 +15,14 @@ const (
 	retryNum = 3
 )
 
-func Subscribe(s app.UserPointsAppService, topics []string) error {
+func Subscribe(s app.UserPointsAppMessageService, topics []string) error {
 	c := &consumer{s}
 
 	return kfk.SubscribeWithStrategyOfRetry(group, c.handle, topics, retryNum)
 }
 
 type consumer struct {
-	s app.UserPointsAppService
+	s app.UserPointsAppMessageService
 }
 
 func (c *consumer) handle(body []byte, h map[string]string) error {

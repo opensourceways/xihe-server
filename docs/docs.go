@@ -6824,6 +6824,9 @@ const docTemplate = `{
         "app.TaskCompletionInfoDTO": {
             "type": "object",
             "properties": {
+                "addr": {
+                    "type": "string"
+                },
                 "completed": {
                     "type": "boolean"
                 },
