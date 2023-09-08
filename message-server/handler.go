@@ -55,7 +55,7 @@ type handler struct {
 	inference app.InferenceMessageService
 	cloud     cloudapp.CloudMessageService
 	async     asyncapp.AsyncMessageService
-	points    pointsapp.UserPointsAppService
+	points    pointsapp.UserPointsAppMessageService
 }
 
 func (h *handler) HandleEventAddPoints(info *pointsapp.CmdToAddPointsItem) error {
