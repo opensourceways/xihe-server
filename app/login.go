@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
 )
 
@@ -40,16 +41,19 @@ type LoginDTO struct {
 type LoginService interface {
 	Create(*LoginCreateCmd) error
 	Get(domain.Account) (LoginDTO, error)
+	SignIn(domain.Account) error
 }
 
-func NewLoginService(repo repository.Login) LoginService {
+func NewLoginService(repo repository.Login, sender message.Sender) LoginService {
 	return loginService{
-		repo: repo,
+		repo:   repo,
+		sender: sender,
 	}
 }
 
 type loginService struct {
-	repo repository.Login
+	repo   repository.Login
+	sender message.Sender
 }
 
 func (s loginService) Create(cmd *LoginCreateCmd) error {
@@ -74,4 +78,8 @@ func (s loginService) toLoginDTO(u *domain.Login, dto *LoginDTO) {
 	dto.Info = u.Info
 	dto.Email = u.Email.Email()
 	dto.UserId = u.UserId
+}
+
+func (s loginService) SignIn(account domain.Account) error {
+	return s.sender.SignIn(account)
 }

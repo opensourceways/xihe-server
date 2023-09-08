@@ -9,7 +9,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	"github.com/opensourceways/xihe-server/domain/platform"
-	"github.com/opensourceways/xihe-server/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -57,18 +56,19 @@ func AddRouterForLoginController(
 	rg *gin.RouterGroup,
 	us userapp.UserService,
 	auth authing.User,
-	login repository.Login,
+	login app.LoginService,
 ) {
 	pc := LoginController{
 		auth: auth,
 		us:   us,
-		ls:   app.NewLoginService(login),
+		ls:   login,
 	}
 
 	pc.password, _ = domain.NewPassword(apiConfig.DefaultPassword)
 
 	rg.GET("/v1/login", pc.Login)
 	rg.GET("/v1/login/:account", pc.Logout)
+	rg.PUT("/v1/signin", pc.SignIn)
 }
 
 type LoginController struct {
@@ -89,7 +89,7 @@ type LoginController struct {
 //	@Success		200	{object}			app.UserDTO
 //	@Failure		500	system_error		system	error
 //	@Failure		501	duplicate_creating	create	user	repeatedly	which	should	not	happen
-//	@Router			/ [get]
+//	@Router			/v1/login [get]
 func (ctl *LoginController) Login(ctx *gin.Context) {
 	info, err := ctl.auth.GetByCode(
 		ctl.getQueryParameter(ctx, "code"),
@@ -231,7 +231,7 @@ func (ctl *LoginController) newPlateformAccount(cmd *userapp.UserCreateCmd) (err
 //	@Failure		400	bad_request_param	account	is	invalid
 //	@Failure		401	not_allowed			can't	get	login	info	of	other	user
 //	@Failure		500	system_error		system	error
-//	@Router			/{account} [get]
+//	@Router			/v1/login/{account} [get]
 func (ctl *LoginController) Logout(ctx *gin.Context) {
 	account, err := domain.NewAccount(ctx.Param("account"))
 	if err != nil {
@@ -280,4 +280,24 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 
 	info.Info = string(v)
 	ctx.JSON(http.StatusOK, newResponseData(info))
+}
+
+//	@Title			SignIn
+//	@Description		user sign in
+//	@Tags			Login
+//	@Accept			json
+//	@Success		202
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/signin [put]
+func (ctl *LoginController) SignIn(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiTokenNoRefresh(ctx, false)
+	if !ok {
+		return
+	}
+
+	if err := ctl.ls.SignIn(pl.DomainAccount()); err != nil {
+		ctl.sendCodeMessage(ctx, "", err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
+	}
 }

@@ -159,7 +159,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		),
 	)
 
-	loginService := app.NewLoginService(login)
+	loginService := app.NewLoginService(login, sender)
 
 	asyncAppService := asyncapp.NewTaskService(asyncrepoimpl.NewAsyncTaskRepo(&cfg.Postgresql.Async))
 
@@ -236,7 +236,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForLoginController(
-			v1, userAppService, authingUser, login,
+			v1, userAppService, authingUser, loginService,
 		)
 
 		controller.AddRouterForLikeController(

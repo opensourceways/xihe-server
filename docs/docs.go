@@ -16,53 +16,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/": {
-            "get": {
-                "description": "callback of authentication by authing",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Login"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "authing code",
-                        "name": "code",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "redirect uri",
-                        "name": "redirect_uri",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/app.UserDTO"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    },
-                    "501": {
-                        "description": "Not Implemented",
-                        "schema": {
-                            "type": "duplicate_creating"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/bigmodel/ai_detector": {
             "post": {
                 "description": "detecte if text generate by ai",
@@ -2921,6 +2874,99 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/login": {
+            "get": {
+                "description": "callback of authentication by authing",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authing code",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "redirect uri",
+                        "name": "redirect_uri",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.UserDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "duplicate_creating"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/login/{account}": {
+            "get": {
+                "description": "get info of login",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "account",
+                        "name": "account",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.LoginDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "not_allowed"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/model": {
             "get": {
                 "description": "list global public model",
@@ -4473,6 +4519,28 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/signin": {
+            "put": {
+                "description": "user sign in",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "responses": {
+                    "202": {
+                        "description": ""
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/tags/{type}": {
             "get": {
                 "description": "list tags",
@@ -5478,52 +5546,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/app.TasksCompletionInfoDTO"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/{account}": {
-            "get": {
-                "description": "get info of login",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Login"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "account",
-                        "name": "account",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/app.LoginDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "bad_request_param"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "not_allowed"
                         }
                     },
                     "500": {
