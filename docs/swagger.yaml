@@ -787,6 +787,8 @@ definitions:
     type: object
   app.TaskCompletionInfoDTO:
     properties:
+      addr:
+        type: string
       completed:
         type: boolean
       name:
