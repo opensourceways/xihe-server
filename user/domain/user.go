@@ -45,7 +45,6 @@ type UserInfo struct {
 	AvatarId AvatarId
 }
 
-
 // register
 type UserRegInfo struct {
 	Account  types.Account
@@ -57,4 +56,11 @@ type UserRegInfo struct {
 	Province Province
 	Detail   map[string]string
 	Version  int
+}
+
+type UserPoints struct {
+	Account Account
+	Type    string
+	Desc    string
+	Time    int64
 }

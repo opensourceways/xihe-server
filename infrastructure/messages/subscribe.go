@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	pointsapp "github.com/opensourceways/xihe-server/points/app"
 
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 	"github.com/sirupsen/logrus"
@@ -30,6 +31,7 @@ const (
 	handlerNameCreateFinetune     = "create_finetune"
 	handlerNameCreateEvaluate     = "create_evaluate"
 	handlerNameCreateInference    = "create_inference"
+	handlerNameAddPoints          = "add_points"
 )
 
 func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) (err error) {
@@ -88,10 +90,34 @@ func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) (err
 		return err
 	}
 
+	// points
+	if err = registerHandlerForPoints(handler); err != nil {
+		return
+	}
+
 	// register end
 	<-ctx.Done()
 
 	return nil
+}
+
+func registerHandlerForPoints(handler interface{}) error {
+	h, ok := handler.(message.PointsHandler)
+	if !ok {
+		return nil
+	}
+
+	return subscribe(topics.AppPoints, handlerNameAddPoints, func(b []byte, hd map[string]string) (err error) {
+		body := msgAddPoints{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
+
+		//拉错分支，没看到task，rule结构体，感觉整个订阅逻辑都不对？
+		points := &pointsapp.CmdToAddPointsItem{}
+
+		return h.HandleEventAddPoints(points)
+	})
 }
 
 func registerHandlerForFollowing(handler interface{}) error {

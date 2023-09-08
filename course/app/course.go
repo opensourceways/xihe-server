@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/opensourceways/xihe-server/domain/message"
 	"strings"
 
 	"github.com/opensourceways/xihe-server/course/domain/repository"
@@ -53,6 +54,7 @@ type courseService struct {
 	playerRepo repository.Player
 	workRepo   repository.Work
 	recordRepo repository.Record
+	sender     message.Sender
 }
 
 // List

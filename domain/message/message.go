@@ -3,6 +3,7 @@ package message
 import (
 	bmdomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/domain"
+	pointsapp "github.com/opensourceways/xihe-server/points/app"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
@@ -57,6 +58,9 @@ type Sender interface {
 	CreateEvaluate(*EvaluateInfo) error
 
 	CalcScore(*SubmissionInfo) error
+
+	AddPointsForApplyCourse(account domain.Account) error
+	AddPointsForApplyCompetition(account domain.Account) error
 }
 
 type EventHandler interface {
@@ -69,6 +73,7 @@ type EventHandler interface {
 	FinetuneHandler
 	InferenceHandler
 	EvaluateHandler
+	PointsHandler
 }
 
 type FollowingHandler interface {
@@ -119,4 +124,8 @@ type InferenceHandler interface {
 
 type EvaluateHandler interface {
 	HandleEventCreateEvaluate(*EvaluateInfo) error
+}
+
+type PointsHandler interface {
+	HandleEventAddPoints(*pointsapp.CmdToAddPointsItem) error
 }
