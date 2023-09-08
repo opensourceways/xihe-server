@@ -4,35 +4,90 @@ import (
 	common "github.com/opensourceways/xihe-server/domain"
 )
 
-type PointsCalculator interface {
-	// pointsOfDay is the total points that user has got that day
-	// pointsOfItem is the points that user has got on the item that day
-	Calc(pointsOfDay, pointsOfItem int) int
-}
-
 // UserPoints
 type UserPoints struct {
 	User    common.Account
 	Total   int
 	Date    string
 	Items   []PointsItem // items of corresponding date
+	Dones   []string     // tasks that user has done
 	Version int
 }
 
-func (entity *UserPoints) AddPointsItem(t string, detail *PointsDetail, r PointsCalculator) *PointsItem {
-	item := entity.poitsItem(t)
+func (entity *UserPoints) AddPointsItem(task *Task, time, desc string) *PointsItem {
+	newItem := false
 
-	v := r.Calc(entity.pointsOfDay(), item.points())
+	item := entity.poitsItem(task.Name)
+	if item == nil {
+		item = &PointsItem{Task: task.Name}
+		newItem = true
+	}
+
+	v := entity.calc(task, item)
 	if v == 0 {
 		return nil
 	}
 
 	entity.Total += v
-	detail.Points = v
 
-	item.add(detail)
+	item.add(&PointsDetail{
+		Id:     "", // TODO uuid
+		Time:   time,
+		Desc:   desc,
+		Points: v,
+	})
+
+	if newItem {
+		entity.Items = append(entity.Items, *item)
+
+		item = &entity.Items[len(entity.Items)-1]
+	}
+
+	if !entity.hasDone(task.Name) {
+		entity.Dones = append(entity.Dones, task.Name)
+	}
 
 	return item
+}
+
+func (entity *UserPoints) IsCompleted(task *Task) bool {
+	item := entity.poitsItem(task.Name)
+	if item == nil {
+		return false
+	}
+
+	v := task.Rule.calc(item.points(), !entity.hasDone(task.Name))
+
+	return v == 0
+}
+
+func (entity *UserPoints) calc(task *Task, item *PointsItem) int {
+	pointsOfDay := entity.pointsOfDay()
+
+	if pointsOfDay >= config.MaxPointsOfDay {
+		return 0
+	}
+
+	v := task.Rule.calc(item.points(), !entity.hasDone(task.Name))
+	if v == 0 {
+		return 0
+	}
+
+	if n := config.MaxPointsOfDay - pointsOfDay; v >= n {
+		return n
+	}
+
+	return v
+}
+
+func (entity *UserPoints) hasDone(t string) bool {
+	for _, i := range entity.Dones {
+		if i == t {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (entity *UserPoints) pointsOfDay() int {
@@ -48,19 +103,17 @@ func (entity *UserPoints) poitsItem(t string) *PointsItem {
 	items := entity.Items
 
 	for i := range items {
-		if items[i].Type == t {
+		if items[i].Task == t {
 			return &items[i]
 		}
 	}
 
-	entity.Items = append(items, PointsItem{Type: t})
-
-	return &entity.Items[len(entity.Items)-1]
+	return nil
 }
 
 // PointsItem
 type PointsItem struct {
-	Type    string
+	Task    string
 	Details []PointsDetail
 }
 
@@ -89,17 +142,33 @@ type PointsDetail struct {
 	Points int    `json:"points"`
 }
 
-// PointsItemRule
-type PointsItemRule struct {
-	Type           string
+// Task
+type Task struct {
+	Name string
+	Kind string //Novice, EveryDay, Activity
+	Rule Rule
+}
+
+// Rule
+type Rule struct {
+	OnceOnly       bool // only can do once
 	Desc           string
 	CreatedAt      string
 	PointsPerOnce  int
 	MaxPointsOfDay int
 }
 
-// points is the one that user has got on this item
-func (r *PointsItemRule) Calc(points int) int {
+// points is the one that user has got on this task today
+// firstTime is that user is first time to do this task
+func (r *Rule) calc(points int, firstTime bool) int {
+	if r.OnceOnly {
+		if firstTime {
+			return 0
+		}
+
+		return r.PointsPerOnce
+	}
+
 	if r.MaxPointsOfDay > 0 && points >= r.MaxPointsOfDay {
 		return 0
 	}

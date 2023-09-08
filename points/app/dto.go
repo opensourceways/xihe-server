@@ -10,7 +10,7 @@ import (
 
 type CmdToAddPointsItem struct {
 	Account common.Account
-	Type    string
+	Task    string
 	Desc    string
 	Time    int64
 }
@@ -31,7 +31,26 @@ type UserPointsDetailsDTO struct {
 }
 
 type PointsDetailDTO struct {
-	Type string `json:"type"`
+	Task string `json:"task"`
 
 	domain.PointsDetail
+}
+
+type TasksCompletionInfoDTO struct {
+	Kind  string                  `json:"kind"`
+	Tasks []TaskCompletionInfoDTO `json:"tasks"`
+}
+
+func (dto *TasksCompletionInfoDTO) add(t *domain.Task, completed bool) {
+	dto.Tasks = append(dto.Tasks, TaskCompletionInfoDTO{
+		Name:      t.Name,
+		Points:    t.Rule.PointsPerOnce,
+		Completed: completed,
+	})
+}
+
+type TaskCompletionInfoDTO struct {
+	Name      string `json:"name"`
+	Points    int    `json:"points"`
+	Completed bool   `json:"completed"`
 }

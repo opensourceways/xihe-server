@@ -46,7 +46,7 @@ func toCmd(msg *message.MsgNormal) (cmd app.CmdToAddPointsItem, err error) {
 		return
 	}
 
-	cmd.Type = msg.Type
+	cmd.Task = msg.Type
 	cmd.Time = msg.CreatedAt
 	cmd.Desc = msg.Desc
 
