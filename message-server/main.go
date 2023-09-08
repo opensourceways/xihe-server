@@ -119,7 +119,7 @@ func main() {
 	cfg.initDomainConfig()
 
 	// points
-	if err = pointsSubscribesMessage(&cfg.MQ.Topics); err != nil {
+	if err = pointsSubscribesMessage(cfg, &cfg.MQ.Topics); err != nil {
 		logrus.Errorf("points subscribes message failed, err:%s", err.Error())
 
 		return
@@ -129,10 +129,12 @@ func main() {
 	run(newHandler(cfg, log), log)
 }
 
-func pointsSubscribesMessage(topics *messages.Topics) error {
+func pointsSubscribesMessage(cfg *configuration, topics *messages.Topics) error {
+	collections := &cfg.Mongodb.Collections
+
 	return pointsmq.Subscribe(
 		pointsapp.NewUserPointsAppMessageService(
-			pointsrepo.TaskAdapter(),
+			pointsrepo.TaskAdapter(mongodb.NewCollection(collections.PointsTask)),
 			pointsrepo.UserPointsAdapter(),
 		),
 		[]string{

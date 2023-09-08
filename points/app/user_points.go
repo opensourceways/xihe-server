@@ -2,6 +2,7 @@ package app
 
 import (
 	common "github.com/opensourceways/xihe-server/domain"
+	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/points/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
@@ -31,16 +32,16 @@ type userPointsAppService struct {
 }
 
 func (s *userPointsAppService) Points(account common.Account) (int, error) {
-	return 0, nil
-	/* TODO retrieve back
 	up, err := s.repo.Find(account, utils.Date())
 	if err != nil {
-		// if not exist
-		return 0, nil
+		if repoerr.IsErrorResourceNotExists(err) {
+			return 0, nil
+		}
+
+		return 0, err
 	}
 
 	return up.Total, nil
-	*/
 }
 
 func (s *userPointsAppService) PointsDetails(account common.Account) (dto UserPointsDetailsDTO, err error) {
@@ -78,12 +79,13 @@ func (s *userPointsAppService) TasksOfDay(account common.Account) ([]TasksComple
 
 	up, err := s.repo.Find(account, utils.Date())
 	if err != nil {
-		// if not exist
+		if !repoerr.IsErrorResourceNotExists(err) {
+			return nil, err
+		}
+
 		isCompleted = func(*domain.Task) bool {
 			return false
 		}
-
-		return nil, err
 	} else {
 		isCompleted = up.IsCompleted
 	}
