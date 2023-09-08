@@ -39,6 +39,30 @@ func (s sender) sendFollowing(msg *userdomain.FollowerInfo, action string) error
 	return s.send(topics.Following, &v)
 }
 
+// AddPoints
+func (s sender) AddPointsForApplyCourse(u domain.Account) error {
+	return s.sendAppPoints(u, "ApplyCourse", "Each course adds 30 points")
+}
+
+func (s sender) AddPointsForApplyCompetition(u domain.Account) error {
+	return s.sendAppPoints(u, "ApplyCompetition", "Each competition adds 30 points")
+}
+
+func (s sender) sendAppPoints(u domain.Account, t string, info string) error {
+	a := ""
+	if u != nil {
+		a = u.Account()
+	}
+	v := msgAddPoints{
+		When: utils.Now(),
+		User: a,
+		Type: t,
+		Info: info,
+	}
+
+	return s.send(topics.AppPoints, &v)
+}
+
 // Like
 func (s sender) AddLike(msg *domain.ResourceObject) error {
 	return s.sendLike(msg, actionAdd)

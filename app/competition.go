@@ -64,6 +64,8 @@ func (s competitionService) Apply(cid string, cmd *CompetitorApplyCmd) error {
 		return err
 	}
 
+	_ = s.sender.AddPointsForApplyCompetition(cmd.Account)
+
 	return nil
 }
 

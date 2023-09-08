@@ -77,6 +77,13 @@ type msgRelatedResources struct {
 	Resources []resourceObjects `json:"resources"`
 }
 
+type msgAddPoints struct {
+	When int64  `json:"when"`
+	User string `json:"user"`
+	Type string `json:"type"`
+	Info string `json:"info"`
+}
+
 func (msg *msgRelatedResources) handle(f func(*message.RelatedResource) error) error {
 	promoter := domain.ResourceObject{}
 	if err := msg.Promoter.toResourceObject(&promoter); err != nil {
