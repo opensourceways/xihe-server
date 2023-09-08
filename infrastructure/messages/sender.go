@@ -6,6 +6,7 @@ import (
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
+	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
@@ -178,6 +179,15 @@ func (s sender) CalcScore(info *message.SubmissionInfo) error {
 	}
 
 	return s.send(topics.Submission, &v)
+}
+
+// Sign In
+func (s sender) SignIn(u domain.Account) error {
+	return s.send(topics.SignIn.Topic, &common.MsgNormal{
+		Type:      topics.SignIn.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+	})
 }
 
 // operate log

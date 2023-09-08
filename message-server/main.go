@@ -28,6 +28,9 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	pointsapp "github.com/opensourceways/xihe-server/points/app"
+	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
@@ -115,8 +118,27 @@ func main() {
 	// cfg
 	cfg.initDomainConfig()
 
+	// points
+	if err = pointsSubscribesMessage(&cfg.MQ.Topics); err != nil {
+		logrus.Errorf("points subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
 	// run
 	run(newHandler(cfg, log), log)
+}
+
+func pointsSubscribesMessage(topics *messages.Topics) error {
+	return pointsmq.Subscribe(
+		pointsapp.NewUserPointsAppMessageService(
+			pointsrepo.TaskAdapter(),
+			pointsrepo.UserPointsAdapter(),
+		),
+		[]string{
+			topics.SignIn.Topic,
+		},
+	)
 }
 
 func newHandler(cfg *configuration, log *logrus.Entry) *handler {

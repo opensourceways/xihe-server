@@ -1804,67 +1804,6 @@ definitions:
 info:
   contact: {}
 paths:
-  /:
-    get:
-      consumes:
-      - application/json
-      description: callback of authentication by authing
-      parameters:
-      - description: authing code
-        in: query
-        name: code
-        required: true
-        type: string
-      - description: redirect uri
-        in: query
-        name: redirect_uri
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/app.UserDTO'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-        "501":
-          description: Not Implemented
-          schema:
-            type: duplicate_creating
-      tags:
-      - Login
-  /{account}:
-    get:
-      consumes:
-      - application/json
-      description: get info of login
-      parameters:
-      - description: account
-        in: path
-        name: account
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/app.LoginDTO'
-        "400":
-          description: Bad Request
-          schema:
-            type: bad_request_param
-        "401":
-          description: Unauthorized
-          schema:
-            type: not_allowed
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - Login
   /{account}/gitlab:
     get:
       consumes:
@@ -3783,6 +3722,67 @@ paths:
       summary: Create
       tags:
       - Inference
+  /v1/login:
+    get:
+      consumes:
+      - application/json
+      description: callback of authentication by authing
+      parameters:
+      - description: authing code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: redirect uri
+        in: query
+        name: redirect_uri
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.UserDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+        "501":
+          description: Not Implemented
+          schema:
+            type: duplicate_creating
+      tags:
+      - Login
+  /v1/login/{account}:
+    get:
+      consumes:
+      - application/json
+      description: get info of login
+      parameters:
+      - description: account
+        in: path
+        name: account
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.LoginDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "401":
+          description: Unauthorized
+          schema:
+            type: not_allowed
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - Login
   /v1/model:
     get:
       consumes:
@@ -4821,6 +4821,20 @@ paths:
             type: system_error
       tags:
       - Search
+  /v1/signin:
+    put:
+      consumes:
+      - application/json
+      description: user sign in
+      responses:
+        "202":
+          description: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - Login
   /v1/tags/{type}:
     get:
       consumes:
