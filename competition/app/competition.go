@@ -153,5 +153,6 @@ func (s *competitionService) getCompetitionsUserApplied(cmd *CompetitionListCMD)
 	return s.listCompetitions(&repository.CompetitionListOption{
 		Status:         cmd.Status,
 		CompetitionIds: cs,
+		Lang:           cmd.Lang,
 	})
 }
