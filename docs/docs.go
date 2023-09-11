@@ -6586,6 +6586,29 @@ const docTemplate = `{
                 }
             }
         },
+        "app.PointsDetailDTO": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "points": {
+                    "type": "integer"
+                },
+                "task": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "integer"
+                },
+                "time_str": {
+                    "type": "string"
+                }
+            }
+        },
         "app.ProjectSummaryDTO": {
             "type": "object",
             "properties": {
@@ -7003,7 +7026,7 @@ const docTemplate = `{
                 "details": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/repository.UserPointsDetail"
+                        "$ref": "#/definitions/app.PointsDetailDTO"
                     }
                 },
                 "total": {
@@ -8382,26 +8405,6 @@ const docTemplate = `{
                     }
                 },
                 "kind": {
-                    "type": "string"
-                }
-            }
-        },
-        "repository.UserPointsDetail": {
-            "type": "object",
-            "properties": {
-                "desc": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "points": {
-                    "type": "integer"
-                },
-                "task": {
-                    "type": "string"
-                },
-                "time": {
                     "type": "string"
                 }
             }

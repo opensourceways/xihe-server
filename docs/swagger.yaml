@@ -618,6 +618,21 @@ definitions:
       video:
         type: string
     type: object
+  app.PointsDetailDTO:
+    properties:
+      desc:
+        type: string
+      id:
+        type: string
+      points:
+        type: integer
+      task:
+        type: string
+      time:
+        type: integer
+      time_str:
+        type: string
+    type: object
   app.ProjectSummaryDTO:
     properties:
       cover_id:
@@ -890,7 +905,7 @@ definitions:
     properties:
       details:
         items:
-          $ref: '#/definitions/repository.UserPointsDetail'
+          $ref: '#/definitions/app.PointsDetailDTO'
         type: array
       total:
         type: integer
@@ -1786,19 +1801,6 @@ definitions:
           type: string
         type: array
       kind:
-        type: string
-    type: object
-  repository.UserPointsDetail:
-    properties:
-      desc:
-        type: string
-      id:
-        type: string
-      points:
-        type: integer
-      task:
-        type: string
-      time:
         type: string
     type: object
 info:
