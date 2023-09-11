@@ -321,6 +321,18 @@ func (s sender) StartJupyter(u domain.Account) error {
 	})
 }
 
+// Fork Project
+func (s sender) ForkProject(u domain.Account, pro domain.ResourceName) error {
+	desc := fmt.Sprintf("fork project %s", pro)
+
+	return s.send(topics.ForkProject.Topic, &common.MsgNormal{
+		Type:      topics.ForkProject.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
 // operate log
 func (s sender) AddOperateLogForNewUser(u domain.Account) error {
 	return s.sendOperateLog(u, "user", nil)

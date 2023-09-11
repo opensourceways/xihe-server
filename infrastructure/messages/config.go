@@ -35,7 +35,7 @@ type Topics struct {
 	Register           topicConfig `json:"register "`
 	BindEmail          topicConfig `json:"bind_email "`
 	SetAvatarId        topicConfig `json:"set_avatar "`
-	SetBio             topicConfig `json:"set_bio "`
+	SetBio             topicConfig `json:"set_bio"`
 }
 
 type topicConfig struct {

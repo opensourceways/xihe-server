@@ -73,5 +73,7 @@ func (s projectService) Fork(cmd *ProjectForkCmd, pr platform.Repository) (dto P
 
 	_ = s.sender.AddOperateLogForCreateResource(r, p.Name)
 
+	_ = s.sender.ForkProject(cmd.Owner, p.Name)
+
 	return
 }

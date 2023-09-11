@@ -71,6 +71,7 @@ type Sender interface {
 	SetAvatarId(domain.Account, userdomain.AvatarId) error
 	SetBio(domain.Account, userdomain.Bio) error
 	StartJupyter(domain.Account) error
+	ForkProject(domain.Account, domain.ResourceName) error
 }
 
 type EventHandler interface {
