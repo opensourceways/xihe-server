@@ -19,7 +19,7 @@ type Topics struct {
 	BigModel         string      `json:"bigmodel"         required:"true"`
 	SignIn           topicConfig `json:"signin"`
 	PublicPicture    topicConfig `json:"public_picture"`
-	ApplyCompetition topicConfig `json:"apply_competition"`
+	CompetitionApply topicConfig `json:"competition_apply"`
 }
 
 type topicConfig struct {

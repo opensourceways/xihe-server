@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/competition/domain"
-	"github.com/opensourceways/xihe-server/competition/domain/message"
 	"github.com/opensourceways/xihe-server/competition/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
@@ -42,9 +41,9 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 		return
 	}
 
-	msg := new(message.CompetitionMsg)
-	msg.GenApplyMsg(cmd.Account, competition.CompetitionSummary.Name.CompetitionName())
-	s.producer.SendApplyCompetitionMsg(msg)
+	s.producer.SendCompetitionApplyMsg(domain.NewCompetitionApplyMsg(
+		cmd.Account, competition.CompetitionSummary.Name.CompetitionName(),
+	))
 
 	return
 }
