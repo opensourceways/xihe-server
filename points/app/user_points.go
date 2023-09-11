@@ -47,12 +47,16 @@ func (s *userPointsAppService) Points(account common.Account) (int, error) {
 func (s *userPointsAppService) PointsDetails(account common.Account) (dto UserPointsDetailsDTO, err error) {
 	v, err := s.repo.FindAll(account)
 	if err != nil {
+		if repoerr.IsErrorResourceNotExists(err) {
+			err = nil
+		}
+
 		return
 	}
 
 	dto.Total = v.Total
 
-	details := make([]PointsDetailDTO, 0, v.DetailNum())
+	details := make([]PointsDetailDTO, 0, v.DetailsNum())
 
 	for i := range v.Items {
 		t := v.Items[i].Task

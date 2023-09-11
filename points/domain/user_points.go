@@ -8,20 +8,26 @@ import (
 type UserPoints struct {
 	User    common.Account
 	Total   int
-	Date    string
-	Items   []PointsItem // items of corresponding date
+	Items   []PointsItem // items of day or all the items
 	Dones   []string     // tasks that user has done
 	Version int
 }
 
-func (entity *UserPoints) AddPointsItem(task *Task, time, desc string) *PointsItem {
-	newItem := false
-
-	item := entity.poitsItem(task.Name)
-	if item == nil {
-		item = &PointsItem{Task: task.Name}
-		newItem = true
+func (entity *UserPoints) DetailsNum() int {
+	n := 0
+	for i := range entity.Items {
+		n += entity.Items[i].detailsNum()
 	}
+
+	return n
+}
+
+func (entity *UserPoints) IsFirstPointsDetailOfDay() bool {
+	return len(entity.Items) == 1 && entity.Items[0].isFirstDetail()
+}
+
+func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsDetail) *PointsItem {
+	item := entity.poitsItem(task.Name)
 
 	v := entity.calc(task, item)
 	if v == 0 {
@@ -30,24 +36,26 @@ func (entity *UserPoints) AddPointsItem(task *Task, time, desc string) *PointsIt
 
 	entity.Total += v
 
-	item.add(&PointsDetail{
-		Id:     "", // TODO uuid
-		Time:   time,
-		Desc:   desc,
-		Points: v,
-	})
-
-	if newItem {
-		entity.Items = append(entity.Items, *item)
-
-		item = &entity.Items[len(entity.Items)-1]
-	}
+	detail.Id = "" // TODO uuid
+	detail.Points = v
 
 	if !entity.hasDone(task.Name) {
 		entity.Dones = append(entity.Dones, task.Name)
 	}
 
-	return item
+	if item != nil {
+		item.add(detail)
+
+		return item
+	}
+
+	entity.Items = append(entity.Items, PointsItem{
+		Task:    task.Name,
+		Date:    date,
+		Details: []PointsDetail{*detail},
+	})
+
+	return &entity.Items[len(entity.Items)-1]
 }
 
 func (entity *UserPoints) IsCompleted(task *Task) bool {
@@ -56,7 +64,7 @@ func (entity *UserPoints) IsCompleted(task *Task) bool {
 		return false
 	}
 
-	v := task.Rule.calc(item.points(), !entity.hasDone(task.Name))
+	v := task.Rule.calcPoints(item.points(), !entity.hasDone(task.Name))
 
 	return v == 0
 }
@@ -68,7 +76,7 @@ func (entity *UserPoints) calc(task *Task, item *PointsItem) int {
 		return 0
 	}
 
-	v := task.Rule.calc(item.points(), !entity.hasDone(task.Name))
+	v := task.Rule.calcPoints(item.points(), !entity.hasDone(task.Name))
 	if v == 0 {
 		return 0
 	}
@@ -114,6 +122,7 @@ func (entity *UserPoints) poitsItem(t string) *PointsItem {
 // PointsItem
 type PointsItem struct {
 	Task    string
+	Date    string
 	Details []PointsDetail
 }
 
@@ -134,12 +143,29 @@ func (item *PointsItem) add(p *PointsDetail) {
 	item.Details = append(item.Details, *p)
 }
 
+func (item *PointsItem) detailsNum() int {
+	return len(item.Details)
+}
+
+func (item *PointsItem) isFirstDetail() bool {
+	return item != nil && len(item.Details) == 1
+}
+
+func (item *PointsItem) LatestDetail() *PointsDetail {
+	if item == nil || len(item.Details) == 0 {
+		return nil
+	}
+
+	return &item.Details[len(item.Details)-1]
+}
+
 // PointsDetail
 type PointsDetail struct {
-	Id     string `json:"id"`
-	Time   string `json:"time"`
-	Desc   string `json:"desc"`
-	Points int    `json:"points"`
+	Id      string `json:"id"`
+	Desc    string `json:"desc"`
+	TimeStr string `json:"time_str"`
+	Time    int64  `json:"time"`
+	Points  int    `json:"points"`
 }
 
 // Task
@@ -161,7 +187,7 @@ type Rule struct {
 
 // points is the one that user has got on this task today
 // firstTime is that user is first time to do this task
-func (r *Rule) calc(points int, firstTime bool) int {
+func (r *Rule) calcPoints(points int, firstTime bool) int {
 	if r.OnceOnly {
 		if firstTime {
 			return 0

@@ -6,23 +6,11 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-)
-
-const (
-	mongoCmdSet  = "$set"
-	mongoCmdPush = "$push"
 )
 
 type mongodbClient interface {
 	IsDocNotExists(error) bool
 	IsDocExists(error) bool
-
-	Collection() *mongo.Collection
-
-	ObjectIdFilter(s string) (bson.M, error)
-
-	AppendElemMatchToFilter(array string, exists bool, cond, filter bson.M)
 
 	GetDoc(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
 
@@ -30,9 +18,23 @@ type mongodbClient interface {
 
 	NewDocIfNotExist(ctx context.Context, filterOfDoc, docInfo bson.M) (string, error)
 
-	UpdateDoc(ctx context.Context, filterOfDoc, update bson.M, op string, version int) error
+	GetArrayElem(
+		ctx context.Context, array string,
+		filterOfDoc, filterOfArray bson.M,
+		project bson.M, result interface{},
+	) error
 
-	ModifyArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray, updateCmd bson.M, op string) (bool, error)
+	PushElemToLimitedArrayWithVersion(
+		ctx context.Context, array string, keep int,
+		filterOfDoc, value bson.M, version int,
+		otherUpdate bson.M,
+	) error
+
+	PushNestedArrayElemAndUpdate(
+		ctx context.Context, array string,
+		filterOfDoc, filterOfArray, data bson.M,
+		version int, otherUpdate bson.M,
+	) (bool, error)
 }
 
 func withContext(f func(context.Context) error) error {

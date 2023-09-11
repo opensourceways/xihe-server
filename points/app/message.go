@@ -46,13 +46,14 @@ func (s *userPointsAppMessageService) AddPointsItem(cmd *CmdToAddPointsItem) err
 			return err
 		}
 
-		up = domain.UserPoints{
-			User: cmd.Account,
-			Date: date,
-		}
+		up = domain.UserPoints{User: cmd.Account}
 	}
 
-	item := up.AddPointsItem(&task, time, cmd.Desc)
+	item := up.AddPointsItem(&task, date, &domain.PointsDetail{
+		Desc:    cmd.Desc,
+		Time:    cmd.Time,
+		TimeStr: time,
+	})
 	if item == nil {
 		return nil
 	}

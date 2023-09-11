@@ -26,6 +26,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
 	points "github.com/opensourceways/xihe-server/points/domain"
+	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 )
 
 var reIpPort = regexp.MustCompile(`^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}:[1-9][0-9]*$`)
@@ -60,6 +61,11 @@ type ConfigSetDefault interface {
 	SetDefault()
 }
 
+type pointsConfig struct {
+	Domain points.Config     `json:"domain"`
+	Repo   pointsrepo.Config `json:"repo"`
+}
+
 type Config struct {
 	MaxRetry        int `json:"max_retry"`
 	ActivityKeepNum int `json:"activity_keep_num"`
@@ -78,7 +84,7 @@ type Config struct {
 	App         app.Config             `json:"app"          required:"true"`
 	API         controller.APIConfig   `json:"api"          required:"true"`
 	MQ          MQ                     `json:"mq"           required:"true"`
-	Points      points.Config          `json:"points"`
+	Points      pointsConfig           `json:"points"`
 }
 
 func (cfg *Config) GetMQConfig() mq.MQConfig {
@@ -120,7 +126,8 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.App,
 		&cfg.API,
 		&cfg.MQ,
-		&cfg.Points,
+		&cfg.Points.Domain,
+		&cfg.Points.Repo,
 	}
 }
 
@@ -205,7 +212,8 @@ type MongodbCollections struct {
 	CloudConf         string `json:"cloud_conf"             required:"true"`
 	ApiApply          string `json:"api_apply"              required:"true"`
 	ApiInfo           string `json:"api_info"               required:"true"`
-	PointsTask        string `json:"points"                 required:"true"`
+	PointsTask        string `json:"points_task"            required:"true"`
+	UserPoints        string `json:"user_points"            required:"true"`
 }
 
 type MQ struct {
@@ -242,6 +250,8 @@ func (cfg *MQ) ParseAddress() []string {
 
 func (cfg *Config) InitDomainConfig() {
 	domain.Init(&cfg.Domain)
+
+	points.Init(&cfg.Points.Domain)
 }
 
 func (cfg *Config) InitAppConfig() {

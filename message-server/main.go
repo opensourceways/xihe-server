@@ -134,8 +134,13 @@ func pointsSubscribesMessage(cfg *configuration, topics *messages.Topics) error 
 
 	return pointsmq.Subscribe(
 		pointsapp.NewUserPointsAppMessageService(
-			pointsrepo.TaskAdapter(mongodb.NewCollection(collections.PointsTask)),
-			pointsrepo.UserPointsAdapter(),
+			pointsrepo.TaskAdapter(
+				mongodb.NewCollection(collections.PointsTask),
+			),
+			pointsrepo.UserPointsAdapter(
+				mongodb.NewCollection(collections.UserPoints),
+				&cfg.Points.Repo,
+			),
 		),
 		[]string{
 			topics.SignIn.Topic,
