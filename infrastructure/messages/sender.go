@@ -2,6 +2,8 @@ package messages
 
 import (
 	"encoding/json"
+	"fmt"
+	coursedomain "github.com/opensourceways/xihe-server/course/domain"
 
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 
@@ -187,6 +189,53 @@ func (s sender) SignIn(u domain.Account) error {
 		Type:      topics.SignIn.Name,
 		User:      u.Account(),
 		CreatedAt: utils.Now(),
+	})
+}
+
+// Apply course
+func (s sender) ApplyCourse(u domain.Account, summary coursedomain.CourseSummary) error {
+	desc := fmt.Sprintf("apply course %s", summary.Name)
+
+	return s.send(topics.ApplyCourse.Topic, &common.MsgNormal{
+		Type:      topics.ApplyCourse.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Daily Download
+func (s sender) DailyDownload(u domain.Account, reponame domain.ResourceName) error {
+	desc := fmt.Sprintf("Download ResourceName %s", reponame)
+
+	return s.send(topics.DailyDownload.Topic, &common.MsgNormal{
+		Type:      topics.DailyDownload.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Daily Like
+func (s sender) DailyLike(u domain.Account) error {
+
+	return s.send(topics.DailyLike.Topic, &common.MsgNormal{
+		Type:      topics.DailyLike.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      "like",
+	})
+}
+
+// Daily Create
+func (s sender) DailyCreate(u domain.Account, reponame domain.ResourceName) error {
+	desc := fmt.Sprintf("aDownload ResourceName %s", reponame)
+
+	return s.send(topics.DailyCreate.Topic, &common.MsgNormal{
+		Type:      topics.DailyCreate.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
 	})
 }
 

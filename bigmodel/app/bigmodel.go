@@ -314,6 +314,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 		version,
 	)
 
+	_ = s.sender.DailyLike(cmd.User)
 	return
 }
 
@@ -364,6 +365,8 @@ func (s bigModelService) AddLikeFromPublicPicture(
 		WuKongPictureMeta: p.WuKongPictureMeta,
 	}
 	pid, err = s.wukongPicture.SaveLike(cmd.User, wp, version)
+
+	_ = s.sender.DailyLike(cmd.User)
 
 	return
 }

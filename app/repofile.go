@@ -26,7 +26,7 @@ type RepoFileService interface {
 	Preview(*UserInfo, *RepoFilePreviewCmd) ([]byte, error)
 	DeleteDir(*UserInfo, *RepoDirDeleteCmd) (string, error)
 	Download(*RepoFileDownloadCmd) (RepoFileDownloadDTO, error)
-	DownloadRepo(u *UserInfo, repoId string, handle func(io.Reader, int64)) error
+	DownloadRepo(u *UserInfo, repoId string, d *RepoDir, handle func(io.Reader, int64)) error
 }
 
 func NewRepoFileService(rf platform.RepoFile, sender message.Sender) RepoFileService {
@@ -199,8 +199,9 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 	return r, nil
 }
 
-func (s *repoFileService) DownloadRepo(u *UserInfo, repoId string, handle func(io.Reader, int64)) error {
-	return s.rf.DownloadRepo(u, repoId, handle)
+func (s *repoFileService) DownloadRepo(u *UserInfo, repoId string, d *RepoDir, handle func(io.Reader, int64)) error {
+	s.rf.DownloadRepo(u, repoId, handle)
+	return s.sender.DailyDownload(u.User, d.RepoName)
 }
 
 type RepoFileDownloadDTO struct {

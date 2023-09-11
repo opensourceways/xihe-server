@@ -18,6 +18,24 @@ type Topics struct {
 	Async           string      `json:"async"            required:"true"`
 	BigModel        string      `json:"bigmodel"         required:"true"`
 	SignIn          topicConfig `json:"signin"`
+	DailyLike       topicConfig `json:"daily_like"`
+	//LikeProject      topicConfig `json:"like_project"`
+	//LikeModel        topicConfig `json:"like_model"`
+	//LikeDataset      topicConfig `json:"like_dataset "`
+	DailyDownload topicConfig `json:"daily_download"`
+	//DownloadModel    topicConfig `json:"download_model"`
+	//DownloadDataset  topicConfig `json:"download_dataset "`
+	StartJupyter topicConfig `json:"start_jupyter "`
+	DailyCreate  topicConfig `json:"daily_create"`
+	//CreateModel      topicConfig `json:"create_model"`
+	//CreateDataset    topicConfig `json:"create_dataset "`
+	ForkProject topicConfig `json:"fork_project "`
+	UseBigmodel topicConfig `json:"use_bigmodel "`
+	ApplyCourse topicConfig `json:"apply_course "`
+	Register    topicConfig `json:"register "`
+	BindEmail   topicConfig `json:"bind_email "`
+	SetAvatar   topicConfig `json:"set_avatar "`
+	SetBio      topicConfig `json:"set_bio "`
 }
 
 type topicConfig struct {

@@ -137,6 +137,10 @@ func pointsSubscribesMessage(topics *messages.Topics) error {
 		),
 		[]string{
 			topics.SignIn.Topic,
+			topics.ApplyCourse.Topic,
+			topics.DailyLike.Topic,
+			topics.DailyDownload.Topic,
+			topics.DailyCreate.Topic,
 		},
 	)
 }

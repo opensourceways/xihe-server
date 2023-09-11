@@ -187,6 +187,7 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, m.Name)
+	_ = s.sender.DailyCreate(cmd.Owner, m.Name)
 
 	return
 }
