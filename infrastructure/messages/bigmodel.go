@@ -1,15 +1,15 @@
 package messages
 
 import (
-	bigmodelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 )
 
 // producer
-func (s sender) SendBigModelMsg(v *bigmodelmsg.MsgTask) error {
+func (s sender) SendBigModelMsg(v *bigmodeldomain.MsgTask) error {
 	return s.send(topics.BigModel, v)
 }
 
-func (s sender) SendBigmodelPublicMsg(v *bigmodelmsg.MsgTask) error {
+func (s sender) SendBigmodelPublicMsg(v *bigmodeldomain.MsgTask) error {
 	v.Type = topics.PublicPicture.Name
 
 	return s.send(topics.PublicPicture.Topic, v)
@@ -18,8 +18,8 @@ func (s sender) SendBigmodelPublicMsg(v *bigmodelmsg.MsgTask) error {
 // comsumer
 type BigModelMessageHandler interface {
 	// wukong
-	HandleEventBigModelWuKongInferenceStart(*bigmodelmsg.MsgTask) error
-	HandleEventBigModelWuKongInferenceError(*bigmodelmsg.MsgTask) error
-	HandleEventBigModelWuKongAsyncTaskStart(*bigmodelmsg.MsgTask) error
-	HandleEventBigModelWuKongAsyncTaskFinish(*bigmodelmsg.MsgTask) error
+	HandleEventBigModelWuKongInferenceStart(*bigmodeldomain.MsgTask) error
+	HandleEventBigModelWuKongInferenceError(*bigmodeldomain.MsgTask) error
+	HandleEventBigModelWuKongAsyncTaskStart(*bigmodeldomain.MsgTask) error
+	HandleEventBigModelWuKongAsyncTaskFinish(*bigmodeldomain.MsgTask) error
 }

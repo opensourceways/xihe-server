@@ -33,7 +33,7 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 	// 1. inference
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
-	msg := new(message.MsgTask)
+	msg := new(domain.MsgTask)
 	msg.WuKongAsyncTaskStart(tid, user.Account())
 	s.sender.SendBigModelMsg(msg)
 
@@ -43,7 +43,7 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 			err = errors.New("internal error")
 		}
 
-		msgError := new(message.MsgTask)
+		msgError := new(domain.MsgTask)
 		msgError.WuKongInferenceError(tid, user.Account(), err.Error())
 		s.sender.SendBigModelMsg(msgError)
 
@@ -51,7 +51,7 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 	}
 
 	// 3. send msg
-	msgFinish := new(message.MsgTask)
+	msgFinish := new(domain.MsgTask)
 	msgFinish.WuKongAsyncInferenceFinish(tid, user.Account(), links)
 
 	return s.sender.SendBigModelMsg(msgFinish)

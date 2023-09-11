@@ -197,7 +197,7 @@ func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd
 		return
 	}
 
-	msg := new(message.MsgTask)
+	msg := new(domain.MsgTask)
 	msg.WuKongInferenceStart(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style, cmd.EsType)
 
 	return "", s.sender.SendBigModelMsg(msg)
@@ -471,9 +471,7 @@ func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCm
 	pid, err = s.wukongPicture.SavePublic(p, version)
 
 	// send msg
-	msg := new(message.MsgTask)
-	msg.GenWuKongPublicPictureMsg(cmd.User.Account())
-	_ = s.sender.SendBigmodelPublicMsg(msg)
+	_ = s.sender.SendBigmodelPublicMsg(domain.NewWuKongPublicPictureMsg(cmd.User.Account()))
 
 	return
 }

@@ -13,7 +13,6 @@ import (
 	asyncdomain "github.com/opensourceways/xihe-server/async-server/domain"
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
-	bigmodelmessage "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/domain"
@@ -337,7 +336,7 @@ func (h *handler) HandleEventPodSubscribe(info *cloudtypes.PodInfo) error {
 }
 
 // bigmodel
-func (h *handler) HandleEventBigModelWuKongInferenceStart(msg *bigmodelmessage.MsgTask) error {
+func (h *handler) HandleEventBigModelWuKongInferenceStart(msg *bigmodeldomain.MsgTask) error {
 	user, err := domain.NewAccount(msg.User)
 	if err != nil {
 		return err
@@ -372,7 +371,7 @@ func (h *handler) HandleEventBigModelWuKongInferenceStart(msg *bigmodelmessage.M
 
 }
 
-func (h *handler) HandleEventBigModelWuKongInferenceError(msg *bigmodelmessage.MsgTask) error {
+func (h *handler) HandleEventBigModelWuKongInferenceError(msg *bigmodeldomain.MsgTask) error {
 	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
 	if err != nil {
 		return err
@@ -407,7 +406,7 @@ func (h *handler) HandleEventBigModelWuKongInferenceError(msg *bigmodelmessage.M
 
 }
 
-func (h *handler) HandleEventBigModelWuKongAsyncTaskStart(msg *bigmodelmessage.MsgTask) error {
+func (h *handler) HandleEventBigModelWuKongAsyncTaskStart(msg *bigmodeldomain.MsgTask) error {
 	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
 	if err != nil {
 		return err
@@ -436,7 +435,7 @@ func (h *handler) HandleEventBigModelWuKongAsyncTaskStart(msg *bigmodelmessage.M
 
 }
 
-func (h *handler) HandleEventBigModelWuKongAsyncTaskFinish(msg *bigmodelmessage.MsgTask) error {
+func (h *handler) HandleEventBigModelWuKongAsyncTaskFinish(msg *bigmodeldomain.MsgTask) error {
 	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
 	if err != nil {
 		return err

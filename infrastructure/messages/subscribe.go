@@ -8,7 +8,7 @@ import (
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 	"github.com/sirupsen/logrus"
 
-	bigmoddelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
@@ -404,7 +404,7 @@ func registerHandlerForCloud(handler interface{}) error {
 func registerHandlerForBigModel(handler interface{}) error {
 
 	f := func(b []byte, m map[string]string) (err error) {
-		body := bigmoddelmsg.MsgTask{}
+		body := bigmodeldomain.MsgTask{}
 		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
@@ -415,19 +415,19 @@ func registerHandlerForBigModel(handler interface{}) error {
 		}
 
 		switch body.Type {
-		case bigmoddelmsg.MsgTypeWuKongAsyncTaskFinish:
+		case bigmodeldomain.MsgTypeWuKongAsyncTaskFinish:
 
 			return h.HandleEventBigModelWuKongAsyncTaskFinish(&body)
 
-		case bigmoddelmsg.MsgTypeWuKongAsyncTaskStart:
+		case bigmodeldomain.MsgTypeWuKongAsyncTaskStart:
 
 			return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
 
-		case bigmoddelmsg.MsgTypeWuKongInferenceStart:
+		case bigmodeldomain.MsgTypeWuKongInferenceStart:
 
 			return h.HandleEventBigModelWuKongInferenceStart(&body)
 
-		case bigmoddelmsg.MsgTypeWuKongInferenceError:
+		case bigmodeldomain.MsgTypeWuKongInferenceError:
 
 			return h.HandleEventBigModelWuKongInferenceError(&body)
 

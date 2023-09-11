@@ -2,10 +2,10 @@ package messages
 
 import (
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
-	"github.com/opensourceways/xihe-server/bigmodel/domain/message"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 )
 
-func (s sender) UpdateWuKongTask(v *message.MsgTask) error {
+func (s sender) UpdateWuKongTask(v *bigmodeldomain.MsgTask) error {
 	return s.send(topics.Async, v)
 }
 
