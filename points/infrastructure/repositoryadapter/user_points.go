@@ -110,7 +110,6 @@ func (impl *userPointsAdapter) addPointsDetail(up *domain.UserPoints, item *doma
 		return err
 	}
 
-	// TODO missing total and dones
 	f := func(ctx context.Context) error {
 		_, err := impl.cli.PushNestedArrayElemAndUpdate(
 			ctx, fieldItems,

@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"strconv"
+
 	common "github.com/opensourceways/xihe-server/domain"
 )
 
@@ -36,7 +38,7 @@ func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsD
 
 	entity.Total += v
 
-	detail.Id = "" // TODO uuid
+	detail.Id = date + "_" + strconv.Itoa(entity.DetailsNum()+1)
 	detail.Points = v
 
 	if !entity.hasDone(task.Name) {
