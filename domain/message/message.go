@@ -62,8 +62,15 @@ type Sender interface {
 	SignIn(domain.Account) error
 	ApplyCourse(domain.Account, coursedomain.CourseSummary) error
 	DailyDownload(domain.Account, domain.ResourceName) error
-	DailyLike(domain.Account) error
+	DailyLike(domain.Account, domain.ResourceName) error
+	LikePicture(domain.Account) error
 	DailyCreate(domain.Account, domain.ResourceName) error
+	ExperienceBigmodel(domain.Account, bmdomain.BigmodelType) error
+	Register(domain.Account) error
+	BindEmail(domain.Account, domain.Email) error
+	SetAvatarId(domain.Account, userdomain.AvatarId) error
+	SetBio(domain.Account, userdomain.Bio) error
+	StartJupyter(domain.Account) error
 }
 
 type EventHandler interface {

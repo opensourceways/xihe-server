@@ -29,13 +29,13 @@ type Topics struct {
 	DailyCreate  topicConfig `json:"daily_create"`
 	//CreateModel      topicConfig `json:"create_model"`
 	//CreateDataset    topicConfig `json:"create_dataset "`
-	ForkProject topicConfig `json:"fork_project "`
-	UseBigmodel topicConfig `json:"use_bigmodel "`
-	ApplyCourse topicConfig `json:"apply_course "`
-	Register    topicConfig `json:"register "`
-	BindEmail   topicConfig `json:"bind_email "`
-	SetAvatar   topicConfig `json:"set_avatar "`
-	SetBio      topicConfig `json:"set_bio "`
+	ForkProject        topicConfig `json:"fork_project "`
+	ExperienceBigmodel topicConfig `json:"experience_bigmodel "`
+	ApplyCourse        topicConfig `json:"apply_course "`
+	Register           topicConfig `json:"register "`
+	BindEmail          topicConfig `json:"bind_email "`
+	SetAvatarId        topicConfig `json:"set_avatar "`
+	SetBio             topicConfig `json:"set_bio "`
 }
 
 type topicConfig struct {

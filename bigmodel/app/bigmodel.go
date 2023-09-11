@@ -153,6 +153,8 @@ func (s bigModelService) WuKong(
 ) (links map[string]string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
 
+	_ = s.sender.ExperienceBigmodel(user, domain.BigmodelWuKong)
+
 	links, err = s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, cmd.EsType)
 	if err != nil {
 		code = s.setCode(err)
@@ -166,6 +168,8 @@ func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
 ) {
 	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelWuKong)
 
+	_ = s.sender.ExperienceBigmodel(cmd.User, domain.BigmodelWuKong)
+
 	links, err = s.fm.GenPicturesByWuKong(cmd.User, &cmd.WuKongPictureMeta, string(domain.BigmodelWuKongHF))
 	if err != nil {
 		code = s.setCode(err)
@@ -178,6 +182,8 @@ func (s bigModelService) WukongApi(
 	user types.Account, model domain.ModelName, cmd *WuKongApiCmd,
 ) (links map[string]string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
+
+	_ = s.sender.ExperienceBigmodel(user, domain.BigmodelWuKong)
 	links, err = s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, string(domain.BigmodelWuKongUser))
 	if err != nil {
 		code = s.setCode(err)
@@ -314,7 +320,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 		version,
 	)
 
-	_ = s.sender.DailyLike(cmd.User)
+	_ = s.sender.LikePicture(cmd.User)
 	return
 }
 
@@ -366,7 +372,7 @@ func (s bigModelService) AddLikeFromPublicPicture(
 	}
 	pid, err = s.wukongPicture.SaveLike(cmd.User, wp, version)
 
-	_ = s.sender.DailyLike(cmd.User)
+	_ = s.sender.LikePicture(cmd.User)
 
 	return
 }

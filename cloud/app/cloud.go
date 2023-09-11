@@ -9,6 +9,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain/service"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
+	messages "github.com/opensourceways/xihe-server/domain/message"
 )
 
 type CloudService interface {
@@ -27,11 +28,13 @@ func NewCloudService(
 	cloudRepo repository.Cloud,
 	podRepo repository.Pod,
 	producer message.CloudMessageProducer,
+	sender messages.Sender,
 ) *cloudService {
 	return &cloudService{
 		cloudRepo:    cloudRepo,
 		podRepo:      podRepo,
 		producer:     producer,
+		sender:       sender,
 		cloudService: service.NewCloudService(podRepo, producer),
 	}
 }
@@ -41,6 +44,7 @@ type cloudService struct {
 	podRepo      repository.Pod
 	producer     message.CloudMessageProducer
 	cloudService service.CloudService
+	sender       messages.Sender
 }
 
 func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err error) {
@@ -122,6 +126,8 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 
 	// subscribe
 	err = s.cloudService.SubscribeCloud(&c.CloudConf, cmd.User)
+
+	//_ = s.sender.StartJupyter(cmd.User)
 
 	return
 }

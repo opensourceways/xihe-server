@@ -134,7 +134,7 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 	// increase like in resource
 	_ = s.sender.AddLike(&v.Like.ResourceObject)
 
-	_ = s.sender.DailyLike(owner)
+	_ = s.sender.DailyLike(owner, cmd.ResourceName)
 
 	return nil
 }

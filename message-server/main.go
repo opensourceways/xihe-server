@@ -141,6 +141,12 @@ func pointsSubscribesMessage(topics *messages.Topics) error {
 			topics.DailyLike.Topic,
 			topics.DailyDownload.Topic,
 			topics.DailyCreate.Topic,
+			topics.ExperienceBigmodel.Topic,
+			topics.Register.Topic,
+			topics.BindEmail.Topic,
+			topics.SetAvatarId.Topic,
+			topics.SetBio.Topic,
+			topics.StartJupyter.Topic,
 		},
 	)
 }

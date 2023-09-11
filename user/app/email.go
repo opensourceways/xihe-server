@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"github.com/opensourceways/xihe-server/domain/message"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/authing"
@@ -26,9 +27,10 @@ func NewEmailService(
 }
 
 type emailService struct {
-	auth  authing.User
-	login login.Login
-	us    UserService
+	auth   authing.User
+	login  login.Login
+	us     UserService
+	sender message.Sender
 }
 
 func (s emailService) SendBindEmail(cmd *SendBindEmailCmd) (code string, err error) {
@@ -77,6 +79,8 @@ func (s emailService) VerifyBindEmail(cmd *BindEmailCmd) (code string, err error
 	if err = s.us.NewPlatformAccountWithUpdate(pfcmd); err != nil {
 		return
 	}
+
+	_ = s.sender.BindEmail(cmd.User, cmd.Email)
 
 	return
 }
