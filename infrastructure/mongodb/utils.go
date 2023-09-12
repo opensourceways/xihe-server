@@ -324,6 +324,39 @@ func (cli *client) pushElemToLimitedArray(
 	return nil
 }
 
+func (cli *client) pushElemToLimitedArrayWithVersion(
+	ctx context.Context,
+	collection, array string, keep int,
+	filterOfDoc, value bson.M, version int, otherUpdate bson.M,
+) error {
+	filterOfDoc[fieldVersion] = version
+
+	updates := bson.M{
+		mongoCmdPush: bson.M{array: bson.M{
+			"$each":  bson.A{value},
+			"$slice": keep,
+		}},
+		mongoCmdInc: bson.M{fieldVersion: 1},
+	}
+
+	if len(otherUpdate) > 0 {
+		updates[mongoCmdSet] = otherUpdate
+	}
+
+	r, err := cli.collection(collection).UpdateOne(
+		ctx, filterOfDoc, updates,
+	)
+	if err != nil {
+		return dbError{err}
+	}
+
+	if r.MatchedCount == 0 {
+		return errDocNotExists
+	}
+
+	return nil
+}
+
 func (cli *client) pullNestedArrayElem(
 	ctx context.Context, collection, array string,
 	filterOfDoc, filterOfArray, data bson.M,
@@ -391,6 +424,57 @@ func (cli *client) modifyArrayElem(
 	}
 
 	updates[op] = cmd
+
+	col := cli.collection(collection)
+	r, err := col.UpdateOne(
+		ctx, filterOfDoc, updates,
+		&options.UpdateOptions{
+			ArrayFilters: &options.ArrayFilters{
+				Filters: bson.A{
+					arrayFilter,
+				},
+			},
+		},
+	)
+	if err != nil {
+		return false, err
+	}
+
+	if r.MatchedCount == 0 {
+		return false, errDocNotExists
+	}
+
+	return r.ModifiedCount > 0, nil
+}
+
+func (cli *client) pushNestedArrayElemAndUpdate(
+	ctx context.Context, collection, array string,
+	filterOfDoc, filterOfArray, updateCmd bson.M,
+	version int, otherUpdate bson.M,
+) (bool, error) {
+	key := func(k string) string {
+		return fmt.Sprintf("%s.$[i].%s", array, k)
+	}
+
+	cmd := bson.M{}
+	for k, v := range updateCmd {
+		cmd[key(k)] = v
+	}
+
+	updates := bson.M{
+		mongoCmdInc:  bson.M{fieldVersion: 1},
+		mongoCmdPush: cmd,
+	}
+	if len(otherUpdate) > 0 {
+		updates[mongoCmdSet] = otherUpdate
+	}
+
+	arrayFilter := bson.M{}
+	for k, v := range filterOfArray {
+		arrayFilter["i."+k] = v
+	}
+
+	filterOfDoc[fieldVersion] = version
 
 	col := cli.collection(collection)
 	r, err := col.UpdateOne(

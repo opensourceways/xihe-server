@@ -205,8 +205,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, sender)
 
 	pointsAppService := pointsapp.NewUserPointsAppService(
-		pointsrepo.TaskAdapter(),
-		pointsrepo.UserPointsAdapter(),
+		pointsrepo.TaskAdapter(
+			mongodb.NewCollection(collections.PointsTask),
+		),
+		pointsrepo.UserPointsAdapter(
+			mongodb.NewCollection(collections.UserPoints), &cfg.Points.Repo,
+		),
 	)
 
 	userAppService := userapp.NewUserService(

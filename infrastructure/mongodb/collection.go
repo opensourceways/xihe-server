@@ -77,6 +77,27 @@ func (c collection) PushElemToLimitedArray(
 	return cli.pushElemToLimitedArray(ctx, c.name, array, keep, filterOfDoc, value)
 }
 
+func (c collection) PushElemToLimitedArrayWithVersion(
+	ctx context.Context, array string, keep int,
+	filterOfDoc, value bson.M, version int,
+	otherUpdate bson.M,
+) error {
+	return cli.pushElemToLimitedArrayWithVersion(
+		ctx, c.name, array, keep, filterOfDoc, value, version, otherUpdate,
+	)
+}
+
+func (c collection) PushNestedArrayElemAndUpdate(
+	ctx context.Context, array string,
+	filterOfDoc, filterOfArray, data bson.M,
+	version int, otherUpdate bson.M,
+) (bool, error) {
+	return cli.pushNestedArrayElemAndUpdate(
+		ctx, c.name, array, filterOfDoc, filterOfArray, data,
+		version, otherUpdate,
+	)
+}
+
 func (c collection) AddToSimpleArray(
 	ctx context.Context, array string,
 	filterOfDoc, value interface{},

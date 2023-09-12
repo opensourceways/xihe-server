@@ -629,6 +629,8 @@ definitions:
       task:
         type: string
       time:
+        type: integer
+      time_str:
         type: string
     type: object
   app.ProjectSummaryDTO:

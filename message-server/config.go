@@ -15,6 +15,8 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
+	points "github.com/opensourceways/xihe-server/points/domain"
+	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 )
 
 type configuration struct {
@@ -30,6 +32,12 @@ type configuration struct {
 	Domain     domain.Config        `json:"domain"       required:"true"`
 	MQ         config.MQ            `json:"mq"           required:"true"`
 	Redis      redis.Config         `json:"redis"        required:"true"`
+	Points     pointsConfig         `json:"points"`
+}
+
+type pointsConfig struct {
+	Domain points.Config     `json:"domain"`
+	Repo   pointsrepo.Config `json:"repo"`
 }
 
 type PostgresqlConfig struct {
@@ -66,6 +74,8 @@ func (cfg *configuration) configItems() []interface{} {
 		&cfg.Domain,
 		&cfg.MQ,
 		&cfg.Redis,
+		&cfg.Points.Domain,
+		&cfg.Points.Repo,
 	}
 }
 
@@ -101,6 +111,7 @@ func (cfg *configuration) Validate() error {
 
 func (cfg *configuration) initDomainConfig() {
 	domain.Init(&cfg.Domain)
+	points.Init(&cfg.Points.Domain)
 }
 
 func (cfg *configuration) getFinetuneConfig() finetuneimpl.Config {

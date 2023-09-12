@@ -6602,6 +6602,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "time": {
+                    "type": "integer"
+                },
+                "time_str": {
                     "type": "string"
                 }
             }

@@ -36,6 +36,7 @@ type PointsDetailDTO struct {
 	domain.PointsDetail
 }
 
+// TasksCompletionInfoDTO
 type TasksCompletionInfoDTO struct {
 	Kind  string                  `json:"kind"`
 	Tasks []TaskCompletionInfoDTO `json:"tasks"`

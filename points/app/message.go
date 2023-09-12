@@ -1,6 +1,7 @@
 package app
 
 import (
+	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/points/domain/repository"
 )
@@ -27,7 +28,10 @@ type userPointsAppMessageService struct {
 func (s *userPointsAppMessageService) AddPointsItem(cmd *CmdToAddPointsItem) error {
 	task, err := s.tr.Find(cmd.Task)
 	if err != nil {
-		// if not exist, return nil
+		if repoerr.IsErrorResourceNotExists(err) {
+			return nil
+		}
+
 		return err
 	}
 
@@ -38,14 +42,18 @@ func (s *userPointsAppMessageService) AddPointsItem(cmd *CmdToAddPointsItem) err
 
 	up, err := s.repo.Find(cmd.Account, date)
 	if err != nil {
-		// if not exist
-		up = domain.UserPoints{
-			User: cmd.Account,
-			Date: date,
+		if !repoerr.IsErrorResourceNotExists(err) {
+			return err
 		}
+
+		up = domain.UserPoints{User: cmd.Account}
 	}
 
-	item := up.AddPointsItem(&task, time, cmd.Desc)
+	item := up.AddPointsItem(&task, date, &domain.PointsDetail{
+		Desc:    cmd.Desc,
+		Time:    cmd.Time,
+		TimeStr: time,
+	})
 	if item == nil {
 		return nil
 	}

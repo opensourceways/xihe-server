@@ -2,6 +2,10 @@ package domain
 
 var config Config
 
+func Init(cfg *Config) {
+	config = *cfg
+}
+
 type Config struct {
 	MaxPointsOfDay int `json:"max_points_of_day"`
 }
