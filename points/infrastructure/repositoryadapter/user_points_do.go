@@ -12,8 +12,8 @@ import (
 const (
 	fieldUser    = "user"
 	fieldDate    = "date"
-	fieldTotal   = "total"
 	fieldDays    = "days"
+	fieldTotal   = "total"
 	fieldDones   = "dones"
 	fieldDetails = "details"
 	fieldVersion = "version"
@@ -21,9 +21,9 @@ const (
 
 type userPointsDO struct {
 	User    string                 `bson:"user"     json:"user"`
-	Total   int                    `bson:"total"    json:"total"`
-	Dones   []string               `bson:"dones"    json:"dones"`
 	Days    []pointsDetailsOfDayDO `bson:"days"     json:"days"`
+	Dones   []string               `bson:"dones"    json:"dones"`
+	Total   int                    `bson:"total"    json:"total"`
 	Version int                    `bson:"version"  json:"version"`
 }
 

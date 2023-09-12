@@ -35,15 +35,11 @@ func (impl *taskAdapter) Add(t *domain.Task) error {
 		return err
 	}
 
-	if err := withContext(f); err != nil {
-		if impl.cli.IsDocExists(err) {
-			err = repoerr.NewErrorDuplicateCreating(err)
-		}
-
-		return err
+	if err = withContext(f); err != nil && impl.cli.IsDocExists(err) {
+		err = repoerr.NewErrorDuplicateCreating(err)
 	}
 
-	return nil
+	return err
 }
 
 func (impl *taskAdapter) FindAllTasks() ([]domain.Task, error) {
