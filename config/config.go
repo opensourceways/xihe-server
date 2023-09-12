@@ -91,6 +91,7 @@ type Config struct {
 	App         app.Config           `json:"app"          required:"true"`
 	API         controller.APIConfig `json:"api"          required:"true"`
 	MQ          MQ                   `json:"mq"           required:"true"`
+	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
 	Points      pointsConfig         `json:"points"`
 }
 
@@ -134,6 +135,7 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.App,
 		&cfg.API,
 		&cfg.MQ,
+		&cfg.MQTopics,
 		&cfg.Points.Domain,
 		&cfg.Points.Repo,
 	}
@@ -225,9 +227,8 @@ type MongodbCollections struct {
 }
 
 type MQ struct {
-	Address string          `json:"address" required:"true"`
-	Version string          `json:"version"`
-	Topics  messages.Topics `json:"topics"  required:"true"`
+	Address string `json:"address" required:"true"`
+	Version string `json:"version"`
 }
 
 func (cfg *MQ) Validate() error {

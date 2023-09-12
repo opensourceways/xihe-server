@@ -15,6 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
+	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	points "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 )
@@ -31,6 +32,7 @@ type configuration struct {
 	Postgresql PostgresqlConfig     `json:"postgresql"   required:"true"`
 	Domain     domain.Config        `json:"domain"       required:"true"`
 	MQ         config.MQ            `json:"mq"           required:"true"`
+	MQTopics   mqTopics             `json:"mq_topics"    required:"true"`
 	Redis      redis.Config         `json:"redis"        required:"true"`
 	Points     pointsConfig         `json:"points"`
 }
@@ -73,6 +75,7 @@ func (cfg *configuration) configItems() []interface{} {
 		&cfg.Postgresql.asyncconf,
 		&cfg.Domain,
 		&cfg.MQ,
+		&cfg.MQTopics,
 		&cfg.Redis,
 		&cfg.Points.Domain,
 		&cfg.Points.Repo,
@@ -180,4 +183,10 @@ func (cfg *cloudConfig) Validate() error {
 	}
 
 	return nil
+}
+
+type mqTopics struct {
+	messages.Topics
+
+	CompetitorApplied string `json:"competitor_applied" required:"true"`
 }
