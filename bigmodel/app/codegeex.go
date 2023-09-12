@@ -11,6 +11,8 @@ func (s bigModelService) CodeGeex(user types.Account, cmd *CodeGeexCmd) (
 ) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelCodeGeex)
 
+	_ = s.sender.ExperienceBigmodel(user, domain.BigmodelCodeGeex)
+
 	if dto, err = s.fm.CodeGeex((*bigmodel.CodeGeexReq)(cmd)); err != nil {
 		code = s.setCode(err)
 	}

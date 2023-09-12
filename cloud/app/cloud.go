@@ -127,7 +127,5 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 	// subscribe
 	err = s.cloudService.SubscribeCloud(&c.CloudConf, cmd.User)
 
-	//_ = s.sender.StartJupyter(cmd.User)
-
 	return
 }

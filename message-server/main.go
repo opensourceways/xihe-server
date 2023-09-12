@@ -146,7 +146,6 @@ func pointsSubscribesMessage(topics *messages.Topics) error {
 			topics.BindEmail.Topic,
 			topics.SetAvatarId.Topic,
 			topics.SetBio.Topic,
-			topics.StartJupyter.Topic,
 			topics.ForkProject.Topic,
 		},
 	)

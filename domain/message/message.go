@@ -70,7 +70,6 @@ type Sender interface {
 	BindEmail(domain.Account, domain.Email) error
 	SetAvatarId(domain.Account, userdomain.AvatarId) error
 	SetBio(domain.Account, userdomain.Bio) error
-	StartJupyter(domain.Account) error
 	ForkProject(domain.Account, domain.ResourceName) error
 }
 

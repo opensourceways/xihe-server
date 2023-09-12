@@ -310,16 +310,16 @@ func (s sender) SetBio(u domain.Account, a userdomain.Bio) error {
 	})
 }
 
-// Start Jupyter
-func (s sender) StartJupyter(u domain.Account) error {
-
-	return s.send(topics.StartJupyter.Topic, &common.MsgNormal{
-		Type:      topics.StartJupyter.Name,
-		User:      u.Account(),
-		CreatedAt: utils.Now(),
-		Desc:      "StartJupyter",
-	})
-}
+//// Start Jupyter
+//func (s sender) StartJupyter(u domain.Account) error {
+//
+//	return s.send(topics.StartJupyter.Topic, &common.MsgNormal{
+//		Type:      topics.StartJupyter.Name,
+//		User:      u.Account(),
+//		CreatedAt: utils.Now(),
+//		Desc:      "StartJupyter",
+//	})
+//}
 
 // Fork Project
 func (s sender) ForkProject(u domain.Account, pro domain.ResourceName) error {
