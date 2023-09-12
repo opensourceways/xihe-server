@@ -19,6 +19,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
+	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/message"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
@@ -186,7 +187,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	cloudAppService := cloudapp.NewCloudService(
 		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
 		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
-		sender,
+		cloudmsg.NewPublisher(&cfg.Cloud, publisher),
 	)
 
 	bigmodelAppService := bigmodelapp.NewBigModelService(
