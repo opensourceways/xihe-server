@@ -16,6 +16,7 @@ import (
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
+	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -66,25 +67,31 @@ type pointsConfig struct {
 	Repo   pointsrepo.Config `json:"repo"`
 }
 
+type competitionConfig struct {
+	competitionimpl.Config
+
+	Message competitionmsg.Config `json:"message"`
+}
+
 type Config struct {
 	MaxRetry        int `json:"max_retry"`
 	ActivityKeepNum int `json:"activity_keep_num"`
 
-	Competition competitionimpl.Config `json:"competition"  required:"true"`
-	Challenge   challengeimpl.Config   `json:"challenge"    required:"true"`
-	Training    trainingimpl.Config    `json:"training"     required:"true"`
-	Finetune    finetuneimpl.Config    `json:"finetune"     required:"true"`
-	BigModel    bigmodels.Config       `json:"bigmodel"     required:"true"`
-	Authing     authingimpl.Config     `json:"authing"      required:"true"`
-	Mongodb     Mongodb                `json:"mongodb"      required:"true"`
-	Postgresql  PostgresqlConfig       `json:"postgresql"   required:"true"`
-	Redis       Redis                  `json:"redis"        required:"true"`
-	Gitlab      gitlab.Config          `json:"gitlab"       required:"true"`
-	Domain      domain.Config          `json:"domain"       required:"true"`
-	App         app.Config             `json:"app"          required:"true"`
-	API         controller.APIConfig   `json:"api"          required:"true"`
-	MQ          MQ                     `json:"mq"           required:"true"`
-	Points      pointsConfig           `json:"points"`
+	Competition competitionConfig    `json:"competition"  required:"true"`
+	Challenge   challengeimpl.Config `json:"challenge"    required:"true"`
+	Training    trainingimpl.Config  `json:"training"     required:"true"`
+	Finetune    finetuneimpl.Config  `json:"finetune"     required:"true"`
+	BigModel    bigmodels.Config     `json:"bigmodel"     required:"true"`
+	Authing     authingimpl.Config   `json:"authing"      required:"true"`
+	Mongodb     Mongodb              `json:"mongodb"      required:"true"`
+	Postgresql  PostgresqlConfig     `json:"postgresql"   required:"true"`
+	Redis       Redis                `json:"redis"        required:"true"`
+	Gitlab      gitlab.Config        `json:"gitlab"       required:"true"`
+	Domain      domain.Config        `json:"domain"       required:"true"`
+	App         app.Config           `json:"app"          required:"true"`
+	API         controller.APIConfig `json:"api"          required:"true"`
+	MQ          MQ                   `json:"mq"           required:"true"`
+	Points      pointsConfig         `json:"points"`
 }
 
 func (cfg *Config) GetMQConfig() mq.MQConfig {
@@ -111,7 +118,8 @@ func (cfg *Config) GetRedisConfig() redislib.Config {
 
 func (cfg *Config) configItems() []interface{} {
 	return []interface{}{
-		&cfg.Competition,
+		&cfg.Competition.Config,
+		&cfg.Competition.Message,
 		&cfg.Challenge,
 		&cfg.Training,
 		&cfg.Finetune,

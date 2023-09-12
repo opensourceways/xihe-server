@@ -84,7 +84,7 @@ func main() {
 	}
 
 	// competition
-	if err := competitionimpl.Init(&cfg.Competition); err != nil {
+	if err := competitionimpl.Init(&cfg.Competition.Config); err != nil {
 		logrus.Fatalf("initialize competition failed, err:%s", err.Error())
 	}
 
