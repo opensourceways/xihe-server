@@ -6,7 +6,7 @@ type Topics struct {
 	Like            string      `json:"like"             required:"true"`
 	Fork            string      `json:"fork"             required:"true"`
 	Download        string      `json:"download"         required:"true"`
-	Training        string      `json:"training"         required:"true"`
+	TrainingCreate  topicConfig `json:"training_create"  required:"true"`
 	Finetune        string      `json:"finetune"         required:"true"`
 	Following       string      `json:"following"        required:"true"`
 	Inference       string      `json:"inference"        required:"true"`

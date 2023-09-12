@@ -233,7 +233,7 @@ func registerHandlerForTraining(handler interface{}) error {
 	}
 
 	f := func(b []byte, hd map[string]string) (err error) {
-		body := message.MsgTraining{}
+		body := domain.Msg{}
 		if err = json.Unmarshal(b, &body); err != nil {
 			return
 		}
@@ -255,7 +255,7 @@ func registerHandlerForTraining(handler interface{}) error {
 		return h.HandleEventCreateTraining(&v)
 	}
 
-	return subscribe(topics.Training, handlerNameCreateTraining, f)
+	return subscribe(topics.TrainingCreate.Topic, handlerNameCreateTraining, f)
 }
 
 func registerHandlerForFinetune(handler interface{}) error {

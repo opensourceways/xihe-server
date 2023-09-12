@@ -127,10 +127,7 @@ func (s trainingService) create(
 		TrainingId: r,
 	}
 
-	msg := new(message.MsgTraining)
-	msg.TrainingCreate(user, index, config.Inputs)
-
-	if err = s.sender.CreateTraining(msg); err != nil {
+	if err = s.sender.CreateTraining(domain.NewCreateTrainingMsg(user, index, config.Inputs)); err != nil {
 		s.log.Errorf("send message of creating training failed, err:%s", err.Error())
 	}
 

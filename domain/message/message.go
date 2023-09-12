@@ -48,7 +48,7 @@ type Sender interface {
 	RemoveRelatedResource(*RelatedResource) error
 	RemoveRelatedResources(*RelatedResources) error
 
-	CreateTraining(*MsgTraining) error
+	CreateTraining(*domain.Msg) error
 	CreateFinetune(*domain.FinetuneIndex) error
 
 	CreateInference(*domain.InferenceInfo) error
