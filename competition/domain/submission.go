@@ -19,15 +19,6 @@ type SubmissionUpdatingInfo struct {
 	Score  float32
 }
 
-// WorkSubmittedEvent
-type WorkSubmittedEvent struct {
-	Id            string `json:"id"`
-	Phase         string `json:"phase"`
-	OBSPath       string `json:"obs_path"`
-	PlayerId      string `json:"pid"`
-	CompetitionId string `json:"cid"`
-}
-
 // Submission
 type Submission struct {
 	Id       string

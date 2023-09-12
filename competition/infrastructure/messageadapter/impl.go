@@ -1,8 +1,11 @@
 package messageadapter
 
 import (
-	"github.com/opensourceways/xihe-server/common/domain/message"
+	"fmt"
+
+	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/competition/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func NewPublisher(cfg *Config) *publisher {
@@ -14,10 +17,24 @@ type publisher struct {
 }
 
 func (impl *publisher) SendWorkSubmittedEvent(v *domain.WorkSubmittedEvent) error {
-	return message.Publish(impl.cfg.WorkSubmitted.Topic, v, nil)
+	return common.Publish(impl.cfg.WorkSubmitted.Topic, v, nil)
+}
+
+func (impl *publisher) SendCompetitorAppliedEvent(v *domain.CompetitorAppliedEvent) error {
+	cfg := &impl.cfg.CompetitorApplied
+
+	msg := common.MsgNormal{
+		Type:      cfg.Name,
+		User:      v.Account.Account(),
+		Desc:      fmt.Sprintf("applied competition of %s", v.CompetitionName),
+		CreatedAt: utils.Now(),
+	}
+
+	return common.Publish(cfg.Topic, &msg, nil)
 }
 
 // Config
 type Config struct {
-	WorkSubmitted message.TopicConfig `json:"work_submitted"`
+	WorkSubmitted     common.TopicConfig `json:"work_submitted"`
+	CompetitorApplied common.TopicConfig `json:"competitor_applied"`
 }
