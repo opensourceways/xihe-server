@@ -21,6 +21,7 @@ import (
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
+	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
 	competitionusercli "github.com/opensourceways/xihe-server/competition/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/config"
@@ -167,7 +168,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		competitionrepo.NewCompetitionRepo(mongodb.NewCollection(collections.Competition)),
 		competitionrepo.NewWorkRepo(mongodb.NewCollection(collections.CompetitionWork)),
 		competitionrepo.NewPlayerRepo(mongodb.NewCollection(collections.CompetitionPlayer)),
-		sender, uploader,
+		competitionmsg.NewPublisher(&cfg.Competition.Message), uploader,
 		competitionusercli.NewUserCli(userRegService),
 	)
 

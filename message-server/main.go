@@ -93,10 +93,7 @@ func main() {
 
 	defer redislib.Close()
 
-	if err = messages.InitKfkLib(
-		cfg.getKfkConfig(),
-		log, cfg.MQ.Topics,
-	); err != nil {
+	if err = messages.InitKfkLib(cfg.getKfkConfig(), log, cfg.MQTopics.Topics); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
@@ -119,7 +116,7 @@ func main() {
 	cfg.initDomainConfig()
 
 	// points
-	if err = pointsSubscribesMessage(cfg, &cfg.MQ.Topics); err != nil {
+	if err = pointsSubscribesMessage(cfg, &cfg.MQTopics); err != nil {
 		logrus.Errorf("points subscribes message failed, err:%s", err.Error())
 
 		return
@@ -129,7 +126,7 @@ func main() {
 	run(newHandler(cfg, log), log)
 }
 
-func pointsSubscribesMessage(cfg *configuration, topics *messages.Topics) error {
+func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 	collections := &cfg.Mongodb.Collections
 
 	return pointsmq.Subscribe(
@@ -144,6 +141,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *messages.Topics) error 
 		),
 		[]string{
 			topics.SignIn.Topic,
+			topics.CompetitorApplied,
 		},
 	)
 }

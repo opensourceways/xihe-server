@@ -238,7 +238,7 @@ func (s *competitionService) Submit(cmd *CompetitionSubmitCMD) (
 
 	// notify
 	info := w.NewSubmissionMessage(&ps)
-	if err = s.producer.NotifyCalcScore(&info); err != nil {
+	if err = s.producer.SendWorkSubmittedEvent(&info); err != nil {
 		return
 	}
 

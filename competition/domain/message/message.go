@@ -2,6 +2,7 @@ package message
 
 import "github.com/opensourceways/xihe-server/competition/domain"
 
-type CalcScoreMessageProducer interface {
-	NotifyCalcScore(*domain.SubmissionMessage) error
+type MessageProducer interface {
+	SendWorkSubmittedEvent(*domain.WorkSubmittedEvent) error
+	SendCompetitorAppliedEvent(*domain.CompetitorAppliedEvent) error
 }

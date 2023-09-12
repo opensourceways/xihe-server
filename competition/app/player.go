@@ -35,11 +35,16 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 		if repoerr.IsErrorDuplicateCreating(err) {
 			code = errorCompetitorExists
 		}
-	}
 
-	if err = s.userCli.AddUserRegInfo(&p.Leader); err != nil {
 		return
 	}
+
+	s.producer.SendCompetitorAppliedEvent(&domain.CompetitorAppliedEvent{
+		Account:         cmd.Account,
+		CompetitionName: competition.Name,
+	})
+
+	err = s.userCli.AddUserRegInfo(&p.Leader)
 
 	return
 }

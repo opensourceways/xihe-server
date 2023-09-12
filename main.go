@@ -84,7 +84,7 @@ func main() {
 	}
 
 	// competition
-	if err := competitionimpl.Init(&cfg.Competition); err != nil {
+	if err := competitionimpl.Init(&cfg.Competition.Config); err != nil {
 		logrus.Fatalf("initialize competition failed, err:%s", err.Error())
 	}
 
@@ -108,10 +108,7 @@ func main() {
 
 	defer redislib.Close()
 
-	if err = messages.InitKfkLib(
-		cfg.GetKfkConfig(),
-		log, cfg.MQ.Topics,
-	); err != nil {
+	if err = messages.InitKfkLib(cfg.GetKfkConfig(), log, cfg.MQTopics); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
