@@ -13,6 +13,12 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 	}
 
 	_, err = s.repo.Save(&user)
+	if cmd.AvatarId != nil {
+		return s.sender.SetAvatarId(account, cmd.AvatarId)
+	}
+	if cmd.Bio != nil {
+		return s.sender.SetBio(account, cmd.Bio)
+	}
 
 	return err
 }

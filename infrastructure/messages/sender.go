@@ -2,6 +2,8 @@ package messages
 
 import (
 	"encoding/json"
+	"fmt"
+	coursedomain "github.com/opensourceways/xihe-server/course/domain"
 
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 
@@ -187,6 +189,147 @@ func (s sender) SignIn(u domain.Account) error {
 		Type:      topics.SignIn.Name,
 		User:      u.Account(),
 		CreatedAt: utils.Now(),
+	})
+}
+
+// Apply course
+func (s sender) ApplyCourse(u domain.Account, summary coursedomain.CourseSummary) error {
+	desc := fmt.Sprintf("apply course %s", summary.Name)
+
+	return s.send(topics.ApplyCourse.Topic, &common.MsgNormal{
+		Type:      topics.ApplyCourse.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Daily Download
+func (s sender) DailyDownload(u domain.Account, reponame domain.ResourceName) error {
+	desc := fmt.Sprintf("Download ResourceName %s", reponame)
+
+	return s.send(topics.DailyDownload.Topic, &common.MsgNormal{
+		Type:      topics.DailyDownload.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Daily Like
+func (s sender) DailyLike(u domain.Account, n domain.ResourceName) error {
+	desc := fmt.Sprintf("Like Rousource %s", n)
+
+	return s.send(topics.DailyLike.Topic, &common.MsgNormal{
+		Type:      topics.DailyLike.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Like Picture
+func (s sender) LikePicture(u domain.Account) error {
+
+	return s.send(topics.DailyLike.Topic, &common.MsgNormal{
+		Type:      topics.DailyLike.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      "like picture",
+	})
+}
+
+// Daily Create
+func (s sender) DailyCreate(u domain.Account, reponame domain.ResourceName) error {
+	desc := fmt.Sprintf("Create ResourceName %s", reponame)
+
+	return s.send(topics.DailyCreate.Topic, &common.MsgNormal{
+		Type:      topics.DailyCreate.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Experience Bigmodel
+func (s sender) ExperienceBigmodel(u domain.Account, b bigmodeldomain.BigmodelType) error {
+	desc := fmt.Sprintf("Experience Bigmodel %s", b)
+
+	return s.send(topics.ExperienceBigmodel.Topic, &common.MsgNormal{
+		Type:      topics.ExperienceBigmodel.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Register
+func (s sender) Register(u domain.Account) error {
+
+	return s.send(topics.Register.Topic, &common.MsgNormal{
+		Type:      topics.Register.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      "Register",
+	})
+}
+
+// BindEmail
+func (s sender) BindEmail(u domain.Account, email domain.Email) error {
+	desc := fmt.Sprintf("Bind Email %s", email)
+
+	return s.send(topics.BindEmail.Topic, &common.MsgNormal{
+		Type:      topics.BindEmail.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Set AvatarId
+func (s sender) SetAvatarId(u domain.Account, a userdomain.AvatarId) error {
+	desc := fmt.Sprintf("Set AvatarId %s", a)
+
+	return s.send(topics.SetAvatarId.Topic, &common.MsgNormal{
+		Type:      topics.SetAvatarId.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+// Set Bio
+func (s sender) SetBio(u domain.Account, a userdomain.Bio) error {
+	desc := fmt.Sprintf("Set Bio %s", a)
+
+	return s.send(topics.SetBio.Topic, &common.MsgNormal{
+		Type:      topics.SetBio.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
+}
+
+//// Start Jupyter
+//func (s sender) StartJupyter(u domain.Account) error {
+//
+//	return s.send(topics.StartJupyter.Topic, &common.MsgNormal{
+//		Type:      topics.StartJupyter.Name,
+//		User:      u.Account(),
+//		CreatedAt: utils.Now(),
+//		Desc:      "StartJupyter",
+//	})
+//}
+
+// Fork Project
+func (s sender) ForkProject(u domain.Account, pro domain.ResourceName) error {
+	desc := fmt.Sprintf("fork project %s", pro)
+
+	return s.send(topics.ForkProject.Topic, &common.MsgNormal{
+		Type:      topics.ForkProject.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
 	})
 }
 

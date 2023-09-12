@@ -41,6 +41,8 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (code string, err error) {
 		return
 	}
 
+	_ = s.sender.ApplyCourse(p.Account, course.CourseSummary)
+
 	return
 }
 

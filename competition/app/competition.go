@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/competition/domain/uploader"
 	"github.com/opensourceways/xihe-server/competition/domain/user"
 	types "github.com/opensourceways/xihe-server/domain"
+	message2 "github.com/opensourceways/xihe-server/domain/message"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 )
 
@@ -60,6 +61,7 @@ type competitionService struct {
 	producer         message.CalcScoreMessageProducer
 	submissionServie domain.SubmissionService
 	userCli          user.User
+	sender           message2.Sender
 }
 
 // show competition detail

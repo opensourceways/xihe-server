@@ -16,7 +16,6 @@ import (
 type CompetitionIndex = domain.CompetitionIndex
 type CompetitionListCMD = repository.CompetitionListOption
 type CompetitionSubmissionInfo = domain.CompetitionSubmissionInfo
-
 type CompetitionService interface {
 	Apply(string, *CompetitorApplyCmd) error
 

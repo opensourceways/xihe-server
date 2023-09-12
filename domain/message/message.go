@@ -2,6 +2,7 @@ package message
 
 import (
 	bmdomain "github.com/opensourceways/xihe-server/bigmodel/domain"
+	coursedomain "github.com/opensourceways/xihe-server/course/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
@@ -59,6 +60,17 @@ type Sender interface {
 	CalcScore(*SubmissionInfo) error
 
 	SignIn(domain.Account) error
+	ApplyCourse(domain.Account, coursedomain.CourseSummary) error
+	DailyDownload(domain.Account, domain.ResourceName) error
+	DailyLike(domain.Account, domain.ResourceName) error
+	LikePicture(domain.Account) error
+	DailyCreate(domain.Account, domain.ResourceName) error
+	ExperienceBigmodel(domain.Account, bmdomain.BigmodelType) error
+	Register(domain.Account) error
+	BindEmail(domain.Account, domain.Email) error
+	SetAvatarId(domain.Account, userdomain.AvatarId) error
+	SetBio(domain.Account, userdomain.Bio) error
+	ForkProject(domain.Account, domain.ResourceName) error
 }
 
 type EventHandler interface {

@@ -12,6 +12,8 @@ func (s bigModelService) DescribePicture(
 ) (string, error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelDescPicture)
 
+	_ = s.sender.ExperienceBigmodel(user, domain.BigmodelDescPicture)
+
 	return s.fm.DescribePicture(picture, name, length, string(domain.BigmodelDescPicture))
 }
 
@@ -20,6 +22,8 @@ func (s bigModelService) DescribePictureHF(
 ) (string, error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelDescPicture)
 
+	_ = s.sender.ExperienceBigmodel(cmd.User, domain.BigmodelDescPicture)
+
 	return s.fm.DescribePicture(cmd.Picture, cmd.Name, cmd.Length, string(domain.BigmodelDescPictureHF))
 }
 
@@ -27,6 +31,8 @@ func (s bigModelService) GenPicture(
 	cmd GenPictureCmd,
 ) (link string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelGenPicture)
+
+	_ = s.sender.ExperienceBigmodel(cmd.User, domain.BigmodelGenPicture)
 
 	if link, err = s.fm.GenPicture(cmd.User, cmd.Desc.Desc()); err != nil {
 		code = s.setCode(err)
@@ -40,6 +46,8 @@ func (s bigModelService) GenPictures(
 ) (links []string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelGenPicture)
 
+	_ = s.sender.ExperienceBigmodel(cmd.User, domain.BigmodelGenPicture)
+
 	if links, err = s.fm.GenPictures(cmd.User, cmd.Desc.Desc()); err != nil {
 		code = s.setCode(err)
 	}
@@ -51,6 +59,8 @@ func (s bigModelService) Ask(
 	u types.Account, q domain.Question, f string,
 ) (v string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(u, domain.BigmodelVQA)
+
+	_ = s.sender.ExperienceBigmodel(u, domain.BigmodelVQA)
 
 	if v, err = s.fm.Ask(q, f); err != nil {
 		code = s.setCode(err)
@@ -65,6 +75,8 @@ func (s bigModelService) VQAUploadPicture(f io.Reader, user types.Account, fileN
 
 func (s bigModelService) VQAHF(cmd *VQAHFCmd) (v string, code string, err error) {
 	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelVQA)
+
+	_ = s.sender.ExperienceBigmodel(cmd.User, domain.BigmodelVQA)
 
 	if v, err = s.fm.AskHF(cmd.Picture, cmd.User, cmd.Ask); err != nil {
 		code = s.setCode(err)

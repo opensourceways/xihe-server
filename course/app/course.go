@@ -6,6 +6,7 @@ import (
 	"github.com/opensourceways/xihe-server/course/domain/repository"
 	"github.com/opensourceways/xihe-server/course/domain/user"
 	projdomain "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/domain/message"
 	projectrepo "github.com/opensourceways/xihe-server/domain/repository"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 )
@@ -53,6 +54,7 @@ type courseService struct {
 	playerRepo repository.Player
 	workRepo   repository.Work
 	recordRepo repository.Record
+	sender     message.Sender
 }
 
 // List
