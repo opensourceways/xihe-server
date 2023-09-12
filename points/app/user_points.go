@@ -70,6 +70,8 @@ func (s *userPointsAppService) PointsDetails(account common.Account) (dto UserPo
 		}
 	}
 
+	dto.Details = details
+
 	return
 }
 

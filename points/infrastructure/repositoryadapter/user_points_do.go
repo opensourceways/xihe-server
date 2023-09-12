@@ -1,6 +1,8 @@
 package repositoryadapter
 
 import (
+	"sort"
+
 	"go.mongodb.org/mongo-driver/bson"
 
 	common "github.com/opensourceways/xihe-server/domain"
@@ -11,16 +13,17 @@ const (
 	fieldUser    = "user"
 	fieldDate    = "date"
 	fieldTotal   = "total"
-	fieldItems   = "items"
+	fieldDays    = "days"
 	fieldDones   = "dones"
 	fieldDetails = "details"
+	fieldVersion = "version"
 )
 
 type userPointsDO struct {
 	User    string                 `bson:"user"     json:"user"`
 	Total   int                    `bson:"total"    json:"total"`
 	Dones   []string               `bson:"dones"    json:"dones"`
-	Items   []pointsDetailsOfDayDO `bson:"items"    json:"items"`
+	Days    []pointsDetailsOfDayDO `bson:"days"     json:"days"`
 	Version int                    `bson:"version"  json:"version"`
 }
 
@@ -46,8 +49,12 @@ func (do *userPointsDO) toUserPoints() (domain.UserPoints, error) {
 func (do *userPointsDO) toPointsItems() []domain.PointsItem {
 	r := []domain.PointsItem{}
 
-	for i := range do.Items {
-		item := &do.Items[i]
+	sort.Slice(do.Days, func(i, j int) bool {
+		return do.Days[i].Date < do.Days[j].Date
+	})
+
+	for i := len(do.Days) - 1; i >= 0; i-- {
+		item := &do.Days[i]
 
 		r = append(r, item.toPointsItems()...)
 	}

@@ -1,18 +1,47 @@
 package repositoryadapter
 
-import "github.com/opensourceways/xihe-server/points/domain"
+import (
+	"go.mongodb.org/mongo-driver/bson"
+
+	"github.com/opensourceways/xihe-server/points/domain"
+)
 
 const (
 	fieldName = "name"
 	fieldOlds = "olds"
 )
 
+func totaskDO(t *domain.Task) taskDO {
+	return taskDO{
+		Name: t.Name,
+		Kind: t.Kind,
+		Addr: t.Addr,
+		Rule: toruleDO(&t.Rule),
+		Olds: []ruleDO{},
+	}
+}
+
+func toruleDO(r *domain.Rule) ruleDO {
+	return ruleDO{
+		OnceOnly:       r.OnceOnly,
+		Desc:           r.Desc,
+		CreatedAt:      r.CreatedAt,
+		PointsPerOnce:  r.PointsPerOnce,
+		MaxPointsOfDay: r.MaxPointsOfDay,
+	}
+}
+
+// taskDO
 type taskDO struct {
 	Name string   `bson:"name"  json:"name"`
 	Kind string   `bson:"kind"  json:"kind"`
 	Addr string   `bson:"addr"  json:"addr"`
 	Rule ruleDO   `bson:"rule"  json:"rule"`
 	Olds []ruleDO `bson:"olds"  json:"olds"`
+}
+
+func (do *taskDO) doc() (bson.M, error) {
+	return genDoc(do)
 }
 
 func (do *taskDO) toTask() domain.Task {
@@ -24,6 +53,7 @@ func (do *taskDO) toTask() domain.Task {
 	}
 }
 
+// ruleDO
 type ruleDO struct {
 	OnceOnly       bool   `bson:"once_only"          json:"once_only"`
 	Desc           string `bson:"desc"               json:"desc"`

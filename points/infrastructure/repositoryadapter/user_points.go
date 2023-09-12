@@ -23,8 +23,19 @@ type userPointsAdapter struct {
 	keep int
 }
 
+func (impl *userPointsAdapter) docFilter(account common.Account) bson.M {
+	return bson.M{fieldUser: account.Account()}
+}
+
+func (impl *userPointsAdapter) docOfDaysFilter(date string) bson.M {
+	return bson.M{fieldDate: date}
+}
+
 func (impl *userPointsAdapter) SavePointsItem(up *domain.UserPoints, item *domain.PointsItem) error {
 	if up.Version == 0 {
+		// set version to 1 to avoid running again here.
+		up.Version = 1
+
 		return impl.addUserPoints(up, item)
 	}
 
@@ -40,7 +51,7 @@ func (impl *userPointsAdapter) addUserPoints(up *domain.UserPoints, item *domain
 	do := userPointsDO{
 		User:    up.User.Account(),
 		Total:   up.Total,
-		Items:   []pointsDetailsOfDayDO{toPointsItemsOfDayDO(item)},
+		Days:    []pointsDetailsOfDayDO{toPointsItemsOfDayDO(item)},
 		Dones:   up.Dones,
 		Version: up.Version,
 	}
@@ -51,9 +62,7 @@ func (impl *userPointsAdapter) addUserPoints(up *domain.UserPoints, item *domain
 	}
 
 	f := func(ctx context.Context) error {
-		_, err := impl.cli.NewDocIfNotExist(
-			ctx, bson.M{fieldUser: up.User.Account()}, doc,
-		)
+		_, err := impl.cli.NewDocIfNotExist(ctx, impl.docFilter(up.User), doc)
 
 		return err
 	}
@@ -80,8 +89,8 @@ func (impl *userPointsAdapter) addFirstPointsDetailOfDay(up *domain.UserPoints, 
 
 	f := func(ctx context.Context) error {
 		return impl.cli.PushElemToLimitedArrayWithVersion(
-			ctx, fieldItems, impl.keep,
-			bson.M{fieldUser: up.User.Account()},
+			ctx, fieldDays, impl.keep,
+			impl.docFilter(up.User),
 			doc, up.Version,
 			bson.M{
 				fieldTotal: up.Total,
@@ -112,9 +121,9 @@ func (impl *userPointsAdapter) addPointsDetail(up *domain.UserPoints, item *doma
 
 	f := func(ctx context.Context) error {
 		_, err := impl.cli.PushNestedArrayElemAndUpdate(
-			ctx, fieldItems,
-			bson.M{fieldUser: up.User.Account()},
-			bson.M{fieldDate: item.Date},
+			ctx, fieldDays,
+			impl.docFilter(up.User),
+			impl.docOfDaysFilter(item.Date),
 			bson.M{fieldDetails: doc}, up.Version,
 			bson.M{
 				fieldTotal: up.Total,
@@ -140,9 +149,17 @@ func (impl *userPointsAdapter) Find(account common.Account, date string) (domain
 	var dos []userPointsDO
 
 	f := func(ctx context.Context) error {
+		project := bson.M{
+			fieldUser:    1,
+			fieldTotal:   1,
+			fieldDones:   1,
+			fieldDays:    1,
+			fieldVersion: 1,
+		}
+
 		return impl.cli.GetArrayElem(
-			ctx, fieldItems, bson.M{fieldUser: account.Account()},
-			bson.M{fieldDate: date}, nil, &dos, // TODO check if it needs set project
+			ctx, fieldDays, impl.docFilter(account),
+			impl.docOfDaysFilter(date), project, &dos,
 		)
 	}
 
@@ -164,7 +181,7 @@ func (impl *userPointsAdapter) FindAll(account common.Account) (domain.UserPoint
 
 	f := func(ctx context.Context) error {
 		return impl.cli.GetDoc(
-			ctx, bson.M{fieldUser: account.Account()}, nil, &do,
+			ctx, impl.docFilter(account), nil, &do,
 		)
 	}
 

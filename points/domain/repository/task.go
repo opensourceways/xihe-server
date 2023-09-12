@@ -3,6 +3,7 @@ package repository
 import "github.com/opensourceways/xihe-server/points/domain"
 
 type Task interface {
-	FindAllTasks() ([]domain.Task, error)
+	Add(*domain.Task) error
 	Find(string) (domain.Task, error)
+	FindAllTasks() ([]domain.Task, error)
 }
