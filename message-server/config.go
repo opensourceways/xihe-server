@@ -3,13 +3,11 @@ package main
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
-	kfklib "github.com/opensourceways/kafka-lib/agent"
-	redislib "github.com/opensourceways/redis-lib"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
-	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
@@ -31,9 +29,8 @@ type configuration struct {
 	Mongodb    config.Mongodb       `json:"mongodb"      required:"true"`
 	Postgresql PostgresqlConfig     `json:"postgresql"   required:"true"`
 	Domain     domain.Config        `json:"domain"       required:"true"`
-	MQ         config.MQ            `json:"mq"           required:"true"`
+	MQ         kafka.Config         `json:"mq"           required:"true"`
 	MQTopics   mqTopics             `json:"mq_topics"    required:"true"`
-	Redis      redis.Config         `json:"redis"        required:"true"`
 	Points     pointsConfig         `json:"points"`
 }
 
@@ -49,22 +46,6 @@ type PostgresqlConfig struct {
 	asyncconf asyncrepoimpl.Config
 }
 
-func (cfg *configuration) getKfkConfig() kfklib.Config {
-	return kfklib.Config{
-		Address: cfg.MQ.Address,
-		Version: cfg.MQ.Version,
-	}
-}
-
-func (cfg *configuration) getRedisConfig() redislib.Config {
-	return redislib.Config{
-		Address:  cfg.Redis.Address,
-		Password: cfg.Redis.Password,
-		DB:       cfg.Redis.DB,
-		Timeout:  cfg.Redis.Timeout,
-	}
-}
-
 func (cfg *configuration) configItems() []interface{} {
 	return []interface{}{
 		&cfg.Inference,
@@ -76,7 +57,6 @@ func (cfg *configuration) configItems() []interface{} {
 		&cfg.Domain,
 		&cfg.MQ,
 		&cfg.MQTopics,
-		&cfg.Redis,
 		&cfg.Points.Domain,
 		&cfg.Points.Repo,
 	}

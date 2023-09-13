@@ -32,7 +32,9 @@ const (
 	handlerNameCreateInference    = "create_inference"
 )
 
-func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) (err error) {
+func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry, topic *Topics) (err error) {
+	topics = *topic
+
 	// register following
 	if err = registerHandlerForFollowing(handler); err != nil {
 		return

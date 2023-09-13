@@ -16,6 +16,7 @@ import (
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/watchimpl"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 )
@@ -76,11 +77,11 @@ func main() {
 	}
 
 	// mq
-	if err := messages.Init(cfg.GetMQConfig(), log, cfg.MQ.Topics); err != nil {
+	if err := kafka.Init(&cfg.MQ, log, nil); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
-	defer messages.Exit(log)
+	defer kafka.Exit()
 
 	// postgresql
 	if err := pgsql.Init(&cfg.Postgresql.DB); err != nil {
@@ -94,7 +95,7 @@ func main() {
 
 	// bigmodel & sender
 	bm := bigmodels.NewBigModelService()
-	sender := messages.NewMessageSender()
+	sender := messages.NewMessageSender(&cfg.MQTopics, kafka.PlublisherAdapter())
 
 	// aysnc.bigmodel.bigmodel
 	bigmodel := bigmodelimpl.NewBigModelImpl(

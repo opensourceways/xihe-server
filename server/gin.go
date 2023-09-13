@@ -20,6 +20,7 @@ import (
 	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
 	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
@@ -148,7 +149,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	gitlabUser := gitlab.NewUserSerivce()
 	gitlabRepo := gitlab.NewRepoFile()
 	authingUser := authingimpl.NewAuthingUser()
-	sender := messages.NewMessageSender()
+	publisher := kafka.PlublisherAdapter()
+	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
 	trainingAdapter := trainingimpl.NewTraining(&cfg.Training)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
@@ -168,7 +170,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		competitionrepo.NewCompetitionRepo(mongodb.NewCollection(collections.Competition)),
 		competitionrepo.NewWorkRepo(mongodb.NewCollection(collections.CompetitionWork)),
 		competitionrepo.NewPlayerRepo(mongodb.NewCollection(collections.CompetitionPlayer)),
-		competitionmsg.NewPublisher(&cfg.Competition.Message), uploader,
+		competitionmsg.MessageAdapter(&cfg.Competition.Message, publisher), uploader,
 		competitionusercli.NewUserCli(userRegService),
 	)
 
