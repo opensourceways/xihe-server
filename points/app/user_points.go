@@ -102,6 +102,10 @@ func (s *userPointsAppService) TasksOfDay(account common.Account) ([]TasksComple
 	for i := range tasks {
 		t := &tasks[i]
 
+		if t.IsPassiveTask() {
+			continue
+		}
+
 		j, ok := m[t.Kind]
 		if !ok {
 			j = len(r)

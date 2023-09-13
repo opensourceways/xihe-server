@@ -62,11 +62,8 @@ func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsD
 
 func (entity *UserPoints) IsCompleted(task *Task) bool {
 	item := entity.poitsItem(task.Name)
-	if item == nil {
-		return false
-	}
 
-	v := task.Rule.calcPoints(item.points(), !entity.hasDone(task.Name))
+	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Name))
 
 	return v == 0
 }
@@ -78,7 +75,7 @@ func (entity *UserPoints) calc(task *Task, item *PointsItem) int {
 		return 0
 	}
 
-	v := task.Rule.calcPoints(item.points(), !entity.hasDone(task.Name))
+	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Name))
 	if v == 0 {
 		return 0
 	}
@@ -172,26 +169,29 @@ type PointsDetail struct {
 
 // Task
 type Task struct {
-	Name string
-	Kind string // Novice, EveryDay, Activity
-	Addr string // The website address of task
-	Rule Rule
+	Name string `json:"name"`
+	Kind string `json:"kind"` // Novice, EveryDay, Activity, PassiveItem
+	Addr string `json:"addr"` // The website address of task
+	Rule Rule   `json:"rule"`
+}
+
+func (t *Task) IsPassiveTask() bool {
+	return t.Kind == "PassiveItem"
 }
 
 // Rule
 type Rule struct {
-	OnceOnly       bool // only can do once
-	Desc           string
-	CreatedAt      string
-	PointsPerOnce  int
-	MaxPointsOfDay int
+	OnceOnly       bool   `json:"once_only"` // only can do once
+	Desc           string `json:"desc"`
+	CreatedAt      string `json:"created_at"`
+	PointsPerOnce  int    `json:"points_per_once"`
+	MaxPointsOfDay int    `json:"max_points_of_day"`
 }
 
 // points is the one that user has got on this task today
-// firstTime is that user is first time to do this task
-func (r *Rule) calcPoints(points int, firstTime bool) int {
+func (r *Rule) calcPoints(points int, hasDone bool) int {
 	if r.OnceOnly {
-		if firstTime {
+		if hasDone {
 			return 0
 		}
 
