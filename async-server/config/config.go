@@ -6,10 +6,10 @@ import (
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/poolimpl"
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/watchimpl"
-	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 )
 
@@ -26,12 +26,12 @@ func LoadConfig(path string, cfg *Config) error {
 type Config struct {
 	MaxRetry int `json:"max_retry"`
 
-	BigModel   bigmodels.Config `json:"bigmodel"     required:"true"`
-	Postgresql PostgresqlConfig `json:"postgresql"   required:"true"`
-	MQ         kafka.Config     `json:"mq"           required:"true"`
-	MQTopics   messages.Topics  `json:"mq_topics"    required:"true"`
-	Pool       poolimpl.Config  `json:"pool"         required:"true"`
-	Watcher    watchimpl.Config `json:"watcher"      required:"true"`
+	BigModel   config.BigmodelConfig `json:"bigmodel"     required:"true"`
+	Postgresql PostgresqlConfig      `json:"postgresql"   required:"true"`
+	MQ         kafka.Config          `json:"mq"           required:"true"`
+	MQTopics   messages.Topics       `json:"mq_topics"    required:"true"`
+	Pool       poolimpl.Config       `json:"pool"         required:"true"`
+	Watcher    watchimpl.Config      `json:"watcher"      required:"true"`
 }
 
 func (cfg *Config) ConfigItems() []interface{} {
