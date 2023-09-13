@@ -12,7 +12,7 @@ const (
 	actionExtend = "extend"
 )
 
-type msgOperateLog struct {
+type MsgOperateLog struct {
 	When int64             `json:"when"`
 	User string            `json:"user"`
 	Type string            `json:"type"`

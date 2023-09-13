@@ -88,7 +88,7 @@ func NewBigModelService(
 	wukong repository.WuKong,
 	wukongPicture repository.WuKongPicture,
 	asynccli async.AsyncTask,
-	sender message.AsyncMessageProducer,
+	sender message.MessageProducer,
 	apiService repository.ApiService,
 	apiInfo repository.ApiInfo,
 	userService userapp.RegService,
@@ -112,7 +112,7 @@ func NewBigModelService(
 type bigModelService struct {
 	fm bigmodel.BigModel
 
-	sender        message.AsyncMessageProducer
+	sender        message.MessageProducer
 	user          userrepo.User
 	luojia        repository.LuoJia
 	wukong        repository.WuKong
@@ -151,7 +151,10 @@ func (s bigModelService) GenWuKongSamples(batchNum int) ([]string, error) {
 func (s bigModelService) WuKong(
 	user types.Account, cmd *WuKongCmd,
 ) (links map[string]string, code string, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
+	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+		Account:      user,
+		BigModelType: domain.BigmodelWuKong,
+	})
 
 	links, err = s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, cmd.EsType)
 	if err != nil {
@@ -164,7 +167,10 @@ func (s bigModelService) WuKong(
 func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
 	links map[string]string, code string, err error,
 ) {
-	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelWuKong)
+	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+		Account:      cmd.User,
+		BigModelType: domain.BigmodelWuKongHF,
+	})
 
 	links, err = s.fm.GenPicturesByWuKong(cmd.User, &cmd.WuKongPictureMeta, string(domain.BigmodelWuKongHF))
 	if err != nil {
@@ -177,7 +183,11 @@ func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
 func (s bigModelService) WukongApi(
 	user types.Account, model domain.ModelName, cmd *WuKongApiCmd,
 ) (links map[string]string, code string, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
+	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+		Account:      user,
+		BigModelType: domain.BigmodelWuKong,
+	})
+
 	links, err = s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, string(domain.BigmodelWuKongUser))
 	if err != nil {
 		code = s.setCode(err)
@@ -197,10 +207,12 @@ func (s bigModelService) WuKongInferenceAsync(user types.Account, cmd *WuKongCmd
 		return
 	}
 
-	msg := new(message.MsgTask)
-	msg.WuKongInferenceStart(user.Account(), cmd.Desc.WuKongPictureDesc(), cmd.Style, cmd.EsType)
-
-	return "", s.sender.SendBigModelMsg(msg)
+	return "", s.sender.SendWuKongInferenceStart(&domain.WuKongInferenceStartEvent{
+		Account: user,
+		Desc:    cmd.Desc,
+		Style:   cmd.Style,
+		EsStyle: cmd.EsType,
+	})
 }
 
 func (s bigModelService) GetWuKongWaitingTaskRank(user types.Account) (dto WuKongRankDTO, err error) {

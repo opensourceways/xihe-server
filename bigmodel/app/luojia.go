@@ -13,7 +13,10 @@ func (s bigModelService) LuoJiaUploadPicture(f io.Reader, user types.Account) er
 }
 
 func (s bigModelService) LuoJia(user types.Account) (v string, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelLuoJia)
+	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+		Account:      user,
+		BigModelType: domain.BigmodelLuoJia,
+	})
 
 	if v, err = s.fm.LuoJia(user.Account()); err != nil {
 		return
@@ -28,7 +31,10 @@ func (s bigModelService) LuoJia(user types.Account) (v string, err error) {
 }
 
 func (s bigModelService) LuoJiaHF(cmd *LuoJiaHFCmd) (v string, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelLuoJia)
+	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+		Account:      cmd.User,
+		BigModelType: domain.BigmodelLuoJia,
+	})
 
 	if v, err = s.fm.LuoJiaHF(cmd.Picture); err != nil {
 		return
