@@ -58,10 +58,6 @@ func (plublisherAdapter) Publish(topic string, v interface{}, header map[string]
 // subscriberAdapter
 type subscriberAdapter struct{}
 
-func (subscriberAdapter) Subscribe(group string, h kfklib.Handler, topics []string) error {
-	return kfklib.Subscribe(group, h, topics)
-}
-
 func (subscriberAdapter) SubscribeWithStrategyOfRetry(
 	group string, h kfklib.Handler, topics []string, retryNum int,
 ) error {

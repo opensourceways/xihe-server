@@ -23,7 +23,5 @@ type Publisher interface {
 }
 
 type Subscriber interface {
-	Subscribe(group string, h kfklib.Handler, topics []string) error
-
 	SubscribeWithStrategyOfRetry(group string, h kfklib.Handler, topics []string, retryNum int) error
 }
