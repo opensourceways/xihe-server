@@ -482,6 +482,11 @@ func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCm
 	}
 	pid, err = s.wukongPicture.SavePublic(p, version)
 
+	// sender
+	_ = s.sender.SendWuKongPicturePublic(&domain.WuKongPicturePublicEvent{
+		Account: cmd.User,
+	})
+
 	return
 }
 
@@ -538,6 +543,11 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 
 		return
 	}
+
+	// sender
+	_ = s.sender.SendWuKongPicturePublic(&domain.WuKongPicturePublicEvent{
+		Account: cmd.User,
+	})
 
 	return
 }
