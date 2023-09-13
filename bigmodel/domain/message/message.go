@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	comsg "github.com/opensourceways/xihe-server/common/domain/message"
-	"github.com/opensourceways/xihe-server/domain/message"
 )
 
 const (
@@ -17,10 +17,16 @@ const (
 
 type MsgTask comsg.MsgNormal
 
-type AsyncMessageProducer interface {
-	message.Sender
+type MessageProducer interface {
+	// wukong
+	SendWuKongInferenceStart(*domain.WuKongInferenceStartEvent) error
+	SendWuKongInferenceError(*domain.WuKongInferenceErrorEvent) error
+	SendWuKongAsyncTaskStart(*domain.WuKongAsyncTaskStartEvent) error
+	SendWuKongAsyncInferenceFinish(*domain.WuKongAsyncInferenceFinishEvent) error
+	SendWuKongPicturePublic(*domain.WuKongPicturePublicEvent) error
 
-	SendBigModelMsg(*MsgTask) error
+	// common
+	SendBigModelAccessLog(*domain.BigModelAccessLogEvent) error
 }
 
 func (msg *MsgTask) WuKongInferenceStart(user, desc, style, taskType string) {

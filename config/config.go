@@ -44,7 +44,7 @@ type Config struct {
 	Challenge   challengeimpl.Config `json:"challenge"    required:"true"`
 	Training    trainingimpl.Config  `json:"training"     required:"true"`
 	Finetune    finetuneimpl.Config  `json:"finetune"     required:"true"`
-	BigModel    bigmodels.Config     `json:"bigmodel"     required:"true"`
+	BigModel    bigmodelConfig       `json:"bigmodel"     required:"true"`
 	Authing     authingimpl.Config   `json:"authing"      required:"true"`
 	Mongodb     Mongodb              `json:"mongodb"      required:"true"`
 	Postgresql  PostgresqlConfig     `json:"postgresql"   required:"true"`
