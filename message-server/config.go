@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
+	msgadapeter "github.com/opensourceways/xihe-server/bigmodel/infrastructure/messageadapter"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	common "github.com/opensourceways/xihe-server/common/config"
@@ -136,6 +137,24 @@ func (cfg *cloudConfig) Validate() error {
 type mqTopics struct {
 	messages.Topics
 
+	// competition
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
 	JupyterCreated    string `json:"jupyter_created"    required:"true"`
+
+	// bigmodel
+	InferenceStart       string `json:"inference_start"        required:"true"`
+	InferenceError       string `json:"inference_error"        required:"true"`
+	InferenceAsyncStart  string `json:"inference_async_start"  required:"true"`
+	InferenceAsyncFinish string `json:"inference_async_finish" required:"true"`
+	PicturePublic        string `json:"picture_public"         required:"true"`
+}
+
+func toBigModelMessageConfig(topics *mqTopics) (cfg msgadapeter.Config) {
+	cfg.InferenceStart.Topic = topics.InferenceStart
+	cfg.InferenceError.Topic = topics.InferenceError
+	cfg.InferenceAsyncStart.Topic = topics.InferenceAsyncStart
+	cfg.InferenceAsyncFinish.Topic = topics.InferenceAsyncFinish
+	cfg.PicturePublic.Topic = topics.PicturePublic
+
+	return
 }
