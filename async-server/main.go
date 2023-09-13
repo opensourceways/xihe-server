@@ -45,7 +45,6 @@ func gatherOptions(fs *flag.FlagSet, args ...string) (options, error) {
 
 func main() {
 	logrusutil.ComponentInit("xihe")
-	log := logrus.NewEntry(logrus.StandardLogger())
 
 	o, err := gatherOptions(
 		flag.NewFlagSet(os.Args[0], flag.ExitOnError),
@@ -74,13 +73,6 @@ func main() {
 	if err := bigmodels.Init(&cfg.BigModel); err != nil {
 		logrus.Fatalf("initialize big model failed, err:%s", err.Error())
 	}
-
-	// mq
-	if err := messages.Init(cfg.GetMQConfig(), log, cfg.MQ.Topics); err != nil {
-		log.Fatalf("initialize mq failed, err:%v", err)
-	}
-
-	defer messages.Exit(log)
 
 	// postgresql
 	if err := pgsql.Init(&cfg.Postgresql.DB); err != nil {
