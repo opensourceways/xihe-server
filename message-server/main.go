@@ -250,7 +250,8 @@ func run(h *handler, log *logrus.Entry, topics *mqTopics) {
 		}
 	}(ctx)
 
-	if err := messages.Subscribe(ctx, h, log, &topics.Topics); err != nil {
+	err := messages.Subscribe(ctx, h, log, &topics.Topics, kafka.SubscriberAdapter())
+	if err != nil {
 		log.Errorf("subscribe failed, err:%v", err)
 	}
 }

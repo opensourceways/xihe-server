@@ -4,8 +4,8 @@ import (
 	bigmodelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 )
 
-func (s sender) SendBigModelMsg(v *bigmodelmsg.MsgTask) error {
-	return s.send(topics.BigModel, v)
+func (s *sender) SendBigModelMsg(v *bigmodelmsg.MsgTask) error {
+	return s.send(s.topics.BigModel, v)
 }
 
 type BigModelMessageHandler interface {
