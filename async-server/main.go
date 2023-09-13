@@ -95,7 +95,7 @@ func main() {
 
 	// bigmodel & sender
 	bm := bigmodels.NewBigModelService()
-	sender := messages.NewMessageSender(&cfg.MQTopics, kafka.PlublisherAdapter())
+	sender := messages.NewMessageSender(&cfg.MQTopics, kafka.PublisherAdapter())
 
 	// aysnc.bigmodel.bigmodel
 	bigmodel := bigmodelimpl.NewBigModelImpl(

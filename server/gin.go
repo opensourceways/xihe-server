@@ -149,7 +149,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	gitlabUser := gitlab.NewUserSerivce()
 	gitlabRepo := gitlab.NewRepoFile()
 	authingUser := authingimpl.NewAuthingUser()
-	publisher := kafka.PlublisherAdapter()
+	publisher := kafka.PublisherAdapter()
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
 	trainingAdapter := trainingimpl.NewTraining(&cfg.Training)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)

@@ -35,18 +35,18 @@ func Init(cfg *Config, log mq.Logger, redis kfklib.Redis) error {
 
 var Exit = kfklib.Exit
 
-func PlublisherAdapter() plublisherAdapter {
-	return plublisherAdapter{}
+func PublisherAdapter() publisherAdapter {
+	return publisherAdapter{}
 }
 
 func SubscriberAdapter() subscriberAdapter {
 	return subscriberAdapter{}
 }
 
-// plublisherAdapter
-type plublisherAdapter struct{}
+// publisherAdapter
+type publisherAdapter struct{}
 
-func (plublisherAdapter) Publish(topic string, v interface{}, header map[string]string) error {
+func (publisherAdapter) Publish(topic string, v interface{}, header map[string]string) error {
 	body, err := json.Marshal(v)
 	if err != nil {
 		return err
