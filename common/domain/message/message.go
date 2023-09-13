@@ -1,8 +1,6 @@
 package message
 
 import (
-	"encoding/json"
-
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 )
 
@@ -20,11 +18,10 @@ type TopicConfig struct {
 	Topic string `json:"topic"  required:"true"`
 }
 
-func Publish(topic string, v interface{}, header map[string]string) error {
-	body, err := json.Marshal(v)
-	if err != nil {
-		return err
-	}
+type Publisher interface {
+	Publish(topic string, v interface{}, header map[string]string) error
+}
 
-	return kfklib.Publish(topic, header, body)
+type Subscriber interface {
+	SubscribeWithStrategyOfRetry(group string, h kfklib.Handler, topics []string, retryNum int) error
 }

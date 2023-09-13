@@ -3,8 +3,6 @@ package messagequeue
 import (
 	"encoding/json"
 
-	kfk "github.com/opensourceways/kafka-lib/agent"
-
 	"github.com/opensourceways/xihe-server/common/domain/message"
 	commondomain "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/points/app"
@@ -15,10 +13,10 @@ const (
 	retryNum = 3
 )
 
-func Subscribe(s app.UserPointsAppMessageService, topics []string) error {
+func Subscribe(s app.UserPointsAppMessageService, topics []string, subscriber message.Subscriber) error {
 	c := &consumer{s}
 
-	return kfk.SubscribeWithStrategyOfRetry(group, c.handle, topics, retryNum)
+	return subscriber.SubscribeWithStrategyOfRetry(group, c.handle, topics, retryNum)
 }
 
 type consumer struct {

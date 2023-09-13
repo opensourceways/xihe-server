@@ -5,8 +5,8 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain/message"
 )
 
-func (s sender) UpdateWuKongTask(v *message.MsgTask) error {
-	return s.send(topics.Async, v)
+func (s *sender) UpdateWuKongTask(v *message.MsgTask) error {
+	return s.send(s.topics.Async, v)
 }
 
 type AsyncUpdateWuKongTaskMessageHandler interface {

@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 
-	kfklib "github.com/opensourceways/kafka-lib/agent"
 	"github.com/sirupsen/logrus"
 
 	bigmoddelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
+	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
@@ -32,59 +32,67 @@ const (
 	handlerNameCreateInference    = "create_inference"
 )
 
-func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) (err error) {
+func Subscribe(
+	ctx context.Context, handler interface{}, log *logrus.Entry,
+	topic *Topics, subscriber common.Subscriber,
+) (err error) {
+	r := register{
+		topics:     topic,
+		subscriber: subscriber,
+	}
+
 	// register following
-	if err = registerHandlerForFollowing(handler); err != nil {
+	if err = r.registerHandlerForFollowing(handler); err != nil {
 		return
 	}
 
 	// register like
-	if err = registerHandlerForLike(handler); err != nil {
+	if err = r.registerHandlerForLike(handler); err != nil {
 		return
 	}
 
 	// register fork
-	if err = registerHandlerForFork(handler); err != nil {
+	if err = r.registerHandlerForFork(handler); err != nil {
 		return
 	}
 
 	// register download
-	if err = registerHandlerForDownload(handler); err != nil {
+	if err = r.registerHandlerForDownload(handler); err != nil {
 		return
 	}
 
 	// register related resource
-	if err = registerHandlerForRelatedResource(handler); err != nil {
+	if err = r.registerHandlerForRelatedResource(handler); err != nil {
 		return
 	}
 
 	// training
-	if err = registerHandlerForTraining(handler); err != nil {
+	if err = r.registerHandlerForTraining(handler); err != nil {
 		return
 	}
 
 	// finetune
-	if err = registerHandlerForFinetune(handler); err != nil {
+	if err = r.registerHandlerForFinetune(handler); err != nil {
 		return
 	}
 
 	// inference
-	if err = registerHandlerForInference(handler); err != nil {
+	if err = r.registerHandlerForInference(handler); err != nil {
 		return
 	}
 
 	// evaluate
-	if err = registerHandlerForEvaluate(handler); err != nil {
+	if err = r.registerHandlerForEvaluate(handler); err != nil {
 		return
 	}
 
 	// cloud
-	if err = registerHandlerForCloud(handler); err != nil {
+	if err = r.registerHandlerForCloud(handler); err != nil {
 		return
 	}
 
 	// bigmodel
-	if err = registerHandlerForBigModel(handler); err != nil {
+	if err = r.registerHandlerForBigModel(handler); err != nil {
 		return err
 	}
 
@@ -94,13 +102,18 @@ func Subscribe(ctx context.Context, handler interface{}, log *logrus.Entry) (err
 	return nil
 }
 
-func registerHandlerForFollowing(handler interface{}) error {
+type register struct {
+	topics     *Topics
+	subscriber common.Subscriber
+}
+
+func (r *register) registerHandlerForFollowing(handler interface{}) error {
 	h, ok := handler.(message.FollowingHandler)
 	if !ok {
 		return nil
 	}
 
-	return subscribe(topics.Following, handlerNameAddFollowing, func(b []byte, hd map[string]string) (err error) {
+	return r.subscribe(r.topics.Following, handlerNameAddFollowing, func(b []byte, hd map[string]string) (err error) {
 		body := msgFollower{}
 		if err = json.Unmarshal(b, &body); err != nil {
 			return
@@ -127,13 +140,13 @@ func registerHandlerForFollowing(handler interface{}) error {
 	})
 }
 
-func registerHandlerForLike(handler interface{}) error {
+func (r *register) registerHandlerForLike(handler interface{}) error {
 	h, ok := handler.(message.LikeHandler)
 	if !ok {
 		return nil
 	}
 
-	return subscribe(topics.Like, handlerNameAddLike, func(b []byte, hd map[string]string) (err error) {
+	return r.subscribe(r.topics.Like, handlerNameAddLike, func(b []byte, hd map[string]string) (err error) {
 		body := msgLike{}
 		if err = json.Unmarshal(b, &body); err != nil {
 			return
@@ -156,13 +169,13 @@ func registerHandlerForLike(handler interface{}) error {
 	})
 }
 
-func registerHandlerForFork(handler interface{}) error {
+func (r *register) registerHandlerForFork(handler interface{}) error {
 	h, ok := handler.(message.ForkHandler)
 	if !ok {
 		return nil
 	}
 
-	return subscribe(topics.Fork, handlerNameAddFork, func(b []byte, hd map[string]string) (err error) {
+	return r.subscribe(r.topics.Fork, handlerNameAddFork, func(b []byte, hd map[string]string) (err error) {
 		body := resourceIndex{}
 		if err = json.Unmarshal(b, &body); err != nil {
 			return
@@ -177,13 +190,13 @@ func registerHandlerForFork(handler interface{}) error {
 	})
 }
 
-func registerHandlerForDownload(handler interface{}) error {
+func (r *register) registerHandlerForDownload(handler interface{}) error {
 	h, ok := handler.(message.DownloadHandler)
 	if !ok {
 		return nil
 	}
 
-	return subscribe(topics.Download, handlerNameAddDownload, func(b []byte, hd map[string]string) (err error) {
+	return r.subscribe(r.topics.Download, handlerNameAddDownload, func(b []byte, hd map[string]string) (err error) {
 		body := resourceObject{}
 		if err = json.Unmarshal(b, &body); err != nil {
 			return
@@ -198,7 +211,7 @@ func registerHandlerForDownload(handler interface{}) error {
 	})
 }
 
-func registerHandlerForRelatedResource(handler interface{}) error {
+func (r *register) registerHandlerForRelatedResource(handler interface{}) error {
 	h, ok := handler.(message.RelatedResourceHandler)
 	if !ok {
 		return nil
@@ -221,12 +234,12 @@ func registerHandlerForRelatedResource(handler interface{}) error {
 		return nil
 	}
 
-	return subscribe(
-		topics.RelatedResource, handlerNameAddRelatedResource, f,
+	return r.subscribe(
+		r.topics.RelatedResource, handlerNameAddRelatedResource, f,
 	)
 }
 
-func registerHandlerForTraining(handler interface{}) error {
+func (r *register) registerHandlerForTraining(handler interface{}) error {
 	h, ok := handler.(message.TrainingHandler)
 	if !ok {
 		return nil
@@ -255,10 +268,10 @@ func registerHandlerForTraining(handler interface{}) error {
 		return h.HandleEventCreateTraining(&v)
 	}
 
-	return subscribe(topics.Training, handlerNameCreateTraining, f)
+	return r.subscribe(r.topics.Training, handlerNameCreateTraining, f)
 }
 
-func registerHandlerForFinetune(handler interface{}) error {
+func (r *register) registerHandlerForFinetune(handler interface{}) error {
 	h, ok := handler.(message.FinetuneHandler)
 	if !ok {
 		return nil
@@ -284,10 +297,10 @@ func registerHandlerForFinetune(handler interface{}) error {
 		return h.HandleEventCreateFinetune(&v)
 	}
 
-	return subscribe(topics.Finetune, handlerNameCreateFinetune, f)
+	return r.subscribe(r.topics.Finetune, handlerNameCreateFinetune, f)
 }
 
-func registerHandlerForInference(handler interface{}) error {
+func (r *register) registerHandlerForInference(handler interface{}) error {
 	h, ok := handler.(message.InferenceHandler)
 	if !ok {
 		return nil
@@ -336,10 +349,10 @@ func registerHandlerForInference(handler interface{}) error {
 		return nil
 	}
 
-	return subscribe(topics.Inference, handlerNameCreateInference, f)
+	return r.subscribe(r.topics.Inference, handlerNameCreateInference, f)
 }
 
-func registerHandlerForEvaluate(handler interface{}) error {
+func (r *register) registerHandlerForEvaluate(handler interface{}) error {
 	h, ok := handler.(message.EvaluateHandler)
 	if !ok {
 		return nil
@@ -366,10 +379,10 @@ func registerHandlerForEvaluate(handler interface{}) error {
 		return h.HandleEventCreateEvaluate(&v)
 	}
 
-	return subscribe(topics.Evaluate, handlerNameCreateEvaluate, f)
+	return r.subscribe(r.topics.Evaluate, handlerNameCreateEvaluate, f)
 }
 
-func registerHandlerForCloud(handler interface{}) error {
+func (r *register) registerHandlerForCloud(handler interface{}) error {
 	h, ok := handler.(cloudmsg.CloudMessageHandler)
 	if !ok {
 		return nil
@@ -398,10 +411,10 @@ func registerHandlerForCloud(handler interface{}) error {
 		return h.HandleEventPodSubscribe(&v)
 	}
 
-	return subscribe(topics.Cloud, handlerNameCreateCloud, f)
+	return r.subscribe(r.topics.Cloud, handlerNameCreateCloud, f)
 }
 
-func registerHandlerForBigModel(handler interface{}) error {
+func (r *register) registerHandlerForBigModel(handler interface{}) error {
 
 	f := func(b []byte, m map[string]string) (err error) {
 		body := bigmoddelmsg.MsgTask{}
@@ -436,11 +449,14 @@ func registerHandlerForBigModel(handler interface{}) error {
 		return
 	}
 
-	return subscribe(topics.BigModel, handlerNameCreateBigModel, f)
+	return r.subscribe(r.topics.BigModel, handlerNameCreateBigModel, f)
 }
 
-func subscribe(topicName string, handlerName string, handler kfklib.Handler) error {
-	return kfklib.SubscribeWithStrategyOfRetry(
+func (r *register) subscribe(
+	topicName string, handlerName string,
+	handler func(b []byte, m map[string]string) (err error),
+) error {
+	return r.subscriber.SubscribeWithStrategyOfRetry(
 		handlerName, handler, []string{topicName}, retryNum,
 	)
 }

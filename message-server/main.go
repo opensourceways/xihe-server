@@ -10,7 +10,6 @@ import (
 
 	"github.com/opensourceways/community-robot-lib/logrusutil"
 	liboptions "github.com/opensourceways/community-robot-lib/options"
-	redislib "github.com/opensourceways/redis-lib"
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
@@ -19,6 +18,7 @@ import (
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
@@ -86,18 +86,11 @@ func main() {
 	}
 
 	// mq
-	redisCfg := cfg.getRedisConfig()
-	if err = redislib.Init(&redisCfg); err != nil {
-		log.Fatalf("initialize redis of mq failed, err:%v", err)
-	}
-
-	defer redislib.Close()
-
-	if err = messages.InitKfkLib(cfg.getKfkConfig(), log, cfg.MQTopics.Topics); err != nil {
+	if err = kafka.Init(&cfg.MQ, log, nil); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
-	defer messages.KfkLibExit()
+	defer kafka.Exit()
 
 	// mongo
 	m := &cfg.Mongodb
@@ -123,7 +116,7 @@ func main() {
 	}
 
 	// run
-	run(newHandler(cfg, log), log)
+	run(newHandler(cfg, log), log, &cfg.MQTopics)
 }
 
 func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
@@ -143,6 +136,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.SignIn.Topic,
 			topics.CompetitorApplied,
 		},
+		kafka.SubscriberAdapter(),
 	)
 }
 
@@ -223,7 +217,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	return h
 }
 
-func run(h *handler, log *logrus.Entry) {
+func run(h *handler, log *logrus.Entry, topics *mqTopics) {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
@@ -257,7 +251,8 @@ func run(h *handler, log *logrus.Entry) {
 		}
 	}(ctx)
 
-	if err := messages.Subscribe(ctx, h, log); err != nil {
+	err := messages.Subscribe(ctx, h, log, &topics.Topics, kafka.SubscriberAdapter())
+	if err != nil {
 		log.Errorf("subscribe failed, err:%v", err)
 	}
 }

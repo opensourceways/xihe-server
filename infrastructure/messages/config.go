@@ -2,8 +2,6 @@ package messages
 
 import "github.com/opensourceways/xihe-server/common/domain/message"
 
-var topics Topics
-
 type Topics struct {
 	Like            string              `json:"like"             required:"true"`
 	Fork            string              `json:"fork"             required:"true"`

@@ -1,19 +1,14 @@
 package config
 
 import (
-	"errors"
-	"regexp"
-	"strings"
-
-	"github.com/opensourceways/community-robot-lib/mq"
 	"github.com/opensourceways/community-robot-lib/utils"
-
-	kfklib "github.com/opensourceways/kafka-lib/agent"
 	redislib "github.com/opensourceways/redis-lib"
+
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
@@ -28,12 +23,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
 	points "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
-)
-
-var reIpPort = regexp.MustCompile(`^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}:[1-9][0-9]*$`)
-
-const (
-	kafkaDeaultVersion = "2.1.0"
 )
 
 func LoadConfig(path string, cfg interface{}) error {
@@ -90,22 +79,9 @@ type Config struct {
 	Domain      domain.Config        `json:"domain"       required:"true"`
 	App         app.Config           `json:"app"          required:"true"`
 	API         controller.APIConfig `json:"api"          required:"true"`
-	MQ          MQ                   `json:"mq"           required:"true"`
+	MQ          kafka.Config         `json:"mq"           required:"true"`
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
 	Points      pointsConfig         `json:"points"`
-}
-
-func (cfg *Config) GetMQConfig() mq.MQConfig {
-	return mq.MQConfig{
-		Addresses: cfg.MQ.ParseAddress(),
-	}
-}
-
-func (cfg *Config) GetKfkConfig() kfklib.Config {
-	return kfklib.Config{
-		Address: cfg.MQ.Address,
-		Version: cfg.MQ.Version,
-	}
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -224,37 +200,6 @@ type MongodbCollections struct {
 	ApiInfo           string `json:"api_info"               required:"true"`
 	PointsTask        string `json:"points_task"            required:"true"`
 	UserPoints        string `json:"user_points"            required:"true"`
-}
-
-type MQ struct {
-	Address string `json:"address" required:"true"`
-	Version string `json:"version"`
-}
-
-func (cfg *MQ) Validate() error {
-	if r := cfg.ParseAddress(); len(r) == 0 {
-		return errors.New("invalid mq address")
-	}
-
-	return nil
-}
-
-func (cfg *MQ) SetDefault() {
-	if cfg.Version == "" {
-		cfg.Version = kafkaDeaultVersion
-	}
-}
-
-func (cfg *MQ) ParseAddress() []string {
-	v := strings.Split(cfg.Address, ",")
-	r := make([]string, 0, len(v))
-	for i := range v {
-		if reIpPort.MatchString(v[i]) {
-			r = append(r, v[i])
-		}
-	}
-
-	return r
 }
 
 func (cfg *Config) InitDomainConfig() {

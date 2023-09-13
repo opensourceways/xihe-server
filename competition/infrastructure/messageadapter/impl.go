@@ -8,19 +8,20 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-func NewPublisher(cfg *Config) *publisher {
-	return &publisher{*cfg}
+func MessageAdapter(cfg *Config, p common.Publisher) *messageAdapter {
+	return &messageAdapter{cfg: *cfg, publisher: p}
 }
 
-type publisher struct {
-	cfg Config
+type messageAdapter struct {
+	cfg       Config
+	publisher common.Publisher
 }
 
-func (impl *publisher) SendWorkSubmittedEvent(v *domain.WorkSubmittedEvent) error {
-	return common.Publish(impl.cfg.WorkSubmitted.Topic, v, nil)
+func (impl *messageAdapter) SendWorkSubmittedEvent(v *domain.WorkSubmittedEvent) error {
+	return impl.publisher.Publish(impl.cfg.WorkSubmitted.Topic, v, nil)
 }
 
-func (impl *publisher) SendCompetitorAppliedEvent(v *domain.CompetitorAppliedEvent) error {
+func (impl *messageAdapter) SendCompetitorAppliedEvent(v *domain.CompetitorAppliedEvent) error {
 	cfg := &impl.cfg.CompetitorApplied
 
 	msg := common.MsgNormal{
@@ -30,7 +31,7 @@ func (impl *publisher) SendCompetitorAppliedEvent(v *domain.CompetitorAppliedEve
 		CreatedAt: utils.Now(),
 	}
 
-	return common.Publish(cfg.Topic, &msg, nil)
+	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
 // Config

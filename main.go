@@ -10,6 +10,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/config"
@@ -17,7 +18,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
-	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/server"
 )
@@ -108,11 +108,11 @@ func main() {
 
 	defer redislib.Close()
 
-	if err = messages.InitKfkLib(cfg.GetKfkConfig(), log, cfg.MQTopics); err != nil {
+	if err = kafka.Init(&cfg.MQ, log, redislib.DAO()); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
-	defer messages.KfkLibExit()
+	defer kafka.Exit()
 
 	// mongo
 	m := &cfg.Mongodb
