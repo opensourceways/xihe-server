@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
 	redislib "github.com/opensourceways/redis-lib"
+	"github.com/opensourceways/xihe-server/infrastructure/courseimpl"
 
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
@@ -13,6 +14,7 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
 	"github.com/opensourceways/xihe-server/controller"
+	coursemsg "github.com/opensourceways/xihe-server/course/infrastructure/messageadapter"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
@@ -23,6 +25,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
 	points "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 )
 
 func LoadConfig(path string, cfg interface{}) error {
@@ -62,6 +65,20 @@ type competitionConfig struct {
 	Message competitionmsg.Config `json:"message"`
 }
 
+// Course
+type courseConfig struct {
+	courseimpl.Config
+
+	Message coursemsg.Config `json:"message"`
+}
+
+// User
+type UserConfig struct {
+	authingimpl.Config
+
+	Message usermsg.Config `json:"message"`
+}
+
 type Config struct {
 	MaxRetry        int `json:"max_retry"`
 	ActivityKeepNum int `json:"activity_keep_num"`
@@ -82,6 +99,8 @@ type Config struct {
 	MQ          kafka.Config         `json:"mq"           required:"true"`
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
 	Points      pointsConfig         `json:"points"`
+	Course      courseConfig         `json:"course"       required:"true"`
+	User        UserConfig           `json:"user"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -114,6 +133,10 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.MQTopics,
 		&cfg.Points.Domain,
 		&cfg.Points.Repo,
+		&cfg.Course.Message,
+		&cfg.Course.Config,
+		&cfg.User.Config,
+		&cfg.User.Message,
 	}
 }
 

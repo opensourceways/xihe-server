@@ -169,4 +169,9 @@ type mqTopics struct {
 	messages.Topics
 
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
+	CourseApplied     string `json:"course_applied"     required:"true"`
+	UserRegister      string `json:"user_register"      required:"true"`
+	BindEmail         string `json:"bind_email"         required:"true"`
+	SetAvatarId       string `json:"set-avatar-id"      required:"true"`
+	SetBio            string `json:"set_bio"            required:"true"`
 }
