@@ -2,6 +2,7 @@ package messageadapter
 
 import (
 	"fmt"
+
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/course/domain"
 	"github.com/opensourceways/xihe-server/utils"

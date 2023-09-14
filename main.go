@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"github.com/opensourceways/xihe-server/infrastructure/courseimpl"
 	"os"
 
 	"github.com/opensourceways/community-robot-lib/logrusutil"
@@ -139,10 +138,5 @@ func main() {
 
 	// run
 	server.StartWebServer(o.service.Port, o.service.GracePeriod, cfg)
-
-	// course
-	if err := courseimpl.Init(&cfg.Course.Config); err != nil {
-		logrus.Fatalf("initialize course failed, err:%s", err.Error())
-	}
 
 }

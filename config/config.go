@@ -15,6 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/competition"
 	"github.com/opensourceways/xihe-server/controller"
+	"github.com/opensourceways/xihe-server/course"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
@@ -57,6 +58,7 @@ type Config struct {
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
 	Points      points.Config        `json:"points"`
 	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
+	Course      course.Config        `json:"course"       required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -90,6 +92,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.Points.Domain,
 		&cfg.Points.Repo,
 		&cfg.Cloud,
+		&cfg.Course.Message,
 	}
 }
 
