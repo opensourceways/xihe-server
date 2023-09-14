@@ -7,35 +7,20 @@ import (
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/watchimpl"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 )
 
-func LoadConfig(path string, cfg interface{}) error {
+func LoadConfig(path string, cfg *Config) error {
 	if err := utils.LoadFromYaml(path, cfg); err != nil {
 		return err
 	}
 
-	if f, ok := cfg.(ConfigSetDefault); ok {
-		f.SetDefault()
-	}
+	cfg.setDefault()
 
-	if f, ok := cfg.(ConfigValidate); ok {
-		if err := f.Validate(); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-type ConfigValidate interface {
-	Validate() error
-}
-
-type ConfigSetDefault interface {
-	SetDefault()
+	return cfg.validate()
 }
 
 type Config struct {
@@ -49,7 +34,7 @@ type Config struct {
 	Watcher    watchimpl.Config `json:"watcher"      required:"true"`
 }
 
-func (cfg *Config) configItems() []interface{} {
+func (cfg *Config) ConfigItems() []interface{} {
 	return []interface{}{
 		&cfg.BigModel,
 		&cfg.Postgresql.DB,
@@ -59,34 +44,20 @@ func (cfg *Config) configItems() []interface{} {
 	}
 }
 
-func (cfg *Config) SetDefault() {
+func (cfg *Config) setDefault() {
 	if cfg.MaxRetry <= 0 {
 		cfg.MaxRetry = 10
 	}
 
-	items := cfg.configItems()
-	for _, i := range items {
-		if f, ok := i.(ConfigSetDefault); ok {
-			f.SetDefault()
-		}
-	}
+	common.SetDefault(cfg)
 }
 
-func (cfg *Config) Validate() error {
+func (cfg *Config) validate() error {
 	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
 		return err
 	}
 
-	items := cfg.configItems()
-	for _, i := range items {
-		if f, ok := i.(ConfigValidate); ok {
-			if err := f.Validate(); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return common.Validate(cfg)
 }
 
 type PostgresqlConfig struct {

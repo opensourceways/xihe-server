@@ -9,6 +9,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
@@ -21,39 +22,18 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
-	points "github.com/opensourceways/xihe-server/points/domain"
-	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+	"github.com/opensourceways/xihe-server/points"
+	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 )
 
-func LoadConfig(path string, cfg interface{}) error {
+func LoadConfig(path string, cfg *Config) error {
 	if err := utils.LoadFromYaml(path, cfg); err != nil {
 		return err
 	}
 
-	if f, ok := cfg.(ConfigSetDefault); ok {
-		f.SetDefault()
-	}
+	cfg.setDefault()
 
-	if f, ok := cfg.(ConfigValidate); ok {
-		if err := f.Validate(); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-type ConfigValidate interface {
-	Validate() error
-}
-
-type ConfigSetDefault interface {
-	SetDefault()
-}
-
-type pointsConfig struct {
-	Domain points.Config     `json:"domain"`
-	Repo   pointsrepo.Config `json:"repo"`
+	return cfg.validate()
 }
 
 type Config struct {
@@ -75,7 +55,7 @@ type Config struct {
 	API         controller.APIConfig `json:"api"          required:"true"`
 	MQ          kafka.Config         `json:"mq"           required:"true"`
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
-	Points      pointsConfig         `json:"points"`
+	Points      points.Config        `json:"points"`
 	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
 }
 
@@ -88,7 +68,7 @@ func (cfg *Config) GetRedisConfig() redislib.Config {
 	}
 }
 
-func (cfg *Config) configItems() []interface{} {
+func (cfg *Config) ConfigItems() []interface{} {
 	return []interface{}{
 		&cfg.Competition.Config,
 		&cfg.Competition.Message,
@@ -113,7 +93,7 @@ func (cfg *Config) configItems() []interface{} {
 	}
 }
 
-func (cfg *Config) SetDefault() {
+func (cfg *Config) setDefault() {
 	if cfg.MaxRetry <= 0 {
 		cfg.MaxRetry = 10
 	}
@@ -122,29 +102,15 @@ func (cfg *Config) SetDefault() {
 		cfg.ActivityKeepNum = 25
 	}
 
-	items := cfg.configItems()
-	for _, i := range items {
-		if f, ok := i.(ConfigSetDefault); ok {
-			f.SetDefault()
-		}
-	}
+	common.SetDefault(cfg)
 }
 
-func (cfg *Config) Validate() error {
+func (cfg *Config) validate() error {
 	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
 		return err
 	}
 
-	items := cfg.configItems()
-	for _, i := range items {
-		if f, ok := i.(ConfigValidate); ok {
-			if err := f.Validate(); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return common.Validate(cfg)
 }
 
 type Mongodb struct {
@@ -201,7 +167,7 @@ type MongodbCollections struct {
 func (cfg *Config) InitDomainConfig() {
 	domain.Init(&cfg.Domain)
 
-	points.Init(&cfg.Points.Domain)
+	pointsdomain.Init(&cfg.Points.Domain)
 }
 
 func (cfg *Config) InitAppConfig() {

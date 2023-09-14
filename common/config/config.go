@@ -8,20 +8,42 @@ type configSetDefault interface {
 	SetDefault()
 }
 
-func SetDefault(items []interface{}) {
-	for _, i := range items {
-		if f, ok := i.(configSetDefault); ok {
-			f.SetDefault()
-		}
+type configItems interface {
+	ConfigItems() []interface{}
+}
+
+func SetDefault(cfg interface{}) {
+	if f, ok := cfg.(configSetDefault); ok {
+		f.SetDefault()
+
+		return
+	}
+
+	f, ok := cfg.(configItems)
+	if !ok {
+		return
+	}
+
+	items := f.ConfigItems()
+	for i := range items {
+		SetDefault(items[i])
 	}
 }
 
-func Validate(items []interface{}) error {
-	for _, i := range items {
-		if f, ok := i.(configValidate); ok {
-			if err := f.Validate(); err != nil {
-				return err
-			}
+func Validate(cfg interface{}) error {
+	if f, ok := cfg.(configValidate); ok {
+		return f.Validate()
+	}
+
+	f, ok := cfg.(configItems)
+	if !ok {
+		return nil
+	}
+
+	items := f.ConfigItems()
+	for i := range items {
+		if err := Validate(items[i]); err != nil {
+			return err
 		}
 	}
 
