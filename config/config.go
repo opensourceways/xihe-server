@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
 	redislib "github.com/opensourceways/redis-lib"
+	"github.com/opensourceways/xihe-server/infrastructure/courseimpl"
 
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
@@ -15,6 +16,7 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/competition"
 	"github.com/opensourceways/xihe-server/controller"
+	coursemsg "github.com/opensourceways/xihe-server/course/infrastructure/messageadapter"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
@@ -22,8 +24,10 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
-	"github.com/opensourceways/xihe-server/points"
+"github.com/opensourceways/xihe-server/points"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
+
 )
 
 func LoadConfig(path string, cfg *Config) error {
@@ -34,6 +38,20 @@ func LoadConfig(path string, cfg *Config) error {
 	cfg.setDefault()
 
 	return cfg.validate()
+}
+
+// Course
+type courseConfig struct {
+	courseimpl.Config
+
+	Message coursemsg.Config `json:"message"`
+}
+
+// User
+type UserConfig struct {
+	authingimpl.Config
+
+	Message usermsg.Config `json:"message"`
 }
 
 type Config struct {
@@ -56,7 +74,9 @@ type Config struct {
 	MQ          kafka.Config         `json:"mq"           required:"true"`
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
 	Points      points.Config        `json:"points"`
-	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
+	Course      courseConfig         `json:"course"       required:"true"`
+	User        UserConfig           `json:"user"`
+  Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -89,7 +109,12 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.MQTopics,
 		&cfg.Points.Domain,
 		&cfg.Points.Repo,
-		&cfg.Cloud,
+		&cfg.Course.Message,
+		&cfg.Course.Config,
+		&cfg.User.Config,
+		&cfg.User.Message,
+    &cfg.Cloud,
+
 	}
 }
 
