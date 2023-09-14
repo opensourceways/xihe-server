@@ -135,6 +135,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.SignIn.Topic,
 			topics.CompetitorApplied,
 			topics.JupyterCreated,
+			topics.CourseApplied,
 		},
 		kafka.SubscriberAdapter(),
 	)
