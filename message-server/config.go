@@ -6,6 +6,7 @@ import (
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
@@ -14,9 +15,19 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
-	points "github.com/opensourceways/xihe-server/points/domain"
-	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+	"github.com/opensourceways/xihe-server/points"
+	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 )
+
+func loadConfig(path string, cfg *configuration) error {
+	if err := utils.LoadFromYaml(path, cfg); err != nil {
+		return err
+	}
+
+	cfg.setDefault()
+
+	return cfg.validate()
+}
 
 type configuration struct {
 	MaxRetry         int    `json:"max_retry"`
@@ -31,12 +42,7 @@ type configuration struct {
 	Domain     domain.Config        `json:"domain"       required:"true"`
 	MQ         kafka.Config         `json:"mq"           required:"true"`
 	MQTopics   mqTopics             `json:"mq_topics"    required:"true"`
-	Points     pointsConfig         `json:"points"`
-}
-
-type pointsConfig struct {
-	Domain points.Config     `json:"domain"`
-	Repo   pointsrepo.Config `json:"repo"`
+	Points     points.Config        `json:"points"`
 }
 
 type PostgresqlConfig struct {
@@ -46,7 +52,7 @@ type PostgresqlConfig struct {
 	asyncconf asyncrepoimpl.Config
 }
 
-func (cfg *configuration) configItems() []interface{} {
+func (cfg *configuration) ConfigItems() []interface{} {
 	return []interface{}{
 		&cfg.Inference,
 		&cfg.Evaluate,
@@ -62,39 +68,25 @@ func (cfg *configuration) configItems() []interface{} {
 	}
 }
 
-func (cfg *configuration) SetDefault() {
+func (cfg *configuration) setDefault() {
 	if cfg.MaxRetry <= 0 {
 		cfg.MaxRetry = 10
 	}
 
-	items := cfg.configItems()
-	for _, i := range items {
-		if f, ok := i.(config.ConfigSetDefault); ok {
-			f.SetDefault()
-		}
-	}
+	common.SetDefault(cfg)
 }
 
-func (cfg *configuration) Validate() error {
+func (cfg *configuration) validate() error {
 	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
 		return err
 	}
 
-	items := cfg.configItems()
-	for _, i := range items {
-		if f, ok := i.(config.ConfigValidate); ok {
-			if err := f.Validate(); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return common.Validate(cfg)
 }
 
 func (cfg *configuration) initDomainConfig() {
 	domain.Init(&cfg.Domain)
-	points.Init(&cfg.Points.Domain)
+	pointsdomain.Init(&cfg.Points.Domain)
 }
 
 func (cfg *configuration) getFinetuneConfig() finetuneimpl.Config {
@@ -115,23 +107,11 @@ func (cfg *evaluateConfig) SetDefault() {
 		cfg.SurvivalTime = 5 * 3600
 	}
 
-	var i interface{}
-	i = &cfg.Config
-
-	if f, ok := i.(config.ConfigSetDefault); ok {
-		f.SetDefault()
-	}
+	common.SetDefault(&cfg.Config)
 }
 
 func (cfg *evaluateConfig) Validate() error {
-	var i interface{}
-	i = &cfg.Config
-
-	if f, ok := i.(config.ConfigValidate); ok {
-		return f.Validate()
-	}
-
-	return nil
+	return common.Validate(&cfg.Config)
 }
 
 // cloud
@@ -146,23 +126,11 @@ func (cfg *cloudConfig) SetDefault() {
 		cfg.SurvivalTime = 5 * 3600
 	}
 
-	var i interface{}
-	i = &cfg.Config
-
-	if f, ok := i.(config.ConfigSetDefault); ok {
-		f.SetDefault()
-	}
+	common.SetDefault(&cfg.Config)
 }
 
 func (cfg *cloudConfig) Validate() error {
-	var i interface{}
-	i = &cfg.Config
-
-	if f, ok := i.(config.ConfigValidate); ok {
-		return f.Validate()
-	}
-
-	return nil
+	return common.Validate(&cfg.Config)
 }
 
 type mqTopics struct {
