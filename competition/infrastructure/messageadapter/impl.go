@@ -36,6 +36,6 @@ func (impl *messageAdapter) SendCompetitorAppliedEvent(v *domain.CompetitorAppli
 
 // Config
 type Config struct {
-	WorkSubmitted     common.TopicConfig `json:"work_submitted"`
-	CompetitorApplied common.TopicConfig `json:"competitor_applied"`
+	WorkSubmitted     common.TopicConfig `json:"work_submitted" required:"true"`
+	CompetitorApplied common.TopicConfig `json:"competitor_applied" required:"true"`
 }
