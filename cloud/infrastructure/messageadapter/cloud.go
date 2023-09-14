@@ -47,5 +47,5 @@ func (s publisher) SubscribeCloud(m *message.MsgCloudConf) error {
 
 // Config
 type Config struct {
-	JupyterCreated common.TopicConfig `json:"jupyter_created"`
+	JupyterCreated common.TopicConfig `json:"jupyter_created" required:"true"`
 }
