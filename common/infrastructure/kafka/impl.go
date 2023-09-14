@@ -20,7 +20,7 @@ type configInterface interface {
 var _ configInterface = (*Config)(nil)
 
 type Config struct {
-	*kfklib.Config
+	kfklib.Config
 }
 
 func (cfg *Config) SetDefault() {
@@ -30,7 +30,7 @@ func (cfg *Config) SetDefault() {
 }
 
 func Init(cfg *Config, log mq.Logger, redis kfklib.Redis) error {
-	return kfklib.Init(cfg.Config, log, redis, queueName)
+	return kfklib.Init(&cfg.Config, log, redis, queueName)
 }
 
 var Exit = kfklib.Exit

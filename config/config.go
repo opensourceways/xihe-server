@@ -12,12 +12,11 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
-	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
+	"github.com/opensourceways/xihe-server/competition"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
-	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
@@ -57,17 +56,11 @@ type pointsConfig struct {
 	Repo   pointsrepo.Config `json:"repo"`
 }
 
-type competitionConfig struct {
-	competitionimpl.Config
-
-	Message competitionmsg.Config `json:"message"`
-}
-
 type Config struct {
 	MaxRetry        int `json:"max_retry"`
 	ActivityKeepNum int `json:"activity_keep_num"`
 
-	Competition competitionConfig    `json:"competition"  required:"true"`
+	Competition competition.Config   `json:"competition"  required:"true"`
 	Challenge   challengeimpl.Config `json:"challenge"    required:"true"`
 	Training    trainingimpl.Config  `json:"training"     required:"true"`
 	Finetune    finetuneimpl.Config  `json:"finetune"     required:"true"`
