@@ -1,6 +1,8 @@
-package message
+package messageadapter
 
 import (
+	"fmt"
+
 	"github.com/opensourceways/xihe-server/cloud/domain/message"
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/utils"
@@ -33,11 +35,13 @@ func (s publisher) SubscribeCloud(m *message.MsgCloudConf) error {
 			Type:      s.cfg.JupyterCreated.Name,
 			User:      m.User,
 			CreatedAt: utils.Now(),
+			Desc:      fmt.Sprintf("start a jupyter notebook on %s", m.CloudName),
 		},
 		PodId:     m.PodId,
 		CloudId:   m.CloudId,
 		CloudName: m.CloudName,
 	}
+
 	return s.publisher.Publish(s.cfg.JupyterCreated.Topic, msg, nil)
 }
 

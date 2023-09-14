@@ -19,7 +19,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
-	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/message"
+	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"

@@ -1,4 +1,4 @@
-package message
+package messageadapter
 
 type Topics struct {
 	CloudCreate topicConfig `json:"cloud_create"`
