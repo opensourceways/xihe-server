@@ -20,7 +20,6 @@ type MsgPod struct {
 
 type CloudMessageProducer interface {
 	SubscribeCloud(*MsgCloudConf) error
-	ReleasePod(*MsgPod) error
 }
 
 func (r *MsgCloudConf) ToMsgCloudConf(c *domain.CloudConf, u types.Account, pid string) {

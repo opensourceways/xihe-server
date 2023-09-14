@@ -45,11 +45,6 @@ func (s publisher) SubscribeCloud(m *message.MsgCloudConf) error {
 	return s.publisher.Publish(s.cfg.JupyterCreated.Topic, msg, nil)
 }
 
-func (s publisher) ReleasePod(m *message.MsgPod) error {
-	// no impl for now
-	return nil
-}
-
 // Config
 type Config struct {
 	JupyterCreated common.TopicConfig `json:"jupyter_created"`

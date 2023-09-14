@@ -110,10 +110,3 @@ func (r *CloudService) HasHolding(user types.Account, c *domain.CloudConf) (bool
 
 	return false, nil
 }
-
-func (r *CloudService) ReleasePod(p *domain.Pod) error {
-	msg := new(message.MsgPod)
-	msg.ToMsgPod(p)
-
-	return r.sender.ReleasePod(msg)
-}
