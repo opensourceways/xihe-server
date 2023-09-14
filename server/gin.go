@@ -29,6 +29,7 @@ import (
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
+	coursemsg "github.com/opensourceways/xihe-server/course/infrastructure/messageadapter"
 	courserepo "github.com/opensourceways/xihe-server/course/infrastructure/repositoryimpl"
 	courseusercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
@@ -45,6 +46,7 @@ import (
 	pointsapp "github.com/opensourceways/xihe-server/points/app"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
@@ -179,6 +181,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		courseusercli.NewUserCli(userRegService),
 		proj,
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
+		coursemsg.MessageAdapter(&cfg.Course.Message, publisher),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
 		courserepo.NewRecordRepo(mongodb.NewCollection(collections.CourseRecord)),
@@ -219,6 +222,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	userAppService := userapp.NewUserService(
 		user, gitlabUser, sender, pointsAppService, controller.EncryptHelperToken(),
+		usermsg.MessageAdapter(&cfg.User.Message, publisher),
 	)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)

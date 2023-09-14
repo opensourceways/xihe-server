@@ -37,9 +37,12 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (code string, err error) {
 		return
 	}
 
-	if err = s.userCli.AddUserRegInfo(&p.Student); err != nil {
-		return
-	}
+	s.producer.SendCourseAppliedEvent(&domain.CourseAppliedEvent{
+		Account:    cmd.Account,
+		CourseName: course.Name,
+	})
+
+	err = s.userCli.AddUserRegInfo(&p.Student)
 
 	return
 }
