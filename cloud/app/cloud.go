@@ -18,7 +18,6 @@ type CloudService interface {
 
 	// pod
 	Get(*PodInfoCmd) (PodInfoDTO, error)
-	ReleasePod(*RelasePodCmd) (code string, err error)
 }
 
 var _ CloudService = (*cloudService)(nil)

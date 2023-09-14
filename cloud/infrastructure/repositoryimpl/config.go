@@ -5,5 +5,5 @@ type Config struct {
 }
 
 type Table struct {
-	Pod string `json:"pod" reuired:"true"`
+	Pod string `json:"pod" required:"true"`
 }

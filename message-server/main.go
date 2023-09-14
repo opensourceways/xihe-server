@@ -20,7 +20,6 @@ import (
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
-	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
@@ -81,7 +80,7 @@ func main() {
 
 	// cfg
 	cfg := new(configuration)
-	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
+	if err := loadConfig(o.service.ConfigFile, cfg); err != nil {
 		logrus.Fatalf("load config, err:%s", err.Error())
 	}
 
@@ -140,6 +139,8 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.BindEmail,
 			topics.SetAvatarId,
 			topics.SetBio,
+      topics.JupyterCreated,
+
 		},
 		kafka.SubscriberAdapter(),
 	)
