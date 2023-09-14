@@ -8,7 +8,7 @@ import (
 type Config struct {
 	competitionimpl.Config
 
-	Message competitionmsg.Config `json:"message"`
+	Message competitionmsg.Config `json:"message" required:"true"`
 }
 
 func (cfg *Config) ConfigItems() []interface{} {
