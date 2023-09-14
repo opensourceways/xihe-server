@@ -68,9 +68,6 @@ func (r *CloudService) SubscribeCloud(
 		return
 	}
 
-	// add operate log
-	r.sender.AddOperateLogForCloudSubscribe(u, p.CloudId)
-
 	// send msg to call pod instance api
 	msg := new(message.MsgCloudConf)
 	msg.ToMsgCloudConf(c, u, pid)
@@ -112,11 +109,4 @@ func (r *CloudService) HasHolding(user types.Account, c *domain.CloudConf) (bool
 	}
 
 	return false, nil
-}
-
-func (r *CloudService) ReleasePod(p *domain.Pod) error {
-	msg := new(message.MsgPod)
-	msg.ToMsgPod(p)
-
-	return r.sender.ReleasePod(msg)
 }

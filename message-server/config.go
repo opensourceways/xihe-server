@@ -169,4 +169,5 @@ type mqTopics struct {
 	messages.Topics
 
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
+	JupyterCreated    string `json:"jupyter_created"    required:"true"`
 }

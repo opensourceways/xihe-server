@@ -218,12 +218,6 @@ func (s *sender) AddOperateLogForDownloadFile(u domain.Account, repo message.Rep
 	})
 }
 
-func (s *sender) AddOperateLogForCloudSubscribe(u domain.Account, cloudId string) error {
-	return s.sendOperateLog(u, "cloud", map[string]string{
-		"cloud_id": cloudId,
-	})
-}
-
 func (s *sender) sendOperateLog(u domain.Account, t string, info map[string]string) error {
 	a := ""
 	if u != nil {

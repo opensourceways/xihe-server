@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
@@ -82,6 +83,7 @@ type Config struct {
 	MQ          kafka.Config         `json:"mq"           required:"true"`
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
 	Points      pointsConfig         `json:"points"`
+	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -114,6 +116,7 @@ func (cfg *Config) configItems() []interface{} {
 		&cfg.MQTopics,
 		&cfg.Points.Domain,
 		&cfg.Points.Repo,
+		&cfg.Cloud,
 	}
 }
 
