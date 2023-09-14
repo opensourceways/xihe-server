@@ -9,7 +9,6 @@ import (
 	asyncdomain "github.com/opensourceways/xihe-server/async-server/domain"
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
-	commsg "github.com/opensourceways/xihe-server/common/domain/message"
 	comsg "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 )
@@ -30,7 +29,7 @@ func Subscribe(s asyncapp.AsyncMessageService, topics *TopicConfig) (err error) 
 	if err = kfk.SubscribeWithStrategyOfRetry(
 		handleNameWuKongInferenceStart,
 		c.handleEventBigModelWuKongInferenceStart,
-		[]string{topics.InferenceStart.Topic}, retryNum,
+		[]string{topics.InferenceStart}, retryNum,
 	); err != nil {
 		return
 	}
@@ -39,7 +38,7 @@ func Subscribe(s asyncapp.AsyncMessageService, topics *TopicConfig) (err error) 
 	if err = kfk.SubscribeWithStrategyOfRetry(
 		handleNameWuKongInferenceError,
 		c.handleEventBigModelWuKongInferenceError,
-		[]string{topics.InferenceError.Topic}, retryNum,
+		[]string{topics.InferenceError}, retryNum,
 	); err != nil {
 		return
 	}
@@ -48,7 +47,7 @@ func Subscribe(s asyncapp.AsyncMessageService, topics *TopicConfig) (err error) 
 	if err = kfk.SubscribeWithStrategyOfRetry(
 		handleNameWuKongAsyncTaskStart,
 		c.handleEventBigModelWuKongAsyncTaskStart,
-		[]string{topics.InferenceAsyncStart.Topic}, retryNum,
+		[]string{topics.InferenceAsyncStart}, retryNum,
 	); err != nil {
 		return
 	}
@@ -57,7 +56,7 @@ func Subscribe(s asyncapp.AsyncMessageService, topics *TopicConfig) (err error) 
 	err = kfk.SubscribeWithStrategyOfRetry(
 		handleNameWuKongAsyncTaskFinish,
 		c.handleEventBigModelWuKongAsyncTaskFinish,
-		[]string{topics.InferenceAsyncFinish.Topic}, retryNum,
+		[]string{topics.InferenceAsyncFinish}, retryNum,
 	)
 
 	return
@@ -187,9 +186,9 @@ func (c *consumer) handleEventBigModelWuKongAsyncTaskFinish(body []byte, h map[s
 }
 
 type TopicConfig struct {
-	InferenceStart       commsg.TopicConfig `json:"inference_start"`
-	InferenceError       commsg.TopicConfig `json:"inference_error"`
-	InferenceAsyncStart  commsg.TopicConfig `json:"inference_async_start"`
-	InferenceAsyncFinish commsg.TopicConfig `json:"inference_async_finish"`
-	PicturePublic        commsg.TopicConfig `json:"picture_public"`
+	InferenceStart       string `json:"inference_start"`
+	InferenceError       string `json:"inference_error"`
+	InferenceAsyncStart  string `json:"inference_async_start"`
+	InferenceAsyncFinish string `json:"inference_async_finish"`
+	PicturePublicized    string `json:"picture_publicized"`
 }

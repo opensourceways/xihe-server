@@ -101,7 +101,7 @@ func (impl *messageAdapter) SendBigModelAccessLog(v *domain.BigModelAccessLogEve
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
-func (impl *messageAdapter) SendUserPublicizeWuKongPicture(v *domain.UserPublicizeWuKongPictureEvent) error {
+func (impl *messageAdapter) SendWuKongPicturePublicized(v *domain.WuKongPicturePublicizedEvent) error {
 	cfg := &impl.cfg.PicturePublic
 
 	msg := common.MsgNormal{
