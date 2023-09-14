@@ -6,7 +6,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
-	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	bigmodel "github.com/opensourceways/xihe-server/bigmodel/config"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	common "github.com/opensourceways/xihe-server/common/config"
@@ -44,7 +44,7 @@ type Config struct {
 	Challenge   challengeimpl.Config `json:"challenge"    required:"true"`
 	Training    trainingimpl.Config  `json:"training"     required:"true"`
 	Finetune    finetuneimpl.Config  `json:"finetune"     required:"true"`
-	BigModel    BigmodelConfig       `json:"bigmodel"     required:"true"`
+	BigModel    bigmodel.Config      `json:"bigmodel"     required:"true"`
 	Authing     authingimpl.Config   `json:"authing"      required:"true"`
 	Mongodb     Mongodb              `json:"mongodb"      required:"true"`
 	Postgresql  PostgresqlConfig     `json:"postgresql"   required:"true"`

@@ -8,6 +8,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	common "github.com/opensourceways/xihe-server/common/config"
+	commsg "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
@@ -139,7 +140,9 @@ type mqTopics struct {
 
 	// competition
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
-	JupyterCreated    string `json:"jupyter_created"    required:"true"`
+
+	// cloud
+	JupyterCreated string `json:"jupyter_created"    required:"true"`
 
 	// bigmodel
 	InferenceStart       string `json:"inference_start"        required:"true"`
@@ -150,11 +153,11 @@ type mqTopics struct {
 }
 
 func toBigModelMessageConfig(topics *mqTopics) (cfg msgadapeter.Config) {
-	cfg.InferenceStart.Topic = topics.InferenceStart
-	cfg.InferenceError.Topic = topics.InferenceError
-	cfg.InferenceAsyncStart.Topic = topics.InferenceAsyncStart
-	cfg.InferenceAsyncFinish.Topic = topics.InferenceAsyncFinish
-	cfg.PicturePublic.Topic = topics.PicturePublic
-
-	return
+	return msgadapeter.Config{
+		InferenceStart:       commsg.TopicConfig{Topic: topics.InferenceStart},
+		InferenceError:       commsg.TopicConfig{Topic: topics.InferenceError},
+		InferenceAsyncStart:  commsg.TopicConfig{Topic: topics.InferenceAsyncStart},
+		InferenceAsyncFinish: commsg.TopicConfig{Topic: topics.InferenceAsyncFinish},
+		PicturePublic:        commsg.TopicConfig{Topic: topics.PicturePublic},
+	}
 }
