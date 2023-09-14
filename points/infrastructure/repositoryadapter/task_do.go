@@ -48,7 +48,7 @@ func (do *taskDO) toTask() domain.Task {
 	return domain.Task{
 		Name: do.Name,
 		Kind: do.Kind,
-		Addr: do.Kind,
+		Addr: do.Addr,
 		Rule: do.Rule.toRule(),
 	}
 }
