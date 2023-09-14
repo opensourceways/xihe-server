@@ -19,14 +19,12 @@ func SetDefault(cfg interface{}) {
 		return
 	}
 
-	f, ok := cfg.(configItems)
-	if !ok {
-		return
-	}
+	if f, ok := cfg.(configItems); ok {
+		items := f.ConfigItems()
 
-	items := f.ConfigItems()
-	for i := range items {
-		SetDefault(items[i])
+		for i := range items {
+			SetDefault(items[i])
+		}
 	}
 }
 
@@ -35,15 +33,13 @@ func Validate(cfg interface{}) error {
 		return f.Validate()
 	}
 
-	f, ok := cfg.(configItems)
-	if !ok {
-		return nil
-	}
+	if f, ok := cfg.(configItems); ok {
+		items := f.ConfigItems()
 
-	items := f.ConfigItems()
-	for i := range items {
-		if err := Validate(items[i]); err != nil {
-			return err
+		for i := range items {
+			if err := Validate(items[i]); err != nil {
+				return err
+			}
 		}
 	}
 
