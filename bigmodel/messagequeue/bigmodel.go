@@ -9,7 +9,7 @@ import (
 	asyncdomain "github.com/opensourceways/xihe-server/async-server/domain"
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
-	msgadapeter "github.com/opensourceways/xihe-server/bigmodel/infrastructure/messageadapter"
+	commsg "github.com/opensourceways/xihe-server/common/domain/message"
 	comsg "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 )
@@ -23,7 +23,7 @@ const (
 	handleNameWuKongAsyncTaskFinish = "wukong_async_task_finish"
 )
 
-func Subscribe(s asyncapp.AsyncMessageService, topics msgadapeter.Config) (err error) {
+func Subscribe(s asyncapp.AsyncMessageService, topics *TopicConfig) (err error) {
 	c := &consumer{s: s}
 
 	// wukong inference start
@@ -54,13 +54,11 @@ func Subscribe(s asyncapp.AsyncMessageService, topics msgadapeter.Config) (err e
 	}
 
 	// wukong async task finish
-	if err = kfk.SubscribeWithStrategyOfRetry(
+	err = kfk.SubscribeWithStrategyOfRetry(
 		handleNameWuKongAsyncTaskFinish,
 		c.handleEventBigModelWuKongAsyncTaskFinish,
 		[]string{topics.InferenceAsyncFinish.Topic}, retryNum,
-	); err != nil {
-		return
-	}
+	)
 
 	return
 }
@@ -186,4 +184,12 @@ func (c *consumer) handleEventBigModelWuKongAsyncTaskFinish(body []byte, h map[s
 	}
 
 	return c.s.UpdateWuKongTask(&v)
+}
+
+type TopicConfig struct {
+	InferenceStart       commsg.TopicConfig `json:"inference_start"`
+	InferenceError       commsg.TopicConfig `json:"inference_error"`
+	InferenceAsyncStart  commsg.TopicConfig `json:"inference_async_start"`
+	InferenceAsyncFinish commsg.TopicConfig `json:"inference_async_finish"`
+	PicturePublic        commsg.TopicConfig `json:"picture_public"`
 }

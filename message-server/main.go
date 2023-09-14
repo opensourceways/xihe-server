@@ -143,6 +143,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.SignIn.Topic,
 			topics.CompetitorApplied,
 			topics.JupyterCreated,
+			topics.BigModelTopics.PicturePublic.Topic,
 		},
 		kafka.SubscriberAdapter(),
 	)
@@ -153,7 +154,7 @@ func bigmodelSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 		asyncapp.NewAsyncMessageService(
 			asyncrepo.NewAsyncTaskRepo(&cfg.Postgresql.asyncconf),
 		),
-		toBigModelMessageConfig(topics),
+		&topics.BigModelTopics,
 	)
 }
 

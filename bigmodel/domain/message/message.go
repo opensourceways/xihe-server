@@ -13,7 +13,7 @@ type MessageProducer interface {
 	SendWuKongInferenceError(*domain.WuKongInferenceErrorEvent) error
 	SendWuKongAsyncTaskStart(*domain.WuKongAsyncTaskStartEvent) error
 	SendWuKongAsyncInferenceFinish(*domain.WuKongAsyncInferenceFinishEvent) error
-	SendWuKongPicturePublic(*domain.WuKongPicturePublicEvent) error
+	SendUserPublicizeWuKongPicture(*domain.UserPublicizeWuKongPictureEvent) error
 
 	// common
 	SendBigModelAccessLog(*domain.BigModelAccessLogEvent) error
