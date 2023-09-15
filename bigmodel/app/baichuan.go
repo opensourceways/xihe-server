@@ -5,7 +5,10 @@ import (
 )
 
 func (s bigModelService) BaiChuan(cmd *BaiChuanCmd) (code string, dto BaiChuanDTO, err error) {
-	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelBaiChuan)
+	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+		Account:      cmd.User,
+		BigModelType: domain.BigmodelBaiChuan,
+	})
 
 	input := &domain.BaiChuanInput{
 		Text:              cmd.Text,

@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	common "github.com/opensourceways/xihe-server/common/config"
@@ -136,7 +137,21 @@ func (cfg *cloudConfig) Validate() error {
 type mqTopics struct {
 	messages.Topics
 
+	// competition
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
+
+	// cloud
 	JupyterCreated    string `json:"jupyter_created"    required:"true"`
+  
+  //course
 	CourseApplied     string `json:"course_applied"     required:"true"`
+
+	// bigmodel
+	BigModelTopics messagequeue.TopicConfig `json:"bigmodel_topics"
+  
+
+
+
+	
+	
 }

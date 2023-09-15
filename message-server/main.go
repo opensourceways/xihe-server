@@ -15,6 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
+	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
@@ -114,6 +115,13 @@ func main() {
 		return
 	}
 
+	// bigmodel
+	if err = bigmodelSubscribesMessage(cfg, &cfg.MQTopics); err != nil {
+		logrus.Errorf("bigmodel subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
 	// run
 	run(newHandler(cfg, log), log, &cfg.MQTopics)
 }
@@ -136,8 +144,19 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.CompetitorApplied,
 			topics.JupyterCreated,
 			topics.CourseApplied,
+      topics.BigModelTopics.PicturePublicized,
+
 		},
 		kafka.SubscriberAdapter(),
+	)
+}
+
+func bigmodelSubscribesMessage(cfg *configuration, topics *mqTopics) error {
+	return bigmodelmq.Subscribe(
+		asyncapp.NewAsyncMessageService(
+			asyncrepo.NewAsyncTaskRepo(&cfg.Postgresql.asyncconf),
+		),
+		&topics.BigModelTopics,
 	)
 }
 

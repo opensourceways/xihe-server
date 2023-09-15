@@ -6,8 +6,8 @@ import (
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/poolimpl"
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/watchimpl"
-	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	common "github.com/opensourceways/xihe-server/common/config"
+	bigmodel "github.com/opensourceways/xihe-server/bigmodel/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
@@ -26,7 +26,7 @@ func LoadConfig(path string, cfg *Config) error {
 type Config struct {
 	MaxRetry int `json:"max_retry"`
 
-	BigModel   bigmodels.Config `json:"bigmodel"     required:"true"`
+	BigModel   bigmodel.Config  `json:"bigmodel"     required:"true"`
 	Postgresql PostgresqlConfig `json:"postgresql"   required:"true"`
 	MQ         kafka.Config     `json:"mq"           required:"true"`
 	MQTopics   messages.Topics  `json:"mq_topics"    required:"true"`
