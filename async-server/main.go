@@ -16,9 +16,9 @@ import (
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/watchimpl"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	bmmsgadapter "github.com/opensourceways/xihe-server/bigmodel/infrastructure/messageadapter"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
-	"github.com/opensourceways/xihe-server/infrastructure/messages"
 )
 
 type options struct {
@@ -72,7 +72,7 @@ func main() {
 	}
 
 	// bigmodel
-	if err := bigmodels.Init(&cfg.BigModel); err != nil {
+	if err := bigmodels.Init(&cfg.BigModel.Config); err != nil {
 		logrus.Fatalf("initialize big model failed, err:%s", err.Error())
 	}
 
@@ -95,11 +95,13 @@ func main() {
 
 	// bigmodel & sender
 	bm := bigmodels.NewBigModelService()
-	sender := messages.NewMessageSender(&cfg.MQTopics, kafka.PublisherAdapter())
+	publisher := kafka.PublisherAdapter()
 
 	// aysnc.bigmodel.bigmodel
 	bigmodel := bigmodelimpl.NewBigModelImpl(
-		bigmodelapp.NewAsyncBigModelService(bm, sender),
+		bigmodelapp.NewAsyncBigModelService(bm, bmmsgadapter.NewMessageAdapter(
+			&cfg.BigModel.Message, publisher,
+		)),
 	)
 
 	// repo

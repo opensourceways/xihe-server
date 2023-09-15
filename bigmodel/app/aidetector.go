@@ -7,7 +7,10 @@ import (
 
 func (s bigModelService) AIDetector(cmd *AIDetectorCmd) (code string, ismachine bool, err error) {
 	// operation log
-	_ = s.sender.AddOperateLogForAccessBigModel(cmd.User, domain.BigmodelAIDetector)
+	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+		Account:      cmd.User,
+		BigModelType: domain.BigmodelAIDetector,
+	})
 
 	// audit
 	if err = s.fm.CheckText(cmd.Text.AIDetectorText()); err != nil {

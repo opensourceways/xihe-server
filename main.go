@@ -74,7 +74,7 @@ func main() {
 	}
 
 	// bigmodel
-	if err := bigmodels.Init(&cfg.BigModel); err != nil {
+	if err := bigmodels.Init(&cfg.BigModel.Config); err != nil {
 		logrus.Fatalf("initialize big model failed, err:%s", err.Error())
 	}
 

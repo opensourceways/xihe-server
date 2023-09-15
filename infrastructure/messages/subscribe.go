@@ -7,7 +7,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	bigmoddelmsg "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
 	common "github.com/opensourceways/xihe-server/common/domain/message"
@@ -25,7 +24,6 @@ const (
 	handlerNameAddFollowing       = "add_following"
 	handlerNameAddRelatedResource = "add_related_resource"
 	handlerNameCreateCloud        = "create_cloud"
-	handlerNameCreateBigModel     = "create_bigmodel"
 	handlerNameCreateTraining     = "create_training"
 	handlerNameCreateFinetune     = "create_finetune"
 	handlerNameCreateEvaluate     = "create_evaluate"
@@ -89,11 +87,6 @@ func Subscribe(
 	// cloud
 	if err = r.registerHandlerForCloud(handler); err != nil {
 		return
-	}
-
-	// bigmodel
-	if err = r.registerHandlerForBigModel(handler); err != nil {
-		return err
 	}
 
 	// register end
@@ -412,44 +405,6 @@ func (r *register) registerHandlerForCloud(handler interface{}) error {
 	}
 
 	return r.subscribe(r.topics.Cloud, handlerNameCreateCloud, f)
-}
-
-func (r *register) registerHandlerForBigModel(handler interface{}) error {
-
-	f := func(b []byte, m map[string]string) (err error) {
-		body := bigmoddelmsg.MsgTask{}
-		if err = json.Unmarshal(b, &body); err != nil {
-			return
-		}
-
-		h, ok := handler.(BigModelMessageHandler)
-		if !ok {
-			return
-		}
-
-		switch body.Type {
-		case bigmoddelmsg.MsgTypeWuKongAsyncTaskFinish:
-
-			return h.HandleEventBigModelWuKongAsyncTaskFinish(&body)
-
-		case bigmoddelmsg.MsgTypeWuKongAsyncTaskStart:
-
-			return h.HandleEventBigModelWuKongAsyncTaskStart(&body)
-
-		case bigmoddelmsg.MsgTypeWuKongInferenceStart:
-
-			return h.HandleEventBigModelWuKongInferenceStart(&body)
-
-		case bigmoddelmsg.MsgTypeWuKongInferenceError:
-
-			return h.HandleEventBigModelWuKongInferenceError(&body)
-
-		}
-
-		return
-	}
-
-	return r.subscribe(r.topics.BigModel, handlerNameCreateBigModel, f)
 }
 
 func (r *register) subscribe(
