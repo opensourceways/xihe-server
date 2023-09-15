@@ -78,7 +78,7 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 
 	s.toUserDTO(&u, &dto)
 
-	s.producer.SendUserRegisterEvent(&domain.UserRegisterEvent{
+	s.producer.SendUserRegisterEvent(&domain.UserSignedUpEvent{
 		Account: cmd.Account,
 	})
 

@@ -4,21 +4,16 @@ import (
 	types "github.com/opensourceways/xihe-server/domain"
 )
 
-type UserRegisterEvent struct {
+type UserSignedUpEvent struct {
 	Account types.Account
 }
 
-type UserBindEmailEvent struct {
-	Account types.Account
-	Email   types.Email
-}
-
-type UserSetAvatarIdEvent struct {
+type UserAvatarSetEvent struct {
 	Account  types.Account
 	AvatarId AvatarId
 }
 
-type UserSetBioEvent struct {
+type UserBioSetEvent struct {
 	Account types.Account
 	Bio     Bio
 }

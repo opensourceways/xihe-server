@@ -150,8 +150,7 @@ type mqTopics struct {
 	CourseApplied string `json:"course_applied"     required:"true"`
 
 	//user
-	UserRegister string `json:"user_register"      required:"true"`
-	BindEmail    string `json:"bind_email"         required:"true"`
-	SetBio       string `json:"set_bio"            required:"true"`
-	SetAvatarId  string `json:"set-avatarid"       required:"true"`
+	UserSignedUp string `json:"user_register"      required:"true"`
+	BioSet       string `json:"set_bio"            required:"true"`
+	AvatarSet    string `json:"set-avatarid"       required:"true"`
 }

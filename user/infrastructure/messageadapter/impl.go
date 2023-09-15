@@ -18,7 +18,7 @@ type messageAdapter struct {
 }
 
 // Register
-func (impl *messageAdapter) SendUserRegisterEvent(v *domain.UserRegisterEvent) error {
+func (impl *messageAdapter) SendUserRegisterEvent(v *domain.UserSignedUpEvent) error {
 	cfg := &impl.cfg.UserRegister
 
 	msg := common.MsgNormal{
@@ -31,22 +31,8 @@ func (impl *messageAdapter) SendUserRegisterEvent(v *domain.UserRegisterEvent) e
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
-// Bind Email
-func (impl *messageAdapter) SendBindEmailEvent(v *domain.UserBindEmailEvent) error {
-	cfg := &impl.cfg.BindEmail
-
-	msg := common.MsgNormal{
-		Type:      cfg.Name,
-		User:      v.Account.Account(),
-		Desc:      fmt.Sprintf("Bind Email of %s", v.Email),
-		CreatedAt: utils.Now(),
-	}
-
-	return impl.publisher.Publish(cfg.Topic, &msg, nil)
-}
-
 // Set AvatarId
-func (impl *messageAdapter) SendSetAvatarIdEvent(v *domain.UserSetAvatarIdEvent) error {
+func (impl *messageAdapter) SendSetAvatarIdEvent(v *domain.UserAvatarSetEvent) error {
 	cfg := &impl.cfg.SetAvatarId
 
 	msg := common.MsgNormal{
@@ -60,7 +46,7 @@ func (impl *messageAdapter) SendSetAvatarIdEvent(v *domain.UserSetAvatarIdEvent)
 }
 
 // Set Bio
-func (impl *messageAdapter) SendSetBioEvent(v *domain.UserSetBioEvent) error {
+func (impl *messageAdapter) SendSetBioEvent(v *domain.UserBioSetEvent) error {
 	cfg := &impl.cfg.SetBio
 
 	msg := common.MsgNormal{
