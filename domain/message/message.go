@@ -66,7 +66,6 @@ type EventHandler interface {
 	LikeHandler
 	ForkHandler
 	DownloadHandler
-	TrainingHandler
 	FinetuneHandler
 	InferenceHandler
 	EvaluateHandler

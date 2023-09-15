@@ -21,6 +21,7 @@ import (
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+	"github.com/opensourceways/xihe-server/controller/messagequeue"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
@@ -122,6 +123,13 @@ func main() {
 		return
 	}
 
+	// training
+	if err = trainingSubscribeMessage(log, cfg); err != nil {
+		logrus.Errorf("training subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
 	// run
 	run(newHandler(cfg, log), log, &cfg.MQTopics)
 }
@@ -146,6 +154,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.PicturePublicized,
 			topics.PictureLiked,
 			topics.CourseApplied,
+			topics.TrainingTopics.TrainingCreated,
 		},
 		kafka.SubscriberAdapter(),
 	)
@@ -157,6 +166,27 @@ func bigmodelSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			asyncrepo.NewAsyncTaskRepo(&cfg.Postgresql.asyncconf),
 		),
 		&topics.BigModelTopics,
+	)
+}
+
+func trainingSubscribeMessage(log *logrus.Entry, cfg *configuration) error {
+	collections := &cfg.Mongodb.Collections
+
+	return messagequeue.Subscribe(
+		log, messagequeue.TrainingConfig{
+			MaxRetry:         cfg.MaxRetry,
+			TrainingEndpoint: cfg.TrainingEndpoint,
+			Topics:           cfg.MQTopics.TrainingTopics,
+		},
+		app.NewTrainingService(
+			log,
+			trainingimpl.NewTraining(&trainingimpl.Config{}),
+			repositories.NewTrainingRepository(
+				mongodb.NewTrainingMapper(collections.Training),
+			),
+			nil, 0,
+		),
+		kafka.SubscriberAdapter(),
 	)
 }
 
@@ -188,15 +218,6 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 			repositories.NewModelRepository(
 				mongodb.NewModelMapper(collections.Model),
 			),
-		),
-
-		training: app.NewTrainingService(
-			log,
-			trainingimpl.NewTraining(&trainingimpl.Config{}),
-			repositories.NewTrainingRepository(
-				mongodb.NewTrainingMapper(collections.Training),
-			),
-			nil, 0,
 		),
 
 		inference: app.NewInferenceMessageService(
