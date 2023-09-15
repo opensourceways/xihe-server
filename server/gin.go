@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	coursemsg "github.com/opensourceways/xihe-server/course/infrastructure/messageadapter"
 	"net/http"
 	"time"
 
@@ -183,6 +184,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
 		courserepo.NewRecordRepo(mongodb.NewCollection(collections.CourseRecord)),
+		coursemsg.MessageAdapter(&cfg.Course.Message, publisher),
 	)
 
 	cloudAppService := cloudapp.NewCloudService(

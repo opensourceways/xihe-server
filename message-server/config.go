@@ -141,8 +141,17 @@ type mqTopics struct {
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
 
 	// cloud
-	JupyterCreated string `json:"jupyter_created"    required:"true"`
+	JupyterCreated    string `json:"jupyter_created"    required:"true"`
+  
+  //course
+	CourseApplied     string `json:"course_applied"     required:"true"`
 
 	// bigmodel
-	BigModelTopics messagequeue.TopicConfig `json:"bigmodel_topics"`
+	BigModelTopics messagequeue.TopicConfig `json:"bigmodel_topics"
+  
+
+
+
+	
+	
 }
