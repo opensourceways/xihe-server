@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	coursemsg "github.com/opensourceways/xihe-server/course/infrastructure/messageadapter"
 	"net/http"
 	"time"
 
@@ -31,6 +30,7 @@ import (
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
+	coursemsg "github.com/opensourceways/xihe-server/course/infrastructure/messageadapter"
 	courserepo "github.com/opensourceways/xihe-server/course/infrastructure/repositoryimpl"
 	courseusercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
