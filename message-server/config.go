@@ -145,4 +145,7 @@ type mqTopics struct {
 
 	// bigmodel
 	BigModelTopics messagequeue.TopicConfig `json:"bigmodel_topics"`
+
+	//course
+	CourseApplied string `json:"course_applied"     required:"true"`
 }

@@ -30,6 +30,7 @@ import (
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
+	coursemsg "github.com/opensourceways/xihe-server/course/infrastructure/messageadapter"
 	courserepo "github.com/opensourceways/xihe-server/course/infrastructure/repositoryimpl"
 	courseusercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
@@ -183,6 +184,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
 		courserepo.NewRecordRepo(mongodb.NewCollection(collections.CourseRecord)),
+		coursemsg.MessageAdapter(&cfg.Course.Message, publisher),
 	)
 
 	cloudAppService := cloudapp.NewCloudService(

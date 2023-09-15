@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
 	redislib "github.com/opensourceways/redis-lib"
+	"github.com/opensourceways/xihe-server/course"
 
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
@@ -57,6 +58,7 @@ type Config struct {
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
 	Points      points.Config        `json:"points"`
 	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
+	Course      course.Config        `json:"course"       required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -90,6 +92,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.Points.Domain,
 		&cfg.Points.Repo,
 		&cfg.Cloud,
+		&cfg.Course,
 	}
 }
 
