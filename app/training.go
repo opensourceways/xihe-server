@@ -38,7 +38,7 @@ func NewTrainingService(
 	log *logrus.Entry,
 	train training.Training,
 	repo repository.Training,
-	sender message.Sender,
+	sender message.MessageProducer,
 	maxTrainingRecordNum int,
 ) TrainingService {
 	return trainingService{
@@ -55,7 +55,7 @@ type trainingService struct {
 	log    *logrus.Entry
 	train  training.Training
 	repo   repository.Training
-	sender message.Sender
+	sender message.MessageProducer
 
 	maxTrainingRecordNum int
 }
@@ -127,10 +127,11 @@ func (s trainingService) create(
 		TrainingId: r,
 	}
 
-	msg := new(message.MsgTraining)
-	msg.TrainingCreate(user, index, config.Inputs)
-
-	if err = s.sender.CreateTraining(msg); err != nil {
+	if err = s.sender.SendTrainingCreated(&domain.TrainingCreatedEvent{
+		Account:        user,
+		TrainingIndex:  index,
+		TrainingInputs: config.Inputs,
+	}); err != nil {
 		s.log.Errorf("send message of creating training failed, err:%s", err.Error())
 	}
 

@@ -23,7 +23,7 @@ func AddRouterForTrainingController(
 	model repository.Model,
 	project repository.Project,
 	dataset repository.Dataset,
-	sender message.Sender,
+	sender message.MessageProducer,
 ) {
 	ctl := TrainingController{
 		ts: app.NewTrainingService(
