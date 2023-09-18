@@ -115,7 +115,7 @@ func (impl *messageAdapter) SendWuKongPicturePublicized(v *domain.WuKongPictureP
 
 // Picture Liked
 func (impl *messageAdapter) SendWuKongPictureLiked(v *domain.WuKongPictureLikedEvent) error {
-	cfg := &impl.cfg.PictureLike
+	cfg := &impl.cfg.PictureLiked
 
 	msg := common.MsgNormal{
 		Type:      cfg.Name,
@@ -135,7 +135,7 @@ type Config struct {
 	InferenceAsyncStart  common.TopicConfig `json:"inference_async_start"`
 	InferenceAsyncFinish common.TopicConfig `json:"inference_async_finish"`
 	PicturePublicized    common.TopicConfig `json:"picture_publicized"`
-	PictureLike          common.TopicConfig `json:"picture_like"`
+	PictureLiked         common.TopicConfig `json:"picture_liked"`
 
 	// common
 	BigModelAccessLog common.TopicConfig `json:"bigmodel_access_log"`
