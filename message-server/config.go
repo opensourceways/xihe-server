@@ -143,9 +143,9 @@ type mqTopics struct {
 	JupyterCreated string `json:"jupyter_created"    required:"true"`
 
 	// bigmodel
-	BigModelTopics    bigmodelmq.TopicConfig `json:"bigmodel-topics"`
-	PicturePublicized string                 `json:"picture-publicized"    required:"true"`
-	PictureLiked      string                 `json:"picture-liked"         required:"true"`
+	BigModelTopics    bigmodelmq.TopicConfig `json:"bigmodel_topics"`
+	PicturePublicized string                 `json:"picture_publicized"    required:"true"`
+	PictureLiked      string                 `json:"picture_liked"         required:"true"`
 
 	//course
 	CourseApplied string `json:"course_applied"     required:"true"`
