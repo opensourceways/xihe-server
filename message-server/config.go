@@ -19,6 +19,10 @@ import (
 	"github.com/opensourceways/xihe-server/messagequeue"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+<<<<<<< HEAD
+=======
+	"github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
+>>>>>>> 0b45df0 (update message of useraction)
 )
 
 func loadConfig(path string, cfg *configuration) error {
@@ -45,6 +49,18 @@ type configuration struct {
 	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
 	Points     pointsConfig                `json:"points"`
 	Training   messagequeue.TrainingConfig `json:"training"`
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+<<<<<<< HEAD
+	User       user.Config          `json:"user"         required:"true"`
+=======
+	User       user.Config                 `json:"user"         required:"true"`
+>>>>>>> f320fe5 ( fix: update message of user config-)
+=======
+	User       messageadapter.Config       `json:"user"`
+>>>>>>> 3afc252 (update message userinfo 566/11)
+>>>>>>> 0b45df0 (update message of useraction)
 }
 
 type PostgresqlConfig struct {
@@ -160,12 +176,17 @@ type mqTopics struct {
 
 	// bigmodel
 	BigModelTopics    bigmodelmq.TopicConfig `json:"bigmodel_topics"`
-	PicturePublicized string                 `json:"picture_publicized"    required:"true"`
-	PictureLiked      string                 `json:"picture_liked"         required:"true"`
+	PicturePublicized string                 `json:"picture_publicized"  required:"true"`
+	PictureLiked      string                 `json:"picture_liked"       required:"true"`
 
 	//course
-	CourseApplied string `json:"course_applied"     required:"true"`
+	CourseApplied string `json:"course_applied"                          required:"true"`
 
 	// training
-	TrainingCreated string `json:"training_created"`
+	TrainingCreated string `json:"training_created"                      required:"true"`
+
+	//user
+	UserSignedUp string `json:"user-signed-up"        required:"true"`
+	BioSet       string `json:"bio_set"               required:"true"`
+	AvatarSet    string `json:"avatar_set"            required:"true"`
 }
