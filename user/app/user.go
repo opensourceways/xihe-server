@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/hex"
+	messages "github.com/opensourceways/xihe-server/user/domain/message"
 
 	"github.com/opensourceways/xihe-server/domain/message"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
@@ -43,6 +44,7 @@ func NewUserService(
 	sender message.Sender,
 	points pointsPort.Points,
 	encryption utils.SymmetricEncryption,
+	producer messages.MessageProducer,
 ) UserService {
 	return userService{
 		ps:         ps,
@@ -50,6 +52,7 @@ func NewUserService(
 		sender:     sender,
 		points:     points,
 		encryption: encryption,
+		producer:   producer,
 	}
 }
 
@@ -59,6 +62,7 @@ type userService struct {
 	sender     message.Sender
 	points     pointsPort.Points
 	encryption utils.SymmetricEncryption
+	producer   messages.MessageProducer
 }
 
 func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
@@ -75,6 +79,10 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 	s.toUserDTO(&u, &dto)
 
 	_ = s.sender.AddOperateLogForNewUser(u.Account)
+
+	s.producer.SendUserRegisterEvent(&domain.UserSignedUpEvent{
+		Account: cmd.Account,
+	})
 
 	return
 }

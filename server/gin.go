@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	"net/http"
 	"time"
 
@@ -222,6 +223,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	userAppService := userapp.NewUserService(
 		user, gitlabUser, sender, pointsAppService, controller.EncryptHelperToken(),
+		usermsg.MessageAdapter(&cfg.User.Message, publisher),
 	)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)

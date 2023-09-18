@@ -146,6 +146,9 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.PicturePublicized,
 			topics.PictureLiked,
 			topics.CourseApplied,
+			topics.UserSignedUp,
+			topics.BioSet,
+			topics.AvatarSet,
 		},
 		kafka.SubscriberAdapter(),
 	)
@@ -170,7 +173,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 		maxRetry:         cfg.MaxRetry,
 		trainingEndpoint: cfg.TrainingEndpoint,
 
-		user: userapp.NewUserService(userRepo, nil, nil, nil, nil),
+		user: userapp.NewUserService(userRepo, nil, nil, nil, nil, nil),
 
 		project: app.NewProjectMessageService(
 			repositories.NewProjectRepository(
