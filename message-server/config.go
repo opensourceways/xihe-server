@@ -11,7 +11,6 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
-	msgqueue "github.com/opensourceways/xihe-server/controller/messagequeue"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
@@ -153,5 +152,5 @@ type mqTopics struct {
 	CourseApplied string `json:"course_applied"     required:"true"`
 
 	// training
-	TrainingTopics msgqueue.TopicConfig `json:"training_topics"`
+	TrainingCreated string `json:"training_created"`
 }

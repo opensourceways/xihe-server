@@ -10,6 +10,7 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
@@ -30,7 +31,7 @@ func Subscribe(
 	err = subscriber.SubscribeWithStrategyOfRetry(
 		handleNameTrainingCreated,
 		c.handleEventTrainingCreated,
-		[]string{cfg.Topics.TrainingCreated}, retryNum,
+		[]string{cfg.TrainingCreated}, retryNum,
 	)
 
 	return
@@ -62,63 +63,45 @@ func (c *consumer) handleEventTrainingCreated(body []byte, h map[string]string) 
 	v.Project.Id = b.Details["project_id"]
 	v.TrainingId = b.Details["training_id"]
 
-	return c.handleEventTrainCreated(&v)
+	return c.handleEventCreateJob(&v)
 }
 
-func (c *consumer) handleEventTrainCreated(info *domain.TrainingIndex) error {
+func (c *consumer) handleEventCreateJob(info *domain.TrainingIndex) error {
 	// wait for the sync of model and dataset
 	time.Sleep(10 * time.Second)
 
-	return c.retry(
-		func(lastChance bool) error {
-			retry, err := c.s.CreateTrainingJob(
-				info, c.cfg.TrainingEndpoint, lastChance,
+	utils.RetryThreeTimes(func() error {
+		retry, err := c.s.CreateTrainingJob(
+			info, c.cfg.TrainingEndpoint, true,
+		)
+		if err != nil {
+			c.log.Errorf(
+				"handle training(%s/%s/%s) failed, err:%s",
+				info.Project.Owner.Account(), info.Project.Id,
+				info.TrainingId, err.Error(),
 			)
-			if err != nil {
-				c.log.Errorf(
-					"handle training(%s/%s/%s) failed, err:%s",
-					info.Project.Owner.Account(), info.Project.Id,
-					info.TrainingId, err.Error(),
-				)
 
-				if !retry {
-					return nil
-				}
+			if !retry {
+				return nil
 			}
-
-			return err
-		},
-		10*time.Second,
-	)
-}
-
-func (c *consumer) retry(f func(bool) error, interval time.Duration) (err error) {
-	n := c.cfg.MaxRetry - 1
-
-	if err = f(n <= 0); err == nil || n <= 0 {
-		return
-	}
-
-	for i := 1; i < n; i++ {
-		time.Sleep(interval)
-
-		if err = f(false); err == nil {
-			return
 		}
-	}
 
-	time.Sleep(interval)
+		return err
+	})
 
-	return f(true)
+	return nil
 }
 
 type TrainingConfig struct {
 	MaxRetry         int    `json:"max_retry"         required:"true"`
 	TrainingEndpoint string `json:"training_endpoint" required:"true"`
 
-	Topics TopicConfig `json:"topics"`
+	// topic
+	TrainingCreated string `json:"training_created" required:"true"`
 }
 
-type TopicConfig struct {
-	TrainingCreated string `json:"training_created" required:"true"`
+func (cfg *TrainingConfig) SetDefault() {
+	if cfg.MaxRetry == 0 {
+		cfg.MaxRetry = 3
+	}
 }

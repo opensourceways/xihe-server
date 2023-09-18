@@ -21,7 +21,6 @@ import (
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
-	"github.com/opensourceways/xihe-server/controller/messagequeue"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
@@ -29,6 +28,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	"github.com/opensourceways/xihe-server/messagequeue"
 	pointsapp "github.com/opensourceways/xihe-server/points/app"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
@@ -124,7 +124,7 @@ func main() {
 	}
 
 	// training
-	if err = trainingSubscribeMessage(log, cfg); err != nil {
+	if err = trainingSubscribesMessage(log, cfg); err != nil {
 		logrus.Errorf("training subscribes message failed, err:%s", err.Error())
 
 		return
@@ -154,7 +154,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.PicturePublicized,
 			topics.PictureLiked,
 			topics.CourseApplied,
-			topics.TrainingTopics.TrainingCreated,
+			topics.TrainingCreated,
 		},
 		kafka.SubscriberAdapter(),
 	)
@@ -169,14 +169,14 @@ func bigmodelSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 	)
 }
 
-func trainingSubscribeMessage(log *logrus.Entry, cfg *configuration) error {
+func trainingSubscribesMessage(log *logrus.Entry, cfg *configuration) error {
 	collections := &cfg.Mongodb.Collections
 
 	return messagequeue.Subscribe(
 		log, messagequeue.TrainingConfig{
 			MaxRetry:         cfg.MaxRetry,
 			TrainingEndpoint: cfg.TrainingEndpoint,
-			Topics:           cfg.MQTopics.TrainingTopics,
+			TrainingCreated:  cfg.MQTopics.TrainingCreated,
 		},
 		app.NewTrainingService(
 			log,

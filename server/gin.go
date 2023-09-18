@@ -160,7 +160,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	// sender
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
-	trainingSender := messages.NewTrainingMessageAdapter(&cfg.Training.Message, publisher)
 
 	userRegService := userapp.NewRegService(
 		userrepoimpl.NewUserRegRepo(
@@ -270,7 +269,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForTrainingController(
-			v1, trainingAdapter, training, model, proj, dataset, trainingSender,
+			v1, trainingAdapter, training, model, proj, dataset, messages.NewTrainingMessageAdapter(
+				&cfg.Training.Message, publisher,
+			),
 		)
 
 		controller.AddRouterForFinetuneController(
