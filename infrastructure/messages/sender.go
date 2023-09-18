@@ -1,6 +1,7 @@
 package messages
 
 import (
+	"fmt"
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
@@ -54,6 +55,18 @@ func (s *sender) sendLike(msg *domain.ResourceObject, action string) error {
 	toMsgResourceObject(msg, &v.Resource)
 
 	return s.send(s.topics.Like, &v)
+}
+
+// Daily Create
+func (s *sender) DailyCreate(u domain.Account, repo domain.ResourceName) error {
+	desc := fmt.Sprintf("Create ResourceName %s", repo)
+
+	return s.send(s.topics.DailyCreate.Topic, &common.MsgNormal{
+		Type:      s.topics.DailyCreate.Name,
+		User:      u.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      desc,
+	})
 }
 
 // Fork

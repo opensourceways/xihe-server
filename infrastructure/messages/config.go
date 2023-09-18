@@ -17,4 +17,5 @@ type Topics struct {
 	Cloud           string              `json:"cloud"            required:"true"`
 	Async           string              `json:"async"            required:"true"`
 	SignIn          message.TopicConfig `json:"signin"           required:"true"`
+	DailyCreate     message.TopicConfig `json:"daily_create"     required:"true"`
 }
