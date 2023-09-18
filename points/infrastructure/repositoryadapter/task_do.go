@@ -13,6 +13,7 @@ const (
 
 func totaskDO(t *domain.Task) taskDO {
 	return taskDO{
+		Id:   t.Id,
 		Name: t.Name,
 		Kind: t.Kind,
 		Addr: t.Addr,
@@ -33,6 +34,7 @@ func toruleDO(r *domain.Rule) ruleDO {
 
 // taskDO
 type taskDO struct {
+	Id   string   `bson:"id"  json:"id"`
 	Name string   `bson:"name"  json:"name"`
 	Kind string   `bson:"kind"  json:"kind"`
 	Addr string   `bson:"addr"  json:"addr"`
@@ -46,6 +48,7 @@ func (do *taskDO) doc() (bson.M, error) {
 
 func (do *taskDO) toTask() domain.Task {
 	return domain.Task{
+		Id:   do.Id,
 		Name: do.Name,
 		Kind: do.Kind,
 		Addr: do.Addr,

@@ -59,7 +59,7 @@ func (s *userPointsAppService) PointsDetails(account common.Account) (dto UserPo
 	details := make([]PointsDetailDTO, 0, v.DetailsNum())
 
 	for i := range v.Items {
-		t := v.Items[i].Task
+		t := v.Items[i].TaskId // TODO id to name
 
 		ds := v.Items[i].Details
 		for j := range ds {

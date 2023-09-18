@@ -10,7 +10,7 @@ import (
 
 type CmdToAddPointsItem struct {
 	Account common.Account
-	Task    string
+	TaskId  string
 	Desc    string
 	Time    int64
 }
