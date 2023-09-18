@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
+
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"

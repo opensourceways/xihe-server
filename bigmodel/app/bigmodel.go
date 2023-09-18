@@ -384,7 +384,6 @@ func (s bigModelService) AddLikeFromPublicPicture(
 		WuKongPictureMeta: p.WuKongPictureMeta,
 	}
 	pid, err = s.wukongPicture.SaveLike(cmd.User, wp, version)
-
 	if err != nil {
 		return
 	}
