@@ -14,8 +14,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
-	userapp "github.com/opensourceways/xihe-server/user/app"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 var _ message.EventHandler = (*handler)(nil)
@@ -36,9 +34,8 @@ type relatedResourceHanler struct {
 type handler struct {
 	log *logrus.Entry
 
-	maxRetry         int
+	maxRetry int
 
-	user      userapp.UserService
 	model     app.ModelMessageService
 	dataset   app.DatasetMessageService
 	project   app.ProjectMessageService
@@ -129,26 +126,6 @@ func (h *handler) getHandlerForEventRelatedResource(
 	}
 
 	return
-}
-
-func (h *handler) HandleEventAddFollowing(f *userdomain.FollowerInfo) error {
-	return h.do(func(bool) (err error) {
-		if err = h.user.AddFollower(f); err == nil {
-			return
-		}
-
-		if _, ok := err.(repository.ErrorDuplicateCreating); ok {
-			err = nil
-		}
-
-		return
-	})
-}
-
-func (h *handler) HandleEventRemoveFollowing(f *userdomain.FollowerInfo) (err error) {
-	return h.do(func(bool) error {
-		return h.user.RemoveFollower(f)
-	})
 }
 
 func (h *handler) HandleEventAddLike(obj *domain.ResourceObject) error {

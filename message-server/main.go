@@ -33,7 +33,9 @@ import (
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	"github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
+	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
 type options struct {
@@ -130,6 +132,13 @@ func main() {
 		return
 	}
 
+	// user
+	if err = userSubscribesMessage(cfg, &cfg.User); err != nil {
+		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
 	// run
 	run(newHandler(cfg, log), log, &cfg.MQTopics)
 }
@@ -161,8 +170,28 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.ProjectDownloaded,
 			topics.ModelDownloaded,
 			topics.DatasetDownloaded,
+			topics.UserSignedUp,
+			topics.BioSet,
+			topics.AvatarSet,
 		},
 		kafka.SubscriberAdapter(),
+	)
+}
+
+func userSubscribesMessage(cfg *configuration, topics *messageadapter.Config) error {
+	collections := &cfg.Mongodb.Collections
+
+	return usermq.Subscribe(
+		userapp.NewUserService(userrepo.NewUserRepo(
+			mongodb.NewCollection(collections.User),
+		),
+			nil,
+			nil,
+			nil,
+			nil,
+		),
+		kafka.SubscriberAdapter(),
+		topics,
 	)
 }
 
