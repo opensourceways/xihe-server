@@ -53,7 +53,12 @@ func (s *sender) sendLike(msg *domain.ResourceObject, action string) error {
 
 	toMsgResourceObject(msg, &v.Resource)
 
-	return s.send(s.topics.Like, &v)
+	return s.send(s.topics.Like.Topic, &common.MsgNormal{
+		Type:      s.topics.Like.Name,
+		User:      msg.Owner.Account(),
+		Desc:      v.Action,
+		CreatedAt: utils.Now(),
+	})
 }
 
 // Fork
