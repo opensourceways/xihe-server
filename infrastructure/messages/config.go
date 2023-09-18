@@ -18,4 +18,5 @@ type Topics struct {
 	Async           string              `json:"async"            required:"true"`
 	BigModel        string              `json:"bigmodel"         required:"true"`
 	SignIn          message.TopicConfig `json:"signin"           required:"true"`
+	DailyLike       message.TopicConfig `json:"daily_like"       required:"true"`
 }

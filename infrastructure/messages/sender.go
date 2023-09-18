@@ -1,6 +1,7 @@
 package messages
 
 import (
+	"fmt"
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
@@ -185,6 +186,18 @@ func (s *sender) SignIn(u domain.Account) error {
 	return s.send(s.topics.SignIn.Topic, &common.MsgNormal{
 		Type:      s.topics.SignIn.Name,
 		User:      u.Account(),
+		CreatedAt: utils.Now(),
+	})
+}
+
+// Daily Like
+func (s *sender) DailyLike(u domain.Account, n domain.ResourceType) error {
+	desc := fmt.Sprintf("Like Rousource %s", n)
+
+	return s.send(s.topics.DailyLike.Topic, &common.MsgNormal{
+		Type:      s.topics.DailyLike.Name,
+		User:      u.Account(),
+		Desc:      desc,
 		CreatedAt: utils.Now(),
 	})
 }
