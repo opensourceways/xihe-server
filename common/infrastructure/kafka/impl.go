@@ -16,12 +16,6 @@ type Config struct {
 	kfklib.Config
 }
 
-func (cfg *Config) ConfigItems() []interface{} {
-	return []interface{}{
-		&cfg.Config,
-	}
-}
-
 func (cfg *Config) SetDefault() {
 	if cfg.Version == "" {
 		cfg.Version = deaultVersion
