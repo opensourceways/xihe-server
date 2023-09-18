@@ -59,6 +59,8 @@ type Sender interface {
 	CalcScore(*SubmissionInfo) error
 
 	SignIn(domain.Account) error
+
+	DailyLike(domain.Account, domain.ResourceType) error
 }
 
 type EventHandler interface {

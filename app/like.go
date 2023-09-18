@@ -88,9 +88,9 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 		Type: cmd.ResourceType,
 		ResourceIndex: domain.ResourceIndex{
 			Owner: cmd.ResourceOwner,
-			Id: cmd.ResourceId,
+			Id:    cmd.ResourceId,
 		},
-	}); 
+	})
 	if err != nil {
 		return err
 	}
@@ -131,7 +131,7 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 	}
 
 	// increase like in resource
-	_ = s.sender.AddLike(&v.Like.ResourceObject)
+	_ = s.sender.DailyLike(owner, cmd.ResourceType)
 
 	return nil
 }
@@ -153,9 +153,9 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 		Type: cmd.ResourceType,
 		ResourceIndex: domain.ResourceIndex{
 			Owner: cmd.ResourceOwner,
-			Id: cmd.ResourceId,
+			Id:    cmd.ResourceId,
 		},
-	}); 
+	})
 	if err != nil {
 		return err
 	}
