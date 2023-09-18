@@ -12,15 +12,14 @@ const (
 	deaultVersion = "2.1.0"
 )
 
-type configInterface interface {
-	Validate() error
-	SetDefault()
-}
-
-var _ configInterface = (*Config)(nil)
-
 type Config struct {
 	kfklib.Config
+}
+
+func (cfg *Config) ConfigItems() []interface{} {
+	return []interface{}{
+		&cfg.Config,
+	}
 }
 
 func (cfg *Config) SetDefault() {
