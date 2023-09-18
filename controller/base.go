@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
+	common "github.com/opensourceways/xihe-server/common/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/utils"
@@ -21,6 +22,7 @@ import (
 const (
 	PrivateToken       = "PRIVATE-TOKEN"
 	csrfToken          = "CSRF-Token"
+	headerLanguage     = "language"
 	Token              = "token"
 	encodeUsername     = "encode-username"
 	headerSecWebsocket = "Sec-Websocket-Protocol"
@@ -355,6 +357,15 @@ func getCookieValue(ctx *gin.Context, key string) (string, error) {
 
 func (ctl *baseController) getTokenForWebsocket(ctx *gin.Context) (csrftoken string) {
 	return ctx.GetHeader(headerSecWebsocket)
+}
+
+func (ctl *baseController) languageRuquested(ctx *gin.Context) (common.Language, error) {
+	v := common.NewLanguage(ctx.GetHeader(headerLanguage))
+	if v == nil {
+		return nil, errors.New("unknown language")
+	}
+
+	return v, nil
 }
 
 func (ctl *baseController) getToken(ctx *gin.Context) (token, csrftoken string, err error) {

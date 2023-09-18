@@ -3,12 +3,13 @@ package domain
 import (
 	"strconv"
 
-	common "github.com/opensourceways/xihe-server/domain"
+	common "github.com/opensourceways/xihe-server/common/domain"
+	types "github.com/opensourceways/xihe-server/domain"
 )
 
 // UserPoints
 type UserPoints struct {
-	User    common.Account
+	User    types.Account
 	Total   int
 	Items   []PointsItem // items of day or all the items
 	Dones   []string     // tasks that user has done
@@ -169,11 +170,15 @@ type PointsDetail struct {
 
 // Task
 type Task struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-	Kind string `json:"kind"` // Novice, EveryDay, Activity, PassiveItem
-	Addr string `json:"addr"` // The website address of task
-	Rule Rule   `json:"rule"`
+	Id    string            `json:"id"`
+	Names map[string]string `json:"names"`
+	Kind  string            `json:"kind"` // Novice, EveryDay, Activity, PassiveItem
+	Addr  string            `json:"addr"` // The website address of task
+	Rule  Rule              `json:"rule"`
+}
+
+func (t *Task) Name(lang common.Language) string {
+	return t.Names[lang.Language()]
 }
 
 func (t *Task) IsPassiveTask() bool {
@@ -182,11 +187,11 @@ func (t *Task) IsPassiveTask() bool {
 
 // Rule
 type Rule struct {
-	Desc           string `json:"desc"`
-	CreatedAt      string `json:"created_at"`
-	OnceOnly       bool   `json:"once_only"` // only can do once
-	PointsPerOnce  int    `json:"points_per_once"`
-	MaxPointsOfDay int    `json:"max_points_of_day"`
+	Descs          map[string]string `json:"descs"`
+	CreatedAt      string            `json:"created_at"`
+	OnceOnly       bool              `json:"once_only"` // only can do once
+	PointsPerOnce  int               `json:"points_per_once"`
+	MaxPointsOfDay int               `json:"max_points_of_day"`
 }
 
 // points is the one that user has got on this task today

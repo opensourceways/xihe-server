@@ -18,7 +18,7 @@ type taskAdapter struct {
 }
 
 func (impl *taskAdapter) docFilter(tid string) bson.M {
-	return bson.M{fieldName: tid}
+	return bson.M{fieldId: tid}
 }
 
 func (impl *taskAdapter) Add(t *domain.Task) error {

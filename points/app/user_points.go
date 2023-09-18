@@ -1,7 +1,8 @@
 package app
 
 import (
-	common "github.com/opensourceways/xihe-server/domain"
+	common "github.com/opensourceways/xihe-server/common/domain"
+	types "github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/points/domain/repository"
@@ -11,9 +12,9 @@ import (
 const minValueOfInvlidTime = 24 * 3600 // second
 
 type UserPointsAppService interface {
-	Points(account common.Account) (int, error)
-	PointsDetails(account common.Account) (dto UserPointsDetailsDTO, err error)
-	TasksOfDay(account common.Account) ([]TasksCompletionInfoDTO, error)
+	Points(account types.Account) (int, error)
+	PointsDetails(account types.Account, lang common.Language) (dto UserPointsDetailsDTO, err error)
+	TasksOfDay(account types.Account, lang common.Language) ([]TasksCompletionInfoDTO, error)
 }
 
 func NewUserPointsAppService(
@@ -31,7 +32,7 @@ type userPointsAppService struct {
 	repo repository.UserPoints
 }
 
-func (s *userPointsAppService) Points(account common.Account) (int, error) {
+func (s *userPointsAppService) Points(account types.Account) (int, error) {
 	up, err := s.repo.Find(account, utils.Date())
 	if err != nil {
 		if repoerr.IsErrorResourceNotExists(err) {
@@ -44,7 +45,19 @@ func (s *userPointsAppService) Points(account common.Account) (int, error) {
 	return up.Total, nil
 }
 
-func (s *userPointsAppService) PointsDetails(account common.Account) (dto UserPointsDetailsDTO, err error) {
+func (s *userPointsAppService) PointsDetails(account types.Account, lang common.Language) (dto UserPointsDetailsDTO, err error) {
+	tasks, err := s.tr.FindAllTasks()
+	if err != nil {
+		return
+	}
+
+	m := map[string]string{}
+	for i := range tasks {
+		item := &tasks[i]
+
+		m[item.Id] = item.Name(lang)
+	}
+
 	v, err := s.repo.FindAll(account)
 	if err != nil {
 		if repoerr.IsErrorResourceNotExists(err) {
@@ -59,7 +72,7 @@ func (s *userPointsAppService) PointsDetails(account common.Account) (dto UserPo
 	details := make([]PointsDetailDTO, 0, v.DetailsNum())
 
 	for i := range v.Items {
-		t := v.Items[i].TaskId // TODO id to name
+		t := m[v.Items[i].TaskId]
 
 		ds := v.Items[i].Details
 		for j := range ds {
@@ -75,7 +88,7 @@ func (s *userPointsAppService) PointsDetails(account common.Account) (dto UserPo
 	return
 }
 
-func (s *userPointsAppService) TasksOfDay(account common.Account) ([]TasksCompletionInfoDTO, error) {
+func (s *userPointsAppService) TasksOfDay(account types.Account, lang common.Language) ([]TasksCompletionInfoDTO, error) {
 	tasks, err := s.tr.FindAllTasks()
 	if err != nil {
 		return nil, err
@@ -114,7 +127,7 @@ func (s *userPointsAppService) TasksOfDay(account common.Account) ([]TasksComple
 			r = append(r, TasksCompletionInfoDTO{Kind: t.Kind})
 		}
 
-		r[j].add(t, isCompleted(t))
+		r[j].add(t, isCompleted(t), lang)
 	}
 
 	return r, nil

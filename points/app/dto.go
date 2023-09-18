@@ -3,13 +3,14 @@ package app
 import (
 	"time"
 
-	common "github.com/opensourceways/xihe-server/domain"
+	common "github.com/opensourceways/xihe-server/common/domain"
+	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
 type CmdToAddPointsItem struct {
-	Account common.Account
+	Account types.Account
 	TaskId  string
 	Desc    string
 	Time    int64
@@ -42,9 +43,9 @@ type TasksCompletionInfoDTO struct {
 	Tasks []TaskCompletionInfoDTO `json:"tasks"`
 }
 
-func (dto *TasksCompletionInfoDTO) add(t *domain.Task, completed bool) {
+func (dto *TasksCompletionInfoDTO) add(t *domain.Task, completed bool, lang common.Language) {
 	dto.Tasks = append(dto.Tasks, TaskCompletionInfoDTO{
-		Name:      t.Name,
+		Name:      t.Name(lang),
 		Addr:      t.Addr,
 		Points:    t.Rule.PointsPerOnce,
 		Completed: completed,
