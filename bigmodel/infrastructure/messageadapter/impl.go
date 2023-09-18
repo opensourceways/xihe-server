@@ -113,6 +113,20 @@ func (impl *messageAdapter) SendWuKongPicturePublicized(v *domain.WuKongPictureP
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
+// Picture Liked
+func (impl *messageAdapter) SendWuKongPictureLiked(v *domain.WuKongPictureLikedEvent) error {
+	cfg := &impl.cfg.PictureLike
+
+	msg := common.MsgNormal{
+		Type:      cfg.Name,
+		User:      v.Account.Account(),
+		CreatedAt: utils.Now(),
+		Desc:      "AI Picture Liked",
+	}
+
+	return impl.publisher.Publish(cfg.Topic, &msg, nil)
+}
+
 // Config
 type Config struct {
 	// wukong
@@ -121,6 +135,7 @@ type Config struct {
 	InferenceAsyncStart  common.TopicConfig `json:"inference_async_start"`
 	InferenceAsyncFinish common.TopicConfig `json:"inference_async_finish"`
 	PicturePublic        common.TopicConfig `json:"picture_public"`
+	PictureLike          common.TopicConfig `json:"picture_like"`
 
 	// common
 	BigModelAccessLog common.TopicConfig `json:"bigmodel_access_log"`

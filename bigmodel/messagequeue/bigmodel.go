@@ -191,4 +191,5 @@ type TopicConfig struct {
 	InferenceAsyncStart  string `json:"inference_async_start"`
 	InferenceAsyncFinish string `json:"inference_async_finish"`
 	PicturePublicized    string `json:"picture_publicized"`
+	PictureLiked         string `json:"Picture_Liked"`
 }
