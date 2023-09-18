@@ -102,7 +102,7 @@ func (impl *messageAdapter) SendBigModelAccessLog(v *domain.BigModelAccessLogEve
 }
 
 func (impl *messageAdapter) SendWuKongPicturePublicized(v *domain.WuKongPicturePublicizedEvent) error {
-	cfg := &impl.cfg.PicturePublic
+	cfg := &impl.cfg.PicturePublicized
 
 	msg := common.MsgNormal{
 		Type:      cfg.Name,
@@ -134,7 +134,7 @@ type Config struct {
 	InferenceError       common.TopicConfig `json:"inference_error"`
 	InferenceAsyncStart  common.TopicConfig `json:"inference_async_start"`
 	InferenceAsyncFinish common.TopicConfig `json:"inference_async_finish"`
-	PicturePublic        common.TopicConfig `json:"picture_public"`
+	PicturePublicized    common.TopicConfig `json:"picture_publicized"`
 	PictureLike          common.TopicConfig `json:"picture_like"`
 
 	// common
