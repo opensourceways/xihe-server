@@ -315,7 +315,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 
 	op, _ := domain.NewOBSPath(p)
 
-	pid, err = s.wukongPicture.SaveLike(
+	if pid, err = s.wukongPicture.SaveLike(
 		cmd.User,
 		&domain.WuKongPicture{
 			Owner:             cmd.User,
@@ -324,7 +324,10 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 			WuKongPictureMeta: meta,
 		},
 		version,
-	)
+	); err != nil {
+		code = ErrorCodeSytem
+		return
+	}
 
 	// sender
 	_ = s.sender.SendWuKongPictureLiked(&domain.WuKongPictureLikedEvent{
@@ -380,7 +383,10 @@ func (s bigModelService) AddLikeFromPublicPicture(
 		CreatedAt:         utils.Date(),
 		WuKongPictureMeta: p.WuKongPictureMeta,
 	}
-	pid, err = s.wukongPicture.SaveLike(cmd.User, wp, version)
+	if pid, err = s.wukongPicture.SaveLike(cmd.User, wp, version); err != nil {
+		code = ErrorCodeSytem
+		return
+	}
 
 	// sender
 	_ = s.sender.SendWuKongPictureLiked(&domain.WuKongPictureLikedEvent{

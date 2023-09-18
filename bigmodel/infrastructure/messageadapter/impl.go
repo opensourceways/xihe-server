@@ -120,8 +120,8 @@ func (impl *messageAdapter) SendWuKongPictureLiked(v *domain.WuKongPictureLikedE
 	msg := common.MsgNormal{
 		Type:      cfg.Name,
 		User:      v.Account.Account(),
-		CreatedAt: utils.Now(),
 		Desc:      "AI Picture Liked",
+		CreatedAt: utils.Now(),
 	}
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
