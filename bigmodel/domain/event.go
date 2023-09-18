@@ -36,3 +36,7 @@ type BigModelAccessLogEvent struct {
 type WuKongPicturePublicizedEvent struct {
 	Account types.Account
 }
+
+type WuKongPictureLikedEvent struct {
+	Account types.Account
+}
