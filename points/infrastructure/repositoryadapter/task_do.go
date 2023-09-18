@@ -67,9 +67,9 @@ type ruleDO struct {
 
 func (do *ruleDO) toRule() domain.Rule {
 	return domain.Rule{
-		OnceOnly:       do.OnceOnly,
 		Descs:          do.Descs,
 		CreatedAt:      do.CreatedAt,
+		OnceOnly:       do.OnceOnly,
 		PointsPerOnce:  do.PointsPerOnce,
 		MaxPointsOfDay: do.MaxPointsOfDay,
 	}
