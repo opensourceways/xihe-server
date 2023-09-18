@@ -22,7 +22,7 @@ import (
 const (
 	PrivateToken       = "PRIVATE-TOKEN"
 	csrfToken          = "CSRF-Token"
-	headerLanguage     = "language"
+	headerLanguage     = "Language"
 	Token              = "token"
 	encodeUsername     = "encode-username"
 	headerSecWebsocket = "Sec-Websocket-Protocol"
