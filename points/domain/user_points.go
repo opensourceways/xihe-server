@@ -3,12 +3,13 @@ package domain
 import (
 	"strconv"
 
-	common "github.com/opensourceways/xihe-server/domain"
+	common "github.com/opensourceways/xihe-server/common/domain"
+	types "github.com/opensourceways/xihe-server/domain"
 )
 
 // UserPoints
 type UserPoints struct {
-	User    common.Account
+	User    types.Account
 	Total   int
 	Items   []PointsItem // items of day or all the items
 	Dones   []string     // tasks that user has done
@@ -29,7 +30,7 @@ func (entity *UserPoints) IsFirstPointsDetailOfDay() bool {
 }
 
 func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsDetail) *PointsItem {
-	item := entity.poitsItem(task.Name)
+	item := entity.poitsItem(task.Id)
 
 	v := entity.calc(task, item)
 	if v == 0 {
@@ -41,8 +42,8 @@ func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsD
 	detail.Id = date + "_" + strconv.Itoa(entity.DetailsNum()+1)
 	detail.Points = v
 
-	if !entity.hasDone(task.Name) {
-		entity.Dones = append(entity.Dones, task.Name)
+	if !entity.hasDone(task.Id) {
+		entity.Dones = append(entity.Dones, task.Id)
 	}
 
 	if item != nil {
@@ -52,7 +53,7 @@ func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsD
 	}
 
 	entity.Items = append(entity.Items, PointsItem{
-		Task:    task.Name,
+		TaskId:  task.Id,
 		Date:    date,
 		Details: []PointsDetail{*detail},
 	})
@@ -61,9 +62,9 @@ func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsD
 }
 
 func (entity *UserPoints) IsCompleted(task *Task) bool {
-	item := entity.poitsItem(task.Name)
+	item := entity.poitsItem(task.Id)
 
-	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Name))
+	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Id))
 
 	return v == 0
 }
@@ -75,7 +76,7 @@ func (entity *UserPoints) calc(task *Task, item *PointsItem) int {
 		return 0
 	}
 
-	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Name))
+	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Id))
 	if v == 0 {
 		return 0
 	}
@@ -110,7 +111,7 @@ func (entity *UserPoints) poitsItem(t string) *PointsItem {
 	items := entity.Items
 
 	for i := range items {
-		if items[i].Task == t {
+		if items[i].TaskId == t {
 			return &items[i]
 		}
 	}
@@ -120,8 +121,8 @@ func (entity *UserPoints) poitsItem(t string) *PointsItem {
 
 // PointsItem
 type PointsItem struct {
-	Task    string
 	Date    string
+	TaskId  string
 	Details []PointsDetail
 }
 
@@ -160,7 +161,7 @@ func (item *PointsItem) LatestDetail() *PointsDetail {
 
 // PointsDetail
 type PointsDetail struct {
-	Id      string `json:"id"`
+	Id      string `json:"id"` // serial number
 	Desc    string `json:"desc"`
 	TimeStr string `json:"time_str"`
 	Time    int64  `json:"time"`
@@ -169,10 +170,15 @@ type PointsDetail struct {
 
 // Task
 type Task struct {
-	Name string `json:"name"`
-	Kind string `json:"kind"` // Novice, EveryDay, Activity, PassiveItem
-	Addr string `json:"addr"` // The website address of task
-	Rule Rule   `json:"rule"`
+	Id    string            `json:"id"`
+	Names map[string]string `json:"names"`
+	Kind  string            `json:"kind"` // Novice, EveryDay, Activity, PassiveItem
+	Addr  string            `json:"addr"` // The website address of task
+	Rule  Rule              `json:"rule"`
+}
+
+func (t *Task) Name(lang common.Language) string {
+	return t.Names[lang.Language()]
 }
 
 func (t *Task) IsPassiveTask() bool {
@@ -181,11 +187,11 @@ func (t *Task) IsPassiveTask() bool {
 
 // Rule
 type Rule struct {
-	OnceOnly       bool   `json:"once_only"` // only can do once
-	Desc           string `json:"desc"`
-	CreatedAt      string `json:"created_at"`
-	PointsPerOnce  int    `json:"points_per_once"`
-	MaxPointsOfDay int    `json:"max_points_of_day"`
+	Descs          map[string]string `json:"descs"`
+	CreatedAt      string            `json:"created_at"`
+	OnceOnly       bool              `json:"once_only"` // only can do once
+	PointsPerOnce  int               `json:"points_per_once"`
+	MaxPointsOfDay int               `json:"max_points_of_day"`
 }
 
 // points is the one that user has got on this task today
