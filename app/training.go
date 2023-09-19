@@ -35,14 +35,12 @@ type TrainingService interface {
 }
 
 func NewTrainingService(
-	log *logrus.Entry,
 	train training.Training,
 	repo repository.Training,
 	sender message.MessageProducer,
 	maxTrainingRecordNum int,
 ) TrainingService {
 	return trainingService{
-		log:    log,
 		train:  train,
 		repo:   repo,
 		sender: sender,

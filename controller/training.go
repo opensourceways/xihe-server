@@ -27,7 +27,7 @@ func AddRouterForTrainingController(
 ) {
 	ctl := TrainingController{
 		ts: app.NewTrainingService(
-			log, ts, repo, sender, apiConfig.MaxTrainingRecordNum,
+			ts, repo, sender, apiConfig.MaxTrainingRecordNum,
 		),
 		model:   model,
 		project: project,

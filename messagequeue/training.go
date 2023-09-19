@@ -20,25 +20,24 @@ const (
 )
 
 func Subscribe(
-	log *logrus.Entry,
 	cfg TrainingConfig,
+	tcTopic string,
 	s app.TrainingService,
 	subscriber message.Subscriber,
 ) (err error) {
-	c := &consumer{log: log, cfg: cfg, s: s}
+	c := &consumer{cfg: cfg, s: s}
 
 	// training created
 	err = subscriber.SubscribeWithStrategyOfRetry(
 		handleNameTrainingCreated,
 		c.handleEventTrainingCreated,
-		[]string{cfg.TrainingCreated}, retryNum,
+		[]string{tcTopic}, retryNum,
 	)
 
 	return
 }
 
 type consumer struct {
-	log *logrus.Entry
 	cfg TrainingConfig
 	s   app.TrainingService
 }
@@ -63,10 +62,10 @@ func (c *consumer) handleEventTrainingCreated(body []byte, h map[string]string) 
 	v.Project.Id = b.Details["project_id"]
 	v.TrainingId = b.Details["training_id"]
 
-	return c.handleEventCreateJob(&v)
+	return c.createJob(&v)
 }
 
-func (c *consumer) handleEventCreateJob(info *domain.TrainingIndex) error {
+func (c *consumer) createJob(info *domain.TrainingIndex) error {
 	// wait for the sync of model and dataset
 	time.Sleep(10 * time.Second)
 
@@ -75,7 +74,7 @@ func (c *consumer) handleEventCreateJob(info *domain.TrainingIndex) error {
 			info, c.cfg.TrainingEndpoint, true,
 		)
 		if err != nil {
-			c.log.Errorf(
+			logrus.Errorf(
 				"handle training(%s/%s/%s) failed, err:%s",
 				info.Project.Owner.Account(), info.Project.Id,
 				info.TrainingId, err.Error(),
@@ -93,11 +92,8 @@ func (c *consumer) handleEventCreateJob(info *domain.TrainingIndex) error {
 }
 
 type TrainingConfig struct {
-	MaxRetry         int    `json:"max_retry"         required:"true"`
+	MaxRetry         int    `json:"max_retry"`
 	TrainingEndpoint string `json:"training_endpoint" required:"true"`
-
-	// topic
-	TrainingCreated string `json:"training_created" required:"true"`
 }
 
 func (cfg *TrainingConfig) SetDefault() {

@@ -94,9 +94,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		mongodb.NewDatasetMapper(collections.Dataset),
 	)
 
-	// user := repositories.NewUserRepository(
-	// 	mongodb.NewUserMapper(collections.User),
-	// )
 	user := userrepoimpl.NewUserRepo(
 		mongodb.NewCollection(collections.User),
 	)
@@ -269,9 +266,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForTrainingController(
-			v1, trainingAdapter, training, model, proj, dataset, messages.NewTrainingMessageAdapter(
-				&cfg.Training.Message, publisher,
-			),
+			v1, trainingAdapter, training, model, proj, dataset,
+			messages.NewTrainingMessageAdapter(
+				&cfg.Training.Message, publisher),
 		)
 
 		controller.AddRouterForFinetuneController(

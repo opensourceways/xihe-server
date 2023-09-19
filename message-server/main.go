@@ -173,13 +173,8 @@ func trainingSubscribesMessage(log *logrus.Entry, cfg *configuration) error {
 	collections := &cfg.Mongodb.Collections
 
 	return messagequeue.Subscribe(
-		log, messagequeue.TrainingConfig{
-			MaxRetry:         cfg.MaxRetry,
-			TrainingEndpoint: cfg.TrainingEndpoint,
-			TrainingCreated:  cfg.MQTopics.TrainingCreated,
-		},
+		cfg.Training, cfg.MQTopics.TrainingCreated,
 		app.NewTrainingService(
-			log,
 			trainingimpl.NewTraining(&trainingimpl.Config{}),
 			repositories.NewTrainingRepository(
 				mongodb.NewTrainingMapper(collections.Training),
@@ -197,8 +192,8 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 
 	h := &handler{
 		log:              log,
-		maxRetry:         cfg.MaxRetry,
-		trainingEndpoint: cfg.TrainingEndpoint,
+		maxRetry:         cfg.Training.MaxRetry,
+		trainingEndpoint: cfg.Training.TrainingEndpoint,
 
 		user: userapp.NewUserService(userRepo, nil, nil, nil, nil),
 
