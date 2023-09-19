@@ -47,8 +47,7 @@ type configuration struct {
 	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
 	Points     points.Config               `json:"points"`
 	Training   messagequeue.TrainingConfig `json:"training"`
-  User       user.Config                 `json:"user"         required:"true"`
-
+	User       user.Config                 `json:"user"         required:"true"`
 }
 
 type PostgresqlConfig struct {
@@ -155,15 +154,14 @@ type mqTopics struct {
 
 	//course
 
-	CourseApplied string                   `json:"course_applied"        required:"true"`
-  
-  // training
-	TrainingCreated string                 `json:"training_created"`
+	CourseApplied string `json:"course_applied"        required:"true"`
+
+	// training
+	TrainingCreated string `json:"training_created"`
 
 	//user
 	UserSignedUp        string             `json:"user-signed-up"        required:"true"`
 	BioSet              string             `json:"bio_set"               required:"true"`
 	AvatarSet           string             `json:"avatar_set"            required:"true"`
 	UserFollowingTopics usermq.TopicConfig `json:"user-following-topics" required:"true"`
-
 }

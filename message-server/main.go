@@ -126,14 +126,14 @@ func main() {
 
 		return
 	}
-  
-  	// training
+
+	// training
 	if err = trainingSubscribesMessage(log, cfg); err != nil {
 		logrus.Errorf("training subscribes message failed, err:%s", err.Error())
 
-    return
+		return
 	}
-  
+
 	// user
 	if err = UserSubscribesMessage(cfg, &cfg.MQTopics); err != nil {
 		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
@@ -164,8 +164,8 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.JupyterCreated,
 			topics.PicturePublicized,
 			topics.PictureLiked,
-			topics.CourseApplied，
-      topics.TrainingCreated,
+			topics.CourseApplied,
+			topics.TrainingCreated,
 			topics.UserSignedUp,
 			topics.BioSet,
 			topics.AvatarSet,
