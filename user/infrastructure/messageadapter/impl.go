@@ -18,8 +18,8 @@ type messageAdapter struct {
 }
 
 // Register
-func (impl *messageAdapter) SendUserRegisterEvent(v *domain.UserSignedUpEvent) error {
-	cfg := &impl.cfg.UserRegister
+func (impl *messageAdapter) SendUserSignedUpEvent(v *domain.UserSignedUpEvent) error {
+	cfg := &impl.cfg.UserSignedUp
 
 	msg := common.MsgNormal{
 		Type:      cfg.Name,
@@ -32,8 +32,8 @@ func (impl *messageAdapter) SendUserRegisterEvent(v *domain.UserSignedUpEvent) e
 }
 
 // Set AvatarId
-func (impl *messageAdapter) SendSetAvatarIdEvent(v *domain.UserAvatarSetEvent) error {
-	cfg := &impl.cfg.SetAvatarId
+func (impl *messageAdapter) SendUserAvatarSetEvent(v *domain.UserAvatarSetEvent) error {
+	cfg := &impl.cfg.AvatarSet
 
 	msg := common.MsgNormal{
 		Type:      cfg.Name,
@@ -46,8 +46,8 @@ func (impl *messageAdapter) SendSetAvatarIdEvent(v *domain.UserAvatarSetEvent) e
 }
 
 // Set Bio
-func (impl *messageAdapter) SendSetBioEvent(v *domain.UserBioSetEvent) error {
-	cfg := &impl.cfg.SetBio
+func (impl *messageAdapter) SendUserBioSetEvent(v *domain.UserBioSetEvent) error {
+	cfg := &impl.cfg.BioSet
 
 	msg := common.MsgNormal{
 		Type:      cfg.Name,
@@ -61,8 +61,7 @@ func (impl *messageAdapter) SendSetBioEvent(v *domain.UserBioSetEvent) error {
 
 // Config
 type Config struct {
-	UserRegister common.TopicConfig `json:"user_register"`
-	BindEmail    common.TopicConfig `json:"bind_email"`
-	SetAvatarId  common.TopicConfig `json:"set-avatar-id"`
-	SetBio       common.TopicConfig `json:"set_bio"`
+	UserSignedUp common.TopicConfig `json:"user-signed-up"`
+	BioSet       common.TopicConfig `json:"bio_set"`
+	AvatarSet    common.TopicConfig `json:"avatar_set"`
 }

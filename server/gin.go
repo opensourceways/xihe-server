@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	"net/http"
 	"time"
 
@@ -48,6 +47,7 @@ import (
 	pointsapp "github.com/opensourceways/xihe-server/points/app"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 

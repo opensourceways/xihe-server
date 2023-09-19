@@ -80,7 +80,7 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 
 	_ = s.sender.AddOperateLogForNewUser(u.Account)
 
-	s.producer.SendUserRegisterEvent(&domain.UserSignedUpEvent{
+	s.producer.SendUserSignedUpEvent(&domain.UserSignedUpEvent{
 		Account: cmd.Account,
 	})
 

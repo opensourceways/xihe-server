@@ -8,22 +8,24 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 		return err
 	}
 
-	if b := cmd.toUser(&user); !b {
+	b := cmd.toUser(&user)
+	if !b {
 		return nil
+	}
+
+	_, err = s.repo.Save(&user)
+	if err != nil {
+		return err
 	} else if b && cmd.AvatarId != nil && cmd.AvatarId != user.AvatarId {
-		return s.producer.SendSetAvatarIdEvent(&domain.UserAvatarSetEvent{
+		return s.producer.SendUserAvatarSetEvent(&domain.UserAvatarSetEvent{
 			Account:  account,
 			AvatarId: cmd.AvatarId,
 		})
-
 	} else if b && cmd.Bio != nil && cmd.Bio != user.Bio {
-		return s.producer.SendSetBioEvent(&domain.UserBioSetEvent{
+		return s.producer.SendUserBioSetEvent(&domain.UserBioSetEvent{
 			Account: account,
 			Bio:     cmd.Bio,
 		})
 	}
-
-	_, err = s.repo.Save(&user)
-
 	return err
 }
