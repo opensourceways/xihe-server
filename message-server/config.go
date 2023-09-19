@@ -18,6 +18,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/points"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
 func loadConfig(path string, cfg *configuration) error {
@@ -152,7 +153,8 @@ type mqTopics struct {
 	CourseApplied string `json:"course_applied"     required:"true"`
 
 	//user
-	UserSignedUp string `json:"user-signed-up"     required:"true"`
-	BioSet       string `json:"bio_set"            required:"true"`
-	AvatarSet    string `json:"avatar_set"         required:"true"`
+	UserSignedUp string             `json:"user-signed-up"     required:"true"`
+	BioSet       string             `json:"bio_set"            required:"true"`
+	AvatarSet    string             `json:"avatar_set"         required:"true"`
+	UserTopics   usermq.TopicConfig `json:"user_topics"`
 }

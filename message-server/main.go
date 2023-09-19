@@ -33,6 +33,7 @@ import (
 	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
+	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
 type options struct {
@@ -122,6 +123,13 @@ func main() {
 		return
 	}
 
+	// user
+	if err = UserSubscribesMessage(cfg, &cfg.MQTopics); err != nil {
+		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
 	// run
 	run(newHandler(cfg, log), log, &cfg.MQTopics)
 }
@@ -154,6 +162,18 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 	)
 }
 
+func UserSubscribesMessage(cfg *configuration, topics *mqTopics) error {
+	collections := &cfg.Mongodb.Collections
+
+	return usermq.Subscribe(
+		userapp.NewRegService(
+			userrepo.NewUserRegRepo(
+				mongodb.NewCollection(collections.User)),
+		),
+		&topics.UserTopics,
+	)
+}
+
 func bigmodelSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 	return bigmodelmq.Subscribe(
 		asyncapp.NewAsyncMessageService(
@@ -172,8 +192,6 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 		log:              log,
 		maxRetry:         cfg.MaxRetry,
 		trainingEndpoint: cfg.TrainingEndpoint,
-
-		user: userapp.NewUserService(userRepo, nil, nil, nil, nil, nil),
 
 		project: app.NewProjectMessageService(
 			repositories.NewProjectRepository(
