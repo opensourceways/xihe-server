@@ -71,7 +71,7 @@ func (cfg *configuration) ConfigItems() []interface{} {
 }
 
 func (cfg *configuration) setDefault() {
-	if cfg.MaxRetry == 0 {
+	if cfg.MaxRetry <= 0 {
 		cfg.MaxRetry = 3
 	}
 
