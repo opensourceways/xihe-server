@@ -26,7 +26,7 @@ type userPointsAppMessageService struct {
 }
 
 func (s *userPointsAppMessageService) AddPointsItem(cmd *CmdToAddPointsItem) error {
-	task, err := s.tr.Find(cmd.Task)
+	task, err := s.tr.Find(cmd.TaskId)
 	if err != nil {
 		if repoerr.IsErrorResourceNotExists(err) {
 			return nil

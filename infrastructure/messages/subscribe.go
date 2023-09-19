@@ -58,11 +58,6 @@ func Subscribe(
 		return
 	}
 
-	// training
-	if err = r.registerHandlerForTraining(handler); err != nil {
-		return
-	}
-
 	// finetune
 	if err = r.registerHandlerForFinetune(handler); err != nil {
 		return
@@ -191,38 +186,6 @@ func (r *register) registerHandlerForRelatedResource(handler interface{}) error 
 	return r.subscribe(
 		r.topics.RelatedResource, handlerNameAddRelatedResource, f,
 	)
-}
-
-func (r *register) registerHandlerForTraining(handler interface{}) error {
-	h, ok := handler.(message.TrainingHandler)
-	if !ok {
-		return nil
-	}
-
-	f := func(b []byte, hd map[string]string) (err error) {
-		body := message.MsgTraining{}
-		if err = json.Unmarshal(b, &body); err != nil {
-			return
-		}
-
-		if body.Details["project_id"] == "" || body.Details["training_id"] == "" {
-			err = errors.New("invalid message of training")
-
-			return
-		}
-
-		v := domain.TrainingIndex{}
-		if v.Project.Owner, err = domain.NewAccount(body.Details["project_owner"]); err != nil {
-			return
-		}
-
-		v.Project.Id = body.Details["project_id"]
-		v.TrainingId = body.Details["training_id"]
-
-		return h.HandleEventCreateTraining(&v)
-	}
-
-	return r.subscribe(r.topics.Training, handlerNameCreateTraining, f)
 }
 
 func (r *register) registerHandlerForFinetune(handler interface{}) error {

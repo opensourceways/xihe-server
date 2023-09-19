@@ -30,6 +30,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	"github.com/opensourceways/xihe-server/messagequeue"
 	pointsapp "github.com/opensourceways/xihe-server/points/app"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
@@ -125,7 +126,14 @@ func main() {
 
 		return
 	}
+  
+  	// training
+	if err = trainingSubscribesMessage(log, cfg); err != nil {
+		logrus.Errorf("training subscribes message failed, err:%s", err.Error())
 
+    return
+	}
+  
 	// user
 	if err = UserSubscribesMessage(cfg, &cfg.MQTopics); err != nil {
 		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
@@ -156,7 +164,8 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.JupyterCreated,
 			topics.PicturePublicized,
 			topics.PictureLiked,
-			topics.CourseApplied,
+			topics.CourseApplied，
+      topics.TrainingCreated,
 			topics.UserSignedUp,
 			topics.BioSet,
 			topics.AvatarSet,
@@ -199,15 +208,30 @@ func bigmodelSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 	)
 }
 
+func trainingSubscribesMessage(log *logrus.Entry, cfg *configuration) error {
+	collections := &cfg.Mongodb.Collections
+
+	return messagequeue.Subscribe(
+		cfg.Training, cfg.MQTopics.TrainingCreated,
+		app.NewTrainingService(
+			trainingimpl.NewTraining(&trainingimpl.Config{}),
+			repositories.NewTrainingRepository(
+				mongodb.NewTrainingMapper(collections.Training),
+			),
+			nil, 0,
+		),
+		kafka.SubscriberAdapter(),
+	)
+}
+
 func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	collections := &cfg.Mongodb.Collections
 
 	userRepo := userrepo.NewUserRepo(mongodb.NewCollection(collections.User))
 
 	h := &handler{
-		log:              log,
-		maxRetry:         cfg.MaxRetry,
-		trainingEndpoint: cfg.TrainingEndpoint,
+		log:      log,
+		maxRetry: cfg.MaxRetry,
 
 		project: app.NewProjectMessageService(
 			repositories.NewProjectRepository(
@@ -225,15 +249,6 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 			repositories.NewModelRepository(
 				mongodb.NewModelMapper(collections.Model),
 			),
-		),
-
-		training: app.NewTrainingService(
-			log,
-			trainingimpl.NewTraining(&trainingimpl.Config{}),
-			repositories.NewTrainingRepository(
-				mongodb.NewTrainingMapper(collections.Training),
-			),
-			nil, 0,
 		),
 
 		inference: app.NewInferenceMessageService(
