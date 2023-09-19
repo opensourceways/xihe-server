@@ -8,7 +8,7 @@ import (
 type Config struct {
 	courseimpl.Config
 
-	Message usermsg.Config `json:"message"`
+	Message usermsg.Config `json:"message"   required:"true"`
 }
 
 func (cfg *Config) ConfigItems() []interface{} {
