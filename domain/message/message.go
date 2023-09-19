@@ -63,7 +63,6 @@ type Sender interface {
 
 type EventHandler interface {
 	RelatedResourceHandler
-	FollowingHandler
 	LikeHandler
 	ForkHandler
 	DownloadHandler
@@ -71,11 +70,6 @@ type EventHandler interface {
 	FinetuneHandler
 	InferenceHandler
 	EvaluateHandler
-}
-
-type FollowingHandler interface {
-	HandleEventAddFollowing(*userdomain.FollowerInfo) error
-	HandleEventRemoveFollowing(*userdomain.FollowerInfo) error
 }
 
 type LikeHandler interface {
