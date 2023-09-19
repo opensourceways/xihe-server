@@ -79,14 +79,14 @@ func (do pointsDetailsOfDayDO) toPointsItems() []domain.PointsItem {
 	for i := range do.Details {
 		item := &do.Details[i]
 
-		j, ok := m[item.Task]
+		j, ok := m[item.TaskId]
 		if !ok {
 			j = len(r)
-			m[item.Task] = j
+			m[item.TaskId] = j
 
 			r = append(r, domain.PointsItem{
-				Task: item.Task,
-				Date: do.Date,
+				Date:   do.Date,
+				TaskId: item.TaskId,
 			})
 		}
 
@@ -100,7 +100,7 @@ func toPointsItemsOfDayDO(item *domain.PointsItem) pointsDetailsOfDayDO {
 	return pointsDetailsOfDayDO{
 		Date: item.Date,
 		Details: []pointsDetailDO{
-			topointsDetailDO(item.Task, item.LatestDetail()),
+			topointsDetailDO(item.TaskId, item.LatestDetail()),
 		},
 	}
 
@@ -108,9 +108,9 @@ func toPointsItemsOfDayDO(item *domain.PointsItem) pointsDetailsOfDayDO {
 
 // pointsDetailDO
 type pointsDetailDO struct {
-	Task    string `bson:"task"     json:"task"`
 	Id      string `json:"id"       json:"id"`
 	Desc    string `json:"desc"     json:"desc"`
+	TaskId  string `bson:"task_id"  json:"task_id"`
 	TimeStr string `json:"time_str" json:"time_str"`
 	Time    int64  `bson:"time"     json:"time"`
 	Points  int    `json:"points"   json:"points"`
@@ -130,11 +130,11 @@ func (do *pointsDetailDO) doc() (bson.M, error) {
 	return genDoc(do)
 }
 
-func topointsDetailDO(task string, detail *domain.PointsDetail) pointsDetailDO {
+func topointsDetailDO(taskId string, detail *domain.PointsDetail) pointsDetailDO {
 	return pointsDetailDO{
-		Task:    task,
 		Id:      detail.Id,
 		Desc:    detail.Desc,
+		TaskId:  taskId,
 		TimeStr: detail.TimeStr,
 		Time:    detail.Time,
 		Points:  detail.Points,

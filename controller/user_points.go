@@ -37,7 +37,14 @@ func (ctl *UserPointsController) PointsDetails(ctx *gin.Context) {
 		return
 	}
 
-	if v, err := ctl.s.PointsDetails(pl.DomainAccount()); err != nil {
+	lang, err := ctl.languageRuquested(ctx)
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if v, err := ctl.s.PointsDetails(pl.DomainAccount(), lang); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, v)
@@ -57,7 +64,14 @@ func (ctl *UserPointsController) TasksOfDay(ctx *gin.Context) {
 		return
 	}
 
-	if v, err := ctl.s.TasksOfDay(pl.DomainAccount()); err != nil {
+	lang, err := ctl.languageRuquested(ctx)
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if v, err := ctl.s.TasksOfDay(pl.DomainAccount(), lang); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, v)
