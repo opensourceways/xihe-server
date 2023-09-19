@@ -21,8 +21,10 @@ import (
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
+	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
@@ -32,6 +34,7 @@ import (
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
@@ -165,12 +168,25 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 func UserSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 	collections := &cfg.Mongodb.Collections
 
-	return usermq.Subscribe(
-		userapp.NewRegService(
-			userrepo.NewUserRegRepo(
-				mongodb.NewCollection(collections.User)),
+	pointsAppService := pointsapp.NewUserPointsAppService(
+		pointsrepo.TaskAdapter(
+			mongodb.NewCollection(collections.PointsTask),
 		),
-		&topics.UserTopics,
+		pointsrepo.UserPointsAdapter(
+			mongodb.NewCollection(collections.UserPoints), &cfg.Points.Repo,
+		),
+	)
+
+	return usermq.Subscribe(
+		userapp.NewUserService(userrepo.NewUserRepo(
+			mongodb.NewCollection(collections.User),
+		),
+			gitlab.NewUserSerivce(),
+			usermsg.MessageAdapter(&cfg.User.Message, kafka.PublisherAdapter()),
+			pointsAppService,
+			controller.EncryptHelperToken(),
+		),
+		&topics.UserFollowingTopics,
 	)
 }
 

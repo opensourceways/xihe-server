@@ -2,12 +2,11 @@ package app
 
 import (
 	"encoding/hex"
-	messages "github.com/opensourceways/xihe-server/user/domain/message"
 
-	"github.com/opensourceways/xihe-server/domain/message"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
+	"github.com/opensourceways/xihe-server/user/domain/message"
 	pointsPort "github.com/opensourceways/xihe-server/user/domain/points"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
@@ -41,10 +40,9 @@ type UserService interface {
 func NewUserService(
 	repo repository.User,
 	ps platform.User,
-	sender message.Sender,
+	sender message.MessageProducer,
 	points pointsPort.Points,
 	encryption utils.SymmetricEncryption,
-	producer messages.MessageProducer,
 ) UserService {
 	return userService{
 		ps:         ps,
@@ -52,17 +50,15 @@ func NewUserService(
 		sender:     sender,
 		points:     points,
 		encryption: encryption,
-		producer:   producer,
 	}
 }
 
 type userService struct {
 	ps         platform.User
 	repo       repository.User
-	sender     message.Sender
+	sender     message.MessageProducer
 	points     pointsPort.Points
 	encryption utils.SymmetricEncryption
-	producer   messages.MessageProducer
 }
 
 func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
@@ -78,11 +74,12 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 
 	s.toUserDTO(&u, &dto)
 
-	_ = s.sender.AddOperateLogForNewUser(u.Account)
-
-	s.producer.SendUserSignedUpEvent(&domain.UserSignedUpEvent{
+	err = s.sender.SendUserSignedUpEvent(&domain.UserSignedUpEvent{
 		Account: cmd.Account,
 	})
+	if err != nil {
+		return
+	}
 
 	return
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	kfk "github.com/opensourceways/kafka-lib/agent"
+	"github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/user/domain"
 )
@@ -15,7 +16,7 @@ const (
 	handleNameUserFollowingRemove = "user_following_remove"
 )
 
-func Subscribe(s app.RegService, topics *TopicConfig) (err error) {
+func Subscribe(s app.UserService, topics *TopicConfig) (err error) {
 	c := &consumer{s}
 
 	if err = kfk.SubscribeWithStrategyOfRetry(
@@ -34,51 +35,46 @@ func Subscribe(s app.RegService, topics *TopicConfig) (err error) {
 }
 
 type consumer struct {
-	s app.RegService
+	s app.UserService
 }
 
 func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) error {
-	msg := &domain.UserRegInfo{}
+	msg := message.MsgNormal{}
 
 	if err := json.Unmarshal(body, msg); err != nil {
 		return err
 	}
-
-	cmd, err := toCmd(msg)
+	user, err := domain.NewAccount(msg.User)
 	if err != nil {
 		return nil
 	}
-	return c.s.UpsertUserRegInfo(&cmd)
+
+	v := domain.FollowerInfo{
+		User:     user,
+		Follower: user,
+	}
+	return c.s.AddFollower(&v)
 
 }
 
 func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) error {
-	msg := &domain.UserRegInfo{}
+	msg := message.MsgNormal{}
 
 	if err := json.Unmarshal(body, msg); err != nil {
 		return err
 	}
-	cmd, err := toCmd(msg)
+
+	user, err := domain.NewAccount(msg.User)
 	if err != nil {
 		return nil
 	}
-	return c.s.UpsertUserRegInfo(&cmd)
 
-}
+	v := domain.FollowerInfo{
+		User:     user,
+		Follower: user,
+	}
+	return c.s.RemoveFollower(&v)
 
-func toCmd(msg *domain.UserRegInfo) (cmd app.UserRegisterInfoCmd, err error) {
-
-	cmd.Account = msg.Account
-	cmd.Email = msg.Email
-	cmd.Name = msg.Name
-	cmd.Identity = msg.Identity
-	cmd.City = msg.City
-	cmd.Detail = msg.Detail
-	cmd.Phone = msg.Phone
-	cmd.Province = msg.Province
-	cmd.Version = msg.Version
-
-	return
 }
 
 type TopicConfig struct {

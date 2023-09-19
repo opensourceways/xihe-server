@@ -18,6 +18,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/points"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	"github.com/opensourceways/xihe-server/user"
 	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
@@ -45,6 +46,7 @@ type configuration struct {
 	MQ         kafka.Config         `json:"mq"           required:"true"`
 	MQTopics   mqTopics             `json:"mq_topics"    required:"true"`
 	Points     points.Config        `json:"points"`
+	User       user.Config          `json:"user"`
 }
 
 type PostgresqlConfig struct {
@@ -153,8 +155,8 @@ type mqTopics struct {
 	CourseApplied string `json:"course_applied"     required:"true"`
 
 	//user
-	UserSignedUp string             `json:"user-signed-up"     required:"true"`
-	BioSet       string             `json:"bio_set"            required:"true"`
-	AvatarSet    string             `json:"avatar_set"         required:"true"`
-	UserTopics   usermq.TopicConfig `json:"user_topics"`
+	UserSignedUp        string             `json:"user-signed-up"     required:"true"`
+	BioSet              string             `json:"bio_set"            required:"true"`
+	AvatarSet           string             `json:"avatar_set"         required:"true"`
+	UserFollowingTopics usermq.TopicConfig `json:"user-following-topics"`
 }

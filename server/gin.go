@@ -222,8 +222,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	)
 
 	userAppService := userapp.NewUserService(
-		user, gitlabUser, sender, pointsAppService, controller.EncryptHelperToken(),
-		usermsg.MessageAdapter(&cfg.User.Message, publisher),
+		user, gitlabUser, usermsg.MessageAdapter(&cfg.User.Message, publisher),
+		pointsAppService, controller.EncryptHelperToken(),
 	)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)

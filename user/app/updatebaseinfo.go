@@ -17,12 +17,12 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 	if err != nil {
 		return err
 	} else if b && cmd.AvatarId != nil && cmd.AvatarId != user.AvatarId {
-		return s.producer.SendUserAvatarSetEvent(&domain.UserAvatarSetEvent{
+		return s.sender.SendUserAvatarSetEvent(&domain.UserAvatarSetEvent{
 			Account:  account,
 			AvatarId: cmd.AvatarId,
 		})
 	} else if b && cmd.Bio != nil && cmd.Bio != user.Bio {
-		return s.producer.SendUserBioSetEvent(&domain.UserBioSetEvent{
+		return s.sender.SendUserBioSetEvent(&domain.UserBioSetEvent{
 			Account: account,
 			Bio:     cmd.Bio,
 		})

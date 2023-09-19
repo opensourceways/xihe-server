@@ -13,7 +13,7 @@ func (s userService) AddFollowing(f *domain.FollowerInfo) error {
 	// TODO: activity
 
 	// send event
-	_ = s.sender.AddFollowing(f)
+	_ = s.sender.SendFollowingAddedEvent(f)
 
 	return nil
 }
@@ -25,7 +25,7 @@ func (s userService) RemoveFollowing(f *domain.FollowerInfo) error {
 	}
 
 	// send event
-	_ = s.sender.RemoveFollowing(f)
+	_ = s.sender.SendFollowingRemovedEvent(f)
 
 	return nil
 }

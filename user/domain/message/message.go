@@ -6,4 +6,8 @@ type MessageProducer interface {
 	SendUserSignedUpEvent(*domain.UserSignedUpEvent) error
 	SendUserAvatarSetEvent(event *domain.UserAvatarSetEvent) error
 	SendUserBioSetEvent(event *domain.UserBioSetEvent) error
+
+	//following
+	SendFollowingAddedEvent(*domain.FollowerInfo) error
+	SendFollowingRemovedEvent(*domain.FollowerInfo) error
 }
