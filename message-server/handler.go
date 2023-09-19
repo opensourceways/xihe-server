@@ -37,7 +37,6 @@ type handler struct {
 	log *logrus.Entry
 
 	maxRetry         int
-	trainingEndpoint string
 
 	user      userapp.UserService
 	model     app.ModelMessageService

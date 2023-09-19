@@ -268,7 +268,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		controller.AddRouterForTrainingController(
 			v1, trainingAdapter, training, model, proj, dataset,
 			messages.NewTrainingMessageAdapter(
-				&cfg.Training.Message, publisher),
+				&cfg.Training.Message, publisher,
+			),
 		)
 
 		controller.AddRouterForFinetuneController(

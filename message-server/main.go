@@ -191,9 +191,8 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	userRepo := userrepo.NewUserRepo(mongodb.NewCollection(collections.User))
 
 	h := &handler{
-		log:              log,
-		maxRetry:         cfg.Training.MaxRetry,
-		trainingEndpoint: cfg.Training.TrainingEndpoint,
+		log:      log,
+		maxRetry: cfg.Training.MaxRetry,
 
 		user: userapp.NewUserService(userRepo, nil, nil, nil, nil),
 

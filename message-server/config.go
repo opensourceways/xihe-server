@@ -70,10 +70,6 @@ func (cfg *configuration) ConfigItems() []interface{} {
 }
 
 func (cfg *configuration) setDefault() {
-	if cfg.Training.MaxRetry <= 0 {
-		cfg.Training.MaxRetry = 10
-	}
-
 	common.SetDefault(cfg)
 }
 
