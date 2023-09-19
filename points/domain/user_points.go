@@ -170,15 +170,24 @@ type PointsDetail struct {
 
 // Task
 type Task struct {
-	Id    string            `json:"id"`
-	Names map[string]string `json:"names"`
-	Kind  string            `json:"kind"` // Novice, EveryDay, Activity, PassiveItem
-	Addr  string            `json:"addr"` // The website address of task
-	Rule  Rule              `json:"rule"`
+	Id      string            `json:"id"`
+	Names   map[string]string `json:"names"`
+	Kind    string            `json:"kind"` // Novice, EveryDay, Activity, PassiveItem
+	Addr    string            `json:"addr"` // The website address of task
+	Rule    Rule              `json:"rule"`
+	Version int               `json:"version"`
 }
 
 func (t *Task) Name(lang common.Language) string {
 	return t.Names[lang.Language()]
+}
+
+func (t *Task) RuleDesc(lang common.Language) string {
+	return t.Rule.Descs[lang.Language()]
+}
+
+func (t *Task) MaxPointsDesc(lang common.Language) string {
+	return t.Rule.MaxPointsDescs[lang.Language()]
 }
 
 func (t *Task) IsPassiveTask() bool {
@@ -192,6 +201,7 @@ type Rule struct {
 	OnceOnly       bool              `json:"once_only"` // only can do once
 	PointsPerOnce  int               `json:"points_per_once"`
 	MaxPointsOfDay int               `json:"max_points_of_day"`
+	MaxPointsDescs map[string]string `json:"max_points_descs"`
 }
 
 // points is the one that user has got on this task today
