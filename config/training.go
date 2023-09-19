@@ -8,7 +8,7 @@ import (
 type trainingConfig struct {
 	trainingimpl.Config
 
-	Message messages.TrainingConfig `json:"message"`
+	Message messages.TrainingConfig `json:"message" required:"true"`
 }
 
 func (cfg *trainingConfig) ConfigItems() []interface{} {

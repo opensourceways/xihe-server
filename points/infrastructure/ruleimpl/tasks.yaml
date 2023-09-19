@@ -296,16 +296,16 @@ items:
     points_per_once: 1
     max_points_of_day: 3
 
-- id: "try_wukong"
+- id: "publicize_wukong_picture"
   names:
     Chinese: "公开画作"
-    English: "try wukong"
+    English: "publicize wukong picture"
   kind: "EveryDay"
   addr: "/modelzoo/wukong"
   rule:
     descs:
       Chinese: "公开画作"
-      English: "try wukong"
+      English: "publicize wukong picture"
     created_at: "2023-09-13"
     points_per_once: 2
     max_points_of_day: 2

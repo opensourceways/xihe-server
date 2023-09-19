@@ -50,5 +50,5 @@ func (impl *trainingMessageAdapter) SendTrainingCreated(v *domain.TrainingCreate
 }
 
 type TrainingConfig struct {
-	TrainingCreated commsg.TopicConfig `json:"training_created"`
+	TrainingCreated commsg.TopicConfig `json:"training_created" required:"true"`
 }
