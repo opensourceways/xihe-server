@@ -41,7 +41,7 @@ type consumer struct {
 func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) error {
 	msg := message.MsgNormal{}
 
-	if err := json.Unmarshal(body, msg); err != nil {
+	if err := json.Unmarshal(body, &msg); err != nil {
 		return err
 	}
 	user, err := domain.NewAccount(msg.User)
@@ -60,7 +60,7 @@ func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) err
 func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) error {
 	msg := message.MsgNormal{}
 
-	if err := json.Unmarshal(body, msg); err != nil {
+	if err := json.Unmarshal(body, &msg); err != nil {
 		return err
 	}
 
@@ -78,6 +78,6 @@ func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) 
 }
 
 type TopicConfig struct {
-	FollowingAdd    string `json:"following_add"`
-	FollowingRemove string `json:"following_remove"`
+	FollowingAdd    string `json:"following_add"       required:"true"`
+	FollowingRemove string `json:"following_remove"    required:"true"`
 }

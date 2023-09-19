@@ -57,7 +57,7 @@ type Config struct {
 	API         controller.APIConfig `json:"api"          required:"true"`
 	MQ          kafka.Config         `json:"mq"           required:"true"`
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
-	Points      points.Config        `json:"points"`
+	Points      points.Config        `json:"points"       required:"true"`
 	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
 	Course      course.Config        `json:"course"       required:"true"`
 	User        user.Config          `json:"user"         required:"true"`

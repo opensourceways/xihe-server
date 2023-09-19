@@ -89,10 +89,10 @@ func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) erro
 
 // Config
 type Config struct {
-	UserSignedUp common.TopicConfig `json:"sign_up"`
-	BioSet       common.TopicConfig `json:"set_bio"`
-	AvatarSet    common.TopicConfig `json:"set_avatar"`
+	UserSignedUp common.TopicConfig `json:"sign_up"           required:"true"`
+	BioSet       common.TopicConfig `json:"set_bio"           required:"true"`
+	AvatarSet    common.TopicConfig `json:"set_avatar"        required:"true"`
 
-	FollowingAdded   common.TopicConfig `json:"following_added"`
-	FollowingRemoved common.TopicConfig `json:"following_removed"`
+	FollowingAdded   common.TopicConfig `json:"following_added"   required:"true"`
+	FollowingRemoved common.TopicConfig `json:"following_removed" required:"true"`
 }

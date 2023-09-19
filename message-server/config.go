@@ -45,8 +45,8 @@ type configuration struct {
 	Domain     domain.Config        `json:"domain"       required:"true"`
 	MQ         kafka.Config         `json:"mq"           required:"true"`
 	MQTopics   mqTopics             `json:"mq_topics"    required:"true"`
-	Points     points.Config        `json:"points"`
-	User       user.Config          `json:"user"`
+	Points     points.Config        `json:"points"       required:"true"`
+	User       user.Config          `json:"user"         required:"true"`
 }
 
 type PostgresqlConfig struct {
@@ -148,15 +148,15 @@ type mqTopics struct {
 
 	// bigmodel
 	BigModelTopics    bigmodelmq.TopicConfig `json:"bigmodel_topics"`
-	PicturePublicized string                 `json:"picture_publicized"    required:"true"`
-	PictureLiked      string                 `json:"picture_liked"         required:"true"`
+	PicturePublicized string                 `json:"picture_publicized"  required:"true"`
+	PictureLiked      string                 `json:"picture_liked"       required:"true"`
 
 	//course
-	CourseApplied string `json:"course_applied"     required:"true"`
+	CourseApplied string `json:"course_applied"                          required:"true"`
 
 	//user
-	UserSignedUp        string             `json:"user-signed-up"     required:"true"`
-	BioSet              string             `json:"bio_set"            required:"true"`
-	AvatarSet           string             `json:"avatar_set"         required:"true"`
-	UserFollowingTopics usermq.TopicConfig `json:"user-following-topics"`
+	UserSignedUp        string             `json:"user-signed-up"        required:"true"`
+	BioSet              string             `json:"bio_set"               required:"true"`
+	AvatarSet           string             `json:"avatar_set"            required:"true"`
+	UserFollowingTopics usermq.TopicConfig `json:"user-following-topics" required:"true"`
 }
