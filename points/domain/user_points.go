@@ -3,6 +3,8 @@ package domain
 import (
 	"strconv"
 
+	"github.com/sirupsen/logrus"
+
 	common "github.com/opensourceways/xihe-server/common/domain"
 	types "github.com/opensourceways/xihe-server/domain"
 )
@@ -30,7 +32,7 @@ func (entity *UserPoints) IsFirstPointsDetailOfDay() bool {
 }
 
 func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsDetail) *PointsItem {
-	item := entity.poitsItem(task.Id)
+	item := entity.pointsItem(task.Id)
 
 	v := entity.calc(task, item)
 	if v == 0 {
@@ -62,7 +64,7 @@ func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsD
 }
 
 func (entity *UserPoints) IsCompleted(task *Task) bool {
-	item := entity.poitsItem(task.Id)
+	item := entity.pointsItem(task.Id)
 
 	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Id))
 
@@ -73,6 +75,8 @@ func (entity *UserPoints) calc(task *Task, item *PointsItem) int {
 	pointsOfDay := entity.pointsOfDay()
 
 	if pointsOfDay >= config.MaxPointsOfDay {
+		logrus.Warnf("Points of day reached the limit: %d, points: %d", config.MaxPointsOfDay, pointsOfDay)
+
 		return 0
 	}
 
@@ -107,7 +111,7 @@ func (entity *UserPoints) pointsOfDay() int {
 	return n
 }
 
-func (entity *UserPoints) poitsItem(t string) *PointsItem {
+func (entity *UserPoints) pointsItem(t string) *PointsItem {
 	items := entity.Items
 
 	for i := range items {
@@ -216,6 +220,8 @@ type Rule struct {
 func (r *Rule) calcPoints(points int, hasDone bool) int {
 	if r.OnceOnly {
 		if hasDone {
+			logrus.Warn("Rule has been done today, will not calc again.")
+
 			return 0
 		}
 
@@ -223,6 +229,8 @@ func (r *Rule) calcPoints(points int, hasDone bool) int {
 	}
 
 	if r.MaxPointsOfDay > 0 && points >= r.MaxPointsOfDay {
+		logrus.Warnf("Points of today: %d, exceed the limit: %d", points, r.MaxPointsOfDay)
+
 		return 0
 	}
 

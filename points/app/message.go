@@ -1,6 +1,8 @@
 package app
 
 import (
+	"github.com/sirupsen/logrus"
+
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/points/domain/repository"
@@ -28,6 +30,8 @@ type userPointsAppMessageService struct {
 func (s *userPointsAppMessageService) AddPointsItem(cmd *CmdToAddPointsItem) error {
 	task, err := s.tr.Find(cmd.TaskId)
 	if err != nil {
+		logrus.Errorf("No task found for task id: %s", cmd.TaskId)
+
 		if repoerr.IsErrorResourceNotExists(err) {
 			return nil
 		}
@@ -37,6 +41,8 @@ func (s *userPointsAppMessageService) AddPointsItem(cmd *CmdToAddPointsItem) err
 
 	date, time := cmd.dateAndTime()
 	if date == "" {
+		logrus.Errorf("Failed to get date and time for task: %s, time: %d.", cmd.TaskId, cmd.Time)
+
 		return nil
 	}
 

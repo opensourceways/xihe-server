@@ -3,6 +3,8 @@ package messagequeue
 import (
 	"encoding/json"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/opensourceways/xihe-server/common/domain/message"
 	commondomain "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/points/app"
@@ -32,7 +34,8 @@ func (c *consumer) handle(body []byte, h map[string]string) error {
 
 	cmd, err := toCmd(msg)
 	if err != nil {
-		// no need retry
+		logrus.Errorf("Invalid message: %s", err.Error())
+
 		return nil
 	}
 
