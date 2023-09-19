@@ -139,7 +139,7 @@ func (r *register) registerHandlerForLike(handler interface{}) error {
 		return nil
 	}
 
-	return r.subscribe(r.topics.Like.Topic, handlerNameAddLike, func(b []byte, hd map[string]string) (err error) {
+	return r.subscribe(r.topics.Like, handlerNameAddLike, func(b []byte, hd map[string]string) (err error) {
 		body := msgLike{}
 		if err = json.Unmarshal(b, &body); err != nil {
 			return

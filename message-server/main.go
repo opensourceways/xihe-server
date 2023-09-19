@@ -146,7 +146,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.PicturePublicized,
 			topics.PictureLiked,
 			topics.CourseApplied,
-			topics.Like.Topic,
+			topics.AddLike.Topic,
 		},
 		kafka.SubscriberAdapter(),
 	)

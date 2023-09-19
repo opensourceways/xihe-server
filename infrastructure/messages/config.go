@@ -3,7 +3,8 @@ package messages
 import "github.com/opensourceways/xihe-server/common/domain/message"
 
 type Topics struct {
-	Like            message.TopicConfig `json:"like"             required:"true"`
+	Like            string              `json:"like"             required:"true"`
+	AddLike         message.TopicConfig `json:"add-like"         required:"true"`
 	Fork            string              `json:"fork"             required:"true"`
 	Download        string              `json:"download"         required:"true"`
 	Training        string              `json:"training"         required:"true"`

@@ -41,11 +41,12 @@ func (s *sender) sendFollowing(msg *userdomain.FollowerInfo, action string) erro
 
 // Like
 func (s *sender) AddLike(msg *domain.ResourceObject) error {
-	return s.sendLike(msg, actionAdd)
+	return s.sendLikeAdd(msg, actionAdd)
 }
 
 func (s *sender) RemoveLike(msg *domain.ResourceObject) error {
 	return s.sendLike(msg, actionRemove)
+
 }
 
 func (s *sender) sendLike(msg *domain.ResourceObject, action string) error {
@@ -53,8 +54,16 @@ func (s *sender) sendLike(msg *domain.ResourceObject, action string) error {
 
 	toMsgResourceObject(msg, &v.Resource)
 
-	return s.send(s.topics.Like.Topic, &common.MsgNormal{
-		Type:      s.topics.Like.Name,
+	return s.send(s.topics.Like, &v)
+}
+
+func (s *sender) sendLikeAdd(msg *domain.ResourceObject, action string) error {
+	v := msgLike{Action: action}
+
+	toMsgResourceObject(msg, &v.Resource)
+
+	return s.send(s.topics.AddLike.Topic, &common.MsgNormal{
+		Type:      s.topics.AddLike.Name,
 		User:      msg.Owner.Account(),
 		Desc:      v.Action,
 		CreatedAt: utils.Now(),
