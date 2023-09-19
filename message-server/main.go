@@ -192,7 +192,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 
 	h := &handler{
 		log:      log,
-		maxRetry: cfg.Training.MaxRetry,
+		maxRetry: cfg.MaxRetry,
 
 		user: userapp.NewUserService(userRepo, nil, nil, nil, nil),
 

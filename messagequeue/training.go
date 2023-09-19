@@ -92,12 +92,5 @@ func (c *consumer) createJob(info *domain.TrainingIndex) error {
 }
 
 type TrainingConfig struct {
-	MaxRetry         int    `json:"max_retry"`
 	TrainingEndpoint string `json:"training_endpoint" required:"true"`
-}
-
-func (cfg *TrainingConfig) SetDefault() {
-	if cfg.MaxRetry == 0 {
-		cfg.MaxRetry = 3
-	}
 }

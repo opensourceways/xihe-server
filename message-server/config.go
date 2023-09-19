@@ -32,6 +32,7 @@ func loadConfig(path string, cfg *configuration) error {
 }
 
 type configuration struct {
+	MaxRetry         int    `json:"max_retry"`
 	FinetuneEndpoint string `json:"finetune_endpoint"  required:"true"`
 
 	Inference  inferenceimpl.Config        `json:"inference"    required:"true"`
@@ -70,6 +71,10 @@ func (cfg *configuration) ConfigItems() []interface{} {
 }
 
 func (cfg *configuration) setDefault() {
+	if cfg.MaxRetry == 0 {
+		cfg.MaxRetry = 3
+	}
+
 	common.SetDefault(cfg)
 }
 
