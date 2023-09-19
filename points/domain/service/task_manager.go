@@ -9,6 +9,10 @@ import (
 	"github.com/opensourceways/xihe-server/points/domain/taskdoc"
 )
 
+type TaskService interface {
+	Doc(lang common.Language) ([]byte, error)
+}
+
 func InitTaskService(repo repository.Task, doc taskdoc.TaskDoc) (*taskService, error) {
 	tm := &taskService{
 		repo:    repo,
@@ -20,7 +24,7 @@ func InitTaskService(repo repository.Task, doc taskdoc.TaskDoc) (*taskService, e
 	items := common.SupportedLanguages()
 
 	for i := range items {
-		if _, err := tm.GenDoc(items[i]); err != nil {
+		if _, err := tm.Doc(items[i]); err != nil {
 			return nil, err
 		}
 	}
@@ -38,7 +42,7 @@ type taskService struct {
 	docs  map[string][]byte // map lanuage to doc path
 }
 
-func (tm *taskService) GenDoc(lang common.Language) ([]byte, error) {
+func (tm *taskService) Doc(lang common.Language) ([]byte, error) {
 	tasks, err := tm.repo.FindAllTasks()
 	if err != nil {
 		return nil, err

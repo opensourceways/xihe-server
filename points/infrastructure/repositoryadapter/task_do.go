@@ -29,6 +29,7 @@ func toruleDO(r *domain.Rule) ruleDO {
 		OnceOnly:       r.OnceOnly,
 		PointsPerOnce:  r.PointsPerOnce,
 		MaxPointsOfDay: r.MaxPointsOfDay,
+		MaxPointsDescs: r.MaxPointsDescs,
 	}
 }
 
@@ -63,6 +64,7 @@ type ruleDO struct {
 	OnceOnly       bool              `bson:"once_only"          json:"once_only"`
 	PointsPerOnce  int               `bson:"points_per_once"    json:"points_per_once"`
 	MaxPointsOfDay int               `bson:"max_points_of_day"  json:"max_points_of_day"`
+	MaxPointsDescs map[string]string `bson:"max_points_descs" json:"max_points_descs"`
 }
 
 func (do *ruleDO) toRule() domain.Rule {
@@ -72,5 +74,6 @@ func (do *ruleDO) toRule() domain.Rule {
 		OnceOnly:       do.OnceOnly,
 		PointsPerOnce:  do.PointsPerOnce,
 		MaxPointsOfDay: do.MaxPointsOfDay,
+		MaxPointsDescs: do.MaxPointsDescs,
 	}
 }

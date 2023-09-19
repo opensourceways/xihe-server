@@ -183,10 +183,18 @@ func (t *Task) Name(lang common.Language) string {
 }
 
 func (t *Task) RuleDesc(lang common.Language) string {
+	if t.Rule.Descs == nil {
+		return ""
+	}
+
 	return t.Rule.Descs[lang.Language()]
 }
 
 func (t *Task) MaxPointsDesc(lang common.Language) string {
+	if t.Rule.MaxPointsDescs == nil {
+		return ""
+	}
+
 	return t.Rule.MaxPointsDescs[lang.Language()]
 }
 

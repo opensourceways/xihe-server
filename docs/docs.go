@@ -5531,6 +5531,32 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/user_points/taskdoc": {
+            "get": {
+                "description": "task doc",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserPoints"
+                ],
+                "summary": "task doc",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.TaskDocDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/user_points/tasks": {
             "get": {
                 "description": "tasks of day",
@@ -6593,6 +6619,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "description": "serial number",
                     "type": "string"
                 },
                 "points": {
@@ -6860,6 +6887,14 @@ const docTemplate = `{
                 },
                 "points": {
                     "type": "integer"
+                }
+            }
+        },
+        "app.TaskDocDTO": {
+            "type": "object",
+            "properties": {
+                "string": {
+                    "type": "string"
                 }
             }
         },

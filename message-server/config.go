@@ -17,8 +17,8 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/messagequeue"
-	"github.com/opensourceways/xihe-server/points"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 )
 
 func loadConfig(path string, cfg *configuration) error {
@@ -43,7 +43,7 @@ type configuration struct {
 	Domain     domain.Config               `json:"domain"       required:"true"`
 	MQ         kafka.Config                `json:"mq"           required:"true"`
 	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
-	Points     points.Config               `json:"points"`
+	Points     pointsConfig                `json:"points"`
 	Training   messagequeue.TrainingConfig `json:"training"`
 }
 
@@ -135,6 +135,20 @@ func (cfg *cloudConfig) Validate() error {
 	return common.Validate(&cfg.Config)
 }
 
+// points
+type pointsConfig struct {
+	Domain pointsdomain.Config `json:"domain"`
+	Repo   pointsrepo.Config   `json:"repo"`
+}
+
+func (cfg *pointsConfig) ConfigItems() []interface{} {
+	return []interface{}{
+		&cfg.Domain,
+		&cfg.Repo,
+	}
+}
+
+// mqTopics
 type mqTopics struct {
 	messages.Topics
 

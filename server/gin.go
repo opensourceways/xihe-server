@@ -45,7 +45,9 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
 	pointsapp "github.com/opensourceways/xihe-server/points/app"
+	pointsservice "github.com/opensourceways/xihe-server/points/domain/service"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+	"github.com/opensourceways/xihe-server/points/infrastructure/taskdocimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
@@ -55,7 +57,11 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	r.Use(gin.Recovery())
 	r.Use(logRequest())
 
-	setRouter(r, cfg)
+	if err := setRouter(r, cfg); err != nil {
+		logrus.Error(err)
+
+		return
+	}
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
@@ -68,7 +74,7 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 }
 
 // setRouter init router
-func setRouter(engine *gin.Engine, cfg *config.Config) {
+func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	docs.SwaggerInfo.BasePath = "/api"
 	docs.SwaggerInfo.Title = "xihe"
 	docs.SwaggerInfo.Description = "set header: 'PRIVATE-TOKEN=xxx'"
@@ -210,20 +216,17 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 
 	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, sender)
 
-	pointsAppService := pointsapp.NewUserPointsAppService(
-		pointsrepo.TaskAdapter(
-			mongodb.NewCollection(collections.PointsTask),
-		),
-		pointsrepo.UserPointsAdapter(
-			mongodb.NewCollection(collections.UserPoints), &cfg.Points.Repo,
-		),
-	)
+	v1 := engine.Group(docs.SwaggerInfo.BasePath)
+
+	pointsAppService, err := addRouterForUserPointsController(v1, cfg)
+	if err != nil {
+		return err
+	}
 
 	userAppService := userapp.NewUserService(
 		user, gitlabUser, sender, pointsAppService, controller.EncryptHelperToken(),
 	)
 
-	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, sender,
@@ -307,13 +310,46 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		controller.AddRouterForCloudController(
 			v1, cloudAppService,
 		)
-
-		controller.AddRouterForUserPointsController(v1, pointsAppService)
-
 	}
 
 	engine.UseRawPath = true
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
+	return nil
+}
+
+func addRouterForUserPointsController(g *gin.RouterGroup, cfg *config.Config) (
+	pointsapp.UserPointsAppService, error,
+) {
+	collections := &cfg.Mongodb.Collections
+
+	taskRepo := pointsrepo.TaskAdapter(
+		mongodb.NewCollection(collections.PointsTask),
+	)
+
+	taskdoc, err := taskdocimpl.Init(&cfg.Points.TaskDoc)
+	if err != nil {
+		return nil, err
+	}
+
+	taskService, err := pointsservice.InitTaskService(taskRepo, taskdoc)
+	if err != nil {
+		return nil, err
+	}
+
+	pointsAppService := pointsapp.NewUserPointsAppService(
+		taskRepo,
+		pointsrepo.UserPointsAdapter(
+			mongodb.NewCollection(collections.UserPoints), &cfg.Points.Repo,
+		),
+	)
+
+	controller.AddRouterForUserPointsController(
+		g, pointsAppService,
+		pointsapp.NewTaskAppService(taskService, taskRepo),
+	)
+
+	return pointsAppService, nil
 }
 
 func logRequest() gin.HandlerFunc {

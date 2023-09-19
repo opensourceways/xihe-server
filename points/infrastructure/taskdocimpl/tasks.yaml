@@ -13,6 +13,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 30
     max_points_of_day: 0
+    max_points_descs:
+      Chinese: "累计获取积分上限 30"
+      English: "The upper limit of points accumulated is 30"
 
 - id: "set_avatar"
   names:
@@ -28,6 +31,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 10
     max_points_of_day: 0
+    max_points_descs:
+      Chinese: "累计获取积分上限 10"
+      English: "The upper limit of points accumulated is 10"
 
 - id: "set_bio"
   names:
@@ -43,6 +49,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 10
     max_points_of_day: 0
+    max_points_descs:
+      Chinese: "累计获取积分上限 10"
+      English: "The upper limit of points accumulated is 10"
 
 - id: "sign_in"
   names:
@@ -57,6 +66,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 1
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 1"
 
 - id: "train"
   names:
@@ -71,6 +83,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 5
     max_points_of_day: 5
+    max_points_descs:
+      Chinese: "每日积分获取上限 5"
+      English: "The daily limit of points is 5"
 
 - id: "start_jupyter"
   names:
@@ -85,6 +100,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 3
     max_points_of_day: 3
+    max_points_descs:
+      Chinese: "每日积分获取上限 3"
+      English: "The daily limit of points is 3"
 
 - id: "start_inference"
   names:
@@ -99,6 +117,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 1
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 1"
 
 - id: "start_official_inference"
   names:
@@ -113,6 +134,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 1
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 1"
 
 - id: "push_code"
   names:
@@ -127,6 +151,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 10
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 10"
 
 - id: "create_project"
   names:
@@ -141,6 +168,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 5
     max_points_of_day: 5
+    max_points_descs:
+      Chinese: "每日积分获取上限 5"
+      English: "The daily limit of points is 5"
 
 - id: "create_model"
   names:
@@ -155,6 +185,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 5
     max_points_of_day: 5
+    max_points_descs:
+      Chinese: "每日积分获取上限 5"
+      English: "The daily limit of points is 5"
 
 - id: "create_dataset"
   names:
@@ -169,6 +202,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 5
     max_points_of_day: 5
+    max_points_descs:
+      Chinese: "每日积分获取上限 5"
+      English: "The daily limit of points is 5"
 
 - id: "fork_project"
   names:
@@ -183,6 +219,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 3
     max_points_of_day: 3
+    max_points_descs:
+      Chinese: "每日积分获取上限 3"
+      English: "The daily limit of points is 3"
 
 - id: "download_project"
   names:
@@ -197,6 +236,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 2"
 
 - id: "download_model"
   names:
@@ -211,6 +253,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 2"
 
 - id: "download_dataset"
   names:
@@ -225,6 +270,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 2"
 
 - id: "like_project"
   names:
@@ -239,6 +287,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 2"
 
 - id: "like_model"
   names:
@@ -253,6 +304,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 2"
 
 - id: "like_dataset"
   names:
@@ -267,6 +321,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 2"
 
 - id: "like_ai_picture"
   names:
@@ -281,6 +338,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 2"
 
 - id: "try_modelzoo"
   names:
@@ -295,6 +355,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 1
     max_points_of_day: 3
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 3"
 
 - id: "publicize_wukong_picture"
   names:
@@ -309,6 +372,9 @@ items:
     created_at: "2023-09-13"
     points_per_once: 2
     max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
 
 - id: "apply_competition"
   names:
