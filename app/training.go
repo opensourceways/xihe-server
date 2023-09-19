@@ -35,14 +35,12 @@ type TrainingService interface {
 }
 
 func NewTrainingService(
-	log *logrus.Entry,
 	train training.Training,
 	repo repository.Training,
-	sender message.Sender,
+	sender message.MessageProducer,
 	maxTrainingRecordNum int,
 ) TrainingService {
 	return trainingService{
-		log:    log,
 		train:  train,
 		repo:   repo,
 		sender: sender,
@@ -55,7 +53,7 @@ type trainingService struct {
 	log    *logrus.Entry
 	train  training.Training
 	repo   repository.Training
-	sender message.Sender
+	sender message.MessageProducer
 
 	maxTrainingRecordNum int
 }
@@ -127,10 +125,12 @@ func (s trainingService) create(
 		TrainingId: r,
 	}
 
-	msg := new(message.MsgTraining)
-	msg.TrainingCreate(user, index, config.Inputs)
-
-	if err = s.sender.CreateTraining(msg); err != nil {
+	err = s.sender.SendTrainingCreated(&domain.TrainingCreatedEvent{
+		Account:        user,
+		TrainingIndex:  index,
+		TrainingInputs: config.Inputs,
+	})
+	if err != nil {
 		s.log.Errorf("send message of creating training failed, err:%s", err.Error())
 	}
 

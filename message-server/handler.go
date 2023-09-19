@@ -37,13 +37,11 @@ type handler struct {
 	log *logrus.Entry
 
 	maxRetry         int
-	trainingEndpoint string
 
 	user      userapp.UserService
 	model     app.ModelMessageService
 	dataset   app.DatasetMessageService
 	project   app.ProjectMessageService
-	training  app.TrainingService
 	finetune  app.FinetuneMessageService
 	evaluate  app.EvaluateMessageService
 	inference app.InferenceMessageService
@@ -234,33 +232,6 @@ func (h *handler) HandleEventDownload(obj *domain.ResourceObject) error {
 
 		return
 	})
-}
-
-func (h *handler) HandleEventCreateTraining(info *domain.TrainingIndex) error {
-	// wait for the sync of model and dataset
-	time.Sleep(10 * time.Second)
-
-	return h.retry(
-		func(lastChance bool) error {
-			retry, err := h.training.CreateTrainingJob(
-				info, h.trainingEndpoint, lastChance,
-			)
-			if err != nil {
-				h.log.Errorf(
-					"handle training(%s/%s/%s) failed, err:%s",
-					info.Project.Owner.Account(), info.Project.Id,
-					info.TrainingId, err.Error(),
-				)
-
-				if !retry {
-					return nil
-				}
-			}
-
-			return err
-		},
-		10*time.Second,
-	)
 }
 
 func (h *handler) HandleEventCreateFinetune(index *domain.FinetuneIndex) error {
