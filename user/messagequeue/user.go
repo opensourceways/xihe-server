@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/user/domain"
+	followmsg "github.com/opensourceways/xihe-server/user/domain/message"
 )
 
 const (
@@ -48,9 +49,7 @@ type consumer struct {
 }
 
 func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) (err error) {
-	msg := message.MsgNormal{}
-
-	f := domain.FollowerInfo{}
+	msg := message.msgFolloweing{}
 
 	if err := json.Unmarshal(body, &msg); err != nil {
 		return err
@@ -59,12 +58,12 @@ func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) (er
 	user, err := domain.NewAccount(msg.User)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	v := domain.FollowerInfo{
 		User:     user,
-		Follower: f.Follower,
+		Follower: msg.Follower.Account,
 	}
 
 	err = c.s.AddFollower(&v)
@@ -81,9 +80,7 @@ func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) (er
 }
 
 func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) error {
-	msg := message.MsgNormal{}
-
-	f := domain.FollowerInfo{}
+	msg := message.msgFolloweing{}
 
 	if err := json.Unmarshal(body, &msg); err != nil {
 		return err
@@ -97,7 +94,7 @@ func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) 
 
 	v := domain.FollowerInfo{
 		User:     user,
-		Follower: f.Follower,
+		Follower: msg.Follower.Account,
 	}
 
 	return c.s.RemoveFollower(&v)
