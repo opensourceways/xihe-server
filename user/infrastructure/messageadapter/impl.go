@@ -6,6 +6,7 @@ import (
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/utils"
+	"github.com/opensourceways/xihe-server/user/domain/message"
 )
 
 func MessageAdapter(cfg *Config, p common.Publisher) *messageAdapter {
@@ -15,11 +16,6 @@ func MessageAdapter(cfg *Config, p common.Publisher) *messageAdapter {
 type messageAdapter struct {
 	cfg       Config
 	publisher common.Publisher
-}
-
-type msgFolloweing struct {
-	com      common.MsgNormal
-	Follower string `json:"follower"`
 }
 
 // Register
@@ -68,7 +64,7 @@ func (impl *messageAdapter) SendUserBioSetEvent(v *domain.UserBioSetEvent) error
 func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingAdded
 
-	msg := msgFolloweing{
+	msg := message.msgFolloweing{
 		Follower: v.Follower.Account(),
 		com: common.MsgNormal{
 			Type:      cfg.Name,
@@ -85,7 +81,7 @@ func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) erro
 func (impl *messageAdapter) SendFollowingRemovedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingRemoved
 
-	msg := msgFolloweing{
+	msg := message.msgFolloweing{
 		Follower: v.Follower.Account(),
 		com: common.MsgNormal{
 			Type:      cfg.Name,
