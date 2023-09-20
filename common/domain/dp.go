@@ -81,3 +81,7 @@ func NewLanguage(v string) Language {
 		return nil
 	}
 }
+
+func SupportedLanguages() []Language {
+	return []Language{chinese, english}
+}

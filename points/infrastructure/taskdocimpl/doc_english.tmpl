@@ -1,0 +1,10 @@
+### Personal computing power points reward rules
+
+---
+
+Note: The upper limit of user points earned in a single day is 50 points. The points are only used for computing resources, and points for ranking activities will be calculated separately.
+
+| Reward Name | Points | Upper Limit | Reward Details |
+{{ range . }}
+| {{ .Name }} | {{ .PointsPerOnce }} | {{ .MaxPoints }} | {{ .Desc }} |
+{{- end }}

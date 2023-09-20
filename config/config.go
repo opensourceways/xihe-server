@@ -22,7 +22,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
-	"github.com/opensourceways/xihe-server/points"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/user"
 )
@@ -56,7 +55,7 @@ type Config struct {
 	API         controller.APIConfig `json:"api"          required:"true"`
 	MQ          kafka.Config         `json:"mq"           required:"true"`
 	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
-	Points      points.Config        `json:"points"       required:"true"`
+	Points      pointsConfig         `json:"points"`
 	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
 	Course      course.Config        `json:"course"       required:"true"`
 	User        user.Config          `json:"user"         required:"true"`
@@ -90,8 +89,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.API,
 		&cfg.MQ,
 		&cfg.MQTopics,
-		&cfg.Points.Domain,
-		&cfg.Points.Repo,
+		&cfg.Points,
 		&cfg.Cloud,
 		&cfg.Course,
 		&cfg.User,

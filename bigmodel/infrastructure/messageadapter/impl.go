@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	basemsg "github.com/opensourceways/xihe-server/infrastructure/messages"
@@ -32,6 +34,8 @@ func (impl *messageAdapter) SendWuKongInferenceStart(v *domain.WuKongInferenceSt
 		},
 	}
 
+	logrus.Debugf("Send WuKongInferenceStart: %v", msg)
+
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
@@ -47,6 +51,8 @@ func (impl *messageAdapter) SendWuKongInferenceError(v *domain.WuKongInferenceEr
 		},
 	}
 
+	logrus.Debugf("Send WuKongInferenceError: %v", msg)
+
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
@@ -60,6 +66,8 @@ func (impl *messageAdapter) SendWuKongAsyncTaskStart(v *domain.WuKongAsyncTaskSt
 			"task_id": strconv.Itoa(int(v.TaskId)),
 		},
 	}
+
+	logrus.Debugf("Send WuKongAsyncTaskStart: %v", msg)
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
@@ -82,6 +90,8 @@ func (impl *messageAdapter) SendWuKongAsyncInferenceFinish(
 			"links":   strings.TrimRight(ls, ","),
 		},
 	}
+
+	logrus.Debugf("Send WuKongAsyncInferenceFinish: %v", msg)
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
@@ -110,6 +120,8 @@ func (impl *messageAdapter) SendWuKongPicturePublicized(v *domain.WuKongPictureP
 		CreatedAt: utils.Now(),
 	}
 
+	logrus.Debugf("Send WuKongPicturePublicized: %v", msg)
+
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
@@ -123,6 +135,8 @@ func (impl *messageAdapter) SendWuKongPictureLiked(v *domain.WuKongPictureLikedE
 		Desc:      "AI Picture Liked",
 		CreatedAt: utils.Now(),
 	}
+
+	logrus.Debugf("Send WuKongPictureLiked: %v", msg)
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
