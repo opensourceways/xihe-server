@@ -29,7 +29,7 @@ func Subscribe(s app.UserService, subscriber message.Subscriber) (err error) {
 	)
 
 	if err != nil {
-		return
+		return  err
 	}
 
 	err = subscriber.SubscribeWithStrategyOfRetry(
