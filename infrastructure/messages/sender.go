@@ -209,6 +209,42 @@ func (s *sender) AddOperateLogForDownloadFile(u domain.Account, repo message.Rep
 	})
 }
 
+func (s *sender) CreateDataset(u domain.Account) error {
+	return s.send(
+		s.topics.CreateDataset.Topic,
+		&common.MsgNormal{
+			Type:      s.topics.CreateDataset.Name,
+			CreatedAt: utils.Now(),
+			Desc:      "Created a dataset",
+			User:      u.Account(),
+		},
+	)
+}
+
+func (s *sender) CreateModel(u domain.Account) error {
+	return s.send(
+		s.topics.CreateModel.Topic,
+		&common.MsgNormal{
+			Type:      s.topics.CreateModel.Name,
+			CreatedAt: utils.Now(),
+			Desc:      "Created a model",
+			User:      u.Account(),
+		},
+	)
+}
+
+func (s *sender) CreateProject(u domain.Account) error {
+	return s.send(
+		s.topics.CreateProject.Topic,
+		&common.MsgNormal{
+			Type:      s.topics.CreateProject.Name,
+			CreatedAt: utils.Now(),
+			Desc:      "Created a project",
+			User:      u.Account(),
+		},
+	)
+}
+
 func (s *sender) sendOperateLog(u domain.Account, t string, info map[string]string) error {
 	a := ""
 	if u != nil {

@@ -212,6 +212,8 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 
 	_ = s.sender.AddOperateLogForCreateResource(r, p.Name)
 
+	_ = s.sender.CreateProject(r.Owner)
+
 	return
 }
 

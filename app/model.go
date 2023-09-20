@@ -188,6 +188,8 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 
 	_ = s.sender.AddOperateLogForCreateResource(r, m.Name)
 
+	_ = s.sender.CreateModel(r.Owner)
+
 	return
 }
 
