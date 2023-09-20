@@ -801,7 +801,7 @@ definitions:
     type: object
   app.TaskDocDTO:
     properties:
-      string:
+      content:
         type: string
     type: object
   app.TasksCompletionInfoDTO:

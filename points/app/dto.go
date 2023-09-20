@@ -60,5 +60,5 @@ type TaskCompletionInfoDTO struct {
 }
 
 type TaskDocDTO struct {
-	Content string `json:"string"`
+	Content string `json:"content"`
 }

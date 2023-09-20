@@ -6893,7 +6893,7 @@ const docTemplate = `{
         "app.TaskDocDTO": {
             "type": "object",
             "properties": {
-                "string": {
+                "content": {
                     "type": "string"
                 }
             }
