@@ -31,9 +31,6 @@ type RepoFile struct {
 type Sender interface {
 	AddOperateLogForAccessBigModel(domain.Account, bmdomain.BigmodelType) error
 
-	AddLike(*domain.ResourceObject) error
-	RemoveLike(*domain.ResourceObject) error
-
 	CreateFinetune(*domain.FinetuneIndex) error
 
 	CreateInference(*domain.InferenceInfo) error

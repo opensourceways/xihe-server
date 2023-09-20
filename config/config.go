@@ -61,6 +61,7 @@ type Config struct {
 	Resource    messages.ResourceConfig         `json:"resource"     required:"true"`
 	Download    messages.DownloadProducerConfig `json:"download"     required:"true"`
 	User        userConfig                      `json:"user"`
+	Like        messages.LikeConfig             `json:"like"       required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -98,6 +99,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.Course,
 		&cfg.Resource,
 		&cfg.User,
+		&cfg.Like,
 	}
 }
 

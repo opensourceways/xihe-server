@@ -25,12 +25,6 @@ type msgFollower struct {
 	Follower string `json:"follower"`
 }
 
-type msgLike struct {
-	Action string `json:"action"`
-
-	Resource resourceObject `json:"resource"`
-}
-
 type msgTraining struct {
 	User       string `json:"user"`
 	ProjectId  string `json:"pid"`

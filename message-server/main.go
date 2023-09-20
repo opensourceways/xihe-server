@@ -172,6 +172,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.User.UserSignedUp,
 			topics.User.BioSet,
 			topics.User.AvatarSet,
+			topics.Like,
 		},
 		kafka.SubscriberAdapter(),
 	)

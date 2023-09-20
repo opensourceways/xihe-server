@@ -163,6 +163,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)
+	likeAdapter := messages.NewLikeMessageAdapter(cfg.MQTopics.Like, &cfg.Like, publisher)
 
 	// sender
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
@@ -261,7 +262,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForLikeController(
-			v1, like, user, proj, model, dataset, activity, sender,
+			v1, like, user, proj, model, dataset, activity, likeAdapter,
 		)
 
 		controller.AddRouterForActivityController(

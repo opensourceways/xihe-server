@@ -19,23 +19,6 @@ type sender struct {
 	publisher common.Publisher
 }
 
-// Like
-func (s *sender) AddLike(msg *domain.ResourceObject) error {
-	return s.sendLike(msg, actionAdd)
-}
-
-func (s *sender) RemoveLike(msg *domain.ResourceObject) error {
-	return s.sendLike(msg, actionRemove)
-}
-
-func (s *sender) sendLike(msg *domain.ResourceObject, action string) error {
-	v := msgLike{Action: action}
-
-	toMsgResourceObject(msg, &v.Resource)
-
-	return s.send(s.topics.Like, &v)
-}
-
 // Finetune
 func (s *sender) CreateFinetune(info *domain.FinetuneIndex) error {
 	v := msgFinetune{
