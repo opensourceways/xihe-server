@@ -101,7 +101,6 @@ func main() {
 
 	// training
 	train := app.NewTrainingService(
-		log,
 		nil,
 		repositories.NewTrainingRepository(
 			mongodb.NewTrainingMapper(collections.Training),

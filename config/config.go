@@ -22,7 +22,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
-	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
 	"github.com/opensourceways/xihe-server/points"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 )
@@ -43,7 +42,7 @@ type Config struct {
 
 	Competition competition.Config   `json:"competition"  required:"true"`
 	Challenge   challengeimpl.Config `json:"challenge"    required:"true"`
-	Training    trainingimpl.Config  `json:"training"     required:"true"`
+	Training    trainingConfig       `json:"training"     required:"true"`
 	Finetune    finetuneimpl.Config  `json:"finetune"     required:"true"`
 	BigModel    bigmodel.Config      `json:"bigmodel"     required:"true"`
 	Authing     authingimpl.Config   `json:"authing"      required:"true"`

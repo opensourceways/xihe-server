@@ -112,7 +112,7 @@ func (impl *userPointsAdapter) addFirstPointsDetailOfDay(up *domain.UserPoints, 
 
 // add points detail of day
 func (impl *userPointsAdapter) addPointsDetail(up *domain.UserPoints, item *domain.PointsItem) error {
-	do := topointsDetailDO(item.Task, item.LatestDetail())
+	do := topointsDetailDO(item.TaskId, item.LatestDetail())
 
 	doc, err := do.doc()
 	if err != nil {
