@@ -34,7 +34,7 @@ type relatedResourceHanler struct {
 type handler struct {
 	log *logrus.Entry
 
-	maxRetry         int
+	maxRetry int
 
 	model     app.ModelMessageService
 	dataset   app.DatasetMessageService

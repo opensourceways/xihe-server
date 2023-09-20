@@ -17,6 +17,11 @@ type messageAdapter struct {
 	publisher common.Publisher
 }
 
+type msgFolloweing struct {
+	com      common.MsgNormal
+	Follower string `json:"follower"`
+}
+
 // Register
 func (impl *messageAdapter) SendUserSignedUpEvent(v *domain.UserSignedUpEvent) error {
 	cfg := &impl.cfg.UserSignedUp
@@ -60,28 +65,34 @@ func (impl *messageAdapter) SendUserBioSetEvent(v *domain.UserBioSetEvent) error
 }
 
 // Add following
-func (impl *messageAdapter) SendFollowingRemovedEvent(v *domain.FollowerInfo) error {
+func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingAdded
 
-	msg := common.MsgNormal{
-		Type:      cfg.Name,
-		User:      v.User.Account(),
-		Desc:      fmt.Sprintf("Add Following of %s", v.Follower),
-		CreatedAt: utils.Now(),
+	msg := msgFolloweing{
+		Follower: v.Follower.Account(),
+		com: common.MsgNormal{
+			Type:      cfg.Name,
+			User:      v.User.Account(),
+			Desc:      fmt.Sprintf("Add Following of %s", v.Follower.Account()),
+			CreatedAt: utils.Now(),
+		},
 	}
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
 // Remove following
-func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) error {
+func (impl *messageAdapter) SendFollowingRemovedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingRemoved
 
-	msg := common.MsgNormal{
-		Type:      cfg.Name,
-		User:      v.User.Account(),
-		Desc:      fmt.Sprintf("Remove Following of %s", v.Follower),
-		CreatedAt: utils.Now(),
+	msg := msgFolloweing{
+		Follower: v.Follower.Account(),
+		com: common.MsgNormal{
+			Type:      cfg.Name,
+			User:      v.User.Account(),
+			Desc:      fmt.Sprintf("Remove Following of %s", v.Follower.Account()),
+			CreatedAt: utils.Now(),
+		},
 	}
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)

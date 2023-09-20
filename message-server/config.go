@@ -19,8 +19,6 @@ import (
 	"github.com/opensourceways/xihe-server/messagequeue"
 	"github.com/opensourceways/xihe-server/points"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
-	"github.com/opensourceways/xihe-server/user"
-	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
 func loadConfig(path string, cfg *configuration) error {
@@ -47,7 +45,6 @@ type configuration struct {
 	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
 	Points     points.Config               `json:"points"`
 	Training   messagequeue.TrainingConfig `json:"training"`
-	User       user.Config                 `json:"user"         required:"true"`
 }
 
 type PostgresqlConfig struct {
@@ -160,8 +157,9 @@ type mqTopics struct {
 	TrainingCreated string `json:"training_created"`
 
 	//user
-	UserSignedUp        string             `json:"user-signed-up"        required:"true"`
-	BioSet              string             `json:"bio_set"               required:"true"`
-	AvatarSet           string             `json:"avatar_set"            required:"true"`
-	UserFollowingTopics usermq.TopicConfig `json:"user-following-topics" required:"true"`
+	UserSignedUp    string `json:"user-signed-up"        required:"true"`
+	BioSet          string `json:"bio_set"               required:"true"`
+	AvatarSet       string `json:"avatar_set"            required:"true"`
+	FollowingAdd    string `json:"following_add"         required:"true"`
+	FollowingRemove string `json:"following_remove"      required:"true"`
 }

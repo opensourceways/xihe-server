@@ -74,12 +74,9 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 
 	s.toUserDTO(&u, &dto)
 
-	err = s.sender.SendUserSignedUpEvent(&domain.UserSignedUpEvent{
+	_ = s.sender.SendUserSignedUpEvent(&domain.UserSignedUpEvent{
 		Account: cmd.Account,
 	})
-	if err != nil {
-		return
-	}
 
 	return
 }
