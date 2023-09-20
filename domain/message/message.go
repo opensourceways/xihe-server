@@ -58,6 +58,7 @@ type Sender interface {
 	CalcScore(*SubmissionInfo) error
 
 	SignIn(domain.Account) error
+	DailyDownload(domain.Account, domain.ResourceName) error
 }
 
 type EventHandler interface {
