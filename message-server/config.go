@@ -168,8 +168,11 @@ type mqTopics struct {
 	CourseApplied string `json:"course_applied"     required:"true"`
 
 	// training
-	TrainingCreated string `json:"training_created"`
-	ProjectCreated  string `json:"project_created"`
-	ModelCreated    string `json:"model_created"`
-	DatasetCreated  string `json:"dataset_created"`
+	TrainingCreated   string `json:"training_created" required:"true"`
+	ProjectCreated    string `json:"project_created" required:"true"`
+	ModelCreated      string `json:"model_created" required:"true"`
+	DatasetCreated    string `json:"dataset_created" required:"true"`
+	ProjectDownloaded string `json:"project_downloaded" required:"true"`
+	DatasetDownloaded string `json:"dataset_downloaded" required:"true"`
+	ModelDownloaded   string `json:"model_downloaded" required:"true"`
 }

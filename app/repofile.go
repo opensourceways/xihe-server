@@ -26,10 +26,10 @@ type RepoFileService interface {
 	Preview(*UserInfo, *RepoFilePreviewCmd) ([]byte, error)
 	DeleteDir(*UserInfo, *RepoDirDeleteCmd) (string, error)
 	Download(*RepoFileDownloadCmd) (RepoFileDownloadDTO, error)
-	DownloadRepo(u *UserInfo, repoId string, handle func(io.Reader, int64)) error
+	DownloadRepo(u *UserInfo, repo domain.ResourceObject, handle func(io.Reader, int64)) error
 }
 
-func NewRepoFileService(rf platform.RepoFile, sender message.Sender) RepoFileService {
+func NewRepoFileService(rf platform.RepoFile, sender message.RepoMessageProducer) RepoFileService {
 	return &repoFileService{
 		rf:     rf,
 		sender: sender,
@@ -38,7 +38,7 @@ func NewRepoFileService(rf platform.RepoFile, sender message.Sender) RepoFileSer
 
 type repoFileService struct {
 	rf     platform.RepoFile
-	sender message.Sender
+	sender message.RepoMessageProducer
 }
 
 type RepoFileListCmd = RepoDir
@@ -199,8 +199,15 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 	return r, nil
 }
 
-func (s *repoFileService) DownloadRepo(u *UserInfo, repoId string, handle func(io.Reader, int64)) error {
-	return s.rf.DownloadRepo(u, repoId, handle)
+func (s *repoFileService) DownloadRepo(u *UserInfo, repoId domain.ResourceObject, handle func(io.Reader, int64)) error {
+	err := s.rf.DownloadRepo(u, repoId.Id, handle)
+	if err == nil {
+		s.sender.DownloadRepo(message.DownloadEvent{
+			Account: u.User,
+		})
+	}
+
+	return err
 }
 
 type RepoFileDownloadDTO struct {

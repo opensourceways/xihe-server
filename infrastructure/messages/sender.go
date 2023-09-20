@@ -56,14 +56,6 @@ func (s *sender) sendLike(msg *domain.ResourceObject, action string) error {
 	return s.send(s.topics.Like, &v)
 }
 
-// Download
-func (s *sender) IncreaseDownload(obj *domain.ResourceObject) error {
-	v := new(resourceObject)
-	toMsgResourceObject(obj, v)
-
-	return s.send(s.topics.Download, v)
-}
-
 // Finetune
 func (s *sender) CreateFinetune(info *domain.FinetuneIndex) error {
 	v := msgFinetune{
@@ -138,14 +130,6 @@ func (s *sender) AddOperateLogForNewUser(u domain.Account) error {
 func (s *sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldomain.BigmodelType) error {
 	return s.sendOperateLog(u, "bigmodel", map[string]string{
 		"bigmodel": string(t),
-	})
-}
-
-func (s *sender) AddOperateLogForDownloadFile(u domain.Account, repo message.RepoFile) error {
-	return s.sendOperateLog(u, "download", map[string]string{
-		"user": repo.User.Account(),
-		"repo": repo.Name.ResourceName(),
-		"path": repo.Path.FilePath(),
 	})
 }
 

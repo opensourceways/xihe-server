@@ -32,15 +32,12 @@ type RepoFile struct {
 type Sender interface {
 	AddOperateLogForNewUser(domain.Account) error
 	AddOperateLogForAccessBigModel(domain.Account, bmdomain.BigmodelType) error
-	AddOperateLogForDownloadFile(domain.Account, RepoFile) error
 
 	AddFollowing(*userdomain.FollowerInfo) error
 	RemoveFollowing(*userdomain.FollowerInfo) error
 
 	AddLike(*domain.ResourceObject) error
 	RemoveLike(*domain.ResourceObject) error
-
-	IncreaseDownload(*domain.ResourceObject) error
 
 	CreateFinetune(*domain.FinetuneIndex) error
 
