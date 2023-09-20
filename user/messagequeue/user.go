@@ -47,7 +47,7 @@ type consumer struct {
 	s app.UserService
 }
 
-func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) error {
+func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) (err error) {
 	msg := message.MsgNormal{}
 
 	f := domain.FollowerInfo{}
@@ -76,7 +76,7 @@ func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) err
 		}
 	}
 
-	return c.s.AddFollower(&v)
+	return
 
 }
 
@@ -92,7 +92,7 @@ func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) 
 	user, err := domain.NewAccount(msg.User)
 
 	if err != nil {
-		return nil
+		return err
 	}
 
 	v := domain.FollowerInfo{
