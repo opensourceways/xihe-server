@@ -9,19 +9,23 @@ import (
 func AddRouterForUserPointsController(
 	rg *gin.RouterGroup,
 	s app.UserPointsAppService,
+	ts app.TaskAppService,
 ) {
 	ctl := UserPointsController{
-		s: s,
+		s:  s,
+		ts: ts,
 	}
 
 	rg.GET("/v1/user_points", ctl.PointsDetails)
 	rg.GET("/v1/user_points/tasks", ctl.TasksOfDay)
+	rg.GET("/v1/user_points/taskdoc", ctl.TasksDoc)
 }
 
 type UserPointsController struct {
 	baseController
 
-	s app.UserPointsAppService
+	s  app.UserPointsAppService
+	ts app.TaskAppService
 }
 
 //	@Summary		get user points details
@@ -72,6 +76,28 @@ func (ctl *UserPointsController) TasksOfDay(ctx *gin.Context) {
 	}
 
 	if v, err := ctl.s.TasksOfDay(pl.DomainAccount(), lang); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, v)
+	}
+}
+
+//	@Summary		task doc
+//	@Description		task doc
+//	@Tags			UserPoints
+//	@Accept			json
+//	@Success		200	{object}	app.TaskDocDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/user_points/taskdoc [get]
+func (ctl *UserPointsController) TasksDoc(ctx *gin.Context) {
+	lang, err := ctl.languageRuquested(ctx)
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if v, err := ctl.ts.Doc(lang); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, v)

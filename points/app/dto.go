@@ -58,3 +58,7 @@ type TaskCompletionInfoDTO struct {
 	Points    int    `json:"points"`
 	Completed bool   `json:"completed"`
 }
+
+type TaskDocDTO struct {
+	Content string `json:"content"`
+}

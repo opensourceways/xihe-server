@@ -623,6 +623,7 @@ definitions:
       desc:
         type: string
       id:
+        description: serial number
         type: string
       points:
         type: integer
@@ -797,6 +798,11 @@ definitions:
         type: string
       points:
         type: integer
+    type: object
+  app.TaskDocDTO:
+    properties:
+      content:
+        type: string
     type: object
   app.TasksCompletionInfoDTO:
     properties:
@@ -5486,6 +5492,23 @@ paths:
           schema:
             type: system_error
       summary: get user points details
+      tags:
+      - UserPoints
+  /v1/user_points/taskdoc:
+    get:
+      consumes:
+      - application/json
+      description: task doc
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.TaskDocDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: task doc
       tags:
       - UserPoints
   /v1/user_points/tasks:
