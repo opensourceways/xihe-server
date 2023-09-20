@@ -184,6 +184,8 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 
 	_ = s.sender.AddOperateLogForCreateResource(r, d.Name)
 
+	_ = s.sender.DailyCreate(cmd.Owner, d.Name)
+
 	return
 }
 
