@@ -152,7 +152,7 @@ items:
     points_per_once: 1
     max_points_of_day: 10
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 10"
       English: "The daily limit of points is 10"
 
 - id: "create_project"
@@ -237,7 +237,7 @@ items:
     points_per_once: 1
     max_points_of_day: 2
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 2"
       English: "The daily limit of points is 2"
 
 - id: "download_model"
@@ -254,7 +254,7 @@ items:
     points_per_once: 1
     max_points_of_day: 2
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 2"
       English: "The daily limit of points is 2"
 
 - id: "download_dataset"
@@ -271,7 +271,7 @@ items:
     points_per_once: 1
     max_points_of_day: 2
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 2"
       English: "The daily limit of points is 2"
 
 - id: "like_project"
@@ -288,7 +288,7 @@ items:
     points_per_once: 1
     max_points_of_day: 2
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 2"
       English: "The daily limit of points is 2"
 
 - id: "like_model"
@@ -305,7 +305,7 @@ items:
     points_per_once: 1
     max_points_of_day: 2
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 2"
       English: "The daily limit of points is 2"
 
 - id: "like_dataset"
@@ -322,7 +322,7 @@ items:
     points_per_once: 1
     max_points_of_day: 2
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 2"
       English: "The daily limit of points is 2"
 
 - id: "like_ai_picture"
@@ -339,7 +339,7 @@ items:
     points_per_once: 1
     max_points_of_day: 2
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 2"
       English: "The daily limit of points is 2"
 
 - id: "try_modelzoo"
@@ -356,7 +356,7 @@ items:
     points_per_once: 1
     max_points_of_day: 3
     max_points_descs:
-      Chinese: "每日积分获取上限 1"
+      Chinese: "每日积分获取上限 3"
       English: "The daily limit of points is 3"
 
 - id: "publicize_wukong_picture"
