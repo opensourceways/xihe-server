@@ -17,8 +17,8 @@ type taskAdapter struct {
 	cli mongodbClient
 }
 
-func (impl *taskAdapter) docFilter(name string) bson.M {
-	return bson.M{fieldName: name}
+func (impl *taskAdapter) docFilter(tid string) bson.M {
+	return bson.M{fieldId: tid}
 }
 
 func (impl *taskAdapter) Add(t *domain.Task) error {
@@ -30,7 +30,7 @@ func (impl *taskAdapter) Add(t *domain.Task) error {
 	}
 
 	f := func(ctx context.Context) error {
-		_, err := impl.cli.NewDocIfNotExist(ctx, impl.docFilter(t.Name), doc)
+		_, err := impl.cli.NewDocIfNotExist(ctx, impl.docFilter(t.Id), doc)
 
 		return err
 	}
@@ -61,11 +61,11 @@ func (impl *taskAdapter) FindAllTasks() ([]domain.Task, error) {
 	return r, nil
 }
 
-func (impl *taskAdapter) Find(name string) (domain.Task, error) {
+func (impl *taskAdapter) Find(tid string) (domain.Task, error) {
 	var do taskDO
 
 	f := func(ctx context.Context) error {
-		return impl.cli.GetDoc(ctx, impl.docFilter(name), bson.M{fieldOlds: 0}, &do)
+		return impl.cli.GetDoc(ctx, impl.docFilter(tid), bson.M{fieldOlds: 0}, &do)
 	}
 
 	if err := withContext(f); err != nil {

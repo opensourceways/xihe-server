@@ -16,6 +16,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
+	"github.com/opensourceways/xihe-server/messagequeue"
 	"github.com/opensourceways/xihe-server/points"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 )
@@ -32,18 +33,18 @@ func loadConfig(path string, cfg *configuration) error {
 
 type configuration struct {
 	MaxRetry         int    `json:"max_retry"`
-	TrainingEndpoint string `json:"training_endpoint"  required:"true"`
 	FinetuneEndpoint string `json:"finetune_endpoint"  required:"true"`
 
-	Inference  inferenceimpl.Config `json:"inference"    required:"true"`
-	Evaluate   evaluateConfig       `json:"evaluate"     required:"true"`
-	Cloud      cloudConfig          `json:"cloud"        required:"true"`
-	Mongodb    config.Mongodb       `json:"mongodb"      required:"true"`
-	Postgresql PostgresqlConfig     `json:"postgresql"   required:"true"`
-	Domain     domain.Config        `json:"domain"       required:"true"`
-	MQ         kafka.Config         `json:"mq"           required:"true"`
-	MQTopics   mqTopics             `json:"mq_topics"    required:"true"`
-	Points     points.Config        `json:"points"`
+	Inference  inferenceimpl.Config        `json:"inference"    required:"true"`
+	Evaluate   evaluateConfig              `json:"evaluate"     required:"true"`
+	Cloud      cloudConfig                 `json:"cloud"        required:"true"`
+	Mongodb    config.Mongodb              `json:"mongodb"      required:"true"`
+	Postgresql PostgresqlConfig            `json:"postgresql"   required:"true"`
+	Domain     domain.Config               `json:"domain"       required:"true"`
+	MQ         kafka.Config                `json:"mq"           required:"true"`
+	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
+	Points     points.Config               `json:"points"`
+	Training   messagequeue.TrainingConfig `json:"training"`
 }
 
 type PostgresqlConfig struct {
@@ -71,7 +72,7 @@ func (cfg *configuration) ConfigItems() []interface{} {
 
 func (cfg *configuration) setDefault() {
 	if cfg.MaxRetry <= 0 {
-		cfg.MaxRetry = 10
+		cfg.MaxRetry = 3
 	}
 
 	common.SetDefault(cfg)
@@ -150,4 +151,7 @@ type mqTopics struct {
 
 	//course
 	CourseApplied string `json:"course_applied"     required:"true"`
+
+	// training
+	TrainingCreated string `json:"training_created"`
 }

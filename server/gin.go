@@ -94,9 +94,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		mongodb.NewDatasetMapper(collections.Dataset),
 	)
 
-	// user := repositories.NewUserRepository(
-	// 	mongodb.NewUserMapper(collections.User),
-	// )
 	user := userrepoimpl.NewUserRepo(
 		mongodb.NewCollection(collections.User),
 	)
@@ -153,11 +150,13 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	gitlabRepo := gitlab.NewRepoFile()
 	authingUser := authingimpl.NewAuthingUser()
 	publisher := kafka.PublisherAdapter()
-	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
-	trainingAdapter := trainingimpl.NewTraining(&cfg.Training)
+	trainingAdapter := trainingimpl.NewTraining(&cfg.Training.Config)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)
+
+	// sender
+	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
 
 	userRegService := userapp.NewRegService(
 		userrepoimpl.NewUserRegRepo(
@@ -267,7 +266,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForTrainingController(
-			v1, trainingAdapter, training, model, proj, dataset, sender,
+			v1, trainingAdapter, training, model, proj, dataset,
+			messages.NewTrainingMessageAdapter(
+				&cfg.Training.Message, publisher,
+			),
 		)
 
 		controller.AddRouterForFinetuneController(
