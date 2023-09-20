@@ -21,7 +21,8 @@ const (
 	bigmodelDescPicture   = "desc_picture"
 	bigmodelDescPictureHF = "desc_picture_hf"
 	bigmodelAIDetector    = "ai_detector"
-	bigmodelBaiChuan           = "baichuan"
+	bigmodelBaiChuan      = "baichuan"
+	bigmodelGLM2          = "glm2"
 
 	langZH = "zh"
 	langEN = "en"
@@ -42,7 +43,8 @@ var (
 	BigmodelDescPicture   = BigmodelType(bigmodelDescPicture)
 	BigmodelDescPictureHF = BigmodelType(bigmodelDescPictureHF)
 	BigmodelAIDetector    = BigmodelType(bigmodelAIDetector)
-	BigmodelBaiChuan           = BigmodelType(bigmodelBaiChuan)
+	BigmodelBaiChuan      = BigmodelType(bigmodelBaiChuan)
+	BigmodelGLM2          = BigmodelType(bigmodelGLM2)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
@@ -287,7 +289,7 @@ func NewBaiChuanText(v string) (BaiChuanText, error) {
 		return nil, errors.New("no baichuan text")
 	}
 
-	if max:= 1000; utils.StrLen(v) > max { // TODO: to config
+	if max := 1000; utils.StrLen(v) > max { // TODO: to config
 		return nil, errors.New("invalid baichuan text")
 	}
 
@@ -306,7 +308,7 @@ type TopK interface {
 type top_k int
 
 func NewTopK(v int) (TopK, error) {
-	if min,max:=0,10; v < min || v > max {
+	if min, max := 0, 10; v < min || v > max {
 		return nil, errors.New("invalid top_k")
 	}
 
@@ -344,7 +346,7 @@ type Temperature interface {
 type temperature float64
 
 func NewTemperature(v float64) (Temperature, error) {
-	if min:= 0.00; v < min {
+	if min := 0.00; v < min {
 		return nil, errors.New("invalid temperature")
 	}
 
@@ -363,7 +365,7 @@ type RepetitionPenalty interface {
 type repetitionPenalty float64
 
 func NewRepetitionPenalty(v float64) (RepetitionPenalty, error) {
-	if min:= 0.00; v < min {
+	if min := 0.00; v < min {
 		return nil, errors.New("invalid repetitionPenalty")
 	}
 
@@ -372,4 +374,46 @@ func NewRepetitionPenalty(v float64) (RepetitionPenalty, error) {
 
 func (t repetitionPenalty) RepetitionPenalty() float64 {
 	return float64(t)
-} 
+}
+
+// glm2 text
+type GLM2Text interface {
+	GLM2Text() string
+}
+
+type glm2Text string
+
+func NewGLM2Text(v string) (GLM2Text, error) {
+	if v == "" {
+		return nil, errors.New("no glm2 text")
+	}
+
+	if max := 1000; utils.StrLen(v) > max { // TODO: to config
+		return nil, errors.New("invalid glm2 text")
+	}
+
+	return glm2Text(v), nil
+}
+
+func (t glm2Text) GLM2Text() string {
+	return string(t)
+}
+
+// glm2 history
+type GLM2History interface {
+	GLM2History() [2]string
+}
+
+type glm2History [2]string
+
+func NewGLM2History(q, a string) (GLM2History, error) {
+	if max := 1000; utils.StrLen(q) > max || utils.StrLen(a) > max {
+		return nil, errors.New("invalid glm2 history")
+	}
+
+	return glm2History{q, a}, nil
+}
+
+func (t glm2History) GLM2History() [2]string {
+	return t
+}

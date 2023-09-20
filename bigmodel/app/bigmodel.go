@@ -79,6 +79,9 @@ type BigModelService interface {
 
 	// baichuan
 	BaiChuan(*BaiChuanCmd) (string, BaiChuanDTO, error)
+
+	// glm2
+	GLM2(*GLM2Cmd) (string, error)
 }
 
 func NewBigModelService(

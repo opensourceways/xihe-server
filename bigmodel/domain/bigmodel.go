@@ -82,3 +82,13 @@ type BaiChuanInput struct {
 	RepetitionPenalty RepetitionPenalty
 }
 
+// glm2
+type GLM2Input struct {
+	Text              GLM2Text
+	Sampling          bool
+	History           []GLM2History
+	TopK              TopK
+	TopP              TopP
+	Temperature       Temperature
+	RepetitionPenalty RepetitionPenalty
+}

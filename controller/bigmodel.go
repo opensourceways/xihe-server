@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"io"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -54,6 +55,7 @@ func AddRouterForBigModelController(
 	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
 	rg.POST("/v1/bigmodel/ai_detector", ctl.AIDetector)
 	rg.POST("/v1/bigmodel/baichuan2_7b_chat", ctl.BaiChuan)
+	rg.POST("/v1/bigmodel/glm2_6b", ctl.GLM2)
 
 	rg.POST("/v1/bigmodel/api/apply/:model", ctl.ApplyApi)
 	rg.GET("/v1/bigmodel/api/get", ctl.GetUserApplyRecord)
@@ -1013,6 +1015,70 @@ func (ctl *BigModelController) BaiChuan(ctx *gin.Context) {
 		ctl.sendRespOfPost(ctx, dto)
 	}
 }
+
+//	@Title			GLM
+//	@Description	conversational AI
+//	@Tags			BigModel
+//	@Param			body	body	glm2Req	true	"body of glm2"
+//	@Accept			json
+//	@Success		202	{object}		message
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/bigmodel/glm2_6b [post]
+func (ctl *BigModelController) GLM2(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	req := glm2Request{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
+
+		return
+	}
+
+	ch := make(chan string)
+	cmd, err := req.toCmd(ch, pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	code, err := ctl.s.GLM2(&cmd)
+	if err != nil {
+		ctx.Stream(func(w io.Writer) bool {
+			if code == app.ErrorBigModelRecourseBusy {
+				ctx.SSEvent("message", "access overload, please try again later")
+			} else if code == app.ErrorBigModelSensitiveInfo {
+				ctx.SSEvent("message", "I cannot answer such questions")
+			}
+
+			close(ch)
+
+			return false
+		})
+
+		return
+	}
+
+	ctx.Header("Content-Type", "text/event-stream; charset=utf-8")
+	ctx.Header("Cache-Control", "no-cache")
+	ctx.Header("Connection", "keep-alive")
+
+	ctx.Stream(func(w io.Writer) bool {
+		if msg, ok := <-ch; ok {
+			if msg == "done" {
+				ctx.SSEvent("status", "done")
+			} else {
+				ctx.SSEvent("message", msg)
+			}
+			return true
+		}
+		return false
+	})
+}
+
 
 //	@Title			ApplyApi
 //	@Description	generates pictures by WuKong-hf

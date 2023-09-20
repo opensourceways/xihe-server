@@ -75,6 +75,7 @@ type Endpoints struct {
 	MultiplePictures string `json:"multiple_pictures"  required:"true"`
 	AIDetector       string `json:"ai_detector"        required:"true"`
 	BaiChuan         string `json:"baichuan"           required:"true"`
+	GLM2             string `json:"glm"                required:"true"`
 }
 
 func (e *Endpoints) validate() (err error) {
