@@ -6,6 +6,11 @@ import (
 	"time"
 )
 
+var (
+	chinese Language = dpLanguage("Chinese")
+	english Language = dpLanguage("English")
+)
+
 // Time
 type Time interface {
 	Time() int64
@@ -51,4 +56,28 @@ type dpURL string
 
 func (r dpURL) URL() string {
 	return string(r)
+}
+
+// Language
+type Language interface {
+	Language() string
+}
+
+type dpLanguage string
+
+func (r dpLanguage) Language() string {
+	return string(r)
+}
+
+func NewLanguage(v string) Language {
+	switch v {
+	case chinese.Language():
+		return chinese
+
+	case english.Language():
+		return english
+
+	default:
+		return nil
+	}
 }

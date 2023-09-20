@@ -7,25 +7,26 @@ import (
 )
 
 const (
-	fieldName = "name"
+	fieldId   = "id"
 	fieldOlds = "olds"
 )
 
 func totaskDO(t *domain.Task) taskDO {
 	return taskDO{
-		Name: t.Name,
-		Kind: t.Kind,
-		Addr: t.Addr,
-		Rule: toruleDO(&t.Rule),
-		Olds: []ruleDO{},
+		Id:    t.Id,
+		Names: t.Names,
+		Kind:  t.Kind,
+		Addr:  t.Addr,
+		Rule:  toruleDO(&t.Rule),
+		Olds:  []ruleDO{},
 	}
 }
 
 func toruleDO(r *domain.Rule) ruleDO {
 	return ruleDO{
-		OnceOnly:       r.OnceOnly,
-		Desc:           r.Desc,
+		Descs:          r.Descs,
 		CreatedAt:      r.CreatedAt,
+		OnceOnly:       r.OnceOnly,
 		PointsPerOnce:  r.PointsPerOnce,
 		MaxPointsOfDay: r.MaxPointsOfDay,
 	}
@@ -33,11 +34,12 @@ func toruleDO(r *domain.Rule) ruleDO {
 
 // taskDO
 type taskDO struct {
-	Name string   `bson:"name"  json:"name"`
-	Kind string   `bson:"kind"  json:"kind"`
-	Addr string   `bson:"addr"  json:"addr"`
-	Rule ruleDO   `bson:"rule"  json:"rule"`
-	Olds []ruleDO `bson:"olds"  json:"olds"`
+	Id    string            `bson:"id"    json:"id"`
+	Names map[string]string `bson:"name"  json:"name"`
+	Kind  string            `bson:"kind"  json:"kind"`
+	Addr  string            `bson:"addr"  json:"addr"`
+	Rule  ruleDO            `bson:"rule"  json:"rule"`
+	Olds  []ruleDO          `bson:"olds"  json:"olds"`
 }
 
 func (do *taskDO) doc() (bson.M, error) {
@@ -46,27 +48,28 @@ func (do *taskDO) doc() (bson.M, error) {
 
 func (do *taskDO) toTask() domain.Task {
 	return domain.Task{
-		Name: do.Name,
-		Kind: do.Kind,
-		Addr: do.Addr,
-		Rule: do.Rule.toRule(),
+		Id:    do.Id,
+		Names: do.Names,
+		Kind:  do.Kind,
+		Addr:  do.Addr,
+		Rule:  do.Rule.toRule(),
 	}
 }
 
 // ruleDO
 type ruleDO struct {
-	OnceOnly       bool   `bson:"once_only"          json:"once_only"`
-	Desc           string `bson:"desc"               json:"desc"`
-	CreatedAt      string `bson:"created_at"         json:"created_at"`
-	PointsPerOnce  int    `bson:"points_per_once"    json:"points_per_once"`
-	MaxPointsOfDay int    `bson:"max_points_of_day"  json:"max_points_of_day"`
+	Descs          map[string]string `bson:"desc"               json:"desc"`
+	CreatedAt      string            `bson:"created_at"         json:"created_at"`
+	OnceOnly       bool              `bson:"once_only"          json:"once_only"`
+	PointsPerOnce  int               `bson:"points_per_once"    json:"points_per_once"`
+	MaxPointsOfDay int               `bson:"max_points_of_day"  json:"max_points_of_day"`
 }
 
 func (do *ruleDO) toRule() domain.Rule {
 	return domain.Rule{
-		OnceOnly:       do.OnceOnly,
-		Desc:           do.Desc,
+		Descs:          do.Descs,
 		CreatedAt:      do.CreatedAt,
+		OnceOnly:       do.OnceOnly,
 		PointsPerOnce:  do.PointsPerOnce,
 		MaxPointsOfDay: do.MaxPointsOfDay,
 	}
