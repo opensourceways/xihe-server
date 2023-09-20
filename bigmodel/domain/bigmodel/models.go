@@ -59,4 +59,7 @@ type BigModel interface {
 
 	// baichuan2
 	BaiChuan(*domain.BaiChuanInput) (string, string, error)
+
+	// glm2
+	GLM2(chan string, *domain.GLM2Input) error
 }

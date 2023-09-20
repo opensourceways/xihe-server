@@ -348,3 +348,28 @@ func (cmd *BaiChuanCmd) SetDefault() {
 type BaiChuanDTO struct {
 	Text string `json:"text"`
 }
+
+// glm2
+type GLM2Cmd struct {
+	CH                chan string
+	User              types.Account
+	History           []domain.GLM2History
+	Sampling          bool
+	Text              domain.GLM2Text
+	TopK              domain.TopK
+	TopP              domain.TopP
+	Temperature       domain.Temperature
+	RepetitionPenalty domain.RepetitionPenalty
+}
+
+func (cmd *GLM2Cmd) SetDefault() {
+	cmd.TopK, _ = domain.NewTopK(5)
+	cmd.TopP, _ = domain.NewTopP(0.85)
+	cmd.Temperature, _ = domain.NewTemperature(0.3)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1.05)
+}
+
+type GLM2DTO struct {
+	Reply        string `json:"reply"`
+	StreamStatus string `json:"stream_status"`
+}
