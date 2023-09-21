@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
-
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
@@ -19,10 +18,7 @@ import (
 	"github.com/opensourceways/xihe-server/messagequeue"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
-<<<<<<< HEAD
-=======
 	"github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
->>>>>>> 0b45df0 (update message of useraction)
 )
 
 func loadConfig(path string, cfg *configuration) error {
@@ -49,18 +45,7 @@ type configuration struct {
 	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
 	Points     pointsConfig                `json:"points"`
 	Training   messagequeue.TrainingConfig `json:"training"`
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-	User       user.Config          `json:"user"         required:"true"`
-=======
-	User       user.Config                 `json:"user"         required:"true"`
->>>>>>> f320fe5 ( fix: update message of user config-)
-=======
 	User       messageadapter.Config       `json:"user"`
->>>>>>> 3afc252 (update message userinfo 566/11)
->>>>>>> 0b45df0 (update message of useraction)
 }
 
 type PostgresqlConfig struct {
