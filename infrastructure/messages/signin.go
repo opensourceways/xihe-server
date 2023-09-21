@@ -6,16 +6,16 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-func NewUserSignedInMessageAdapter(cfg *UserSignedInConfig, p common.Publisher) *signInMessageAdapter {
-	return &signInMessageAdapter{cfg: *cfg, publisher: p}
+func NewSignInMessageAdapter(cfg *SignInConfig, p common.Publisher) *signinMessageAdapter {
+	return &signinMessageAdapter{cfg: *cfg, publisher: p}
 }
 
-type signInMessageAdapter struct {
-	cfg       UserSignedInConfig
+type signinMessageAdapter struct {
+	cfg       SignInConfig
 	publisher common.Publisher
 }
 
-func (impl *signInMessageAdapter) SendUserSignedIn(v *domain.UserSignedInEvent) error {
+func (impl *signinMessageAdapter) SendUserSignedIn(v *domain.UserSignedInEvent) error {
 	t := &impl.cfg.UserSignedIn
 
 	return impl.publisher.Publish(
@@ -29,6 +29,6 @@ func (impl *signInMessageAdapter) SendUserSignedIn(v *domain.UserSignedInEvent) 
 	)
 }
 
-type UserSignedInConfig struct {
+type SignInConfig struct {
 	UserSignedIn common.TopicConfig `json:"user_signedin" required:"true"`
 }
