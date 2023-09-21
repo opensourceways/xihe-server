@@ -45,7 +45,6 @@ type configuration struct {
 	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
 	Points     pointsConfig                `json:"points"`
 	Training   messagequeue.TrainingConfig `json:"training"`
-	Resource   messages.ResourceConfig     `json:"resource"`
 }
 
 type PostgresqlConfig struct {

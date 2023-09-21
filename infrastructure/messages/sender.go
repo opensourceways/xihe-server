@@ -6,7 +6,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
-	"github.com/opensourceways/xihe-server/utils"
 )
 
 var _ message.Sender = (*sender)(nil)

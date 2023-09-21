@@ -131,7 +131,7 @@ func main() {
 	}
 
 	// run
-	run(newHandler(cfg, log), log, &cfg.MQTopics, cfg.Resource)
+	run(newHandler(cfg, log), log, &cfg.MQTopics)
 }
 
 func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
@@ -255,7 +255,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	return h
 }
 
-func run(h *handler, log *logrus.Entry, topics *mqTopics, cfg messages.ResourceConfig) {
+func run(h *handler, log *logrus.Entry, topics *mqTopics) {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
@@ -289,7 +289,7 @@ func run(h *handler, log *logrus.Entry, topics *mqTopics, cfg messages.ResourceC
 		}
 	}(ctx)
 
-	err := messages.Subscribe(ctx, h, log, &topics.Topics, kafka.SubscriberAdapter(), cfg)
+	err := messages.Subscribe(ctx, h, log, &topics.Topics, kafka.SubscriberAdapter())
 	if err != nil {
 		log.Errorf("subscribe failed, err:%v", err)
 	}
