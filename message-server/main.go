@@ -148,7 +148,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			),
 		),
 		[]string{
-			topics.SignIn.Topic,
+			topics.SignIn,
 			topics.CompetitorApplied,
 			topics.JupyterCreated,
 			topics.PicturePublicized,

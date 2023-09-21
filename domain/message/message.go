@@ -56,8 +56,6 @@ type Sender interface {
 	CreateEvaluate(*EvaluateInfo) error
 
 	CalcScore(*SubmissionInfo) error
-
-	SignIn(domain.Account) error
 }
 
 type EventHandler interface {

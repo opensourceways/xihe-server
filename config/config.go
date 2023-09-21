@@ -39,24 +39,25 @@ type Config struct {
 	MaxRetry        int `json:"max_retry"`
 	ActivityKeepNum int `json:"activity_keep_num"`
 
-	Competition competition.Config   `json:"competition"  required:"true"`
-	Challenge   challengeimpl.Config `json:"challenge"    required:"true"`
-	Training    trainingConfig       `json:"training"     required:"true"`
-	Finetune    finetuneimpl.Config  `json:"finetune"     required:"true"`
-	BigModel    bigmodel.Config      `json:"bigmodel"     required:"true"`
-	Authing     authingimpl.Config   `json:"authing"      required:"true"`
-	Mongodb     Mongodb              `json:"mongodb"      required:"true"`
-	Postgresql  PostgresqlConfig     `json:"postgresql"   required:"true"`
-	Redis       Redis                `json:"redis"        required:"true"`
-	Gitlab      gitlab.Config        `json:"gitlab"       required:"true"`
-	Domain      domain.Config        `json:"domain"       required:"true"`
-	App         app.Config           `json:"app"          required:"true"`
-	API         controller.APIConfig `json:"api"          required:"true"`
-	MQ          kafka.Config         `json:"mq"           required:"true"`
-	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
-	Points      pointsConfig         `json:"points"`
-	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
-	Course      course.Config        `json:"course"       required:"true"`
+	Competition competition.Config          `json:"competition"  required:"true"`
+	Challenge   challengeimpl.Config        `json:"challenge"    required:"true"`
+	Training    trainingConfig              `json:"training"     required:"true"`
+	Finetune    finetuneimpl.Config         `json:"finetune"     required:"true"`
+	BigModel    bigmodel.Config             `json:"bigmodel"     required:"true"`
+	Authing     authingimpl.Config          `json:"authing"      required:"true"`
+	Mongodb     Mongodb                     `json:"mongodb"      required:"true"`
+	Postgresql  PostgresqlConfig            `json:"postgresql"   required:"true"`
+	Redis       Redis                       `json:"redis"        required:"true"`
+	Gitlab      gitlab.Config               `json:"gitlab"       required:"true"`
+	Domain      domain.Config               `json:"domain"       required:"true"`
+	App         app.Config                  `json:"app"          required:"true"`
+	API         controller.APIConfig        `json:"api"          required:"true"`
+	MQ          kafka.Config                `json:"mq"           required:"true"`
+	MQTopics    messages.Topics             `json:"mq_topics"    required:"true"`
+	SignIn      messages.UserSignedInConfig `json:"sign_in"      required:"true"`
+	Points      pointsConfig                `json:"points"`
+	Cloud       cloudmsg.Config             `json:"cloud"        required:"true"`
+	Course      course.Config               `json:"course"       required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {

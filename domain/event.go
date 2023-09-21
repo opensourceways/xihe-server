@@ -6,3 +6,7 @@ type TrainingCreatedEvent struct {
 	TrainingIndex  TrainingIndex
 	TrainingInputs []Input
 }
+
+type UserSignedInEvent struct {
+	Account Account
+}

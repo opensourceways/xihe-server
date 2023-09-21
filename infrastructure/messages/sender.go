@@ -180,15 +180,6 @@ func (s *sender) CalcScore(info *message.SubmissionInfo) error {
 	return s.send(s.topics.Submission, &v)
 }
 
-// Sign In
-func (s *sender) SignIn(u domain.Account) error {
-	return s.send(s.topics.SignIn.Topic, &common.MsgNormal{
-		Type:      s.topics.SignIn.Name,
-		User:      u.Account(),
-		CreatedAt: utils.Now(),
-	})
-}
-
 // operate log
 func (s *sender) AddOperateLogForNewUser(u domain.Account) error {
 	return s.sendOperateLog(u, "user", nil)

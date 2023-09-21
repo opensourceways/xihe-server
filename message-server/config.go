@@ -152,6 +152,8 @@ func (cfg *pointsConfig) ConfigItems() []interface{} {
 type mqTopics struct {
 	messages.Topics
 
+	SignIn string `json:"signin" required:"true"`
+
 	// competition
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
 
