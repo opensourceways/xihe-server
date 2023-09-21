@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/opensourceways/community-robot-lib/utils"
 	redislib "github.com/opensourceways/redis-lib"
 	"github.com/opensourceways/xihe-server/course"
 
@@ -23,6 +22,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func LoadConfig(path string, cfg *Config) error {
@@ -108,7 +108,7 @@ func (cfg *Config) setDefault() {
 }
 
 func (cfg *Config) validate() error {
-	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
+	if err := utils.CheckConfig(cfg, ""); err != nil {
 		return err
 	}
 

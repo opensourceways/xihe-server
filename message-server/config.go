@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/opensourceways/community-robot-lib/utils"
-
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
@@ -19,6 +17,7 @@ import (
 	"github.com/opensourceways/xihe-server/messagequeue"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func loadConfig(path string, cfg *configuration) error {
@@ -79,7 +78,7 @@ func (cfg *configuration) setDefault() {
 }
 
 func (cfg *configuration) validate() error {
-	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
+	if err := utils.CheckConfig(cfg, ""); err != nil {
 		return err
 	}
 

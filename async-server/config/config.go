@@ -1,8 +1,6 @@
 package config
 
 import (
-	"github.com/opensourceways/community-robot-lib/utils"
-
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/poolimpl"
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/async-server/infrastructure/watchimpl"
@@ -10,6 +8,7 @@ import (
 	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func LoadConfig(path string, cfg *Config) error {
@@ -51,7 +50,7 @@ func (cfg *Config) setDefault() {
 }
 
 func (cfg *Config) validate() error {
-	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
+	if err := utils.CheckConfig(cfg, ""); err != nil {
 		return err
 	}
 
