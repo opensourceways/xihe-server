@@ -5,6 +5,7 @@ import (
 
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 	"github.com/opensourceways/kafka-lib/mq"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
@@ -36,6 +37,13 @@ func SubscriberAdapter() subscriberAdapter {
 	return subscriberAdapter{}
 }
 
+func OperateLogPublisherAdapter(topic string, publisher publisherAdapter) operatePublisherAdapter {
+	return operatePublisherAdapter{
+		topic:     topic,
+		publisher: publisher,
+	}
+}
+
 // publisherAdapter
 type publisherAdapter struct{}
 
@@ -46,6 +54,28 @@ func (publisherAdapter) Publish(topic string, v interface{}, header map[string]s
 	}
 
 	return kfklib.Publish(topic, header, body)
+}
+
+type operatePublisherAdapter struct {
+	topic     string
+	publisher publisherAdapter
+}
+
+type MsgOperateLog struct {
+	When int64             `json:"when"`
+	User string            `json:"user"`
+	Type string            `json:"type"`
+	Info map[string]string `json:"info,omitempty"`
+}
+
+func (o operatePublisherAdapter) SendOperateLog(u string, t string, info map[string]string) error {
+
+	return o.publisher.Publish(o.topic, &MsgOperateLog{
+		When: utils.Now(),
+		User: u,
+		Type: t,
+		Info: info,
+	}, nil)
 }
 
 // subscriberAdapter

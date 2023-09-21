@@ -169,4 +169,7 @@ type mqTopics struct {
 
 	// training
 	TrainingCreated string `json:"training_created"`
+	ProjectCreated  string `json:"project_created"`
+	ModelCreated    string `json:"model_created"`
+	DatasetCreated  string `json:"dataset_created"`
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
-	"github.com/opensourceways/xihe-server/utils"
 )
 
 var _ message.Sender = (*sender)(nil)
@@ -16,8 +15,9 @@ func NewMessageSender(topic *Topics, p common.Publisher) *sender {
 }
 
 type sender struct {
-	topics    Topics
-	publisher common.Publisher
+	topics     Topics
+	publisher  common.Publisher
+	operateLog common.OperateLogPublisher
 }
 
 // Following
@@ -54,14 +54,6 @@ func (s *sender) sendLike(msg *domain.ResourceObject, action string) error {
 	toMsgResourceObject(msg, &v.Resource)
 
 	return s.send(s.topics.Like, &v)
-}
-
-// Fork
-func (s *sender) IncreaseFork(msg *domain.ResourceIndex) error {
-	v := new(resourceIndex)
-	toMsgResourceIndex(msg, v)
-
-	return s.send(s.topics.Fork, v)
 }
 
 // Download
@@ -126,48 +118,6 @@ func (s *sender) CreateEvaluate(info *message.EvaluateInfo) error {
 	return s.send(s.topics.Evaluate, &v)
 }
 
-// RelatedResource
-func (s *sender) AddRelatedResource(msg *message.RelatedResource) error {
-	return s.sendRelatedResource(msg, actionAdd)
-}
-
-func (s *sender) RemoveRelatedResource(msg *message.RelatedResource) error {
-	return s.sendRelatedResource(msg, actionRemove)
-}
-
-func (s *sender) RemoveRelatedResources(msg *message.RelatedResources) error {
-	v := msgRelatedResources{Action: actionRemove}
-
-	toMsgResourceObject(&msg.Promoter, &v.Promoter)
-
-	v.Resources = make([]resourceObjects, len(msg.Resources))
-	for i := range msg.Resources {
-		toMsgResourceObjects(&msg.Resources[i], &v.Resources[i])
-	}
-
-	return s.send(s.topics.RelatedResource, &v)
-}
-
-func (s *sender) sendRelatedResource(msg *message.RelatedResource, action string) error {
-	v := msgRelatedResources{Action: action}
-
-	toMsgResourceObject(msg.Promoter, &v.Promoter)
-
-	v.Resources = []resourceObjects{
-		{
-			Type: msg.Resource.Type.ResourceType(),
-			Objects: []resourceIndex{
-				{
-					Owner: msg.Resource.Owner.Account(),
-					Id:    msg.Resource.Id,
-				},
-			},
-		},
-	}
-
-	return s.send(s.topics.RelatedResource, &v)
-}
-
 // Competition
 func (s *sender) CalcScore(info *message.SubmissionInfo) error {
 	v := msgSubmission{
@@ -191,16 +141,6 @@ func (s *sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldoma
 	})
 }
 
-func (s *sender) AddOperateLogForCreateResource(
-	obj domain.ResourceObject, name domain.ResourceName,
-) error {
-	return s.sendOperateLog(obj.Owner, "resource", map[string]string{
-		"id":   obj.Id,
-		"name": name.ResourceName(),
-		"type": obj.Type.ResourceType(),
-	})
-}
-
 func (s *sender) AddOperateLogForDownloadFile(u domain.Account, repo message.RepoFile) error {
 	return s.sendOperateLog(u, "download", map[string]string{
 		"user": repo.User.Account(),
@@ -210,17 +150,7 @@ func (s *sender) AddOperateLogForDownloadFile(u domain.Account, repo message.Rep
 }
 
 func (s *sender) sendOperateLog(u domain.Account, t string, info map[string]string) error {
-	a := ""
-	if u != nil {
-		a = u.Account()
-	}
-
-	return s.send(s.topics.OperateLog, &MsgOperateLog{
-		When: utils.Now(),
-		User: a,
-		Type: t,
-		Info: info,
-	})
+	return s.operateLog.SendOperateLog(u.Account(), t, info)
 }
 
 // send
