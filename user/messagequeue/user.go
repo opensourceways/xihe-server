@@ -7,7 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/user/domain"
-	followmsg "github.com/opensourceways/xihe-server/user/domain/message"
+	"github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 )
 
 const (
@@ -17,26 +17,24 @@ const (
 	handleNameUserFollowingRemove = "user_following_remove"
 )
 
-func Subscribe(s app.UserService, subscriber message.Subscriber) (err error) {
+func Subscribe(s app.UserService, subscriber message.Subscriber, topics *messageadapter.Config) (err error) {
 	c := &consumer{s}
-
-	topicmsg := TopicConfig{}
 
 	err = subscriber.SubscribeWithStrategyOfRetry(
 		handleNameUserFollowingAdd,
 		c.HandleEventAddFollowing,
-		[]string{topicmsg.FollowingAdd},
+		[]string{topics.FollowingAdded.Topic},
 		retryNum,
 	)
 
 	if err != nil {
-		return  err
+		return err
 	}
 
 	err = subscriber.SubscribeWithStrategyOfRetry(
 		handleNameUserFollowingRemove,
 		c.HandleEventRemoveFollowing,
-		[]string{topicmsg.FollowingRemove},
+		[]string{topics.FollowingRemoved.Topic},
 		retryNum,
 	)
 
@@ -49,21 +47,25 @@ type consumer struct {
 }
 
 func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) (err error) {
-	msg := message.msgFolloweing{}
+	msg := domain.MsgFollowing{}
 
 	if err := json.Unmarshal(body, &msg); err != nil {
 		return err
 	}
 
-	user, err := domain.NewAccount(msg.User)
-
+	user, err := domain.NewAccount(msg.MsgNormal.User)
 	if err != nil {
-		return err
+		return
+	}
+
+	follower, err := domain.NewAccount(msg.Follower)
+	if err != nil {
+		return
 	}
 
 	v := domain.FollowerInfo{
 		User:     user,
-		Follower: msg.Follower.Account,
+		Follower: follower,
 	}
 
 	err = c.s.AddFollower(&v)
@@ -79,22 +81,27 @@ func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) (er
 
 }
 
-func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) error {
-	msg := message.msgFolloweing{}
+func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) (err error) {
+	msg := domain.MsgFollowing{}
 
 	if err := json.Unmarshal(body, &msg); err != nil {
-		return err
+		return
 	}
 
-	user, err := domain.NewAccount(msg.User)
+	user, err := domain.NewAccount(msg.MsgNormal.User)
 
 	if err != nil {
-		return err
+		return
+	}
+
+	follower, err := domain.NewAccount(msg.Follower)
+	if err != nil {
+		return
 	}
 
 	v := domain.FollowerInfo{
 		User:     user,
-		Follower: msg.Follower.Account,
+		Follower: follower,
 	}
 
 	return c.s.RemoveFollower(&v)

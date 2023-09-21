@@ -6,9 +6,9 @@ import (
 )
 
 type UserConfig struct {
-	messageadapter.Config
+	authingimpl.Config
 
-	Message authingimpl.Config `json:"message"   required:"true"`
+	Message messageadapter.Config `json:"message"   required:"true"`
 }
 
 func (cfg *UserConfig) ConfigItems() []interface{} {

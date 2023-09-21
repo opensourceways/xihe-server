@@ -6,7 +6,6 @@ import (
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/utils"
-	"github.com/opensourceways/xihe-server/user/domain/message"
 )
 
 func MessageAdapter(cfg *Config, p common.Publisher) *messageAdapter {
@@ -64,9 +63,9 @@ func (impl *messageAdapter) SendUserBioSetEvent(v *domain.UserBioSetEvent) error
 func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingAdded
 
-	msg := message.msgFolloweing{
+	msg := domain.MsgFollowing{
 		Follower: v.Follower.Account(),
-		com: common.MsgNormal{
+		MsgNormal: common.MsgNormal{
 			Type:      cfg.Name,
 			User:      v.User.Account(),
 			Desc:      fmt.Sprintf("Add Following of %s", v.Follower.Account()),
@@ -81,14 +80,32 @@ func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) erro
 func (impl *messageAdapter) SendFollowingRemovedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingRemoved
 
-	msg := message.msgFolloweing{
+	msg := domain.MsgFollowing{
 		Follower: v.Follower.Account(),
-		com: common.MsgNormal{
+		MsgNormal: common.MsgNormal{
 			Type:      cfg.Name,
 			User:      v.User.Account(),
 			Desc:      fmt.Sprintf("Remove Following of %s", v.Follower.Account()),
 			CreatedAt: utils.Now(),
 		},
+	}
+
+	return impl.publisher.Publish(cfg.Topic, &msg, nil)
+}
+
+func (impl *messageAdapter) AddOperateLogForNewUser(u domain.Account) error {
+	a := ""
+	if u != nil {
+		a = u.Account()
+	}
+
+	cfg := &impl.cfg.OperateLog
+
+	msg := common.MsgNormal{
+		Type:      cfg.Name,
+		User:      a,
+		Desc:      fmt.Sprintf("Add Operate Log for new user: %s", a),
+		CreatedAt: utils.Now(),
 	}
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
@@ -102,4 +119,5 @@ type Config struct {
 
 	FollowingAdded   common.TopicConfig `json:"following_added"   required:"true"`
 	FollowingRemoved common.TopicConfig `json:"following_removed" required:"true"`
+	OperateLog       common.TopicConfig `json:"operate_log"       required:"true"`
 }

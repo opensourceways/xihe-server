@@ -23,7 +23,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
-	"github.com/opensourceways/xihe-server/user"
 )
 
 func LoadConfig(path string, cfg *Config) error {
@@ -58,7 +57,7 @@ type Config struct {
 	Points      pointsConfig         `json:"points"`
 	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
 	Course      course.Config        `json:"course"       required:"true"`
-	User        user.Config          `json:"user"         required:"true"`
+	User        UserConfig           `json:"user"         required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {

@@ -33,6 +33,7 @@ import (
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	"github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
@@ -132,7 +133,7 @@ func main() {
 	}
 
 	// user
-	if err = userSubscribesMessage(cfg, &cfg.MQTopics); err != nil {
+	if err = userSubscribesMessage(cfg, &cfg.User); err != nil {
 		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
 
 		return
@@ -171,7 +172,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 	)
 }
 
-func userSubscribesMessage(cfg *configuration, topics *mqTopics) error {
+func userSubscribesMessage(cfg *configuration, topics *messageadapter.Config) error {
 	collections := &cfg.Mongodb.Collections
 
 	return usermq.Subscribe(
@@ -184,6 +185,7 @@ func userSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			nil,
 		),
 		kafka.SubscriberAdapter(),
+		topics,
 	)
 }
 
