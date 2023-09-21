@@ -1,7 +1,6 @@
 package config
 
 import (
-	"github.com/opensourceways/community-robot-lib/utils"
 	redislib "github.com/opensourceways/redis-lib"
 
 	"github.com/opensourceways/xihe-server/app"
@@ -23,6 +22,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func LoadConfig(path string, cfg *Config) error {
@@ -39,25 +39,27 @@ type Config struct {
 	MaxRetry        int `json:"max_retry"`
 	ActivityKeepNum int `json:"activity_keep_num"`
 
-	Competition competition.Config   `json:"competition"  required:"true"`
-	Challenge   challengeimpl.Config `json:"challenge"    required:"true"`
-	Training    trainingConfig       `json:"training"     required:"true"`
-	Finetune    finetuneimpl.Config  `json:"finetune"     required:"true"`
-	BigModel    bigmodel.Config      `json:"bigmodel"     required:"true"`
-	Authing     authingimpl.Config   `json:"authing"      required:"true"`
-	Mongodb     Mongodb              `json:"mongodb"      required:"true"`
-	Postgresql  PostgresqlConfig     `json:"postgresql"   required:"true"`
-	Redis       Redis                `json:"redis"        required:"true"`
-	Gitlab      gitlab.Config        `json:"gitlab"       required:"true"`
-	Domain      domain.Config        `json:"domain"       required:"true"`
-	App         app.Config           `json:"app"          required:"true"`
-	API         controller.APIConfig `json:"api"          required:"true"`
-	MQ          kafka.Config         `json:"mq"           required:"true"`
-	MQTopics    messages.Topics      `json:"mq_topics"    required:"true"`
-	Points      pointsConfig         `json:"points"`
-	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
-	Course      course.Config        `json:"course"       required:"true"`
-	User        UserConfig           `json:"user"         required:"true"`
+	Competition competition.Config      `json:"competition"  required:"true"`
+	Challenge   challengeimpl.Config    `json:"challenge"    required:"true"`
+	Training    trainingConfig          `json:"training"     required:"true"`
+	Finetune    finetuneimpl.Config     `json:"finetune"     required:"true"`
+	BigModel    bigmodel.Config         `json:"bigmodel"     required:"true"`
+	Authing     authingimpl.Config      `json:"authing"      required:"true"`
+	Mongodb     Mongodb                 `json:"mongodb"      required:"true"`
+	Postgresql  PostgresqlConfig        `json:"postgresql"   required:"true"`
+	Redis       Redis                   `json:"redis"        required:"true"`
+	Gitlab      gitlab.Config           `json:"gitlab"       required:"true"`
+	Domain      domain.Config           `json:"domain"       required:"true"`
+	App         app.Config              `json:"app"          required:"true"`
+	API         controller.APIConfig    `json:"api"          required:"true"`
+	MQ          kafka.Config            `json:"mq"           required:"true"`
+	MQTopics    messages.Topics         `json:"mq_topics"    required:"true"`
+	SignIn      messages.SignInConfig   `json:"sign_in"      required:"true"`
+	Points      pointsConfig            `json:"points"`
+	Cloud       cloudmsg.Config         `json:"cloud"        required:"true"`
+	Course      course.Config           `json:"course"       required:"true"`
+	Resource    messages.ResourceConfig `json:"resource"       required:"true"`
+  	User        UserConfig           `json:"user"         required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -88,10 +90,13 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.API,
 		&cfg.MQ,
 		&cfg.MQTopics,
+		&cfg.SignIn,
 		&cfg.Points,
 		&cfg.Cloud,
 		&cfg.Course,
+    		&cfg.Resource
 		&cfg.User,
+
 	}
 }
 
@@ -108,7 +113,7 @@ func (cfg *Config) setDefault() {
 }
 
 func (cfg *Config) validate() error {
-	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
+	if err := utils.CheckConfig(cfg, ""); err != nil {
 		return err
 	}
 

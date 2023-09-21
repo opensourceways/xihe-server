@@ -134,7 +134,7 @@ func NewModelService(
 	dataset repository.Dataset,
 	activity repository.Activity,
 	pr platform.Repository,
-	sender message.Sender,
+	sender message.ResourceProducer,
 ) ModelService {
 	return modelService{
 		repo:     repo,
@@ -154,7 +154,7 @@ type modelService struct {
 	//pr       platform.Repository
 	activity repository.Activity
 	rs       resourceService
-	sender   message.Sender
+	sender   message.ResourceProducer
 }
 
 func (s modelService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -187,6 +187,11 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, m.Name)
+
+	_ = s.sender.CreateModel(message.ModelCreatedEvent{
+		Account:   r.Owner,
+		ModelName: dto.Name,
+	})
 
 	return
 }

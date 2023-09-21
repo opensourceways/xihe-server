@@ -33,7 +33,6 @@ require (
 require (
 	github.com/IBM/sarama v1.41.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/Shopify/sarama v1.38.1 // indirect
 	github.com/bytedance/sonic v1.9.2 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect

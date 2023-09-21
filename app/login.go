@@ -44,7 +44,7 @@ type LoginService interface {
 	SignIn(domain.Account) error
 }
 
-func NewLoginService(repo repository.Login, sender message.Sender) LoginService {
+func NewLoginService(repo repository.Login, sender message.UserSignedInMessageProducer) LoginService {
 	return loginService{
 		repo:   repo,
 		sender: sender,
@@ -53,7 +53,7 @@ func NewLoginService(repo repository.Login, sender message.Sender) LoginService 
 
 type loginService struct {
 	repo   repository.Login
-	sender message.Sender
+	sender message.UserSignedInMessageProducer
 }
 
 func (s loginService) Create(cmd *LoginCreateCmd) error {
@@ -81,5 +81,5 @@ func (s loginService) toLoginDTO(u *domain.Login, dto *LoginDTO) {
 }
 
 func (s loginService) SignIn(account domain.Account) error {
-	return s.sender.SignIn(account)
+	return s.sender.SendUserSignedIn(&domain.UserSignedInEvent{account})
 }

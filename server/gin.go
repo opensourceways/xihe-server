@@ -157,6 +157,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	gitlabRepo := gitlab.NewRepoFile()
 	authingUser := authingimpl.NewAuthingUser()
 	publisher := kafka.PublisherAdapter()
+	operater := kafka.OperateLogPublisherAdapter(cfg.MQTopics.OperateLog, publisher)
 	trainingAdapter := trainingimpl.NewTraining(&cfg.Training.Config)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
@@ -164,6 +165,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	// sender
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
+	// resource producer
+	resProducer := messages.NewResourceMessageAdapter(&cfg.Resource, publisher, operater)
 
 	userRegService := userapp.NewRegService(
 		userrepoimpl.NewUserRegRepo(
@@ -171,7 +174,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
-	loginService := app.NewLoginService(login, sender)
+	loginService := app.NewLoginService(
+		login, messages.NewSignInMessageAdapter(&cfg.SignIn, publisher),
+	)
 
 	asyncAppService := asyncapp.NewTaskService(asyncrepoimpl.NewAsyncTaskRepo(&cfg.Postgresql.Async))
 
@@ -211,11 +216,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		userRegService,
 	)
 
-	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, sender)
+	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, resProducer)
 
-	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, sender)
+	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
 
-	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, sender)
+	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, resProducer)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 
@@ -231,17 +236,17 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	{
 		controller.AddRouterForProjectController(
-			v1, user, proj, model, dataset, activity, tags, like, sender,
+			v1, user, proj, model, dataset, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
 		controller.AddRouterForModelController(
-			v1, user, model, proj, dataset, activity, tags, like, sender,
+			v1, user, model, proj, dataset, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
 		controller.AddRouterForDatasetController(
-			v1, user, dataset, model, proj, activity, tags, like, sender,
+			v1, user, dataset, model, proj, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 

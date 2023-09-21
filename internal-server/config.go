@@ -1,11 +1,10 @@
 package main
 
 import (
-	"github.com/opensourceways/community-robot-lib/utils"
-
 	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 func loadConfig(path string, cfg *configuration) error {
@@ -37,7 +36,7 @@ func (cfg *configuration) setDefault() {
 }
 
 func (cfg *configuration) validate() error {
-	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
+	if err := utils.CheckConfig(cfg, ""); err != nil {
 		return err
 	}
 

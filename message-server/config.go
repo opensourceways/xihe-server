@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/opensourceways/community-robot-lib/utils"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
@@ -18,6 +17,7 @@ import (
 	"github.com/opensourceways/xihe-server/messagequeue"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+  	"github.com/opensourceways/xihe-server/utils"
 	followmsg "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
@@ -80,7 +80,7 @@ func (cfg *configuration) setDefault() {
 }
 
 func (cfg *configuration) validate() error {
-	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
+	if err := utils.CheckConfig(cfg, ""); err != nil {
 		return err
 	}
 
@@ -162,6 +162,8 @@ type userConfig struct {
 type mqTopics struct {
 	messages.Topics
 
+	SignIn string `json:"signin" required:"true"`
+
 	// competition
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
 
@@ -177,7 +179,10 @@ type mqTopics struct {
 	CourseApplied string `json:"course_applied"      required:"true"`
 
 	// training
-	TrainingCreated string `json:"training_created"    required:"true"`
+	TrainingCreated string `json:"training_created"`
+	ProjectCreated  string `json:"project_created"`
+	ModelCreated    string `json:"model_created"`
+	DatasetCreated  string `json:"dataset_created"`
 
 	//user
 	User userConfig `json:"user"                required:"true"`
