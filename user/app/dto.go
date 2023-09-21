@@ -65,20 +65,22 @@ type UserDTO struct {
 }
 
 type UpdateUserBasicInfoCmd struct {
-	Bio      domain.Bio
-	Email    domain.Email
-	AvatarId domain.AvatarId
+	Bio           domain.Bio
+	Email         domain.Email
+	AvatarId      domain.AvatarId
+	avatarChanged bool
+	bioChanged    bool
 }
 
 func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 	if cmd.AvatarId != nil && !domain.IsSameDomainValue(cmd.AvatarId, u.AvatarId) {
 		u.AvatarId = cmd.AvatarId
-		changed = true
+		cmd.avatarChanged = true
 	}
 
 	if cmd.Bio != nil && !domain.IsSameDomainValue(cmd.Bio, u.Bio) {
 		u.Bio = cmd.Bio
-		changed = true
+		cmd.bioChanged = true
 	}
 
 	if cmd.Email != nil && u.Email.Email() != cmd.Email.Email() {

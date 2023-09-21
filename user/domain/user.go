@@ -1,6 +1,7 @@
 package domain
 
 import (
+	common "github.com/opensourceways/xihe-server/common/domain/message"
 	types "github.com/opensourceways/xihe-server/domain"
 )
 
@@ -45,7 +46,6 @@ type UserInfo struct {
 	AvatarId AvatarId
 }
 
-
 // register
 type UserRegInfo struct {
 	Account  types.Account
@@ -57,4 +57,9 @@ type UserRegInfo struct {
 	Province Province
 	Detail   map[string]string
 	Version  int
+}
+
+type MsgFollowing struct {
+	MsgNormal common.MsgNormal
+	Follower  string `json:"follower"`
 }

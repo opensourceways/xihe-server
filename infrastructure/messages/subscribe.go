@@ -12,7 +12,6 @@ import (
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 const (
@@ -37,11 +36,6 @@ func Subscribe(
 	r := register{
 		topics:     topic,
 		subscriber: subscriber,
-	}
-
-	// register following
-	if err = r.registerHandlerForFollowing(handler); err != nil {
-		return
 	}
 
 	// register like
@@ -93,39 +87,6 @@ func Subscribe(
 type register struct {
 	topics     *Topics
 	subscriber common.Subscriber
-}
-
-func (r *register) registerHandlerForFollowing(handler interface{}) error {
-	h, ok := handler.(message.FollowingHandler)
-	if !ok {
-		return nil
-	}
-
-	return r.subscribe(r.topics.Following, handlerNameAddFollowing, func(b []byte, hd map[string]string) (err error) {
-		body := msgFollower{}
-		if err = json.Unmarshal(b, &body); err != nil {
-			return
-		}
-
-		f := &userdomain.FollowerInfo{}
-		if f.User, err = userdomain.NewAccount(body.User); err != nil {
-			return
-		}
-
-		if f.Follower, err = userdomain.NewAccount(body.Follower); err != nil {
-			return
-		}
-
-		switch body.Action {
-		case actionAdd:
-			return h.HandleEventAddFollowing(f)
-
-		case actionRemove:
-			return h.HandleEventRemoveFollowing(f)
-		}
-
-		return nil
-	})
 }
 
 func (r *register) registerHandlerForLike(handler interface{}) error {

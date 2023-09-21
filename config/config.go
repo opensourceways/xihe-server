@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/opensourceways/community-robot-lib/utils"
 	redislib "github.com/opensourceways/redis-lib"
-	"github.com/opensourceways/xihe-server/course"
 
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
@@ -16,6 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/competition"
 	"github.com/opensourceways/xihe-server/controller"
+	"github.com/opensourceways/xihe-server/course"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
@@ -57,6 +57,7 @@ type Config struct {
 	Points      pointsConfig         `json:"points"`
 	Cloud       cloudmsg.Config      `json:"cloud"        required:"true"`
 	Course      course.Config        `json:"course"       required:"true"`
+	User        UserConfig           `json:"user"         required:"true"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -90,6 +91,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.Points,
 		&cfg.Cloud,
 		&cfg.Course,
+		&cfg.User,
 	}
 }
 
