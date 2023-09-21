@@ -34,6 +34,7 @@ import (
 	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
+	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
 type options struct {
@@ -130,6 +131,13 @@ func main() {
 		return
 	}
 
+	// user
+	if err = userSubscribesMessage(cfg, &cfg.User); err != nil {
+		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
 	// run
 	run(newHandler(cfg, log), log, &cfg.MQTopics)
 }
@@ -155,11 +163,32 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.PictureLiked,
 			topics.CourseApplied,
 			topics.TrainingCreated,
-			topics.ProjectCreated,
-			topics.DatasetCreated,
-			topics.ProjectCreated,
+      			topics.ProjectCreated,
+			      topics.DatasetCreated,
+			      topics.ProjectCreated,
+			topics.User.UserSignedUp,
+			topics.User.BioSet,
+			topics.User.AvatarSet,
+			topics.TrainingCreated,
 		},
 		kafka.SubscriberAdapter(),
+	)
+}
+
+func userSubscribesMessage(cfg *configuration, topics *userConfig) error {
+	collections := &cfg.Mongodb.Collections
+
+	return usermq.Subscribe(
+		userapp.NewUserService(userrepo.NewUserRepo(
+			mongodb.NewCollection(collections.User),
+		),
+			nil,
+			nil,
+			nil,
+			nil,
+		),
+		kafka.SubscriberAdapter(),
+		topics.TopicConfig,
 	)
 }
 
@@ -196,8 +225,6 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	h := &handler{
 		log:      log,
 		maxRetry: cfg.MaxRetry,
-
-		user: userapp.NewUserService(userRepo, nil, nil, nil, nil),
 
 		project: app.NewProjectMessageService(
 			repositories.NewProjectRepository(

@@ -49,6 +49,7 @@ import (
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	"github.com/opensourceways/xihe-server/points/infrastructure/taskdocimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
@@ -229,7 +230,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	}
 
 	userAppService := userapp.NewUserService(
-		user, gitlabUser, sender, pointsAppService, controller.EncryptHelperToken(),
+		user, gitlabUser, usermsg.MessageAdapter(&cfg.User.Message, publisher),
+		pointsAppService, controller.EncryptHelperToken(),
 	)
 
 	{
