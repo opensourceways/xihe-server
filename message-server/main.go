@@ -33,7 +33,6 @@ import (
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
 	userapp "github.com/opensourceways/xihe-server/user/app"
-	"github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
@@ -170,15 +169,15 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.ProjectDownloaded,
 			topics.ModelDownloaded,
 			topics.DatasetDownloaded,
-			topics.UserSignedUp,
-			topics.BioSet,
-			topics.AvatarSet,
+			topics.User.UserSignedUp,
+			topics.User.BioSet,
+			topics.User.AvatarSet,
 		},
 		kafka.SubscriberAdapter(),
 	)
 }
 
-func userSubscribesMessage(cfg *configuration, topics *messageadapter.Config) error {
+func userSubscribesMessage(cfg *configuration, topics *userConfig) error {
 	collections := &cfg.Mongodb.Collections
 
 	return usermq.Subscribe(
@@ -191,7 +190,7 @@ func userSubscribesMessage(cfg *configuration, topics *messageadapter.Config) er
 			nil,
 		),
 		kafka.SubscriberAdapter(),
-		topics,
+		topics.TopicConfig,
 	)
 }
 
@@ -228,8 +227,6 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	h := &handler{
 		log:      log,
 		maxRetry: cfg.MaxRetry,
-
-		user: userapp.NewUserService(userRepo, nil, nil, nil, nil),
 
 		project: app.NewProjectMessageService(
 			repositories.NewProjectRepository(
