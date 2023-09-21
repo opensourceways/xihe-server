@@ -46,7 +46,7 @@ func (s *downloadMessageAdapter) IncreaseDownload(obj *domain.ResourceObject) er
 	return s.publisher.Publish(s.cfg.ModelDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) SendResourceDownloaded(e *domain.RepoDownloadEvent) (err error) {
+func (s *downloadMessageAdapter) SendRepoDownloaded(e *domain.RepoDownloadedEvent) (err error) {
 	switch e.Type {
 	case domain.ResourceTypeDataset:
 		err = s.downloadDataset(e)
@@ -60,7 +60,7 @@ func (s *downloadMessageAdapter) SendResourceDownloaded(e *domain.RepoDownloadEv
 }
 
 // Download project/model/dataset
-func (s *downloadMessageAdapter) downloadModel(e *domain.RepoDownloadEvent) error {
+func (s *downloadMessageAdapter) downloadModel(e *domain.RepoDownloadedEvent) error {
 	v := &commsg.MsgNormal{
 		User:      e.Account.Account(),
 		Type:      s.cfg.ModelDownload.Name,
@@ -71,7 +71,7 @@ func (s *downloadMessageAdapter) downloadModel(e *domain.RepoDownloadEvent) erro
 	return s.publisher.Publish(s.cfg.ModelDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) downloadDataset(e *domain.RepoDownloadEvent) error {
+func (s *downloadMessageAdapter) downloadDataset(e *domain.RepoDownloadedEvent) error {
 	v := &commsg.MsgNormal{
 		User:      e.Account.Account(),
 		Type:      s.cfg.DatasetDownload.Name,
@@ -82,7 +82,7 @@ func (s *downloadMessageAdapter) downloadDataset(e *domain.RepoDownloadEvent) er
 	return s.publisher.Publish(s.cfg.DatasetDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) downloadProject(e *domain.RepoDownloadEvent) error {
+func (s *downloadMessageAdapter) downloadProject(e *domain.RepoDownloadedEvent) error {
 	v := &commsg.MsgNormal{
 		User:      e.Account.Account(),
 		Type:      s.cfg.ProjectDownload.Name,

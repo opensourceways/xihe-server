@@ -5,7 +5,7 @@ import (
 )
 
 type RepoMessageProducer interface {
-	SendResourceDownloaded(*domain.RepoDownloadEvent) error
+	SendRepoDownloaded(*domain.RepoDownloadedEvent) error
 	IncreaseDownload(*domain.ResourceObject) error
 	AddOperateLogForDownloadFile(domain.Account, RepoFile) error
 }

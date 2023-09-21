@@ -202,7 +202,7 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 func (s *repoFileService) DownloadRepo(u *UserInfo, obj *domain.ResourceObject, handle func(io.Reader, int64)) error {
 	err := s.rf.DownloadRepo(u, obj.Id, handle)
 	if err == nil {
-		s.sender.SendResourceDownloaded(&domain.RepoDownloadEvent{
+		s.sender.SendRepoDownloaded(&domain.RepoDownloadedEvent{
 			Account: u.User,
 			Type:    obj.Type,
 			Name:    obj.Owner.Account(),

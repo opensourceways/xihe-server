@@ -11,7 +11,7 @@ type UserSignedInEvent struct {
 	Account Account
 }
 
-type RepoDownloadEvent struct {
+type RepoDownloadedEvent struct {
 	Account Account
 	Type    ResourceType
 	Name    string
