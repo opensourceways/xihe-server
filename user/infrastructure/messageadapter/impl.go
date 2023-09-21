@@ -17,6 +17,11 @@ type messageAdapter struct {
 	publisher common.Publisher
 }
 
+type MsgFollowing struct {
+	MsgNormal common.MsgNormal
+	Follower  string `json:"follower"`
+}
+
 // Register
 func (impl *messageAdapter) SendUserSignedUpEvent(v *domain.UserSignedUpEvent) error {
 	cfg := &impl.cfg.UserSignedUp
@@ -63,7 +68,7 @@ func (impl *messageAdapter) SendUserBioSetEvent(v *domain.UserBioSetEvent) error
 func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingAdded
 
-	msg := domain.MsgFollowing{
+	msg := MsgFollowing{
 		Follower: v.Follower.Account(),
 		MsgNormal: common.MsgNormal{
 			Type:      cfg.Name,
@@ -80,7 +85,7 @@ func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) erro
 func (impl *messageAdapter) SendFollowingRemovedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingRemoved
 
-	msg := domain.MsgFollowing{
+	msg := MsgFollowing{
 		Follower: v.Follower.Account(),
 		MsgNormal: common.MsgNormal{
 			Type:      cfg.Name,
@@ -113,9 +118,9 @@ func (impl *messageAdapter) AddOperateLogForNewUser(u domain.Account) error {
 
 // Config
 type Config struct {
-	UserSignedUp common.TopicConfig `json:"sign_up"           required:"true"`
-	BioSet       common.TopicConfig `json:"set_bio"           required:"true"`
-	AvatarSet    common.TopicConfig `json:"set_avatar"        required:"true"`
+	UserSignedUp common.TopicConfig `json:"signed_up"           required:"true"`
+	BioSet       common.TopicConfig `json:"bio_set"           required:"true"`
+	AvatarSet    common.TopicConfig `json:"avatar_set"        required:"true"`
 
 	FollowingAdded   common.TopicConfig `json:"following_added"   required:"true"`
 	FollowingRemoved common.TopicConfig `json:"following_removed" required:"true"`

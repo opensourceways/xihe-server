@@ -8,10 +8,11 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 		return err
 	}
 
-	b := cmd.toUser(&user)
-	if !b {
+	if b := cmd.toUser(&user); !b {
 		return nil
 	}
+
+	_, err = s.repo.Save(&user)
 
 	if cmd.avatarChanged == true {
 		return s.sender.SendUserAvatarSetEvent(&domain.UserAvatarSetEvent{
@@ -27,8 +28,5 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 		})
 	}
 
-	_, err = s.repo.Save(&user)
-
 	return err
-
 }

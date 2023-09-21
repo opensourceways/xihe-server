@@ -18,7 +18,7 @@ import (
 	"github.com/opensourceways/xihe-server/messagequeue"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
-	"github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
+	followmsg "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
 func loadConfig(path string, cfg *configuration) error {
@@ -45,7 +45,7 @@ type configuration struct {
 	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
 	Points     pointsConfig                `json:"points"`
 	Training   messagequeue.TrainingConfig `json:"training"`
-	User       messageadapter.Config       `json:"user"`
+	User       userConfig                  `json:"user"`
 }
 
 type PostgresqlConfig struct {
@@ -149,6 +149,15 @@ func (cfg *pointsConfig) ConfigItems() []interface{} {
 	}
 }
 
+// user
+type userConfig struct {
+	UserSignedUp string `json:"user-signed-up"        required:"true"`
+	BioSet       string `json:"bio_set"               required:"true"`
+	AvatarSet    string `json:"avatar_set"            required:"true"`
+
+	*followmsg.TopicConfig
+}
+
 // mqTopics
 type mqTopics struct {
 	messages.Topics
@@ -165,13 +174,11 @@ type mqTopics struct {
 	PictureLiked      string                 `json:"picture_liked"       required:"true"`
 
 	//course
-	CourseApplied string `json:"course_applied"                          required:"true"`
+	CourseApplied string `json:"course_applied"      required:"true"`
 
 	// training
-	TrainingCreated string `json:"training_created"                      required:"true"`
+	TrainingCreated string `json:"training_created"    required:"true"`
 
 	//user
-	UserSignedUp string `json:"user-signed-up"        required:"true"`
-	BioSet       string `json:"bio_set"               required:"true"`
-	AvatarSet    string `json:"avatar_set"            required:"true"`
+	User userConfig `json:"user"                required:"true"`
 }

@@ -68,8 +68,8 @@ type UpdateUserBasicInfoCmd struct {
 	Bio           domain.Bio
 	Email         domain.Email
 	AvatarId      domain.AvatarId
-	avatarChanged bool
 	bioChanged    bool
+	avatarChanged bool
 }
 
 func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
