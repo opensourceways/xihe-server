@@ -108,21 +108,19 @@ func toPointsItemsOfDayDO(item *domain.PointsItem) pointsDetailsOfDayDO {
 
 // pointsDetailDO
 type pointsDetailDO struct {
-	Id      string `json:"id"       json:"id"`
-	Desc    string `json:"desc"     json:"desc"`
-	TaskId  string `bson:"task_id"  json:"task_id"`
-	TimeStr string `json:"time_str" json:"time_str"`
-	Time    int64  `bson:"time"     json:"time"`
-	Points  int    `json:"points"   json:"points"`
+	Id     string `json:"id"       json:"id"`
+	Desc   string `json:"desc"     json:"desc"`
+	Time   string `bson:"time"     json:"time"`
+	TaskId string `bson:"task_id"  json:"task_id"`
+	Points int    `json:"points"   json:"points"`
 }
 
 func (do *pointsDetailDO) toPointsDetail() domain.PointsDetail {
 	return domain.PointsDetail{
-		Id:      do.Id,
-		Desc:    do.Desc,
-		Time:    do.Time,
-		TimeStr: do.TimeStr,
-		Points:  do.Points,
+		Id:     do.Id,
+		Desc:   do.Desc,
+		Time:   do.Time,
+		Points: do.Points,
 	}
 }
 
@@ -132,11 +130,10 @@ func (do *pointsDetailDO) doc() (bson.M, error) {
 
 func topointsDetailDO(taskId string, detail *domain.PointsDetail) pointsDetailDO {
 	return pointsDetailDO{
-		Id:      detail.Id,
-		Desc:    detail.Desc,
-		TaskId:  taskId,
-		TimeStr: detail.TimeStr,
-		Time:    detail.Time,
-		Points:  detail.Points,
+		Id:     detail.Id,
+		Desc:   detail.Desc,
+		TaskId: taskId,
+		Time:   detail.Time,
+		Points: detail.Points,
 	}
 }

@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"strconv"
-
 	"github.com/sirupsen/logrus"
 
 	common "github.com/opensourceways/xihe-server/common/domain"
@@ -41,7 +39,6 @@ func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsD
 
 	entity.Total += v
 
-	detail.Id = date + "_" + strconv.Itoa(entity.DetailsNum()+1)
 	detail.Points = v
 
 	if !entity.hasDone(task.Id) {
@@ -165,11 +162,10 @@ func (item *PointsItem) LatestDetail() *PointsDetail {
 
 // PointsDetail
 type PointsDetail struct {
-	Id      string `json:"id"` // serial number
-	Desc    string `json:"desc"`
-	TimeStr string `json:"time_str"`
-	Time    int64  `json:"time"`
-	Points  int    `json:"points"`
+	Id     string `json:"id"` // serial number
+	Desc   string `json:"desc"`
+	Time   string `json:"time"`
+	Points int    `json:"points"`
 }
 
 // Task

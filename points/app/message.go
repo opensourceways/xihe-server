@@ -1,6 +1,8 @@
 package app
 
 import (
+	"strconv"
+
 	"github.com/sirupsen/logrus"
 
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
@@ -56,9 +58,9 @@ func (s *userPointsAppMessageService) AddPointsItem(cmd *CmdToAddPointsItem) err
 	}
 
 	item := up.AddPointsItem(&task, date, &domain.PointsDetail{
-		Desc:    cmd.Desc,
-		Time:    cmd.Time,
-		TimeStr: time,
+		Id:   strconv.FormatInt(cmd.Time, 10),
+		Desc: cmd.Desc,
+		Time: time,
 	})
 	if item == nil {
 		return nil
