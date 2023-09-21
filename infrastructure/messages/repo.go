@@ -9,8 +9,11 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-func NewDownloadMessageAdapter(cfg *DownloadProducerConfig,
-	p commsg.Publisher, o commsg.OperateLogPublisher) *downloadMessageAdapter {
+func NewDownloadMessageAdapter(
+	cfg *DownloadProducerConfig,
+	p commsg.Publisher,
+	o commsg.OperateLogPublisher,
+) *downloadMessageAdapter {
 	return &downloadMessageAdapter{cfg: *cfg, publisher: p, operateLog: o}
 }
 
@@ -43,7 +46,7 @@ func (s *downloadMessageAdapter) IncreaseDownload(obj *domain.ResourceObject) er
 	return s.publisher.Publish(s.cfg.ModelDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) SendResourceDownloaded(e domain.RepoDownload) (err error) {
+func (s *downloadMessageAdapter) SendResourceDownloaded(e *domain.RepoDownloadEvent) (err error) {
 	switch e.Type {
 	case domain.ResourceTypeDataset:
 		err = s.downloadDataset(e)
@@ -57,7 +60,7 @@ func (s *downloadMessageAdapter) SendResourceDownloaded(e domain.RepoDownload) (
 }
 
 // Download project/model/dataset
-func (s *downloadMessageAdapter) downloadModel(e domain.RepoDownload) error {
+func (s *downloadMessageAdapter) downloadModel(e *domain.RepoDownloadEvent) error {
 	v := &commsg.MsgNormal{
 		User:      e.Account.Account(),
 		Type:      s.cfg.ModelDownload.Name,
@@ -68,7 +71,7 @@ func (s *downloadMessageAdapter) downloadModel(e domain.RepoDownload) error {
 	return s.publisher.Publish(s.cfg.ModelDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) downloadDataset(e domain.RepoDownload) error {
+func (s *downloadMessageAdapter) downloadDataset(e *domain.RepoDownloadEvent) error {
 	v := &commsg.MsgNormal{
 		User:      e.Account.Account(),
 		Type:      s.cfg.DatasetDownload.Name,
@@ -79,7 +82,7 @@ func (s *downloadMessageAdapter) downloadDataset(e domain.RepoDownload) error {
 	return s.publisher.Publish(s.cfg.DatasetDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) downloadProject(e domain.RepoDownload) error {
+func (s *downloadMessageAdapter) downloadProject(e *domain.RepoDownloadEvent) error {
 	v := &commsg.MsgNormal{
 		User:      e.Account.Account(),
 		Type:      s.cfg.ProjectDownload.Name,
