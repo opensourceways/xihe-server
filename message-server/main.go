@@ -131,7 +131,7 @@ func main() {
 	}
 
 	// run
-	run(newHandler(cfg, log), log, &cfg.MQTopics)
+	run(newHandler(cfg, log), log, &cfg.MQTopics, cfg.Resource)
 }
 
 func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
@@ -155,9 +155,9 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.PictureLiked,
 			topics.CourseApplied,
 			topics.TrainingCreated,
-			topics.CreateModel.Topic,
-			topics.CreateDataset.Topic,
-			topics.CreateProject.Topic,
+			topics.ProjectCreated,
+			topics.DatasetCreated,
+			topics.ProjectCreated,
 		},
 		kafka.SubscriberAdapter(),
 	)
@@ -255,7 +255,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	return h
 }
 
-func run(h *handler, log *logrus.Entry, topics *mqTopics) {
+func run(h *handler, log *logrus.Entry, topics *mqTopics, cfg messages.ResourceConfig) {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
@@ -289,7 +289,7 @@ func run(h *handler, log *logrus.Entry, topics *mqTopics) {
 		}
 	}(ctx)
 
-	err := messages.Subscribe(ctx, h, log, &topics.Topics, kafka.SubscriberAdapter())
+	err := messages.Subscribe(ctx, h, log, &topics.Topics, kafka.SubscriberAdapter(), cfg)
 	if err != nil {
 		log.Errorf("subscribe failed, err:%v", err)
 	}

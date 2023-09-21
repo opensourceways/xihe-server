@@ -22,6 +22,10 @@ type Publisher interface {
 	Publish(topic string, v interface{}, header map[string]string) error
 }
 
+type OperateLogPublisher interface {
+	SendOperateLog(user string, t string, info map[string]string) error
+}
+
 type Subscriber interface {
 	SubscribeWithStrategyOfRetry(group string, h kfklib.Handler, topics []string, retryNum int) error
 }

@@ -130,7 +130,7 @@ func NewDatasetService(
 	model repository.Model,
 	activity repository.Activity,
 	pr platform.Repository,
-	sender message.Sender,
+	sender message.ResourceProducer,
 ) DatasetService {
 	return datasetService{
 		repo:     repo,
@@ -149,7 +149,7 @@ type datasetService struct {
 	repo repository.Dataset
 	//pr       platform.Repository
 	activity repository.Activity
-	sender   message.Sender
+	sender   message.ResourceProducer
 	rs       resourceService
 }
 
@@ -184,7 +184,10 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 
 	_ = s.sender.AddOperateLogForCreateResource(r, d.Name)
 
-	_ = s.sender.CreateDataset(r.Owner)
+	_ = s.sender.CreateDataset(message.DatasetCreatedEvent{
+		Account:     r.Owner,
+		DatasetName: dto.Name,
+	})
 
 	return
 }

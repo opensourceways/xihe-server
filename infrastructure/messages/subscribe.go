@@ -32,11 +32,12 @@ const (
 
 func Subscribe(
 	ctx context.Context, handler interface{}, log *logrus.Entry,
-	topic *Topics, subscriber common.Subscriber,
+	topic *Topics, subscriber common.Subscriber, res ResourceConfig,
 ) (err error) {
 	r := register{
 		topics:     topic,
 		subscriber: subscriber,
+		resouce:    res,
 	}
 
 	// register following
@@ -92,6 +93,7 @@ func Subscribe(
 
 type register struct {
 	topics     *Topics
+	resouce    ResourceConfig
 	subscriber common.Subscriber
 }
 
@@ -223,7 +225,7 @@ func (r *register) registerHandlerForRelatedResource(handler interface{}) error 
 	}
 
 	return r.subscribe(
-		r.topics.RelatedResource, handlerNameAddRelatedResource, f,
+		r.resouce.RelatedResource, handlerNameAddRelatedResource, f,
 	)
 }
 

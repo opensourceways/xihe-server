@@ -32,7 +32,6 @@ type RepoFile struct {
 type Sender interface {
 	AddOperateLogForNewUser(domain.Account) error
 	AddOperateLogForAccessBigModel(domain.Account, bmdomain.BigmodelType) error
-	AddOperateLogForCreateResource(domain.ResourceObject, domain.ResourceName) error
 	AddOperateLogForDownloadFile(domain.Account, RepoFile) error
 
 	AddFollowing(*userdomain.FollowerInfo) error
@@ -41,12 +40,7 @@ type Sender interface {
 	AddLike(*domain.ResourceObject) error
 	RemoveLike(*domain.ResourceObject) error
 
-	IncreaseFork(*domain.ResourceIndex) error
 	IncreaseDownload(*domain.ResourceObject) error
-
-	AddRelatedResource(*RelatedResource) error
-	RemoveRelatedResource(*RelatedResource) error
-	RemoveRelatedResources(*RelatedResources) error
 
 	CreateFinetune(*domain.FinetuneIndex) error
 
