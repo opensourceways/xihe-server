@@ -297,7 +297,7 @@ func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 		return
 	}
 
-	r := domain.ResourceObject{
+	r := &domain.ResourceObject{
 		Type:          repoInfo.rt,
 		ResourceIndex: repoInfo.ResourceIndex(),
 	}

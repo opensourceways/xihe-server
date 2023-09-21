@@ -1,13 +1,16 @@
 package messages
 
 import (
+	"fmt"
+
 	commsg "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-func NewDownloadMessageAdapter(cfg *DownloadProducerConfig, p commsg.Publisher, o commsg.OperateLogPublisher) *downloadMessageAdapter {
+func NewDownloadMessageAdapter(cfg *DownloadProducerConfig,
+	p commsg.Publisher, o commsg.OperateLogPublisher) *downloadMessageAdapter {
 	return &downloadMessageAdapter{cfg: *cfg, publisher: p, operateLog: o}
 }
 
@@ -40,49 +43,48 @@ func (s *downloadMessageAdapter) IncreaseDownload(obj *domain.ResourceObject) er
 	return s.publisher.Publish(s.cfg.ModelDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) DownloadRepo(e message.DownloadEvent) error {
-
+func (s *downloadMessageAdapter) SendResourceDownloaded(e domain.RepoDownload) (err error) {
 	switch e.Type {
 	case domain.ResourceTypeDataset:
-		_ = s.downloadDataset(e.Account)
+		err = s.downloadDataset(e)
 	case domain.ResourceTypeModel:
-		_ = s.downloadModel(e.Account)
+		err = s.downloadModel(e)
 	case domain.ResourceTypeProject:
-		_ = s.downloadProject(e.Account)
+		err = s.downloadProject(e)
 	}
 
-	return nil
+	return
 }
 
 // Download project/model/dataset
-func (s *downloadMessageAdapter) downloadModel(u domain.Account) error {
+func (s *downloadMessageAdapter) downloadModel(e domain.RepoDownload) error {
 	v := &commsg.MsgNormal{
-		User:      u.Account(),
+		User:      e.Account.Account(),
 		Type:      s.cfg.ModelDownload.Name,
 		CreatedAt: utils.Now(),
-		Desc:      "Downloaded a model",
+		Desc:      fmt.Sprintf("Downloaded a model %s", e.Name),
 	}
 
 	return s.publisher.Publish(s.cfg.ModelDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) downloadDataset(u domain.Account) error {
+func (s *downloadMessageAdapter) downloadDataset(e domain.RepoDownload) error {
 	v := &commsg.MsgNormal{
-		User:      u.Account(),
+		User:      e.Account.Account(),
 		Type:      s.cfg.DatasetDownload.Name,
 		CreatedAt: utils.Now(),
-		Desc:      "Downloaded a dataset",
+		Desc:      fmt.Sprintf("Downloaded a dataset %s", e.Name),
 	}
 
 	return s.publisher.Publish(s.cfg.DatasetDownload.Topic, v, nil)
 }
 
-func (s *downloadMessageAdapter) downloadProject(u domain.Account) error {
+func (s *downloadMessageAdapter) downloadProject(e domain.RepoDownload) error {
 	v := &commsg.MsgNormal{
-		User:      u.Account(),
+		User:      e.Account.Account(),
 		Type:      s.cfg.ProjectDownload.Name,
 		CreatedAt: utils.Now(),
-		Desc:      "Downloaded a project",
+		Desc:      fmt.Sprintf("Downloaded a project %s", e.Name),
 	}
 
 	return s.publisher.Publish(s.cfg.ProjectDownload.Topic, v, nil)
