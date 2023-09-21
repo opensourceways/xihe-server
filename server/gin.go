@@ -158,7 +158,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	publisher := kafka.PublisherAdapter()
 	operater := kafka.OperateLogPublisherAdapter(cfg.MQTopics.OperateLog, publisher)
 	trainingAdapter := trainingimpl.NewTraining(&cfg.Training.Config)
-	repoAdapter := messages.NewDownloadMessageAdapter(&cfg.Download, publisher, operater)
+	repoAdapter := messages.NewDownloadMessageAdapter(cfg.MQTopics.Download, &cfg.Download, publisher, operater)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)

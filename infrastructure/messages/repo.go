@@ -10,14 +10,16 @@ import (
 )
 
 func NewDownloadMessageAdapter(
+	topic string,
 	cfg *DownloadProducerConfig,
 	p commsg.Publisher,
 	o commsg.OperateLogPublisher,
 ) *downloadMessageAdapter {
-	return &downloadMessageAdapter{cfg: *cfg, publisher: p, operateLog: o}
+	return &downloadMessageAdapter{topic: topic, cfg: *cfg, publisher: p, operateLog: o}
 }
 
 type downloadMessageAdapter struct {
+	topic      string
 	cfg        DownloadProducerConfig
 	publisher  commsg.Publisher
 	operateLog commsg.OperateLogPublisher
@@ -27,7 +29,6 @@ type DownloadProducerConfig struct {
 	ModelDownload   commsg.TopicConfig `json:"model_download" required:"true"`
 	DatasetDownload commsg.TopicConfig `json:"dataset_download" required:"true"`
 	ProjectDownload commsg.TopicConfig `json:"project_download" required:"true"`
-	Download        commsg.TopicConfig `json:"download" required:"true"`
 }
 
 func (s *downloadMessageAdapter) AddOperateLogForDownloadFile(u domain.Account, repo message.RepoFile) error {
@@ -43,7 +44,7 @@ func (s *downloadMessageAdapter) IncreaseDownload(obj *domain.ResourceObject) er
 	v := new(resourceObject)
 	toMsgResourceObject(obj, v)
 
-	return s.publisher.Publish(s.cfg.ModelDownload.Topic, v, nil)
+	return s.publisher.Publish(s.topic, v, nil)
 }
 
 func (s *downloadMessageAdapter) SendRepoDownloaded(e *domain.RepoDownloadedEvent) (err error) {
