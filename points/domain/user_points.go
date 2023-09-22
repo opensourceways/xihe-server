@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"fmt"
+
 	"github.com/sirupsen/logrus"
 
 	common "github.com/opensourceways/xihe-server/common/domain"
@@ -63,7 +65,7 @@ func (entity *UserPoints) AddPointsItem(task *Task, date string, detail *PointsD
 func (entity *UserPoints) IsCompleted(task *Task) bool {
 	item := entity.pointsItem(task.Id)
 
-	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Id))
+	v, _ := task.Rule.calcPoints(item.points(), entity.hasDone(task.Id))
 
 	return v == 0
 }
@@ -77,8 +79,13 @@ func (entity *UserPoints) calc(task *Task, item *PointsItem) int {
 		return 0
 	}
 
-	v := task.Rule.calcPoints(item.points(), entity.hasDone(task.Id))
+	v, reason := task.Rule.calcPoints(item.points(), entity.hasDone(task.Id))
 	if v == 0 {
+		logrus.Warnf(
+			"%s, can't obtain points on task: %s, reason: %s",
+			entity.User.Account(), task.Id, reason,
+		)
+
 		return 0
 	}
 
@@ -213,22 +220,18 @@ type Rule struct {
 }
 
 // points is the one that user has got on this task today
-func (r *Rule) calcPoints(points int, hasDone bool) int {
+func (r *Rule) calcPoints(points int, hasDone bool) (int, string) {
 	if r.OnceOnly {
 		if hasDone {
-			logrus.Warn("Rule has been done today, will not calc again.")
-
-			return 0
+			return 0, "Rule has been done today, will not calc again."
 		}
 
-		return r.PointsPerOnce
+		return r.PointsPerOnce, ""
 	}
 
 	if r.MaxPointsOfDay > 0 && points >= r.MaxPointsOfDay {
-		logrus.Warnf("Points of today: %d, exceed the limit: %d", points, r.MaxPointsOfDay)
-
-		return 0
+		return 0, fmt.Sprintf("Points of today: %d, exceed the limit: %d", points, r.MaxPointsOfDay)
 	}
 
-	return r.PointsPerOnce
+	return r.PointsPerOnce, ""
 }
