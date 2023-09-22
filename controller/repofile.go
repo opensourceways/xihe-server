@@ -297,9 +297,14 @@ func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 		return
 	}
 
-	r := &domain.ResourceObject{
-		Type:          repoInfo.rt,
-		ResourceIndex: repoInfo.ResourceIndex(),
+	r := &domain.RepoDownloadedEvent{
+		Account: pl.DomainAccount(),
+		Obj: domain.ResourceObject{
+			Type:          repoInfo.rt,
+			ResourceIndex: repoInfo.ResourceIndex(),
+		},
+		Name:   repoInfo.Name.ResourceName(),
+		RepoId: repoInfo.RepoId,
 	}
 
 	ctl.s.DownloadRepo(&u, r, func(data io.Reader, n int64) {

@@ -13,8 +13,9 @@ type UserSignedInEvent struct {
 
 type RepoDownloadedEvent struct {
 	Account Account
-	Type    ResourceType
 	Name    string
+	RepoId  string
+	Obj     ResourceObject
 }
 
 type ResourceLikedEvent struct {
