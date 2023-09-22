@@ -16,3 +16,8 @@ type RepoDownloadedEvent struct {
 	Type    ResourceType
 	Name    string
 }
+
+type ResourceLikedEvent struct {
+	Account Account
+	Obj     ResourceObject
+}

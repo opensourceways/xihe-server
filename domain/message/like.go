@@ -5,6 +5,6 @@ import (
 )
 
 type LikeMessageProducer interface {
-	AddLike(*domain.ResourceObject) error
-	RemoveLike(*domain.ResourceObject) error
+	AddLike(*domain.ResourceLikedEvent) error
+	RemoveLike(*domain.ResourceLikedEvent) error
 }

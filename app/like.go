@@ -72,6 +72,7 @@ type likeService struct {
 	rs resourceService
 }
 
+// owner is the user who like the resource
 func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 	// check if resource is private
 	var repotype domain.RepoType
@@ -131,7 +132,10 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 	}
 
 	// increase like in resource
-	_ = s.sender.AddLike(&v.Like.ResourceObject)
+	_ = s.sender.AddLike(&domain.ResourceLikedEvent{
+		Account: owner,
+		Obj:     v.ResourceObject,
+	})
 
 	return nil
 }
@@ -174,7 +178,10 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 	}
 
 	// reduce like count in resource
-	_ = s.sender.RemoveLike(&v.Like.ResourceObject)
+	_ = s.sender.RemoveLike(&domain.ResourceLikedEvent{
+		Account: owner,
+		Obj:     obj,
+	})
 
 	return nil
 }

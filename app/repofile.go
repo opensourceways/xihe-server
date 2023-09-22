@@ -26,7 +26,7 @@ type RepoFileService interface {
 	Preview(*UserInfo, *RepoFilePreviewCmd) ([]byte, error)
 	DeleteDir(*UserInfo, *RepoDirDeleteCmd) (string, error)
 	Download(*RepoFileDownloadCmd) (RepoFileDownloadDTO, error)
-	DownloadRepo(u *UserInfo, obj *domain.ResourceObject, handle func(io.Reader, int64)) error
+	DownloadRepo(u *UserInfo, obj *domain.ResourceObject, handle func(io.Reader, int64), downloader domain.Account) error
 }
 
 func NewRepoFileService(rf platform.RepoFile, sender message.RepoMessageProducer) RepoFileService {
@@ -199,11 +199,16 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 	return r, nil
 }
 
-func (s *repoFileService) DownloadRepo(u *UserInfo, obj *domain.ResourceObject, handle func(io.Reader, int64)) error {
+func (s *repoFileService) DownloadRepo(
+	u *UserInfo,
+	obj *domain.ResourceObject,
+	handle func(io.Reader, int64),
+	downloader domain.Account, // downloader is the account who download the repo
+) error {
 	err := s.rf.DownloadRepo(u, obj.Id, handle)
-	if err == nil {
+	if err == nil && downloader != nil {
 		s.sender.SendRepoDownloaded(&domain.RepoDownloadedEvent{
-			Account: u.User,
+			Account: downloader,
 			Type:    obj.Type,
 			Name:    obj.Owner.Account(),
 		})
