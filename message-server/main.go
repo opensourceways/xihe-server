@@ -165,7 +165,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.TrainingCreated,
 			topics.ProjectCreated,
 			topics.DatasetCreated,
-			topics.ProjectCreated,
+			topics.ModelCreated,
 			topics.ProjectDownloaded,
 			topics.ModelDownloaded,
 			topics.DatasetDownloaded,

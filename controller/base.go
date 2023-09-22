@@ -215,6 +215,10 @@ func (ctl baseController) checkUserApiTokenBase(
 	}
 
 	if token == "" || csrftoken == "" {
+		// try best to grab userinfo
+		if token != "" {
+			_, _, _ = ctl.checkToken(ctx, token, &pl)
+		}
 		if allowVistor {
 			visitor = true
 			ok = true

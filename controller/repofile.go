@@ -318,7 +318,7 @@ func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 				"Content-Transfer-Encoding": "binary",
 			},
 		)
-	}, pl.DomainAccount())
+	})
 }
 
 // @Summary		Preview
