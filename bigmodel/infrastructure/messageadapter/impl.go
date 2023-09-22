@@ -30,6 +30,8 @@ func (impl *messageAdapter) SendWuKongInferenceStart(v *domain.WuKongInferenceSt
 
 	msg := common.MsgNormal{
 		User: v.Account.Account(),
+		Type: cfg.Name,
+		Desc: fmt.Sprintf("Tried a WuKong with %s pictures inference", v.EsStyle),
 		Details: map[string]string{
 			"status":    "waiting",
 			"task_type": v.EsStyle,
