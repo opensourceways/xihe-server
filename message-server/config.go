@@ -151,9 +151,9 @@ func (cfg *pointsConfig) ConfigItems() []interface{} {
 
 // user
 type userConfig struct {
-	UserSignedUp string `json:"user_signed_up"        required:"true"`
-	BioSet       string `json:"bio_set"               required:"true"`
-	AvatarSet    string `json:"avatar_set"            required:"true"`
+	BioSet       string `json:"bio_set"         required:"true"`
+	AvatarSet    string `json:"avatar_set"      required:"true"`
+	UserSignedUp string `json:"user_signed_up"  required:"true"`
 
 	usermq.TopicConfig
 }
