@@ -5,6 +5,8 @@ import (
 
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 	"github.com/opensourceways/kafka-lib/mq"
+
+	"github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -61,16 +63,8 @@ type operatePublisherAdapter struct {
 	publisher publisherAdapter
 }
 
-type MsgOperateLog struct {
-	When int64             `json:"when"`
-	User string            `json:"user"`
-	Type string            `json:"type"`
-	Info map[string]string `json:"info,omitempty"`
-}
-
 func (o operatePublisherAdapter) SendOperateLog(u string, t string, info map[string]string) error {
-
-	return o.publisher.Publish(o.topic, &MsgOperateLog{
+	return o.publisher.Publish(o.topic, &message.MsgOperateLog{
 		When: utils.Now(),
 		User: u,
 		Type: t,

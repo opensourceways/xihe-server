@@ -5,7 +5,7 @@ import (
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 var _ message.Sender = (*sender)(nil)
@@ -15,28 +15,8 @@ func NewMessageSender(topic *Topics, p common.Publisher) *sender {
 }
 
 type sender struct {
-	topics     Topics
-	publisher  common.Publisher
-	operateLog common.OperateLogPublisher
-}
-
-// Following
-func (s *sender) AddFollowing(msg *userdomain.FollowerInfo) error {
-	return s.sendFollowing(msg, actionAdd)
-}
-
-func (s *sender) RemoveFollowing(msg *userdomain.FollowerInfo) error {
-	return s.sendFollowing(msg, actionRemove)
-}
-
-func (s *sender) sendFollowing(msg *userdomain.FollowerInfo, action string) error {
-	v := msgFollower{
-		Action:   action,
-		User:     msg.User.Account(),
-		Follower: msg.Follower.Account(),
-	}
-
-	return s.send(s.topics.Following, &v)
+	topics    Topics
+	publisher common.Publisher
 }
 
 // Like
@@ -123,10 +103,6 @@ func (s *sender) CalcScore(info *message.SubmissionInfo) error {
 }
 
 // operate log
-func (s *sender) AddOperateLogForNewUser(u domain.Account) error {
-	return s.sendOperateLog(u, "user", nil)
-}
-
 func (s *sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldomain.BigmodelType) error {
 	return s.sendOperateLog(u, "bigmodel", map[string]string{
 		"bigmodel": string(t),
@@ -134,10 +110,24 @@ func (s *sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldoma
 }
 
 func (s *sender) sendOperateLog(u domain.Account, t string, info map[string]string) error {
-	return s.operateLog.SendOperateLog(u.Account(), t, info)
+	return s.send(s.topics.OperateLog, operateLog(u, t, info))
 }
 
 // send
 func (s *sender) send(topic string, v interface{}) error {
 	return s.publisher.Publish(topic, v, nil)
+}
+
+func operateLog(u domain.Account, t string, info map[string]string) common.MsgOperateLog {
+	a := ""
+	if u != nil {
+		a = u.Account()
+	}
+
+	return common.MsgOperateLog{
+		When: utils.Now(),
+		User: a,
+		Type: t,
+		Info: info,
+	}
 }

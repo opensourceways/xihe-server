@@ -5,13 +5,13 @@ import (
 	"github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 )
 
-type UserConfig struct {
+type userConfig struct {
 	authingimpl.Config
 
 	Message messageadapter.Config `json:"message"   required:"true"`
 }
 
-func (cfg *UserConfig) ConfigItems() []interface{} {
+func (cfg *userConfig) ConfigItems() []interface{} {
 	return []interface{}{
 		&cfg.Config,
 		&cfg.Message,

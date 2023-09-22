@@ -4,6 +4,13 @@ import (
 	kfklib "github.com/opensourceways/kafka-lib/agent"
 )
 
+type MsgOperateLog struct {
+	When int64             `json:"when"`
+	User string            `json:"user"`
+	Type string            `json:"type"`
+	Info map[string]string `json:"info,omitempty"`
+}
+
 type MsgNormal struct {
 	Type      string            `json:"type"`
 	User      string            `json:"user"`

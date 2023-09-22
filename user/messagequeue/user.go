@@ -13,16 +13,16 @@ import (
 const (
 	retryNum = 3
 
-	handleNameUserFollowingAdd    = "user_following_add"
-	handleNameUserFollowingRemove = "user_following_remove"
+	handleNameFollowingAdded   = "following_added"
+	handleNameFollowingRemoved = "following_removed"
 )
 
 func Subscribe(s app.UserService, subscriber message.Subscriber, topics *TopicConfig) (err error) {
 	c := &consumer{s}
 
 	err = subscriber.SubscribeWithStrategyOfRetry(
-		handleNameUserFollowingAdd,
-		c.HandleEventAddFollowing,
+		handleNameFollowingAdded,
+		c.handleFollowingAddedEvent,
 		[]string{topics.FollowingAdded},
 		retryNum,
 	)
@@ -31,11 +31,32 @@ func Subscribe(s app.UserService, subscriber message.Subscriber, topics *TopicCo
 	}
 
 	err = subscriber.SubscribeWithStrategyOfRetry(
-		handleNameUserFollowingRemove,
-		c.HandleEventRemoveFollowing,
+		handleNameFollowingRemoved,
+		c.handleFollowingRemovedEvent,
 		[]string{topics.FollowingRemoved},
 		retryNum,
 	)
+
+	return
+}
+
+type msgFollowing struct {
+	common.MsgNormal
+
+	Follower string `json:"follower"`
+}
+
+func followerInfo(body []byte) (info domain.FollowerInfo, err error) {
+	msg := msgFollowing{}
+	if err = json.Unmarshal(body, &msg); err != nil {
+		return
+	}
+
+	if info.User, err = domain.NewAccount(msg.MsgNormal.User); err != nil {
+		return
+	}
+
+	info.Follower, err = domain.NewAccount(msg.Follower)
 
 	return
 }
@@ -44,67 +65,30 @@ type consumer struct {
 	s app.UserService
 }
 
-type MsgFollowing struct {
-	MsgNormal common.MsgNormal
-	Follower  string `json:"follower"`
-}
-
-func (c *consumer) HandleEventAddFollowing(body []byte, h map[string]string) (err error) {
-	msg := MsgFollowing{}
-
-	if err := json.Unmarshal(body, &msg); err != nil {
+func (c *consumer) handleFollowingAddedEvent(body []byte, h map[string]string) error {
+	info, err := followerInfo(body)
+	if err != nil {
 		return err
 	}
 
-	user, err := domain.NewAccount(msg.MsgNormal.User)
-	if err != nil {
-		return
+	err = c.s.AddFollower(&info)
+	if err != nil && repository.IsErrorDuplicateCreating(err) {
+		err = nil
 	}
 
-	follower, err := domain.NewAccount(msg.Follower)
-	if err != nil {
-		return
-	}
-
-	v := domain.FollowerInfo{
-		User:     user,
-		Follower: follower,
-	}
-
-	if err = c.s.AddFollower(&v); err != nil {
-		_, ok := err.(repository.ErrorDuplicateCreating)
-		if ok {
-			err = nil
-		}
-	}
-
-	return
+	return err
 }
 
-func (c *consumer) HandleEventRemoveFollowing(body []byte, h map[string]string) (err error) {
-	msg := MsgFollowing{}
-
-	if err := json.Unmarshal(body, &msg); err != nil {
-		return
-	}
-
-	user, err := domain.NewAccount(msg.MsgNormal.User)
+func (c *consumer) handleFollowingRemovedEvent(body []byte, h map[string]string) error {
+	info, err := followerInfo(body)
 	if err != nil {
-		return
+		return err
 	}
 
-	follower, err := domain.NewAccount(msg.Follower)
-	if err != nil {
-		return
-	}
-
-	return c.s.RemoveFollower(&domain.FollowerInfo{
-		User:     user,
-		Follower: follower,
-	})
+	return c.s.RemoveFollower(&info)
 }
 
 type TopicConfig struct {
-	FollowingAdded   string `json:"following_added"       required:"true"`
-	FollowingRemoved string `json:"following_removed"    required:"true"`
+	FollowingAdded   string `json:"following_added"    required:"true"`
+	FollowingRemoved string `json:"following_removed"  required:"true"`
 }

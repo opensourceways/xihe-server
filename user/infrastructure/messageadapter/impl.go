@@ -17,33 +17,34 @@ type messageAdapter struct {
 	publisher common.Publisher
 }
 
-type MsgFollowing struct {
-	MsgNormal common.MsgNormal
-	Follower  string `json:"follower"`
+type msgFollowing struct {
+	common.MsgNormal
+
+	Follower string `json:"follower"`
 }
 
-// Register
+// Sign Up
 func (impl *messageAdapter) SendUserSignedUpEvent(v *domain.UserSignedUpEvent) error {
 	cfg := &impl.cfg.UserSignedUp
 
 	msg := common.MsgNormal{
 		Type:      cfg.Name,
 		User:      v.Account.Account(),
-		Desc:      "Register",
+		Desc:      "Sign Up",
 		CreatedAt: utils.Now(),
 	}
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
-// Set AvatarId
+// Set Avatar
 func (impl *messageAdapter) SendUserAvatarSetEvent(v *domain.UserAvatarSetEvent) error {
 	cfg := &impl.cfg.AvatarSet
 
 	msg := common.MsgNormal{
 		Type:      cfg.Name,
 		User:      v.Account.Account(),
-		Desc:      fmt.Sprintf("Set AvatarId of %s", v.AvatarId),
+		Desc:      fmt.Sprintf("Set Avatar of %s", v.AvatarId),
 		CreatedAt: utils.Now(),
 	}
 
@@ -68,7 +69,7 @@ func (impl *messageAdapter) SendUserBioSetEvent(v *domain.UserBioSetEvent) error
 func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingAdded
 
-	msg := MsgFollowing{
+	msg := msgFollowing{
 		Follower: v.Follower.Account(),
 		MsgNormal: common.MsgNormal{
 			Type:      cfg.Name,
@@ -85,7 +86,7 @@ func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) erro
 func (impl *messageAdapter) SendFollowingRemovedEvent(v *domain.FollowerInfo) error {
 	cfg := &impl.cfg.FollowingRemoved
 
-	msg := MsgFollowing{
+	msg := msgFollowing{
 		Follower: v.Follower.Account(),
 		MsgNormal: common.MsgNormal{
 			Type:      cfg.Name,
@@ -98,31 +99,28 @@ func (impl *messageAdapter) SendFollowingRemovedEvent(v *domain.FollowerInfo) er
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
+// operate log
 func (impl *messageAdapter) AddOperateLogForNewUser(u domain.Account) error {
 	a := ""
 	if u != nil {
 		a = u.Account()
 	}
 
-	cfg := &impl.cfg.OperateLog
-
-	msg := common.MsgNormal{
-		Type:      cfg.Name,
-		User:      a,
-		Desc:      fmt.Sprintf("Add Operate Log for new user: %s", a),
-		CreatedAt: utils.Now(),
+	msg := common.MsgOperateLog{
+		When: utils.Now(),
+		User: a,
+		Type: "user",
 	}
 
-	return impl.publisher.Publish(cfg.Topic, &msg, nil)
+	return impl.publisher.Publish(impl.cfg.OperateLog, &msg, nil)
 }
 
 // Config
 type Config struct {
-	UserSignedUp common.TopicConfig `json:"signed_up"           required:"true"`
-	BioSet       common.TopicConfig `json:"bio_set"           required:"true"`
-	AvatarSet    common.TopicConfig `json:"avatar_set"        required:"true"`
-
+	BioSet           common.TopicConfig `json:"bio_set"           required:"true"`
+	AvatarSet        common.TopicConfig `json:"avatar_set"        required:"true"`
+	OperateLog       string             `json:"operate_log"       required:"true"`
+	UserSignedUp     common.TopicConfig `json:"user_signedup"     required:"true"`
 	FollowingAdded   common.TopicConfig `json:"following_added"   required:"true"`
 	FollowingRemoved common.TopicConfig `json:"following_removed" required:"true"`
-	OperateLog       common.TopicConfig `json:"operate_log"       required:"true"`
 }

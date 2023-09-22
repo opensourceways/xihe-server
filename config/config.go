@@ -58,9 +58,9 @@ type Config struct {
 	Points      pointsConfig                    `json:"points"`
 	Cloud       cloudmsg.Config                 `json:"cloud"        required:"true"`
 	Course      course.Config                   `json:"course"       required:"true"`
-	Resource    messages.ResourceConfig         `json:"resource"       required:"true"`
+	Resource    messages.ResourceConfig         `json:"resource"     required:"true"`
 	Download    messages.DownloadProducerConfig `json:"download"     required:"true"`
-	User        UserConfig                      `json:"user"         required:"true"`
+	User        userConfig                      `json:"user"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {

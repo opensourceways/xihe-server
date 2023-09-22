@@ -181,16 +181,14 @@ func userSubscribesMessage(cfg *configuration, topics *userConfig) error {
 	collections := &cfg.Mongodb.Collections
 
 	return usermq.Subscribe(
-		userapp.NewUserService(userrepo.NewUserRepo(
-			mongodb.NewCollection(collections.User),
-		),
-			nil,
-			nil,
-			nil,
-			nil,
+		userapp.NewUserService(
+			userrepo.NewUserRepo(
+				mongodb.NewCollection(collections.User),
+			),
+			nil, nil, nil, nil,
 		),
 		kafka.SubscriberAdapter(),
-		topics.TopicConfig,
+		&topics.TopicConfig,
 	)
 }
 

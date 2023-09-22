@@ -17,7 +17,7 @@ import (
 	"github.com/opensourceways/xihe-server/messagequeue"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
-	followmsg "github.com/opensourceways/xihe-server/user/messagequeue"
+	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -151,11 +151,11 @@ func (cfg *pointsConfig) ConfigItems() []interface{} {
 
 // user
 type userConfig struct {
-	UserSignedUp string `json:"user-signed-up"        required:"true"`
+	UserSignedUp string `json:"user_signed_up"        required:"true"`
 	BioSet       string `json:"bio_set"               required:"true"`
 	AvatarSet    string `json:"avatar_set"            required:"true"`
 
-	*followmsg.TopicConfig
+	usermq.TopicConfig
 }
 
 // mqTopics
@@ -168,25 +168,27 @@ type mqTopics struct {
 	CompetitorApplied string `json:"competitor_applied" required:"true"`
 
 	// cloud
-	JupyterCreated string `json:"jupyter_created"    required:"true"`
+	JupyterCreated string `json:"jupyter_created" required:"true"`
 
 	// bigmodel
 	BigModelTopics    bigmodelmq.TopicConfig `json:"bigmodel_topics"`
-	PicturePublicized string                 `json:"picture_publicized"  required:"true"`
 	PictureLiked      string                 `json:"picture_liked"       required:"true"`
+	PicturePublicized string                 `json:"picture_publicized"  required:"true"`
 
 	//course
-	CourseApplied string `json:"course_applied"      required:"true"`
+	CourseApplied string `json:"course_applied" required:"true"`
 
 	// training
-	TrainingCreated   string `json:"training_created" required:"true"`
-	ProjectCreated    string `json:"project_created" required:"true"`
-	ModelCreated      string `json:"model_created" required:"true"`
-	DatasetCreated    string `json:"dataset_created" required:"true"`
+	TrainingCreated string `json:"training_created" required:"true"`
+
+	// resource
+	ModelCreated      string `json:"model_created"      required:"true"`
+	ProjectCreated    string `json:"project_created"    required:"true"`
+	DatasetCreated    string `json:"dataset_created"    required:"true"`
+	ModelDownloaded   string `json:"model_downloaded"   required:"true"`
 	ProjectDownloaded string `json:"project_downloaded" required:"true"`
 	DatasetDownloaded string `json:"dataset_downloaded" required:"true"`
-	ModelDownloaded   string `json:"model_downloaded" required:"true"`
 
 	//user
-	User userConfig `json:"user"                required:"true"`
+	User userConfig `json:"user"`
 }
