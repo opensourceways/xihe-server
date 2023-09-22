@@ -177,7 +177,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			// when the action need to be scoring
 			topics.Like,
 			topics.BigModelStarted,
-			topics.InferenceAsyncFinish,
+			topics.BigModelTopics.InferenceAsyncFinish,
 		},
 		kafka.SubscriberAdapter(),
 	)
