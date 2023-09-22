@@ -171,6 +171,7 @@ type mqTopics struct {
 
 	// bigmodel
 	BigModelTopics    bigmodelmq.TopicConfig `json:"bigmodel_topics"`
+	BigModelAccessLog string                 `json:"bigmodel_access_log"   required:"true"`
 	PictureLiked      string                 `json:"picture_liked"       required:"true"`
 	PicturePublicized string                 `json:"picture_publicized"  required:"true"`
 

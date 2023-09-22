@@ -1,6 +1,7 @@
 package messageadapter
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -8,8 +9,11 @@ import (
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	common "github.com/opensourceways/xihe-server/common/domain/message"
-	basemsg "github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/utils"
+)
+
+const (
+	bigmodelType = "bigmodel_type"
 )
 
 func NewMessageAdapter(cfg *Config, p common.Publisher) *messageAdapter {
@@ -99,13 +103,16 @@ func (impl *messageAdapter) SendWuKongAsyncInferenceFinish(
 func (impl *messageAdapter) SendBigModelAccessLog(v *domain.BigModelAccessLogEvent) error {
 	cfg := &impl.cfg.BigModelAccessLog
 
-	msg := basemsg.MsgOperateLog{
-		When: utils.Now(),
+
+
+	msg := common.MsgNormal{
 		User: v.Account.Account(),
-		Type: "bigmodel",
-		Info: map[string]string{
-			"bigmodel": string(v.BigModelType),
+		Type: cfg.Name,
+		Desc: fmt.Sprintf("Tried ad bigmodel %s", string(v.BigModelType)),
+		Details: map[string]string{
+			bigmodelType: string(v.BigModelType),
 		},
+		CreatedAt: utils.Now(),
 	}
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
