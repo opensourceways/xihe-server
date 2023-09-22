@@ -132,7 +132,7 @@ func main() {
 	}
 
 	// user
-	if err = userSubscribesMessage(cfg, &cfg.User); err != nil {
+	if err = userSubscribesMessage(cfg, &cfg.MQTopics.User); err != nil {
 		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
 
 		return
@@ -172,6 +172,9 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			topics.User.UserSignedUp,
 			topics.User.BioSet,
 			topics.User.AvatarSet,
+			// both add and remove action will send the event
+			// but we only fullfill the MsgNormal
+			// when the action need to be scoring
 			topics.Like,
 		},
 		kafka.SubscriberAdapter(),

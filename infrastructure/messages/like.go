@@ -7,15 +7,15 @@ import (
 )
 
 type msgLike struct {
-	Action string `json:"action"`
-
+	Action   string         `json:"action"`
 	Resource resourceObject `json:"resource"`
+
 	commsg.MsgNormal
 }
 
 type LikeConfig struct {
+	ModelLiked   commsg.TopicConfig `json:"model_liked"   required:"true"`
 	ProjectLiked commsg.TopicConfig `json:"project_liked" required:"true"`
-	ModelLiked   commsg.TopicConfig `json:"model_liked" required:"true"`
 	DatasetLiked commsg.TopicConfig `json:"dataset_liked" required:"true"`
 }
 
@@ -24,12 +24,12 @@ func NewLikeMessageAdapter(topic string, cfg *LikeConfig, p commsg.Publisher) *l
 }
 
 type likeMessageAdapter struct {
-	topic     string
 	cfg       LikeConfig
+	topic     string
 	publisher commsg.Publisher
 }
 
-func (s *likeMessageAdapter) toLikePointsMsg(t domain.ResourceType, u string) *commsg.MsgNormal {
+func (s *likeMessageAdapter) toLikePointsMsg(t domain.ResourceType, u string) commsg.MsgNormal {
 	m := commsg.MsgNormal{
 		CreatedAt: utils.Now(),
 		User:      u,
@@ -39,33 +39,34 @@ func (s *likeMessageAdapter) toLikePointsMsg(t domain.ResourceType, u string) *c
 	case domain.ResourceTypeDataset:
 		m.Type = s.cfg.DatasetLiked.Name
 		m.Desc = "Liked a dataset"
-	case domain.ResourceTypeModel:
-		m.Type = s.cfg.ModelLiked.Name
-		m.Desc = "Liked a model"
+
 	case domain.ResourceTypeProject:
 		m.Type = s.cfg.ProjectLiked.Name
 		m.Desc = "Liked a project"
+
+	case domain.ResourceTypeModel:
+		m.Type = s.cfg.ModelLiked.Name
+		m.Desc = "Liked a model"
+
 	default:
 		m = commsg.MsgNormal{}
 	}
-	return &m
+
+	return m
 }
 
-func (s *likeMessageAdapter) toLikeMsg(msg *domain.ResourceObject, action string) *msgLike {
-	m := &commsg.MsgNormal{}
-	// only send point msg when like happened
-	if action == actionAdd {
-		m = s.toLikePointsMsg(msg.Type, msg.Owner.Account())
-	}
-
+func (s *likeMessageAdapter) toLikeMsg(msg *domain.ResourceObject, action string) msgLike {
 	v := msgLike{
-		Action:    action,
-		MsgNormal: *m,
+		Action: action,
 	}
 
 	toMsgResourceObject(msg, &v.Resource)
 
-	return &v
+	if action == actionAdd {
+		v.MsgNormal = s.toLikePointsMsg(msg.Type, msg.Owner.Account())
+	}
+
+	return v
 }
 
 // Like
@@ -80,7 +81,5 @@ func (s *likeMessageAdapter) RemoveLike(msg *domain.ResourceObject) error {
 // we send all the projectLiked/modelLiked/datasetLikded msg to like topic
 // but with different Type in MsgNormal
 func (s *likeMessageAdapter) sendLike(msg *domain.ResourceObject, action string) error {
-	v := s.toLikeMsg(msg, action)
-
-	return s.publisher.Publish(s.topic, v, nil)
+	return s.publisher.Publish(s.topic, s.toLikeMsg(msg, action), nil)
 }
