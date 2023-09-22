@@ -50,7 +50,7 @@ func (s *downloadMessageAdapter) IncreaseDownload(obj *domain.ResourceObject) er
 }
 
 func (s *downloadMessageAdapter) SendRepoDownloaded(e *domain.RepoDownloadedEvent) (err error) {
-	switch e.Type {
+	switch e.Obj.Type {
 	case domain.ResourceTypeDataset:
 		err = s.downloadDataset(e)
 	case domain.ResourceTypeModel:
