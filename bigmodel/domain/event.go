@@ -28,7 +28,7 @@ type WuKongAsyncInferenceFinishEvent struct {
 	Links   map[string]string
 }
 
-type BigModelAccessLogEvent struct {
+type BigModelStartedEvent struct {
 	Account      types.Account
 	BigModelType BigmodelType
 }

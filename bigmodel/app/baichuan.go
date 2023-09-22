@@ -5,7 +5,7 @@ import (
 )
 
 func (s bigModelService) BaiChuan(cmd *BaiChuanCmd) (code string, dto BaiChuanDTO, err error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      cmd.User,
 		BigModelType: domain.BigmodelBaiChuan,
 	})

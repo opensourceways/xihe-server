@@ -151,7 +151,7 @@ func (s bigModelService) GenWuKongSamples(batchNum int) ([]string, error) {
 func (s bigModelService) WuKong(
 	user types.Account, cmd *WuKongCmd,
 ) (links map[string]string, code string, err error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      user,
 		BigModelType: domain.BigmodelWuKong,
 	})
@@ -167,7 +167,7 @@ func (s bigModelService) WuKong(
 func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
 	links map[string]string, code string, err error,
 ) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      cmd.User,
 		BigModelType: domain.BigmodelWuKongHF,
 	})
@@ -183,7 +183,7 @@ func (s bigModelService) WuKongHF(cmd *WuKongHFCmd) (
 func (s bigModelService) WukongApi(
 	user types.Account, model domain.ModelName, cmd *WuKongApiCmd,
 ) (links map[string]string, code string, err error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      user,
 		BigModelType: domain.BigmodelWuKong,
 	})

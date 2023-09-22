@@ -9,7 +9,7 @@ import (
 func (s bigModelService) CodeGeex(user types.Account, cmd *CodeGeexCmd) (
 	dto CodeGeexDTO, code string, err error,
 ) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      user,
 		BigModelType: domain.BigmodelCodeGeex,
 	})

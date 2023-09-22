@@ -10,7 +10,7 @@ import (
 func (s bigModelService) DescribePicture(
 	user types.Account, picture io.Reader, name string, length int64,
 ) (string, error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      user,
 		BigModelType: domain.BigmodelDescPicture,
 	})
@@ -21,7 +21,7 @@ func (s bigModelService) DescribePicture(
 func (s bigModelService) DescribePictureHF(
 	cmd *DescribePictureCmd,
 ) (string, error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      cmd.User,
 		BigModelType: domain.BigmodelDescPicture,
 	})
@@ -32,7 +32,7 @@ func (s bigModelService) DescribePictureHF(
 func (s bigModelService) GenPicture(
 	cmd GenPictureCmd,
 ) (link string, code string, err error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      cmd.User,
 		BigModelType: domain.BigmodelGenPicture,
 	})
@@ -47,7 +47,7 @@ func (s bigModelService) GenPicture(
 func (s bigModelService) GenPictures(
 	cmd GenPictureCmd,
 ) (links []string, code string, err error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      cmd.User,
 		BigModelType: domain.BigmodelGenPicture,
 	})
@@ -62,7 +62,7 @@ func (s bigModelService) GenPictures(
 func (s bigModelService) Ask(
 	u types.Account, q domain.Question, f string,
 ) (v string, code string, err error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      u,
 		BigModelType: domain.BigmodelVQA,
 	})
@@ -79,7 +79,7 @@ func (s bigModelService) VQAUploadPicture(f io.Reader, user types.Account, fileN
 }
 
 func (s bigModelService) VQAHF(cmd *VQAHFCmd) (v string, code string, err error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      cmd.User,
 		BigModelType: domain.BigmodelVQA,
 	})

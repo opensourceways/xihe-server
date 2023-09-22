@@ -6,7 +6,7 @@ import (
 )
 
 func (s bigModelService) PanGu(u types.Account, q string) (v string, code string, err error) {
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      u,
 		BigModelType: domain.BigmodelPanGu,
 	})
