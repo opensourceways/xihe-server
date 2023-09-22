@@ -70,6 +70,7 @@ type UpdateUserBasicInfoCmd struct {
 	AvatarId      domain.AvatarId
 	bioChanged    bool
 	avatarChanged bool
+	emailChanged  bool
 }
 
 func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
@@ -85,8 +86,10 @@ func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 
 	if cmd.Email != nil && u.Email.Email() != cmd.Email.Email() {
 		u.Email = cmd.Email
-		changed = true
+		cmd.emailChanged = true
 	}
+
+	changed = cmd.avatarChanged || cmd.bioChanged || cmd.emailChanged
 
 	return
 }

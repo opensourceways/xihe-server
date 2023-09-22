@@ -3,6 +3,8 @@ package messageadapter
 import (
 	"fmt"
 
+	"github.com/sirupsen/logrus"
+
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/utils"
@@ -34,6 +36,8 @@ func (impl *messageAdapter) SendUserSignedUpEvent(v *domain.UserSignedUpEvent) e
 		CreatedAt: utils.Now(),
 	}
 
+	logrus.Debugf("Send sign up msg: %+v", msg)
+
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
@@ -48,6 +52,8 @@ func (impl *messageAdapter) SendUserAvatarSetEvent(v *domain.UserAvatarSetEvent)
 		CreatedAt: utils.Now(),
 	}
 
+	logrus.Debugf("Send set avatar  msg: %+v", msg)
+
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
@@ -61,6 +67,8 @@ func (impl *messageAdapter) SendUserBioSetEvent(v *domain.UserBioSetEvent) error
 		Desc:      fmt.Sprintf("Set Bio of %s", v.Bio),
 		CreatedAt: utils.Now(),
 	}
+
+	logrus.Debugf("Send set biomsg: %+v", msg)
 
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
@@ -79,6 +87,8 @@ func (impl *messageAdapter) SendFollowingAddedEvent(v *domain.FollowerInfo) erro
 		},
 	}
 
+	logrus.Debugf("Send add follower msg: %+v", msg)
+
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
@@ -96,6 +106,8 @@ func (impl *messageAdapter) SendFollowingRemovedEvent(v *domain.FollowerInfo) er
 		},
 	}
 
+	logrus.Debugf("Send remove followermsg: %+v", msg)
+
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
@@ -111,6 +123,8 @@ func (impl *messageAdapter) AddOperateLogForNewUser(u domain.Account) error {
 		User: a,
 		Type: "user",
 	}
+
+	logrus.Debugf("Send new user oprate msg: %+v", msg)
 
 	return impl.publisher.Publish(impl.cfg.OperateLog, &msg, nil)
 }
