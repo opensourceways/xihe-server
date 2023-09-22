@@ -57,15 +57,15 @@ func (s *likeMessageAdapter) toLikePointsMsg(t domain.ResourceType, u string) co
 	return m
 }
 
-func (s *likeMessageAdapter) toLikeMsg(user domain.Account, msg *domain.ResourceObject, action string) msgLike {
+func (s *likeMessageAdapter) toLikeMsg(msg *domain.ResourceLikedEvent, action string) msgLike {
 	v := msgLike{
 		Action: action,
 	}
 
-	toMsgResourceObject(msg, &v.Resource)
+	toMsgResourceObject(&msg.Obj, &v.Resource)
 
 	if action == actionAdd {
-		v.MsgNormal = s.toLikePointsMsg(msg.Type, user.Account())
+		v.MsgNormal = s.toLikePointsMsg(msg.Obj.Type, msg.Account.Account())
 	}
 
 	return v
@@ -73,17 +73,17 @@ func (s *likeMessageAdapter) toLikeMsg(user domain.Account, msg *domain.Resource
 
 // Like
 func (s *likeMessageAdapter) AddLike(msg *domain.ResourceLikedEvent) error {
-	return s.sendLike(msg.Account, &msg.Obj, actionAdd)
+	return s.sendLike(msg, actionAdd)
 }
 
 func (s *likeMessageAdapter) RemoveLike(msg *domain.ResourceLikedEvent) error {
-	return s.sendLike(msg.Account, &msg.Obj, actionRemove)
+	return s.sendLike(msg, actionRemove)
 }
 
 // we send all the projectLiked/modelLiked/datasetLikded msg to like topic
 // but with different Type in MsgNormal
-func (s *likeMessageAdapter) sendLike(user domain.Account, msg *domain.ResourceObject, action string) error {
-	m := s.toLikeMsg(user, msg, action)
+func (s *likeMessageAdapter) sendLike(msg *domain.ResourceLikedEvent, action string) error {
+	m := s.toLikeMsg(msg, action)
 	logrus.Debugf("Send liked msg %+v", m)
 
 	return s.publisher.Publish(s.topic, m, nil)
