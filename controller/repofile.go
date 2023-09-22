@@ -292,7 +292,7 @@ func (ctl *RepoFileController) Download(ctx *gin.Context) {
 // @Failure		500	system_error		system	error
 // @Router			/v1/repo/{type}/{user}/{name} [get]
 func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
-	_, u, repoInfo, ok := ctl.checkForView(ctx)
+	pl, u, repoInfo, ok := ctl.checkForView(ctx)
 	if !ok {
 		return
 	}
@@ -313,7 +313,7 @@ func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 				"Content-Transfer-Encoding": "binary",
 			},
 		)
-	})
+	}, pl.DomainAccount())
 }
 
 // @Summary		Preview

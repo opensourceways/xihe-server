@@ -3,6 +3,8 @@ package messages
 import (
 	"fmt"
 
+	"github.com/sirupsen/logrus"
+
 	commsg "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -69,6 +71,8 @@ func (s *downloadMessageAdapter) downloadModel(e *domain.RepoDownloadedEvent) er
 		Desc:      fmt.Sprintf("Downloaded a model %s", e.Name),
 	}
 
+	logrus.Debugf("Send a downloaded model message: %+v", v)
+
 	return s.publisher.Publish(s.cfg.ModelDownload.Topic, v, nil)
 }
 
@@ -80,6 +84,8 @@ func (s *downloadMessageAdapter) downloadDataset(e *domain.RepoDownloadedEvent) 
 		Desc:      fmt.Sprintf("Downloaded a dataset %s", e.Name),
 	}
 
+	logrus.Debugf("Send a downloaded dataset message: %+v", v)
+
 	return s.publisher.Publish(s.cfg.DatasetDownload.Topic, v, nil)
 }
 
@@ -90,6 +96,8 @@ func (s *downloadMessageAdapter) downloadProject(e *domain.RepoDownloadedEvent) 
 		CreatedAt: utils.Now(),
 		Desc:      fmt.Sprintf("Downloaded a project %s", e.Name),
 	}
+
+	logrus.Debugf("Send a downloaded project message: %+v", v)
 
 	return s.publisher.Publish(s.cfg.ProjectDownload.Topic, v, nil)
 }
