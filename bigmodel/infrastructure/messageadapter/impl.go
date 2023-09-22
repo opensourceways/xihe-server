@@ -86,10 +86,14 @@ func (impl *messageAdapter) SendWuKongAsyncInferenceFinish(
 		ls += v.Links[k] + ","
 	}
 
+	taskid := strconv.Itoa(int(v.TaskId))
+
 	msg := common.MsgNormal{
 		User: v.Account.Account(),
+		Type: cfg.Name,
+		Desc: fmt.Sprintf("Tried wukong inference, task id is: %s", taskid),
 		Details: map[string]string{
-			"task_id": strconv.Itoa(int(v.TaskId)),
+			"task_id": taskid,
 			"status":  "finished",
 			"links":   strings.TrimRight(ls, ","),
 		},

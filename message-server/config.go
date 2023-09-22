@@ -170,10 +170,11 @@ type mqTopics struct {
 	JupyterCreated string `json:"jupyter_created" required:"true"`
 
 	// bigmodel
-	BigModelTopics    bigmodelmq.TopicConfig `json:"bigmodel_topics"`
-	BigModelStarted   string                 `json:"bigmodel_started"    required:"true"`
-	PictureLiked      string                 `json:"picture_liked"       required:"true"`
-	PicturePublicized string                 `json:"picture_publicized"  required:"true"`
+	BigModelTopics       bigmodelmq.TopicConfig `json:"bigmodel_topics"`
+	BigModelStarted      string                 `json:"bigmodel_started"         required:"true"`
+	PictureLiked         string                 `json:"picture_liked"            required:"true"`
+	PicturePublicized    string                 `json:"picture_publicized"       required:"true"`
+	InferenceAsyncFinish string                 `json:"inference_async_finish"   required:"true"`
 
 	//course
 	CourseApplied string `json:"course_applied" required:"true"`
