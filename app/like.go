@@ -48,7 +48,7 @@ func NewLikeService(
 	project repository.Project,
 	dataset repository.Dataset,
 	activity repository.Activity,
-	sender message.Sender,
+	sender message.LikeMessageProducer,
 ) LikeService {
 	return likeService{
 		repo:     repo,
@@ -67,7 +67,7 @@ func NewLikeService(
 type likeService struct {
 	repo     repository.Like
 	activity repository.Activity
-	sender   message.Sender
+	sender   message.LikeMessageProducer
 
 	rs resourceService
 }
@@ -88,9 +88,9 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 		Type: cmd.ResourceType,
 		ResourceIndex: domain.ResourceIndex{
 			Owner: cmd.ResourceOwner,
-			Id: cmd.ResourceId,
+			Id:    cmd.ResourceId,
 		},
-	}); 
+	})
 	if err != nil {
 		return err
 	}
@@ -153,9 +153,9 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 		Type: cmd.ResourceType,
 		ResourceIndex: domain.ResourceIndex{
 			Owner: cmd.ResourceOwner,
-			Id: cmd.ResourceId,
+			Id:    cmd.ResourceId,
 		},
-	}); 
+	})
 	if err != nil {
 		return err
 	}
