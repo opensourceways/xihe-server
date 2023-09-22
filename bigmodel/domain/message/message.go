@@ -17,5 +17,5 @@ type MessageProducer interface {
 	SendWuKongPictureLiked(*domain.WuKongPictureLikedEvent) error
 
 	// common
-	SendBigModelAccessLog(*domain.BigModelAccessLogEvent) error
+	SendBigModelStarted(*domain.BigModelStartedEvent) error
 }

@@ -7,7 +7,7 @@ import (
 
 func (s bigModelService) AIDetector(cmd *AIDetectorCmd) (code string, ismachine bool, err error) {
 	// operation log
-	_ = s.sender.SendBigModelAccessLog(&domain.BigModelAccessLogEvent{
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      cmd.User,
 		BigModelType: domain.BigmodelAIDetector,
 	})

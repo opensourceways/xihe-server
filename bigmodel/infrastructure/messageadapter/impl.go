@@ -100,10 +100,8 @@ func (impl *messageAdapter) SendWuKongAsyncInferenceFinish(
 	return impl.publisher.Publish(cfg.Topic, &msg, nil)
 }
 
-func (impl *messageAdapter) SendBigModelAccessLog(v *domain.BigModelAccessLogEvent) error {
-	cfg := &impl.cfg.BigModelAccessLog
-
-
+func (impl *messageAdapter) SendBigModelStarted(v *domain.BigModelStartedEvent) error {
+	cfg := &impl.cfg.BigModelStarted
 
 	msg := common.MsgNormal{
 		User: v.Account.Account(),
@@ -159,5 +157,5 @@ type Config struct {
 	PictureLiked         common.TopicConfig `json:"picture_liked"`
 
 	// common
-	BigModelAccessLog common.TopicConfig `json:"bigmodel_access_log"`
+	BigModelStarted common.TopicConfig `json:"bigmodel_started"`
 }
