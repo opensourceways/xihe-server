@@ -97,6 +97,7 @@ func (impl *messageAdapter) SendWuKongAsyncInferenceFinish(
 			"status":  "finished",
 			"links":   strings.TrimRight(ls, ","),
 		},
+		CreatedAt: utils.Now(),
 	}
 
 	logrus.Debugf("Send WuKongAsyncInferenceFinish: %v", msg)
