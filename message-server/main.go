@@ -176,7 +176,7 @@ func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
 			// but we only fullfill the MsgNormal
 			// when the action need to be scoring
 			topics.Like,
-			topics.BigModelFinished,
+			topics.BigModelTopics.BigModelFinished,
 			topics.BigModelTopics.InferenceAsyncFinish,
 		},
 		kafka.SubscriberAdapter(),

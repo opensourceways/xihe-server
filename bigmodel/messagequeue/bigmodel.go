@@ -186,6 +186,7 @@ func (c *consumer) handleEventBigModelWuKongAsyncTaskFinish(body []byte, h map[s
 }
 
 type TopicConfig struct {
+	BigModelFinished     string `json:"bigmodel_finished"        required:"true"`
 	InferenceStart       string `json:"inference_start"`
 	InferenceError       string `json:"inference_error"`
 	InferenceAsyncStart  string `json:"inference_async_start"`
