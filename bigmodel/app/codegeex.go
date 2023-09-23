@@ -18,5 +18,10 @@ func (s bigModelService) CodeGeex(user types.Account, cmd *CodeGeexCmd) (
 		code = s.setCode(err)
 	}
 
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      user,
+		BigModelType: domain.BigmodelCodeGeex,
+	})
+
 	return
 }

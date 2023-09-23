@@ -9,13 +9,24 @@ import (
 
 func (s bigModelService) DescribePicture(
 	user types.Account, picture io.Reader, name string, length int64,
-) (string, error) {
+) (desc string, err error) {
 	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      user,
 		BigModelType: domain.BigmodelDescPicture,
 	})
 
-	return s.fm.DescribePicture(picture, name, length, string(domain.BigmodelDescPicture))
+	if desc, err = s.fm.DescribePicture(
+		picture, name, length, string(domain.BigmodelDescPicture),
+	); err != nil {
+		return
+	}
+
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      user,
+		BigModelType: domain.BigmodelDescPicture,
+	})
+
+	return
 }
 
 func (s bigModelService) DescribePictureHF(
@@ -41,6 +52,11 @@ func (s bigModelService) GenPicture(
 		code = s.setCode(err)
 	}
 
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      cmd.User,
+		BigModelType: domain.BigmodelGenPicture,
+	})
+
 	return
 }
 
@@ -56,6 +72,11 @@ func (s bigModelService) GenPictures(
 		code = s.setCode(err)
 	}
 
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      cmd.User,
+		BigModelType: domain.BigmodelGenPicture,
+	})
+
 	return
 }
 
@@ -70,6 +91,11 @@ func (s bigModelService) Ask(
 	if v, err = s.fm.Ask(q, f); err != nil {
 		code = s.setCode(err)
 	}
+
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      u,
+		BigModelType: domain.BigmodelVQA,
+	})
 
 	return
 }

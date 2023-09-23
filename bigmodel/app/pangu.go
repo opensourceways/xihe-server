@@ -15,5 +15,10 @@ func (s bigModelService) PanGu(u types.Account, q string) (v string, code string
 		code = s.setCode(err)
 	}
 
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      u,
+		BigModelType: domain.BigmodelPanGu,
+	})
+
 	return
 }

@@ -33,5 +33,11 @@ func (s bigModelService) AIDetector(cmd *AIDetectorCmd) (code string, ismachine 
 		return
 	}
 
+	// call finished
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      cmd.User,
+		BigModelType: domain.BigmodelAIDetector,
+	})
+
 	return
 }

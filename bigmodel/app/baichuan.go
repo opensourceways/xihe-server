@@ -22,5 +22,10 @@ func (s bigModelService) BaiChuan(cmd *BaiChuanCmd) (code string, dto BaiChuanDT
 		return
 	}
 
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      cmd.User,
+		BigModelType: domain.BigmodelBaiChuan,
+	})
+
 	return
 }

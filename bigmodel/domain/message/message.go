@@ -18,4 +18,5 @@ type MessageProducer interface {
 
 	// common
 	SendBigModelStarted(*domain.BigModelStartedEvent) error
+	SendBigModelFinished(*domain.BigModelFinishedEvent) error
 }

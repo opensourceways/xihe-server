@@ -110,7 +110,23 @@ func (impl *messageAdapter) SendBigModelStarted(v *domain.BigModelStartedEvent) 
 	msg := common.MsgNormal{
 		User: v.Account.Account(),
 		Type: cfg.Name,
-		Desc: fmt.Sprintf("Tried ad bigmodel %s", string(v.BigModelType)),
+		Desc: fmt.Sprintf("Tried a bigmodel %s", string(v.BigModelType)),
+		Details: map[string]string{
+			bigmodelType: string(v.BigModelType),
+		},
+		CreatedAt: utils.Now(),
+	}
+
+	return impl.publisher.Publish(cfg.Topic, &msg, nil)
+}
+
+func (impl *messageAdapter) SendBigModelFinished(v *domain.BigModelFinishedEvent) error {
+	cfg := &impl.cfg.BigModelFinished
+
+	msg := common.MsgNormal{
+		User: v.Account.Account(),
+		Type: cfg.Name,
+		Desc: fmt.Sprintf("Tried bigmodel %s success", string(v.BigModelType)),
 		Details: map[string]string{
 			bigmodelType: string(v.BigModelType),
 		},
@@ -161,5 +177,6 @@ type Config struct {
 	PictureLiked         common.TopicConfig `json:"picture_liked"`
 
 	// common
-	BigModelStarted common.TopicConfig `json:"bigmodel_started"`
+	BigModelStarted  common.TopicConfig `json:"bigmodel_started"`
+	BigModelFinished common.TopicConfig `json:"bigmodel_finished"`
 }
