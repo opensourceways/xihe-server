@@ -33,6 +33,11 @@ type BigModelStartedEvent struct {
 	BigModelType BigmodelType
 }
 
+type BigModelFinishedEvent struct {
+	Account      types.Account
+	BigModelType BigmodelType
+}
+
 type WuKongPicturePublicizedEvent struct {
 	Account types.Account
 }

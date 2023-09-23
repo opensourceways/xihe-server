@@ -27,6 +27,11 @@ func (s bigModelService) LuoJia(user types.Account) (v string, err error) {
 
 	s.luojia.Save(&record)
 
+	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+		Account:      user,
+		BigModelType: domain.BigmodelLuoJia,
+	})
+
 	return
 }
 
