@@ -16,6 +16,8 @@ func (s bigModelService) CodeGeex(user types.Account, cmd *CodeGeexCmd) (
 
 	if dto, err = s.fm.CodeGeex((*bigmodel.CodeGeexReq)(cmd)); err != nil {
 		code = s.setCode(err)
+
+		return
 	}
 
 	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{

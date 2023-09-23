@@ -50,6 +50,8 @@ func (s bigModelService) GenPicture(
 
 	if link, err = s.fm.GenPicture(cmd.User, cmd.Desc.Desc()); err != nil {
 		code = s.setCode(err)
+
+		return
 	}
 
 	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
@@ -70,6 +72,8 @@ func (s bigModelService) GenPictures(
 
 	if links, err = s.fm.GenPictures(cmd.User, cmd.Desc.Desc()); err != nil {
 		code = s.setCode(err)
+
+		return
 	}
 
 	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
@@ -90,6 +94,8 @@ func (s bigModelService) Ask(
 
 	if v, err = s.fm.Ask(q, f); err != nil {
 		code = s.setCode(err)
+
+		return
 	}
 
 	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
