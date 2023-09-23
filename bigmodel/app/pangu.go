@@ -13,6 +13,8 @@ func (s bigModelService) PanGu(u types.Account, q string) (v string, code string
 
 	if v, err = s.fm.PanGu(q); err != nil {
 		code = s.setCode(err)
+
+		return
 	}
 
 	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
