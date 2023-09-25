@@ -353,7 +353,7 @@ type BaiChuanDTO struct {
 type GLM2Cmd struct {
 	CH                chan string
 	User              types.Account
-	History           []domain.GLM2History
+	History           []domain.History
 	Sampling          bool
 	Text              domain.GLM2Text
 	TopK              domain.TopK
@@ -370,6 +370,31 @@ func (cmd *GLM2Cmd) SetDefault() {
 }
 
 type GLM2DTO struct {
+	Reply        string `json:"reply"`
+	StreamStatus string `json:"stream_status"`
+}
+
+// llama2
+type LLAMA2Cmd struct {
+	CH                chan string
+	User              types.Account
+	History           []domain.History
+	Sampling          bool
+	Text              domain.LLAMA2Text
+	TopK              domain.TopK
+	TopP              domain.TopP
+	Temperature       domain.Temperature
+	RepetitionPenalty domain.RepetitionPenalty
+}
+
+func (cmd *LLAMA2Cmd) SetDefault() {
+	cmd.TopK, _ = domain.NewTopK(3)
+	cmd.TopP, _ = domain.NewTopP(1)
+	cmd.Temperature, _ = domain.NewTemperature(1)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1)
+}
+
+type LLAMA2DTO struct {
 	Reply        string `json:"reply"`
 	StreamStatus string `json:"stream_status"`
 }
