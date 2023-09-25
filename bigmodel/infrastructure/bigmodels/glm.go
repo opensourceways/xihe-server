@@ -1,11 +1,11 @@
 package bigmodels
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"net/http"
 	"strings"
-	"time"
 
 	libutils "github.com/opensourceways/community-robot-lib/utils"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
@@ -95,25 +95,26 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 		return
 	}
 
+	reader := bufio.NewReader(resp.Body)
+
 	var r glm2Response
 	go func() {
 		defer func() { ec <- endpoint }()
 		defer resp.Body.Close()
 
 		for {
-			time.Sleep(300 * time.Microsecond)
-
-			eventData := make([]byte, 2048)
-			if _, err = resp.Body.Read(eventData); err != nil {
+			line, err := reader.ReadString('\n')
+			if err != nil {
 				ch <- "done"
+
 				return
 			}
-
-			// clean & unmarshal data
-			data := strings.Replace(string(eventData), "data: ", "", -1)
+			data := strings.Replace(string(line), "data: ", "", 1)
 			data = strings.TrimRight(data, "\x00")
 
-			json.Unmarshal([]byte(data), &r) // ignore error
+			if err = json.Unmarshal([]byte(data), &r); err != nil {
+				continue
+			}
 
 			// response audit
 			if err = s.check.check(r.Reply); err != nil {
