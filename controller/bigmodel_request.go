@@ -448,9 +448,57 @@ func (req *glm2Request) toCmd(ch chan string, user types.Account) (cmd app.GLM2C
 		return
 	}
 
-	history := make([]domain.GLM2History, len(req.History))
+	history := make([]domain.History, len(req.History))
 	for i := range req.History {
-		if history[i], err = domain.NewGLM2History(req.History[i][0], req.History[i][1]); err != nil {
+		if history[i], err = domain.NewHistory(req.History[i][0], req.History[i][1]); err != nil {
+			return
+		}
+	}
+
+	if req.Sampling {
+		if cmd.TopK, err = domain.NewTopK(req.TopK); err != nil {
+			return
+		}
+
+		if cmd.TopP, err = domain.NewTopP(req.TopP); err != nil {
+			return
+		}
+
+		if cmd.Temperature, err = domain.NewTemperature(req.Temperature); err != nil {
+			return
+		}
+
+		if cmd.RepetitionPenalty, err = domain.NewRepetitionPenalty(req.RepetitionPenalty); err != nil {
+			return
+		}
+	}
+
+	cmd.CH = ch
+	cmd.Sampling = req.Sampling
+	cmd.User = user
+
+	return
+}
+
+// llama2
+type llama2Request struct {
+	Text              string      `json:"text"`
+	History           [][2]string `json:"history"`
+	Sampling          bool        `json:"sampling"`
+	TopK              int         `json:"top_k"`
+	TopP              float64     `json:"top_p"`
+	Temperature       float64     `json:"temperature"`
+	RepetitionPenalty float64     `json:"repetition_penalty"`
+}
+
+func (req *llama2Request) toCmd(ch chan string, user types.Account) (cmd app.LLAMA2Cmd, err error) {
+	if cmd.Text, err = domain.NewLLAMA2Text(req.Text); err != nil {
+		return
+	}
+
+	history := make([]domain.History, len(req.History))
+	for i := range req.History {
+		if history[i], err = domain.NewHistory(req.History[i][0], req.History[i][1]); err != nil {
 			return
 		}
 	}

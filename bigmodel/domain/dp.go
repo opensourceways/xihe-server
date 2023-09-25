@@ -23,6 +23,7 @@ const (
 	bigmodelAIDetector    = "ai_detector"
 	bigmodelBaiChuan      = "baichuan"
 	bigmodelGLM2          = "glm2"
+	bigmodelLLAMA2        = "llama2"
 
 	langZH = "zh"
 	langEN = "en"
@@ -45,6 +46,7 @@ var (
 	BigmodelAIDetector    = BigmodelType(bigmodelAIDetector)
 	BigmodelBaiChuan      = BigmodelType(bigmodelBaiChuan)
 	BigmodelGLM2          = BigmodelType(bigmodelGLM2)
+	BigmodelLLAMA2        = BigmodelType(bigmodelLLAMA2)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
@@ -388,7 +390,7 @@ func NewGLM2Text(v string) (GLM2Text, error) {
 		return nil, errors.New("no glm2 text")
 	}
 
-	if max := 1000; utils.StrLen(v) > max { // TODO: to config
+	if max := 3000; utils.StrLen(v) > max { // TODO: to config
 		return nil, errors.New("invalid glm2 text")
 	}
 
@@ -400,20 +402,43 @@ func (t glm2Text) GLM2Text() string {
 }
 
 // glm2 history
-type GLM2History interface {
-	GLM2History() [2]string
+type History interface {
+	History() [2]string
 }
 
-type glm2History [2]string
+type history [2]string
 
-func NewGLM2History(q, a string) (GLM2History, error) {
-	if max := 1000; utils.StrLen(q) > max || utils.StrLen(a) > max {
-		return nil, errors.New("invalid glm2 history")
+func NewHistory(q, a string) (History, error) {
+	if max := 3000; utils.StrLen(q) > max || utils.StrLen(a) > max {
+		return nil, errors.New("invalid bigmodel history")
 	}
 
-	return glm2History{q, a}, nil
+	return history{q, a}, nil
 }
 
-func (t glm2History) GLM2History() [2]string {
+func (t history) History() [2]string {
 	return t
+}
+
+// llama2 text
+type LLAMA2Text interface {
+	LLAMA2Text() string
+}
+
+type llama2Text string
+
+func NewLLAMA2Text(v string) (LLAMA2Text, error) {
+	if v == "" {
+		return nil, errors.New("no llama2 text")
+	}
+
+	if max := 3000; utils.StrLen(v) > max { // TODO: to config
+		return nil, errors.New("invalid llama2 text")
+	}
+
+	return llama2Text(v), nil
+}
+
+func (t llama2Text) LLAMA2Text() string {
+	return string(t)
 }

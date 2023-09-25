@@ -76,6 +76,7 @@ type Endpoints struct {
 	AIDetector       string `json:"ai_detector"        required:"true"`
 	BaiChuan         string `json:"baichuan"           required:"true"`
 	GLM2             string `json:"glm"                required:"true"`
+	LLAMA2           string `json:"llama"             required:"true"`
 }
 
 func (e *Endpoints) validate() (err error) {

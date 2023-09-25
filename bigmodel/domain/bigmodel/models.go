@@ -62,4 +62,7 @@ type BigModel interface {
 
 	// glm2
 	GLM2(chan string, *domain.GLM2Input) error
+
+	// llama2
+	LLAMA2(chan string, *domain.LLAMA2Input) error
 }
