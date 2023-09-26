@@ -9,6 +9,7 @@ import (
 
 	libutils "github.com/opensourceways/community-robot-lib/utils"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
+	"github.com/sirupsen/logrus"
 )
 
 type glm2Request struct {
@@ -22,9 +23,10 @@ type glm2Request struct {
 }
 
 type glm2Response struct {
-	Reply string `json:"reply"`
-	Code  int    `json:"code"`
-	Msg   string `json:"msg"`
+	Reply        string `json:"reply"`
+	Code         int    `json:"code"`
+	Msg          string `json:"msg"`
+	StreamStatus string `json:"stream_status"`
 }
 
 type glm2Info struct {
@@ -109,6 +111,7 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 
 				return
 			}
+
 			data := strings.Replace(string(line), "data: ", "", 1)
 			data = strings.TrimRight(data, "\x00")
 
@@ -116,9 +119,21 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 				continue
 			}
 
-			// response audit
-			if err = s.check.check(r.Reply); err != nil {
+			if r.StreamStatus == "DONE" {
+				ch <- "done"
+
 				return
+			}
+
+			// response audit
+			if r.Reply != "" {
+				if err = s.check.check(r.Reply); err != nil {
+					logrus.Debugf("content audit not pass: %s", err.Error())
+
+					ch <- "done"
+
+					return
+				}
 			}
 
 			ch <- r.Reply
