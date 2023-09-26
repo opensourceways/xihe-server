@@ -1070,15 +1070,17 @@ func (ctl *BigModelController) GLM2(ctx *gin.Context) {
 		if msg, ok := <-ch; ok {
 			if msg == "done" {
 				ctx.SSEvent("status", "done")
+				close(ch)
 			} else {
 				ctx.SSEvent("message", msg)
 			}
+
 			return true
 		}
+
 		return false
 	})
 }
-
 
 //	@Title			ApplyApi
 //	@Description	generates pictures by WuKong-hf
