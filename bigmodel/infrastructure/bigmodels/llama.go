@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -115,8 +114,6 @@ func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.L
 
 				return
 			}
-
-			fmt.Printf("line: %v\n", line)
 
 			data := strings.Replace(string(line), "data: ", "", 1)
 			data = strings.TrimRight(data, "\x00")
