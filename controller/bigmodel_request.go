@@ -471,6 +471,8 @@ func (req *glm2Request) toCmd(ch chan string, user types.Account) (cmd app.GLM2C
 		if cmd.RepetitionPenalty, err = domain.NewRepetitionPenalty(req.RepetitionPenalty); err != nil {
 			return
 		}
+	} else {
+		cmd.SetDefault()
 	}
 
 	cmd.CH = ch
@@ -519,6 +521,8 @@ func (req *llama2Request) toCmd(ch chan string, user types.Account) (cmd app.LLA
 		if cmd.RepetitionPenalty, err = domain.NewRepetitionPenalty(req.RepetitionPenalty); err != nil {
 			return
 		}
+	} else {
+		cmd.SetDefault()
 	}
 
 	cmd.CH = ch
