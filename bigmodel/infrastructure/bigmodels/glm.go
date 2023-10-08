@@ -99,7 +99,10 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 
 	reader := bufio.NewReader(resp.Body)
 
-	var r glm2Response
+	var (
+		r     glm2Response
+		count int
+	)
 	go func() {
 		defer func() { ec <- endpoint }()
 		defer resp.Body.Close()
@@ -125,8 +128,10 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 				return
 			}
 
-			// response audit
-			if r.Reply != "" {
+			// response audit, skip 6 response
+			if r.Reply != "" && count > 6 {
+				count = 0
+
 				if err = s.check.check(r.Reply); err != nil {
 					logrus.Debugf("content audit not pass: %s", err.Error())
 
@@ -137,6 +142,7 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 			}
 
 			ch <- r.Reply
+			count += 1
 		}
 	}()
 
