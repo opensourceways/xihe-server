@@ -91,8 +91,6 @@ func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.L
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Connection", "keep-alive")
 	req.Header.Set("Accept", "*/*")
-	req.Header.Set("User-Agent", "PostmanRuntime/7.32.3")
-	req.Header.Set("Accept-Encoding", "gzip, deflate, br")
 
 	resp, err := s.hc.Client.Do(req)
 	if err != nil {
@@ -100,7 +98,11 @@ func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.L
 	}
 
 	reader := bufio.NewReader(resp.Body)
-	var r llama2Response
+
+	var (
+		r     llama2Response
+		count int
+	)
 	go func() {
 		defer func() { ec <- endpoint }()
 		defer resp.Body.Close()
@@ -128,8 +130,10 @@ func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.L
 				return
 			}
 
-			// response audit
-			if r.Reply != "" {
+			// response audit, skip 6 response
+			if r.Reply != "" && count > 6 {
+				count = 0
+
 				if err = s.check.check(r.Reply); err != nil {
 					logrus.Debugf("content audit not pass: %s", err.Error())
 
@@ -140,6 +144,7 @@ func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.L
 			}
 
 			ch <- r.Reply
+			count += 1
 		}
 	}()
 
