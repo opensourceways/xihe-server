@@ -43,6 +43,7 @@ func Init(cfg *Config) error {
 	fm.wukongInfo, err = newWuKongInfo(cfg)
 	fm.baichuanInfo, err = newBaiChuanInfo(cfg)
 	fm.glm2Info, err = newGLM2Info(cfg)
+	fm.llama2Info, err = newLLAMA2Info(cfg)
 
 	return err
 }
@@ -68,6 +69,7 @@ type service struct {
 	aiDetectorInfo  aiDetectorInfo
 	baichuanInfo    baichuanInfo
 	glm2Info        glm2Info
+	llama2Info      llama2Info
 }
 
 func (s *service) token() (string, error) {

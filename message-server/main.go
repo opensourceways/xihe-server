@@ -87,6 +87,10 @@ func main() {
 		logrus.Fatalf("load config, err:%s", err.Error())
 	}
 
+	if err := os.Remove(o.service.ConfigFile); err != nil {
+		logrus.Fatalf("config file delete failed, err:%s", err.Error())
+	}
+
 	// mq
 	if err = kafka.Init(&cfg.MQ, log, nil); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)

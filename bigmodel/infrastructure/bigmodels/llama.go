@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type glm2Request struct {
+type llama2Request struct {
 	Inputs            string      `json:"inputs"`
 	History           [][2]string `json:"history"`
 	Sampling          bool        `json:"sampling"`
@@ -22,20 +22,20 @@ type glm2Request struct {
 	RepetitionPenalty float64     `json:"repetition_penalty"`
 }
 
-type glm2Response struct {
+type llama2Response struct {
 	Reply        string `json:"reply"`
 	Code         int    `json:"code"`
 	Msg          string `json:"msg"`
 	StreamStatus string `json:"stream_status"`
 }
 
-type glm2Info struct {
+type llama2Info struct {
 	endpoints chan string
 }
 
-func newGLM2Info(cfg *Config) (info glm2Info, err error) {
+func newLLAMA2Info(cfg *Config) (info llama2Info, err error) {
 	ce := &cfg.Endpoints
-	es, _ := ce.parse(ce.GLM2)
+	es, _ := ce.parse(ce.LLAMA2)
 
 	// init endpoints
 	info.endpoints = make(chan string, len(es))
@@ -46,27 +46,27 @@ func newGLM2Info(cfg *Config) (info glm2Info, err error) {
 	return
 }
 
-func (s *service) GLM2(ch chan string, input *domain.GLM2Input) (err error) {
+func (s *service) LLAMA2(ch chan string, input *domain.LLAMA2Input) (err error) {
 	// input audit
-	if err = s.check.check(input.Text.GLM2Text()); err != nil {
+	if err = s.check.check(input.Text.LLAMA2Text()); err != nil {
 		return
 	}
 
-	// call bigmodel glm2
+	// call bigmodel llama2
 	f := func(ec chan string, e string) (err error) {
-		err = s.genGLM2(ec, ch, e, input)
+		err = s.genllama2(ec, ch, e, input)
 
 		return
 	}
 
-	if err = s.doIfFreeNoEndpointReturn(s.glm2Info.endpoints, f); err != nil {
+	if err = s.doIfFreeNoEndpointReturn(s.llama2Info.endpoints, f); err != nil {
 		return
 	}
 
 	return
 }
 
-func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM2Input) (
+func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.LLAMA2Input) (
 	err error,
 ) {
 	t, err := genToken(&s.wukongInfo.cfg.CloudConfig)
@@ -74,7 +74,7 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 		return
 	}
 
-	opt := toGLM2Req(input)
+	opt := toLLAMA2Req(input)
 	body, err := libutils.JsonMarshal(&opt)
 	if err != nil {
 		return
@@ -100,7 +100,7 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 	reader := bufio.NewReader(resp.Body)
 
 	var (
-		r     glm2Response
+		r     llama2Response
 		count int
 	)
 	go func() {
@@ -111,6 +111,8 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 			line, err := reader.ReadString('\n')
 			if err != nil {
 				ch <- "done"
+
+				logrus.Debugf("llama read end or error: %s", err)
 
 				return
 			}
@@ -149,15 +151,15 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 	return
 }
 
-func toGLM2Req(input *domain.GLM2Input) glm2Request {
+func toLLAMA2Req(input *domain.LLAMA2Input) llama2Request {
 	history := make([][2]string, len(input.History))
 
 	for i := range input.History {
 		history[i] = input.History[i].History()
 	}
 
-	return glm2Request{
-		Inputs:            input.Text.GLM2Text(),
+	return llama2Request{
+		Inputs:            input.Text.LLAMA2Text(),
 		History:           history,
 		Sampling:          input.Sampling,
 		TopK:              input.TopK.TopK(),
