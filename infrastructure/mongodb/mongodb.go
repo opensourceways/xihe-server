@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"io/ioutil"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,6 +17,10 @@ var cli *client
 func Initialize(conn, dbName, dbCert string) error {
 	ca, err := ioutil.ReadFile(dbCert)
 	if err != nil {
+		return err
+	}
+
+	if err := os.Remove(dbCert); err != nil {
 		return err
 	}
 

@@ -84,6 +84,10 @@ func main() {
 		log.Fatalf("load config, err:%s", err.Error())
 	}
 
+	if err := os.Remove(o.service.ConfigFile); err != nil {
+		logrus.Fatalf("config file delete failed, err:%s", err.Error())
+	}
+
 	// mongo
 	m := &cfg.Mongodb
 	if err := mongodb.Initialize(m.DBConn, m.DBName, m.DBCert); err != nil {
