@@ -73,6 +73,10 @@ func main() {
 		logrus.Fatalf("load config, err:%s", err.Error())
 	}
 
+	if err := os.Remove(o.service.ConfigFile); err != nil {
+		logrus.Fatalf("config file delete failed, err:%s", err.Error())
+	}
+
 	// bigmodel
 	if err := bigmodels.Init(&cfg.BigModel.Config); err != nil {
 		logrus.Fatalf("initialize big model failed, err:%s", err.Error())
