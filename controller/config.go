@@ -50,6 +50,10 @@ func Init(cfg *APIConfig, l *logrus.Entry) error {
 	return nil
 }
 
+func EncryptHelperToken() utils.SymmetricEncryption {
+	return encryptHelperToken
+}
+
 type APIConfig struct {
 	Tags                           Tags   `json:"tags"                        required:"true"`
 	TokenKey                       string `json:"token_key"                   required:"true"`
@@ -66,6 +70,7 @@ type APIConfig struct {
 	PodTimeout                     int    `json:"pod_timeout"`
 	MaxPictureSizeToDescribe       int64  `json:"-"`
 	MaxPictureSizeToVQA            int64  `json:"-"`
+	MaxCompetitionSubmmitFileSzie  int64  `json:"max_competition_submmit_file_size"`
 	MinSurvivalTimeOfEvaluate      int    `json:"min_survival_time_of_evaluate"`
 	MinSurvivalTimeOfInference     int    `json:"min_survival_time_of_inference"`
 	MaxTagsNumToSearchResource     int    `json:"max_tags_num_to_search_resource"`
@@ -107,6 +112,10 @@ func (cfg *APIConfig) SetDefault() {
 
 	if cfg.MaxTagKindsNumToSearchResource <= 0 {
 		cfg.MaxTagKindsNumToSearchResource = 5
+	}
+
+	if cfg.MaxCompetitionSubmmitFileSzie <= 0 {
+		cfg.MaxCompetitionSubmmitFileSzie = 10 * 1024 * 1024
 	}
 }
 

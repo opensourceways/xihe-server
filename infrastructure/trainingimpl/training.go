@@ -142,7 +142,7 @@ func (impl *trainingImpl) toInput(v []domain.Input) []sdk.Input {
 			Value: sdk.ResourceRef{
 				Owner:  item.User.Account(),
 				RepoId: item.RepoId,
-				File:   item.File,
+				File:   item.File.InputeFilePath(),
 			},
 		}
 	}

@@ -21,11 +21,11 @@ func (cfg *Config) SetDefault() {
 	cfg.WuKong.setDefault()
 
 	if cfg.MaxPictureSizeToDescribe <= 0 {
-		cfg.MaxPictureSizeToDescribe = 2 << 20
+		cfg.MaxPictureSizeToDescribe = 2 << 21
 	}
 
 	if cfg.MaxPictureSizeToVQA <= 0 {
-		cfg.MaxPictureSizeToVQA = 2 << 20
+		cfg.MaxPictureSizeToVQA = 2 << 21
 	}
 }
 
@@ -67,12 +67,16 @@ type Endpoints struct {
 	WuKong           string `json:"wukong"             required:"true"`
 	WuKong4IMG       string `json:"wukong_4img"        required:"true"`
 	WuKongHF         string `json:"wukong_hf"          required:"true"`
+	WuKongUser       string `json:"wukong_user"        required:"true"`
 	CodeGeex         string `json:"codegeex"           required:"true"`
 	DescPicture      string `json:"desc_picture"       required:"true"`
 	DescPictureHF    string `json:"desc_picture_hf"    required:"true"`
 	SinglePicture    string `json:"signle_picture"     required:"true"`
 	MultiplePictures string `json:"multiple_pictures"  required:"true"`
 	AIDetector       string `json:"ai_detector"        required:"true"`
+	BaiChuan         string `json:"baichuan"           required:"true"`
+	GLM2             string `json:"glm"                required:"true"`
+	LLAMA2           string `json:"llama"             required:"true"`
 }
 
 func (e *Endpoints) validate() (err error) {
@@ -113,6 +117,10 @@ func (e *Endpoints) validate() (err error) {
 	}
 
 	if _, err = e.parse(e.AIDetector); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.BaiChuan); err != nil {
 		return
 	}
 
@@ -181,4 +189,11 @@ func (cfg *WuKong) validate() error {
 	}
 
 	return nil
+}
+
+type ApiService struct {
+	TokenExpire string
+}
+
+type BaiChuan struct {
 }

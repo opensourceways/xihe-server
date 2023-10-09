@@ -3,7 +3,6 @@ package message
 import (
 	bmdomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/domain"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 type EvaluateInfo struct {
@@ -30,25 +29,8 @@ type RepoFile struct {
 }
 
 type Sender interface {
-	AddOperateLogForNewUser(domain.Account) error
 	AddOperateLogForAccessBigModel(domain.Account, bmdomain.BigmodelType) error
-	AddOperateLogForCreateResource(domain.ResourceObject, domain.ResourceName) error
-	AddOperateLogForDownloadFile(domain.Account, RepoFile) error
 
-	AddFollowing(*userdomain.FollowerInfo) error
-	RemoveFollowing(*userdomain.FollowerInfo) error
-
-	AddLike(*domain.ResourceObject) error
-	RemoveLike(*domain.ResourceObject) error
-
-	IncreaseFork(*domain.ResourceIndex) error
-	IncreaseDownload(*domain.ResourceObject) error
-
-	AddRelatedResource(*RelatedResource) error
-	RemoveRelatedResource(*RelatedResource) error
-	RemoveRelatedResources(*RelatedResources) error
-
-	CreateTraining(*MsgTraining) error
 	CreateFinetune(*domain.FinetuneIndex) error
 
 	CreateInference(*domain.InferenceInfo) error
@@ -61,19 +43,12 @@ type Sender interface {
 
 type EventHandler interface {
 	RelatedResourceHandler
-	FollowingHandler
 	LikeHandler
 	ForkHandler
 	DownloadHandler
-	TrainingHandler
 	FinetuneHandler
 	InferenceHandler
 	EvaluateHandler
-}
-
-type FollowingHandler interface {
-	HandleEventAddFollowing(*userdomain.FollowerInfo) error
-	HandleEventRemoveFollowing(*userdomain.FollowerInfo) error
 }
 
 type LikeHandler interface {

@@ -3,7 +3,6 @@ package domain
 import (
 	"errors"
 	"net/url"
-	"regexp"
 	"strings"
 
 	libutil "github.com/opensourceways/community-robot-lib/utils"
@@ -15,11 +14,6 @@ const (
 	identityStudent   = "student"
 	identityTeacher   = "teacher"
 	identityDeveloper = "developer"
-)
-
-var (
-	reName         = regexp.MustCompile("^[a-zA-Z0-9_-]+$")
-	reResourceName = reName
 )
 
 // DomainValue
@@ -45,7 +39,7 @@ type Account interface {
 }
 
 func NewAccount(v string) (Account, error) {
-	if v == "" || strings.ToLower(v) == "root" || !reName.MatchString(v) {
+	if v == "" || strings.ToLower(v) == "root" || !utils.IsUserName(v) {
 		return nil, errors.New("invalid user name")
 	}
 
@@ -190,8 +184,10 @@ type Name interface {
 }
 
 func NewName(v string) (Name, error) {
-	if v == "" {
-		return nil, errors.New("empty value")
+	v = utils.XSSFilter(v)
+
+	if v == "" || utils.StrLen(v) > 30 {
+		return nil, errors.New("invalid name")
 	}
 
 	return name(v), nil

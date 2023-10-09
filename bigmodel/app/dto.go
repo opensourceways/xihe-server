@@ -2,14 +2,15 @@ package app
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
+	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
-	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -106,6 +107,10 @@ type WuKongCmd struct {
 func (cmd *WuKongCmd) Validate() error {
 	cmd.Style = utils.XSSFilter(cmd.Style)
 
+	if max := 4 * 4; utils.StrLen(cmd.Style) > max {
+		return fmt.Errorf("style should less than %d", max)
+	}
+
 	return nil
 }
 
@@ -118,10 +123,29 @@ type WuKongHFCmd struct {
 
 func (cmd *WuKongHFCmd) Validate() error {
 	cmd.WuKongCmd.Style = utils.XSSFilter(cmd.WuKongCmd.Style)
-	
+
 	b := cmd.User == nil ||
 		cmd.User.Account() != "wukong_hf" ||
 		cmd.Desc == nil
+
+	if b {
+		return errors.New("invalid cmd")
+	}
+
+	return nil
+}
+
+type WuKongApiCmd struct {
+	WuKongCmd
+
+	EndPointType string
+	User         types.Account
+}
+
+func (cmd *WuKongApiCmd) Validate() error {
+	cmd.WuKongCmd.Style = utils.XSSFilter(cmd.WuKongCmd.Style)
+
+	b := cmd.Desc == nil
 
 	if b {
 		return errors.New("invalid cmd")
@@ -251,4 +275,126 @@ func (cmd AIDetectorCmd) Validate() error {
 type GenPictureCmd struct {
 	User types.Account `json:"user"`
 	Desc domain.Desc   `json:"desc"`
+}
+
+type ApplyRecordGetCmd struct {
+	User      types.Account
+	ModelName domain.ModelName
+}
+
+type ApiApplyRecordDTO struct {
+	User      string `json:"user"`
+	Name      string `json:"name"`
+	Endpoint  string `json:"endpoint"`
+	Token     string `json:"token"`
+	ApplyAt   string `json:"apply_at"`
+	ModelName string `json:"model_name"`
+	Enabled   bool   `json:"enabled"`
+}
+
+func (s bigModelService) toApiApplyRecordDTO(
+	v *domain.UserApiRecord,
+	dto *ApiApplyRecordDTO,
+	info domain.ApiInfo,
+) {
+	*dto = ApiApplyRecordDTO{
+		User:      v.User.Account(),
+		Name:      info.Name,
+		ApplyAt:   v.ApplyAt,
+		Token:     v.Token,
+		ModelName: v.ModelName.ModelName(),
+		Enabled:   v.Enabled,
+		Endpoint:  info.Endpoint,
+	}
+}
+
+type ApiInfoDTO struct {
+	Id       string `json:"id"`
+	Name     string `json:"name"`
+	Endpoint string `json:"endpoint"`
+	Doc      string `json:"doc"`
+}
+
+func (s bigModelService) toApiInfoDTO(
+	v *domain.ApiInfo,
+	dto *ApiInfoDTO,
+) {
+	*dto = ApiInfoDTO{
+		Id:       v.Id,
+		Name:     v.Name,
+		Endpoint: v.Endpoint,
+		Doc:      v.Doc.URL(),
+	}
+}
+
+// baichuan
+type BaiChuanCmd struct {
+	User              types.Account
+	Sampling          bool
+	Text              domain.BaiChuanText
+	TopK              domain.TopK
+	TopP              domain.TopP
+	Temperature       domain.Temperature
+	RepetitionPenalty domain.RepetitionPenalty
+}
+
+func (cmd *BaiChuanCmd) SetDefault() {
+	cmd.TopK, _ = domain.NewTopK(5)
+	cmd.TopP, _ = domain.NewTopP(0.85)
+	cmd.Temperature, _ = domain.NewTemperature(0.3)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1.05)
+}
+
+type BaiChuanDTO struct {
+	Text string `json:"text"`
+}
+
+// glm2
+type GLM2Cmd struct {
+	CH                chan string
+	User              types.Account
+	History           []domain.History
+	Sampling          bool
+	Text              domain.GLM2Text
+	TopK              domain.TopK
+	TopP              domain.TopP
+	Temperature       domain.Temperature
+	RepetitionPenalty domain.RepetitionPenalty
+}
+
+func (cmd *GLM2Cmd) SetDefault() {
+	cmd.TopK, _ = domain.NewTopK(5)
+	cmd.TopP, _ = domain.NewTopP(0.85)
+	cmd.Temperature, _ = domain.NewTemperature(0.3)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1.05)
+}
+
+type GLM2DTO struct {
+	Reply        string `json:"reply"`
+	StreamStatus string `json:"stream_status"`
+}
+
+// llama2
+type LLAMA2Cmd struct {
+	CH                chan string
+	User              types.Account
+	History           []domain.History
+	Sampling          bool
+	Text              domain.LLAMA2Text
+	TopK              domain.TopK
+	TopP              domain.TopP
+	Temperature       domain.Temperature
+	RepetitionPenalty domain.RepetitionPenalty
+}
+
+func (cmd *LLAMA2Cmd) SetDefault() {
+	cmd.TopK, _ = domain.NewTopK(3)
+	cmd.TopP, _ = domain.NewTopP(1)
+	cmd.Temperature, _ = domain.NewTemperature(1)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1)
+}
+
+type LLAMA2DTO struct {
+	Reply        string `json:"reply"`
+	StreamStatus string `json:"stream_status"`
 }

@@ -2,9 +2,7 @@ package controller
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"strconv"
@@ -15,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
+	common "github.com/opensourceways/xihe-server/common/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/utils"
@@ -23,6 +22,8 @@ import (
 const (
 	PrivateToken       = "PRIVATE-TOKEN"
 	csrfToken          = "CSRF-Token"
+	headerLanguage     = "Expect-Language"
+	Token              = "token"
 	encodeUsername     = "encode-username"
 	headerSecWebsocket = "Sec-Websocket-Protocol"
 
@@ -170,21 +171,13 @@ func (ctl baseController) checkApiToken(
 
 	token, csrftoken = ctl.refreshDoubleToken(ac)
 
-	payload, err := toOldUserTokenPayload(pl)
-	if err != nil {
-		return
+	payload, good := ac.Payload.(*oldUserTokenPayload)
+	if !good {
+		return good
 	}
 
 	if err := ctl.setRespToken(ctx, token, csrftoken, payload.Account); err != nil {
 		logrus.Debugf("set resp token error: %s", err.Error())
-	}
-
-	return
-}
-
-func toOldUserTokenPayload(pl interface{}) (payload oldUserTokenPayload, err error) {
-	if err = json.Unmarshal([]byte(fmt.Sprintf("%v", pl)), &payload); err != nil {
-		return
 	}
 
 	return
@@ -222,6 +215,10 @@ func (ctl baseController) checkUserApiTokenBase(
 	}
 
 	if token == "" || csrftoken == "" {
+		// try best to grab userinfo
+		if token != "" {
+			_, _, _ = ctl.checkToken(ctx, token, &pl)
+		}
 		if allowVistor {
 			visitor = true
 			ok = true
@@ -366,6 +363,15 @@ func (ctl *baseController) getTokenForWebsocket(ctx *gin.Context) (csrftoken str
 	return ctx.GetHeader(headerSecWebsocket)
 }
 
+func (ctl *baseController) languageRuquested(ctx *gin.Context) (common.Language, error) {
+	v := common.NewLanguage(ctx.GetHeader(headerLanguage))
+	if v == nil {
+		return nil, errors.New("unknown language")
+	}
+
+	return v, nil
+}
+
 func (ctl *baseController) getToken(ctx *gin.Context) (token, csrftoken string, err error) {
 	if token, err = ctl.getCookieToken(ctx); err != nil {
 		return
@@ -465,8 +471,38 @@ func (ctl baseController) decryptDataForCSRF(s string) ([]byte, error) {
 	return encryptHelperCSRF.Decrypt(dst)
 }
 
+// crypt for database
+func (ctl baseController) encryptDataForToken(d string) (string, error) {
+	t, err := encryptHelperToken.Encrypt([]byte(d))
+	if err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(t), nil
+}
+
+func (ctl baseController) decryptDataForToken(s string) ([]byte, error) {
+	dst, err := hex.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return encryptHelperToken.Decrypt(dst)
+}
+
 func (ctl baseController) cleanCookie(ctx *gin.Context) {
 	setCookie(ctx, PrivateToken, "", true, time.Now().AddDate(0, 0, -1))
+	t, ok := ctx.Get(encodeUsername)
+	if !ok {
+		logrus.Warnf("context get encode username failed")
+	}
+
+	u, ok2 := t.(string)
+	if !ok2 {
+		logrus.Warnf("encode username convert error")
+	}
+
+	ctl.newRepo().Expire(u, 0)
+
 	setCookie(ctx, csrfToken, "", false, time.Now().AddDate(0, 0, -1))
 }
 
@@ -602,4 +638,29 @@ func (ctl baseController) getListGlobalResourceParameter(
 
 func (ctl baseController) newRepo() repositories.Access {
 	return repositories.NewAccessRepo(int(apiConfig.TokenExpiry - 10))
+}
+
+func (ctl baseController) checkBigmodelApiToken(ctx *gin.Context) (user string, ok bool) {
+	v := ctx.GetHeader(Token)
+	deToken, err := ctl.decryptData(v)
+	if err != nil {
+		return
+	}
+
+	strs := strings.Split(string(deToken), "+")
+	user = strs[0]
+
+	time, err := strconv.ParseInt(strs[1], 10, 64)
+	if err != nil {
+		return
+	}
+
+	if utils.Now()-time > 5184000 {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, "token expire",
+		))
+		return
+	}
+
+	return user, true
 }

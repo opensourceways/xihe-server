@@ -53,7 +53,7 @@ type ResourceRef struct {
 	User   Account
 	Type   ResourceType
 	RepoId string
-	File   string
+	File   InputeFilePath
 }
 
 type JobInfo struct {

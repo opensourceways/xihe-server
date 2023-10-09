@@ -10,15 +10,18 @@ import (
 	"github.com/opensourceways/xihe-server/competition/domain"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 )
 
 func AddRouterForCompetitionController(
 	rg *gin.RouterGroup,
 	s app.CompetitionService,
+	us userapp.RegService,
 	project repository.Project,
 ) {
 	ctl := CompetitionController{
 		s:       s,
+		us:      us,
 		project: project,
 	}
 
@@ -27,6 +30,7 @@ func AddRouterForCompetitionController(
 	rg.GET("/v1/competition/:id/team", ctl.GetMyTeam)
 	rg.GET("/v1/competition/:id/ranking", ctl.GetRankingList)
 	rg.GET("/v1/competition/:id/submissions", ctl.GetSubmissions)
+	rg.GET("/v1/competition/reginfo", ctl.GetRegisterInfo)
 	rg.POST("/v1/competition/:id/team", ctl.CreateTeam)
 	rg.POST("/v1/competition/:id/submissions", ctl.Submit)
 	rg.POST("/v1/competition/:id/competitor", ctl.Apply)
@@ -43,6 +47,7 @@ type CompetitionController struct {
 	baseController
 
 	s       app.CompetitionService
+	us      userapp.RegService
 	project repository.Project
 }
 
@@ -96,12 +101,27 @@ func (ctl *CompetitionController) Get(ctx *gin.Context) {
 		return
 	}
 
+	cmd := app.CompetitionGetCmd{}
 	var user types.Account
 	if !visitor {
 		user = pl.DomainAccount()
+		cmd.User = user
 	}
 
-	data, err := ctl.s.Get(ctx.Param("id"), user)
+	var err error
+	if str := ctl.getQueryParameter(ctx, "lang"); str != "" {
+		cmd.Lang, err = domain.NewLanguage(str)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+				errorBadRequestParam, err,
+			))
+
+			return
+		}
+	}
+
+	cmd.CompetitionId = ctx.Param("id")
+	data, err := ctl.s.Get(&cmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
@@ -144,14 +164,24 @@ func (ctl *CompetitionController) List(ctx *gin.Context) {
 		cmd.Tag = tag
 	}
 
-	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	if str := ctl.getQueryParameter(ctx, "lang"); str != "" {
+		cmd.Lang, err = domain.NewLanguage(str)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+				errorBadRequestParam, err,
+			))
+
+			return
+		}
+	}
+
+	pl, v, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
 
 	if ctl.getQueryParameter(ctx, "mine") != "" {
-		_, _, ok := ctl.checkUserApiToken(ctx, false)
-		if !ok {
+		if v {
 			return
 		}
 
@@ -290,7 +320,11 @@ func (ctl *CompetitionController) GetSubmissions(ctx *gin.Context) {
 		return
 	}
 
-	data, err := ctl.s.GetSubmissions(ctx.Param("id"), pl.DomainAccount())
+	cmd := app.CompetitionGetCmd{}
+	cmd.User = pl.DomainAccount()
+	cmd.CompetitionId = ctx.Param("id")
+
+	data, err := ctl.s.GetSubmissions(&cmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
@@ -317,6 +351,14 @@ func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorBadRequestBody, err.Error(),
+		))
+
+		return
+	}
+
+	if f.Size > apiConfig.MaxCompetitionSubmmitFileSzie {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, "too big picture",
 		))
 
 		return
@@ -558,5 +600,26 @@ func (ctl *CompetitionController) Dissolve(ctx *gin.Context) {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
 		ctl.sendRespOfPut(ctx, "success")
+	}
+}
+
+//	@Summary		GetRegisterInfo
+//	@Description	get register info
+//	@Tags			Competition
+//	@Accept			json
+//	@Success		200	{object}		app.UserRegisterInfoDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/competition/reginfo [get]
+func (ctl *CompetitionController) GetRegisterInfo(ctx *gin.Context) {
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	if data, err := ctl.us.GetUserRegInfo(pl.DomainAccount()); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, data)
 	}
 }

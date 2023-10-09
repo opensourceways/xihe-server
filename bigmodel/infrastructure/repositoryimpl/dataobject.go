@@ -39,3 +39,13 @@ func (table *TWukongTask) toWuKongTaskResp(p *repository.WuKongTaskResp) (err er
 
 	return
 }
+
+func (a *dApiInfo) toApiInfo(d *domain.ApiInfo) (err error) {
+	d.Id = a.Id
+	d.Name = a.Name
+	if d.Doc, err = types.NewURL(a.Doc); err != nil {
+		return
+	}
+	d.Endpoint = a.Endpoint
+	return
+}

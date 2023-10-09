@@ -1,11 +1,21 @@
 package main
 
 import (
-	"github.com/opensourceways/community-robot-lib/utils"
-
+	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
+
+func loadConfig(path string, cfg *configuration) error {
+	if err := utils.LoadFromYaml(path, cfg); err != nil {
+		return err
+	}
+
+	cfg.setDefault()
+
+	return cfg.validate()
+}
 
 type configuration struct {
 	Mongodb    config.Mongodb          `json:"mongodb"      required:"true"`
@@ -13,7 +23,7 @@ type configuration struct {
 	Domain     domain.Config           `json:"domain"       required:"true"`
 }
 
-func (cfg *configuration) configItems() []interface{} {
+func (cfg *configuration) ConfigItems() []interface{} {
 	return []interface{}{
 		&cfg.Mongodb,
 		&cfg.Domain,
@@ -21,30 +31,16 @@ func (cfg *configuration) configItems() []interface{} {
 	}
 }
 
-func (cfg *configuration) SetDefault() {
-	items := cfg.configItems()
-	for _, i := range items {
-		if f, ok := i.(config.ConfigSetDefault); ok {
-			f.SetDefault()
-		}
-	}
+func (cfg *configuration) setDefault() {
+	common.SetDefault(cfg)
 }
 
-func (cfg *configuration) Validate() error {
-	if _, err := utils.BuildRequestBody(cfg, ""); err != nil {
+func (cfg *configuration) validate() error {
+	if err := utils.CheckConfig(cfg, ""); err != nil {
 		return err
 	}
 
-	items := cfg.configItems()
-	for _, i := range items {
-		if f, ok := i.(config.ConfigValidate); ok {
-			if err := f.Validate(); err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+	return common.Validate(cfg)
 }
 
 func (cfg *configuration) initDomainConfig() {

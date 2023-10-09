@@ -48,7 +48,7 @@ func NewLikeService(
 	project repository.Project,
 	dataset repository.Dataset,
 	activity repository.Activity,
-	sender message.Sender,
+	sender message.LikeMessageProducer,
 ) LikeService {
 	return likeService{
 		repo:     repo,
@@ -67,11 +67,12 @@ func NewLikeService(
 type likeService struct {
 	repo     repository.Like
 	activity repository.Activity
-	sender   message.Sender
+	sender   message.LikeMessageProducer
 
 	rs resourceService
 }
 
+// owner is the user who like the resource
 func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 	// check if resource is private
 	var repotype domain.RepoType
@@ -88,9 +89,9 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 		Type: cmd.ResourceType,
 		ResourceIndex: domain.ResourceIndex{
 			Owner: cmd.ResourceOwner,
-			Id: cmd.ResourceId,
+			Id:    cmd.ResourceId,
 		},
-	}); 
+	})
 	if err != nil {
 		return err
 	}
@@ -131,7 +132,10 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 	}
 
 	// increase like in resource
-	_ = s.sender.AddLike(&v.Like.ResourceObject)
+	_ = s.sender.AddLike(&domain.ResourceLikedEvent{
+		Account: owner,
+		Obj:     v.ResourceObject,
+	})
 
 	return nil
 }
@@ -153,14 +157,14 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 		Type: cmd.ResourceType,
 		ResourceIndex: domain.ResourceIndex{
 			Owner: cmd.ResourceOwner,
-			Id: cmd.ResourceId,
+			Id:    cmd.ResourceId,
 		},
-	}); 
+	})
 	if err != nil {
 		return err
 	}
 	if !hasLiked {
-		return errors.New("cannot remove like resource you had liked")
+		return errors.New("cannot remove like resource you are not like")
 	}
 
 	// remove like
@@ -174,7 +178,10 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 	}
 
 	// reduce like count in resource
-	_ = s.sender.RemoveLike(&v.Like.ResourceObject)
+	_ = s.sender.RemoveLike(&domain.ResourceLikedEvent{
+		Account: owner,
+		Obj:     obj,
+	})
 
 	return nil
 }

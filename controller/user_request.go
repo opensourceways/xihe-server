@@ -67,6 +67,7 @@ type followingCreateRequest struct {
 type userDetail struct {
 	*app.UserDTO
 
+	Points     int  `json:"points"`
 	IsFollower bool `json:"is_follower"`
 }
 

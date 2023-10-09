@@ -56,4 +56,13 @@ type BigModel interface {
 
 	// ai detector
 	AIDetector(domain.AIDetectorInput) (bool, error)
+
+	// baichuan2
+	BaiChuan(*domain.BaiChuanInput) (string, string, error)
+
+	// glm2
+	GLM2(chan string, *domain.GLM2Input) error
+
+	// llama2
+	LLAMA2(chan string, *domain.LLAMA2Input) error
 }

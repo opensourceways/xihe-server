@@ -25,6 +25,11 @@ if [ "$1" != "refs/heads/main" ]; then
         exit 1
 fi
 
+if [ "$1" = "refs/heads/main" ]; then
+        echo "GL-HOOK-ERR: XiHe: Not allow to push." >&2	
+        exit 1
+fi
+
 n=$(git rev-list --count $2...$3)
 if [ $n -ne 1 ]; then
         echo "GL-HOOK-ERR: XiHe: There are $n commits. Only allow to push 1 commit once. Please squash the commits."

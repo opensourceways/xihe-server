@@ -24,7 +24,7 @@ func (s userService) ListFollower(cmd *FollowsListCmd) (
 		s.toFollowDTO(&items[i], &dtos[i])
 	}
 
-	dto.Total = v.Total
+	dto.Total = len(dtos)
 	dto.Data = dtos
 
 	return

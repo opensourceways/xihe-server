@@ -19,15 +19,6 @@ type SubmissionUpdatingInfo struct {
 	Score  float32
 }
 
-// SubmissionMessage
-type SubmissionMessage struct {
-	PlayerId      string `json:"pid"`
-	CompetitionId string `json:"cid"`
-	Phase         string `json:"phase"`
-	Id            string `json:"id"`
-	OBSPath       string `json:"obs_path"`
-}
-
 // Submission
 type Submission struct {
 	Id       string

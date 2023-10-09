@@ -88,13 +88,13 @@ func (w *Work) HasSubmittedToday(phase CompetitionPhase) bool {
 	return false
 }
 
-func (w *Work) NewSubmissionMessage(s *PhaseSubmission) SubmissionMessage {
-	return SubmissionMessage{
-		CompetitionId: w.WorkIndex.CompetitionId,
-		PlayerId:      w.WorkIndex.PlayerId,
-		Phase:         s.Phase.CompetitionPhase(),
+func (w *Work) NewSubmissionMessage(s *PhaseSubmission) WorkSubmittedEvent {
+	return WorkSubmittedEvent{
 		Id:            s.Submission.Id,
+		Phase:         s.Phase.CompetitionPhase(),
 		OBSPath:       s.Submission.OBSPath,
+		PlayerId:      w.WorkIndex.PlayerId,
+		CompetitionId: w.WorkIndex.CompetitionId,
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"github.com/opensourceways/xihe-server/competition/domain/message"
 	"github.com/opensourceways/xihe-server/competition/domain/repository"
 	"github.com/opensourceways/xihe-server/competition/domain/uploader"
+	"github.com/opensourceways/xihe-server/competition/domain/user"
 	types "github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 )
@@ -22,12 +23,12 @@ type CompetitionService interface {
 	DissolveTeam(cid string, leader types.Account) error
 
 	// competition
-	Get(cid string, competitor types.Account) (UserCompetitionDTO, error)
+	Get(*CompetitionGetCmd) (UserCompetitionDTO, error)
 	List(*CompetitionListCMD) ([]CompetitionSummaryDTO, error)
 
 	// work
 	Submit(*CompetitionSubmitCMD) (CompetitionSubmissionDTO, string, error)
-	GetSubmissions(string, types.Account) (CompetitionSubmissionsDTO, error)
+	GetSubmissions(*CompetitionGetCmd) (CompetitionSubmissionsDTO, error)
 	GetRankingList(string) (CompetitonRankingDTO, error)
 	AddRelatedProject(*CompetitionAddReleatedProjectCMD) (string, error)
 }
@@ -38,8 +39,9 @@ func NewCompetitionService(
 	repo repository.Competition,
 	workRepo repository.Work,
 	playerRepo repository.Player,
-	producer message.CalcScoreMessageProducer,
+	producer message.MessageProducer,
 	uploader uploader.SubmissionFileUploader,
+	userCli user.User,
 ) *competitionService {
 	return &competitionService{
 		repo:             repo,
@@ -47,6 +49,7 @@ func NewCompetitionService(
 		playerRepo:       playerRepo,
 		producer:         producer,
 		submissionServie: domain.NewSubmissionService(uploader),
+		userCli:          userCli,
 	}
 }
 
@@ -54,21 +57,25 @@ type competitionService struct {
 	repo             repository.Competition
 	workRepo         repository.Work
 	playerRepo       repository.Player
-	producer         message.CalcScoreMessageProducer
+	producer         message.MessageProducer
 	submissionServie domain.SubmissionService
+	userCli          user.User
 }
 
 // show competition detail
-func (s *competitionService) Get(cid string, user types.Account) (
+func (s *competitionService) Get(cmd *CompetitionGetCmd) (
 	dto UserCompetitionDTO, err error,
 ) {
-	c, err := s.repo.FindCompetition(cid)
+	c, err := s.repo.FindCompetition(&repository.CompetitionGetOption{
+		CompetitionId: cmd.CompetitionId,
+		Lang:          cmd.Lang,
+	})
 	if err != nil {
 		return
 	}
 
 	// competitors count
-	n, err := s.playerRepo.CompetitorsCount(cid)
+	n, err := s.playerRepo.CompetitorsCount(cmd.CompetitionId)
 	if err != nil {
 		return
 	}
@@ -76,11 +83,11 @@ func (s *competitionService) Get(cid string, user types.Account) (
 	s.toCompetitionDTO(&c, n, &dto.CompetitionDTO)
 
 	// competitor info
-	if user == nil {
+	if cmd.User == nil {
 		return
 	}
 
-	p, _, err := s.playerRepo.FindPlayer(cid, user)
+	p, _, err := s.playerRepo.FindPlayer(cmd.CompetitionId, cmd.User)
 	if err != nil {
 		if repoerr.IsErrorResourceNotExists(err) {
 			err = nil
@@ -110,6 +117,7 @@ func (s *competitionService) List(cmd *CompetitionListCMD) (
 	return s.listCompetitions(&repository.CompetitionListOption{
 		Status: cmd.Status,
 		Tag:    cmd.Tag,
+		Lang:   cmd.Lang,
 	})
 }
 
@@ -145,5 +153,6 @@ func (s *competitionService) getCompetitionsUserApplied(cmd *CompetitionListCMD)
 	return s.listCompetitions(&repository.CompetitionListOption{
 		Status:         cmd.Status,
 		CompetitionIds: cs,
+		Lang:           cmd.Lang,
 	})
 }

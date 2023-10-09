@@ -8,8 +8,6 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
-	"github.com/opensourceways/xihe-server/domain/message"
-	"github.com/opensourceways/xihe-server/domain/platform"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
@@ -17,15 +15,12 @@ import (
 
 func AddRouterForUserController(
 	rg *gin.RouterGroup,
+	us userapp.UserService,
 	repo userrepo.User,
-	ps platform.User,
 	auth authing.User,
 	login app.LoginService,
-	sender message.Sender,
+	register userapp.RegService,
 ) {
-
-	us := userapp.NewUserService(repo, ps, sender, encryptHelperToken)
-
 	ctl := UserController{
 		auth: auth,
 		repo: repo,
@@ -34,6 +29,7 @@ func AddRouterForUserController(
 			auth, userlogincli.NewLoginCli(login),
 			us,
 		),
+		register: register,
 	}
 
 	rg.POST("/v1/user", ctl.Create) // TODO: delete
@@ -53,15 +49,18 @@ func AddRouterForUserController(
 	rg.GET("/v1/user/check_email", checkUserEmailMiddleware(&ctl.baseController))
 	rg.POST("/v1/user/email/sendbind", ctl.SendBindEmail)
 	rg.POST("/v1/user/email/bind", ctl.BindEmail)
+
+	rg.GET("/v1/user/info/:account", ctl.GetInfo)
 }
 
 type UserController struct {
 	baseController
 
-	repo  userrepo.User
-	auth  authing.User
-	s     userapp.UserService
-	email userapp.EmailService
+	repo     userrepo.User
+	auth     authing.User
+	s        userapp.UserService
+	email    userapp.EmailService
+	register userapp.RegService
 }
 
 // @Summary		Create
@@ -203,10 +202,11 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 		return
 	}
 
-	resp := func(u *userapp.UserDTO, isFollower bool) {
+	resp := func(u *userapp.UserDTO, points int, isFollower bool) {
 		ctx.JSON(http.StatusOK, newResponseData(
 			userDetail{
 				UserDTO:    u,
+				Points:     points,
 				IsFollower: isFollower,
 			}),
 		)
@@ -223,7 +223,7 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 			ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		} else {
 			u.Email = ""
-			resp(&u, false)
+			resp(&u, 0, false)
 		}
 
 		return
@@ -235,17 +235,17 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 			ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		} else {
 			u.Email = ""
-			resp(&u, isFollower)
+			resp(&u, 0, isFollower)
 		}
 
 		return
 	}
 
 	// get user own info
-	if u, err := ctl.s.GetByAccount(pl.DomainAccount()); err != nil {
+	if u, err := ctl.s.UserInfo(pl.DomainAccount()); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
-		resp(&u, true)
+		resp(&u.UserDTO, u.Points, true)
 	}
 }
 
@@ -254,7 +254,7 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 // @Tags			User
 // @Param			account	path	string	true	"account"
 // @Accept			json
-// @Success		200	{object}			success
+// @Success		200
 // @Failure		400	bad_request_param	account	is	invalid
 // @Failure		401	not_allowed			can't	get	info	of	other	user
 // @Router			/{account}/gitlab/refresh [get]
@@ -484,4 +484,26 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 
 		ctl.sendRespOfPost(ctx, "success")
 	}
+}
+
+// @Summary		GetInfo
+// @Description	get user apply info
+// @Tags			User
+// @Param			body	body	userCreateRequest	true	"body of creating user"
+// @Accept			json
+// @Success		200	{object}			app.UserDTO
+// @Failure		400	bad_request_body	can't	parse	request	body
+// @Router			/v1/user/info/{account} [get]
+func (ctl *UserController) GetInfo(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	v, err := ctl.register.GetUserRegInfo(pl.DomainAccount())
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	}
+
+	ctx.JSON(http.StatusOK, newResponseData(v))
 }

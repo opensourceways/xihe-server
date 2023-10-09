@@ -247,7 +247,7 @@ type GetSubmissionCmd struct {
 type RecordAddCmd domain.Record
 
 func (cmd *RecordAddCmd) Validate() error {
-	if len(cmd.Cid) > 15 || len(cmd.PointId) > 15 {
+	if len(cmd.Cid) > 50 || len(cmd.PointId) > 50 {
 		return errors.New("invalid cid or pointid")
 	}
 

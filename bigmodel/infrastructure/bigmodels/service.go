@@ -40,8 +40,10 @@ func Init(cfg *Config) error {
 	fm.pictureGenInfo = newPictureGenInfo(cfg)
 	fm.pictureDescInfo = newPictureDescInfo(cfg)
 	fm.aiDetectorInfo = newAIDetectorInfo(cfg)
-
 	fm.wukongInfo, err = newWuKongInfo(cfg)
+	fm.baichuanInfo, err = newBaiChuanInfo(cfg)
+	fm.glm2Info, err = newGLM2Info(cfg)
+	fm.llama2Info, err = newLLAMA2Info(cfg)
 
 	return err
 }
@@ -65,6 +67,9 @@ type service struct {
 	pictureGenInfo  pictureGenInfo
 	pictureDescInfo pictureDescInfo
 	aiDetectorInfo  aiDetectorInfo
+	baichuanInfo    baichuanInfo
+	glm2Info        glm2Info
+	llama2Info      llama2Info
 }
 
 func (s *service) token() (string, error) {
@@ -127,6 +132,21 @@ func (s *service) doIfFree(
 	case e := <-ec:
 		err := f(e)
 		ec <- e
+
+		return err
+
+	default:
+		return bigmodel.NewErrorBusySource(errors.New("access overload, please try again later"))
+	}
+}
+
+func (s *service) doIfFreeNoEndpointReturn(
+	ec chan string,
+	f func(chan string, string) error,
+) error {
+	select {
+	case e := <-ec:
+		err := f(ec, e)
 
 		return err
 

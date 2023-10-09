@@ -45,7 +45,6 @@ type UserInfo struct {
 	AvatarId AvatarId
 }
 
-
 // register
 type UserRegInfo struct {
 	Account  types.Account

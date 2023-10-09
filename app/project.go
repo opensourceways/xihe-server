@@ -156,7 +156,7 @@ func NewProjectService(
 	dataset repository.Dataset,
 	activity repository.Activity,
 	pr platform.Repository,
-	sender message.Sender,
+	sender message.ResourceProducer,
 ) ProjectService {
 	return projectService{
 		repo:     repo,
@@ -175,7 +175,7 @@ type projectService struct {
 	repo repository.Project
 	//pr       platform.Repository
 	activity repository.Activity
-	sender   message.Sender
+	sender   message.ResourceProducer
 	rs       resourceService
 }
 
@@ -211,6 +211,11 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, p.Name)
+
+	_ = s.sender.CreateProject(message.ProjectCreatedEvent{
+		Account:     r.Owner,
+		ProjectName: dto.Name,
+	})
 
 	return
 }

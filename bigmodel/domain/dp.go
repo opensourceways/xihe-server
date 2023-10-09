@@ -15,14 +15,20 @@ const (
 	bigmodelWuKong        = "wukong"
 	bigmodelWuKong4Img    = "wukong_4img"
 	bigmodelWuKongHF      = "wukong_hf"
+	bigmodelWuKongUser    = "wukong_user"
 	bigmodelCodeGeex      = "codegeex"
 	bigmodelGenPicture    = "gen_picture"
 	bigmodelDescPicture   = "desc_picture"
 	bigmodelDescPictureHF = "desc_picture_hf"
 	bigmodelAIDetector    = "ai_detector"
+	bigmodelBaiChuan      = "baichuan"
+	bigmodelGLM2          = "glm2"
+	bigmodelLLAMA2        = "llama2"
 
 	langZH = "zh"
 	langEN = "en"
+
+	modelNameWukong = "wukong"
 )
 
 var (
@@ -32,11 +38,15 @@ var (
 	BigmodelWuKong        = BigmodelType(bigmodelWuKong)
 	BigmodelWuKong4Img    = BigmodelType(bigmodelWuKong4Img)
 	BigmodelWuKongHF      = BigmodelType(bigmodelWuKongHF)
+	BigmodelWuKongUser    = BigmodelType(bigmodelWuKongUser)
 	BigmodelCodeGeex      = BigmodelType(bigmodelCodeGeex)
 	BigmodelGenPicture    = BigmodelType(bigmodelGenPicture)
 	BigmodelDescPicture   = BigmodelType(bigmodelDescPicture)
 	BigmodelDescPictureHF = BigmodelType(bigmodelDescPictureHF)
 	BigmodelAIDetector    = BigmodelType(bigmodelAIDetector)
+	BigmodelBaiChuan      = BigmodelType(bigmodelBaiChuan)
+	BigmodelGLM2          = BigmodelType(bigmodelGLM2)
+	BigmodelLLAMA2        = BigmodelType(bigmodelLLAMA2)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
@@ -60,7 +70,7 @@ type Question interface {
 
 func NewQuestion(v string) (Question, error) {
 	// TODO check format
-	if utils.StrLen(v) > 30 {
+	if v == "" || utils.StrLen(v) > 30 {
 		return nil, errors.New("invalid question")
 	}
 
@@ -83,13 +93,13 @@ func NewWuKongPictureDesc(v string) (WuKongPictureDesc, error) {
 		return nil, errors.New("no desc")
 	}
 
+	v = utils.XSSFilter(v)
+
 	if max := 55; utils.StrLen(v) > max { // TODO config
 		return nil, fmt.Errorf(
 			"the length of desc should be less than %d", max,
 		)
 	}
-
-	v = utils.XSSFilter(v)
 
 	return wukongPictureDesc(v), nil
 }
@@ -232,14 +242,14 @@ type Desc interface {
 }
 
 func NewDesc(v string) (Desc, error) {
+	v = utils.XSSFilter(v)
+
 	b := v == "" ||
 		utils.StrLen(v) > 30
 
 	if b {
 		return nil, errors.New("invalid desc")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return desc(v), nil
 }
@@ -248,4 +258,187 @@ type desc string
 
 func (r desc) Desc() string {
 	return string(r)
+}
+
+// Model Name
+type ModelName interface {
+	ModelName() string
+}
+
+func NewModelName(v string) (ModelName, error) {
+	b := v == modelNameWukong
+	if !b {
+		return nil, errors.New("invalid model name")
+	}
+	return modelName(v), nil
+}
+
+type modelName string
+
+func (m modelName) ModelName() string {
+	return string(m)
+}
+
+// baichuan text
+type BaiChuanText interface {
+	BaiChuanText() string
+}
+
+type baiChuanText string
+
+func NewBaiChuanText(v string) (BaiChuanText, error) {
+	if v == "" {
+		return nil, errors.New("no baichuan text")
+	}
+
+	if max := 1000; utils.StrLen(v) > max { // TODO: to config
+		return nil, errors.New("invalid baichuan text")
+	}
+
+	return baiChuanText(v), nil
+}
+
+func (g baiChuanText) BaiChuanText() string {
+	return string(g)
+}
+
+// top k
+type TopK interface {
+	TopK() int
+}
+
+type top_k int
+
+func NewTopK(v int) (TopK, error) {
+	if min, max := 0, 10; v < min || v > max {
+		return nil, errors.New("invalid top_k")
+	}
+
+	return top_k(v), nil
+}
+
+func (t top_k) TopK() int {
+	return int(t)
+}
+
+// top p
+type TopP interface {
+	TopP() float64
+}
+
+type top_p float64
+
+func NewTopP(v float64) (TopP, error) {
+	if min, max := 0.00, 1.00; v < min || v > max {
+		return nil, errors.New("invalid top_p")
+	}
+
+	return top_p(v), nil
+}
+
+func (t top_p) TopP() float64 {
+	return float64(t)
+}
+
+// temperature
+type Temperature interface {
+	Temperature() float64
+}
+
+type temperature float64
+
+func NewTemperature(v float64) (Temperature, error) {
+	if min := 0.00; v < min {
+		return nil, errors.New("invalid temperature")
+	}
+
+	return temperature(v), nil
+}
+
+func (t temperature) Temperature() float64 {
+	return float64(t)
+}
+
+// repetition penalty
+type RepetitionPenalty interface {
+	RepetitionPenalty() float64
+}
+
+type repetitionPenalty float64
+
+func NewRepetitionPenalty(v float64) (RepetitionPenalty, error) {
+	if min := 0.00; v < min {
+		return nil, errors.New("invalid repetitionPenalty")
+	}
+
+	return repetitionPenalty(v), nil
+}
+
+func (t repetitionPenalty) RepetitionPenalty() float64 {
+	return float64(t)
+}
+
+// glm2 text
+type GLM2Text interface {
+	GLM2Text() string
+}
+
+type glm2Text string
+
+func NewGLM2Text(v string) (GLM2Text, error) {
+	if v == "" {
+		return nil, errors.New("no glm2 text")
+	}
+
+	if max := 3000; utils.StrLen(v) > max { // TODO: to config
+		return nil, errors.New("invalid glm2 text")
+	}
+
+	return glm2Text(v), nil
+}
+
+func (t glm2Text) GLM2Text() string {
+	return string(t)
+}
+
+// glm2 history
+type History interface {
+	History() [2]string
+}
+
+type history [2]string
+
+func NewHistory(q, a string) (History, error) {
+	if max := 3000; utils.StrLen(q) > max || utils.StrLen(a) > max {
+		return nil, errors.New("invalid bigmodel history")
+	}
+
+	return history{q, a}, nil
+}
+
+func (t history) History() [2]string {
+	return t
+}
+
+// llama2 text
+type LLAMA2Text interface {
+	LLAMA2Text() string
+}
+
+type llama2Text string
+
+func NewLLAMA2Text(v string) (LLAMA2Text, error) {
+	if v == "" {
+		return nil, errors.New("no llama2 text")
+	}
+
+	if max := 3000; utils.StrLen(v) > max { // TODO: to config
+		return nil, errors.New("invalid llama2 text")
+	}
+
+	return llama2Text(v), nil
+}
+
+func (t llama2Text) LLAMA2Text() string {
+	return string(t)
 }

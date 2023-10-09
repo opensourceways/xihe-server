@@ -24,7 +24,6 @@ import (
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
 	competitiondomain "github.com/opensourceways/xihe-server/competition/domain"
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
-	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
@@ -81,7 +80,7 @@ func main() {
 
 	// cfg
 	cfg := new(configuration)
-	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
+	if err := loadConfig(o.service.ConfigFile, cfg); err != nil {
 		log.Fatalf("load config, err:%s", err.Error())
 	}
 
@@ -106,7 +105,6 @@ func main() {
 
 	// training
 	train := app.NewTrainingService(
-		log,
 		nil,
 		repositories.NewTrainingRepository(
 			mongodb.NewTrainingMapper(collections.Training),

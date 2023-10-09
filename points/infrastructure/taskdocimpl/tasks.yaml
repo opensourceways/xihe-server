@@ -1,0 +1,488 @@
+items:
+- id: "sign_up"
+  names:
+    Chinese: "注册"
+    English: "sign up"
+  kind: "Novice"
+  addr: ""
+  rule:
+    once_only: true
+    descs:
+      Chinese: "注册"
+      English: "sign up"
+    created_at: "2023-09-13"
+    points_per_once: 30
+    max_points_of_day: 0
+    max_points_descs:
+      Chinese: "累计获取积分上限 30"
+      English: "The upper limit of points accumulated is 30"
+
+- id: "set_avatar"
+  names:
+    Chinese: "设置头像"
+    English: "set avatar"
+  kind: "Novice"
+  addr: "/settings/profile"
+  rule:
+    once_only: true
+    descs:
+      Chinese: "设置头像"
+      English: "set avatar"
+    created_at: "2023-09-13"
+    points_per_once: 10
+    max_points_of_day: 0
+    max_points_descs:
+      Chinese: "累计获取积分上限 10"
+      English: "The upper limit of points accumulated is 10"
+
+- id: "set_bio"
+  names:
+    Chinese: "设置签名"
+    English: "set bio"
+  kind: "Novice"
+  addr: "/settings/profile"
+  rule:
+    once_only: true
+    descs:
+      Chinese: "设置签名"
+      English: "set bio"
+    created_at: "2023-09-13"
+    points_per_once: 10
+    max_points_of_day: 0
+    max_points_descs:
+      Chinese: "累计获取积分上限 10"
+      English: "The upper limit of points accumulated is 10"
+
+- id: "sign_in"
+  names:
+    Chinese: "签到"
+    English: "sign in"
+  kind: "EveryDay"
+  addr: "/settings/homepage"
+  rule:
+    descs:
+      Chinese: "签到"
+      English: "sign in"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 1
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 1"
+
+- id: "train"
+  names:
+    Chinese: "开展在线训练"
+    English: "train"
+  kind: "EveryDay"
+  addr: "/{user_name}/projects"
+  rule:
+    descs:
+      Chinese: "开展在线训练"
+      English: "train"
+    created_at: "2023-09-13"
+    points_per_once: 5
+    max_points_of_day: 5
+    max_points_descs:
+      Chinese: "每日积分获取上限 5"
+      English: "The daily limit of points is 5"
+
+- id: "start_jupyter"
+  names:
+    Chinese: "使用jupyter"
+    English: "start jupyter"
+  kind: "EveryDay"
+  addr: "/{user_name}/projects"
+  rule:
+    descs:
+      Chinese: "使用jupyter"
+      English: "start jupyter"
+    created_at: "2023-09-13"
+    points_per_once: 3
+    max_points_of_day: 3
+    max_points_descs:
+      Chinese: "每日积分获取上限 3"
+      English: "The daily limit of points is 3"
+
+- id: "start_inference"
+  names:
+    Chinese: "启动自己的推理服务"
+    English: "start inference"
+  kind: "EveryDay"
+  addr: "/{user_name}/projects"
+  rule:
+    descs:
+      Chinese: "启动自己的推理服务"
+      English: "start inference"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 1
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 1"
+
+- id: "start_official_inference"
+  names:
+    Chinese: "启动官方的推理服务"
+    English: "start official inference"
+  kind: "EveryDay"
+  addr: "/MindSpore/projects"
+  rule:
+    descs:
+      Chinese: "启动官方的推理服务"
+      English: "start official inference"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 1
+    max_points_descs:
+      Chinese: "每日积分获取上限 1"
+      English: "The daily limit of points is 1"
+
+- id: "push_code"
+  names:
+    Chinese: "提交代码"
+    English: "push code"
+  kind: "EveryDay"
+  addr: "/{user_name}"
+  rule:
+    descs:
+      Chinese: "提交代码"
+      English: "push code"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 10
+    max_points_descs:
+      Chinese: "每日积分获取上限 10"
+      English: "The daily limit of points is 10"
+
+- id: "create_project"
+  names:
+    Chinese: "创建项目"
+    English: "create project"
+  kind: "EveryDay"
+  addr: "/new/projects"
+  rule:
+    descs:
+      Chinese: "创建项目"
+      English: "create project"
+    created_at: "2023-09-13"
+    points_per_once: 5
+    max_points_of_day: 5
+    max_points_descs:
+      Chinese: "每日积分获取上限 5"
+      English: "The daily limit of points is 5"
+
+- id: "create_model"
+  names:
+    Chinese: "创建模型"
+    English: "create model"
+  kind: "EveryDay"
+  addr: "/new/models"
+  rule:
+    descs:
+      Chinese: "创建模型"
+      English: "create model"
+    created_at: "2023-09-13"
+    points_per_once: 5
+    max_points_of_day: 5
+    max_points_descs:
+      Chinese: "每日积分获取上限 5"
+      English: "The daily limit of points is 5"
+
+- id: "create_dataset"
+  names:
+    Chinese: "创建数据集"
+    English: "create dataset"
+  kind: "EveryDay"
+  addr: "/new/datasets"
+  rule:
+    descs:
+      Chinese: "创建数据集"
+      English: "create dataset"
+    created_at: "2023-09-13"
+    points_per_once: 5
+    max_points_of_day: 5
+    max_points_descs:
+      Chinese: "每日积分获取上限 5"
+      English: "The daily limit of points is 5"
+
+- id: "fork_project"
+  names:
+    Chinese: "fork 项目"
+    English: "fork project"
+  kind: "EveryDay"
+  addr: "/projects"
+  rule:
+    descs:
+      Chinese: "fork 项目"
+      English: "fork project"
+    created_at: "2023-09-13"
+    points_per_once: 3
+    max_points_of_day: 3
+    max_points_descs:
+      Chinese: "每日积分获取上限 3"
+      English: "The daily limit of points is 3"
+
+- id: "download_project"
+  names:
+    Chinese: "下载项目"
+    English: "download project"
+  kind: "EveryDay"
+  addr: "/{user_name}"
+  rule:
+    descs:
+      Chinese: "下载项目"
+      English: "download project"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
+
+- id: "download_model"
+  names:
+    Chinese: "下载模型"
+    English: "download model"
+  kind: "EveryDay"
+  addr: "/{user_name}"
+  rule:
+    descs:
+      Chinese: "下载模型"
+      English: "download model"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
+
+- id: "download_dataset"
+  names:
+    Chinese: "下载数据集"
+    English: "download dataset"
+  kind: "EveryDay"
+  addr: "/{user_name}"
+  rule:
+    descs:
+      Chinese: "下载数据集"
+      English: "download dataset"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
+
+- id: "like_project"
+  names:
+    Chinese: "收藏项目"
+    English: "like project"
+  kind: "EveryDay"
+  addr: "/projects"
+  rule:
+    descs:
+      Chinese: "收藏项目"
+      English: "like project"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
+
+- id: "like_model"
+  names:
+    Chinese: "收藏模型"
+    English: "like model"
+  kind: "EveryDay"
+  addr: "/models"
+  rule:
+    descs:
+      Chinese: "收藏模型"
+      English: "like model"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
+
+- id: "like_dataset"
+  names:
+    Chinese: "收藏数据集"
+    English: "like dataset"
+  kind: "EveryDay"
+  addr: "/datasets"
+  rule:
+    descs:
+      Chinese: "收藏数据集"
+      English: "like dataset"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
+
+- id: "like_ai_picture"
+  names:
+    Chinese: "收藏AI画集"
+    English: "like ai picture"
+  kind: "EveryDay"
+  addr: "/modelzoo/wukong/album"
+  rule:
+    descs:
+      Chinese: "收藏AI画集"
+      English: "like ai picture"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
+
+- id: "try_modelzoo"
+  names:
+    Chinese: "体验大模型"
+    English: "try modelzoo"
+  kind: "EveryDay"
+  addr: "/modelzoo"
+  rule:
+    descs:
+      Chinese: "体验大模型"
+      English: "try modelzoo"
+    created_at: "2023-09-13"
+    points_per_once: 1
+    max_points_of_day: 3
+    max_points_descs:
+      Chinese: "每日积分获取上限 3"
+      English: "The daily limit of points is 3"
+
+- id: "publicize_wukong_picture"
+  names:
+    Chinese: "公开画作"
+    English: "publicize wukong picture"
+  kind: "EveryDay"
+  addr: "/modelzoo/wukong"
+  rule:
+    descs:
+      Chinese: "公开画作"
+      English: "publicize wukong picture"
+    created_at: "2023-09-13"
+    points_per_once: 2
+    max_points_of_day: 2
+    max_points_descs:
+      Chinese: "每日积分获取上限 2"
+      English: "The daily limit of points is 2"
+
+- id: "apply_competition"
+  names:
+    Chinese: "报名比赛"
+    English: "apply competition"
+  kind: "Activity"
+  addr: "/competition"
+  rule:
+    descs:
+      Chinese: "报名比赛"
+      English: "apply competition"
+    created_at: "2023-09-13"
+    points_per_once: 30
+
+- id: "apply_course"
+  names:
+    Chinese: "报名课程"
+    English: "apply course"
+  kind: "Activity"
+  addr: "/course"
+  rule:
+    descs:
+      Chinese: "报名课程"
+      English: "apply course"
+    created_at: "2023-09-13"
+    points_per_once: 30
+    max_points_of_day: 0
+
+- id: "apply_activity"
+  names:
+    Chinese: "报名活动"
+    English: "apply activity"
+  kind: "Activity"
+  addr: "/activity"
+  rule:
+    descs:
+      Chinese: "报名活动"
+      English: "apply activity"
+    created_at: "2023-09-13"
+    points_per_once:
+    max_points_of_day: 0
+
+- id: "fork_ranking_top3"
+  names:
+    Chinese: "fork数量排名前三"
+    English: "fork ranking top3"
+  kind: "PassiveItem"
+  addr: ""
+  rule:
+    descs:
+      Chinese: "fork数量排名前三"
+      English: "fork ranking top3"
+    created_at: "2023-09-13"
+    points_per_once: 20
+    max_points_of_day: 0
+
+- id: "like_ranking_top3"
+  names:
+    Chinese: "收藏数量排名前三"
+    English: "like ranking top3"
+  kind: "PassiveItem"
+  addr: ""
+  rule:
+    descs:
+      Chinese: "收藏数量排名前三"
+      English: "like ranking top3"
+    created_at: "2023-09-13"
+    points_per_once: 20
+    max_points_of_day: 0
+
+- id: "download_ranking_top3"
+  names:
+    Chinese: "下载量排名前三"
+    English: "download ranking top3"
+  kind: "PassiveItem"
+  addr: ""
+  rule:
+    descs:
+      Chinese: "下载量排名前三"
+      English: "download ranking top3"
+    created_at: "2023-09-13"
+    points_per_once: 20
+    max_points_of_day: 0
+
+- id: "ai_like_ranking_top3"
+  names:
+    Chinese: "AI画集收藏量排名前三"
+    English: "ai like ranking top3"
+  kind: "PassiveItem"
+  addr: ""
+  rule:
+    descs:
+      Chinese: "AI画集收藏量排名前三"
+      English: "ai like ranking top3"
+    created_at: "2023-09-13"
+    points_per_once: 10
+    max_points_of_day: 0
+
+- id: "win_competition"
+  names:
+    Chinese: "比赛获奖"
+    English: "win competition"
+  kind: "PassiveItem"
+  addr: ""
+  rule:
+    descs:
+      Chinese: "比赛获奖"
+      English: "win competition"
+    created_at: "2023-09-13"
+    points_per_once: 20
+    max_points_of_day: 0

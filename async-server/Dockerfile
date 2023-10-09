@@ -6,6 +6,9 @@ RUN cd /go/src/github.com/opensourceways/xihe-server/async-server && GO111MODULE
 
 # copy binary config and utils
 FROM alpine:latest
+
+RUN adduser mindspore -u 5000 -D
+USER mindspore
 WORKDIR /opt/app/
 
 ENV BIGMODEL_WUKONGHF="test"

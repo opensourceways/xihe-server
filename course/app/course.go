@@ -3,6 +3,7 @@ package app
 import (
 	"strings"
 
+	"github.com/opensourceways/xihe-server/course/domain/message"
 	"github.com/opensourceways/xihe-server/course/domain/repository"
 	"github.com/opensourceways/xihe-server/course/domain/user"
 	projdomain "github.com/opensourceways/xihe-server/domain"
@@ -33,6 +34,7 @@ func NewCourseService(
 	playerRepo repository.Player,
 	workRepo repository.Work,
 	recordRepo repository.Record,
+	producer message.MessageProducer,
 ) *courseService {
 	return &courseService{
 		userCli:     userCli,
@@ -42,6 +44,7 @@ func NewCourseService(
 		playerRepo: playerRepo,
 		workRepo:   workRepo,
 		recordRepo: recordRepo,
+		producer:   producer,
 	}
 }
 
@@ -53,6 +56,7 @@ type courseService struct {
 	playerRepo repository.Player
 	workRepo   repository.Work
 	recordRepo repository.Record
+	producer   message.MessageProducer
 }
 
 // List

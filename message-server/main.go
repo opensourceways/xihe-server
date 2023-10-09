@@ -15,11 +15,12 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
+	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
-	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
@@ -27,8 +28,13 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	"github.com/opensourceways/xihe-server/messagequeue"
+	pointsapp "github.com/opensourceways/xihe-server/points/app"
+	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+	pointsmq "github.com/opensourceways/xihe-server/points/messagequeue"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
+	usermq "github.com/opensourceways/xihe-server/user/messagequeue"
 )
 
 type options struct {
@@ -77,7 +83,7 @@ func main() {
 
 	// cfg
 	cfg := new(configuration)
-	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
+	if err := loadConfig(o.service.ConfigFile, cfg); err != nil {
 		logrus.Fatalf("load config, err:%s", err.Error())
 	}
 
@@ -86,11 +92,11 @@ func main() {
 	}
 
 	// mq
-	if err := messages.Init(cfg.getMQConfig(), log, cfg.MQ.Topics); err != nil {
+	if err = kafka.Init(&cfg.MQ, log, nil); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
-	defer messages.Exit(log)
+	defer kafka.Exit()
 
 	// mongo
 	m := &cfg.Mongodb
@@ -108,8 +114,117 @@ func main() {
 	// cfg
 	cfg.initDomainConfig()
 
+	// points
+	if err = pointsSubscribesMessage(cfg, &cfg.MQTopics); err != nil {
+		logrus.Errorf("points subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
+	// bigmodel
+	if err = bigmodelSubscribesMessage(cfg, &cfg.MQTopics); err != nil {
+		logrus.Errorf("bigmodel subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
+	// training
+	if err = trainingSubscribesMessage(log, cfg); err != nil {
+		logrus.Errorf("training subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
+	// user
+	if err = userSubscribesMessage(cfg, &cfg.MQTopics.User); err != nil {
+		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
+
+		return
+	}
+
 	// run
-	run(newHandler(cfg, log), log)
+	run(newHandler(cfg, log), log, &cfg.MQTopics)
+}
+
+func pointsSubscribesMessage(cfg *configuration, topics *mqTopics) error {
+	collections := &cfg.Mongodb.Collections
+
+	return pointsmq.Subscribe(
+		pointsapp.NewUserPointsAppMessageService(
+			pointsrepo.TaskAdapter(
+				mongodb.NewCollection(collections.PointsTask),
+			),
+			pointsrepo.UserPointsAdapter(
+				mongodb.NewCollection(collections.UserPoints),
+				&cfg.Points.Repo,
+			),
+		),
+		[]string{
+			topics.SignIn,
+			topics.CompetitorApplied,
+			topics.JupyterCreated,
+			topics.PicturePublicized,
+			topics.PictureLiked,
+			topics.CourseApplied,
+			topics.TrainingCreated,
+			topics.ProjectCreated,
+			topics.DatasetCreated,
+			topics.ModelCreated,
+			topics.ProjectDownloaded,
+			topics.ModelDownloaded,
+			topics.DatasetDownloaded,
+			topics.User.UserSignedUp,
+			topics.User.BioSet,
+			topics.User.AvatarSet,
+			// both add and remove action will send the event
+			// but we only fullfill the MsgNormal
+			// when the action need to be scoring
+			topics.Like,
+			topics.BigModelTopics.BigModelFinished,
+			topics.BigModelTopics.InferenceAsyncFinish,
+		},
+		kafka.SubscriberAdapter(),
+	)
+}
+
+func userSubscribesMessage(cfg *configuration, topics *userConfig) error {
+	collections := &cfg.Mongodb.Collections
+
+	return usermq.Subscribe(
+		userapp.NewUserService(
+			userrepo.NewUserRepo(
+				mongodb.NewCollection(collections.User),
+			),
+			nil, nil, nil, nil,
+		),
+		kafka.SubscriberAdapter(),
+		&topics.TopicConfig,
+	)
+}
+
+func bigmodelSubscribesMessage(cfg *configuration, topics *mqTopics) error {
+	return bigmodelmq.Subscribe(
+		asyncapp.NewAsyncMessageService(
+			asyncrepo.NewAsyncTaskRepo(&cfg.Postgresql.asyncconf),
+		),
+		&topics.BigModelTopics,
+	)
+}
+
+func trainingSubscribesMessage(log *logrus.Entry, cfg *configuration) error {
+	collections := &cfg.Mongodb.Collections
+
+	return messagequeue.Subscribe(
+		cfg.Training, cfg.MQTopics.TrainingCreated,
+		app.NewTrainingService(
+			trainingimpl.NewTraining(&trainingimpl.Config{}),
+			repositories.NewTrainingRepository(
+				mongodb.NewTrainingMapper(collections.Training),
+			),
+			nil, 0,
+		),
+		kafka.SubscriberAdapter(),
+	)
 }
 
 func newHandler(cfg *configuration, log *logrus.Entry) *handler {
@@ -118,11 +233,8 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	userRepo := userrepo.NewUserRepo(mongodb.NewCollection(collections.User))
 
 	h := &handler{
-		log:              log,
-		maxRetry:         cfg.MaxRetry,
-		trainingEndpoint: cfg.TrainingEndpoint,
-
-		user: userapp.NewUserService(userRepo, nil, nil, nil),
+		log:      log,
+		maxRetry: cfg.MaxRetry,
 
 		project: app.NewProjectMessageService(
 			repositories.NewProjectRepository(
@@ -140,15 +252,6 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 			repositories.NewModelRepository(
 				mongodb.NewModelMapper(collections.Model),
 			),
-		),
-
-		training: app.NewTrainingService(
-			log,
-			trainingimpl.NewTraining(&trainingimpl.Config{}),
-			repositories.NewTrainingRepository(
-				mongodb.NewTrainingMapper(collections.Training),
-			),
-			nil, 0,
 		),
 
 		inference: app.NewInferenceMessageService(
@@ -189,7 +292,7 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	return h
 }
 
-func run(h *handler, log *logrus.Entry) {
+func run(h *handler, log *logrus.Entry, topics *mqTopics) {
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt, syscall.SIGTERM)
 
@@ -223,7 +326,8 @@ func run(h *handler, log *logrus.Entry) {
 		}
 	}(ctx)
 
-	if err := messages.Subscribe(ctx, h, log); err != nil {
+	err := messages.Subscribe(ctx, h, log, &topics.Topics, kafka.SubscriberAdapter())
+	if err != nil {
 		log.Errorf("subscribe failed, err:%v", err)
 	}
 }

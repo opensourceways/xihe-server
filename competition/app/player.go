@@ -11,7 +11,9 @@ import (
 )
 
 func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code string, err error) {
-	competition, err := s.repo.FindCompetition(cid)
+	competition, err := s.repo.FindCompetition(&repository.CompetitionGetOption{
+		CompetitionId: cid,
+	})
 	if err != nil {
 		return
 	}
@@ -33,7 +35,16 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 		if repoerr.IsErrorDuplicateCreating(err) {
 			code = errorCompetitorExists
 		}
+
+		return
 	}
+
+	s.producer.SendCompetitorAppliedEvent(&domain.CompetitorAppliedEvent{
+		Account:         cmd.Account,
+		CompetitionName: competition.Name,
+	})
+
+	err = s.userCli.AddUserRegInfo(&p.Leader)
 
 	return
 }

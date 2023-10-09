@@ -23,7 +23,7 @@ func AddRouterForDatasetController(
 	activity repository.Activity,
 	tags repository.Tags,
 	like repository.Like,
-	sender message.Sender,
+	sender message.ResourceProducer,
 	newPlatformRepository func(token, namespace string) platform.Repository,
 ) {
 	ctl := DatasetController{
@@ -59,15 +59,15 @@ type DatasetController struct {
 	newPlatformRepository func(string, string) platform.Repository
 }
 
-//	@Summary		Check
-//	@Description	check whether the name can be applied to create a new dataset
-//	@Tags			Dataset
-//	@Param			owner	path	string	true	"owner of dataset"
-//	@Param			name	path	string	true	"name of dataset"
-//	@Accept			json
-//	@Success		200	{object}	canApplyResourceNameResp
-//	@Produce		json
-//	@Router			/v1/dataset/{owner}/{name}/check [get]
+// @Summary		Check
+// @Description	check whether the name can be applied to create a new dataset
+// @Tags			Dataset
+// @Param			owner	path	string	true	"owner of dataset"
+// @Param			name	path	string	true	"name of dataset"
+// @Accept			json
+// @Success		200	{object}	canApplyResourceNameResp
+// @Produce		json
+// @Router			/v1/dataset/{owner}/{name}/check [get]
 func (ctl *DatasetController) Check(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -105,17 +105,17 @@ func (ctl *DatasetController) Check(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(canApplyResourceNameResp{b}))
 }
 
-//	@Summary		Create
-//	@Description	create dataset
-//	@Tags			Dataset
-//	@Param			body	body	datasetCreateRequest	true	"body of creating dataset"
-//	@Accept			json
-//	@Success		201	{object}			app.DatasetDTO
-//	@Failure		400	bad_request_body	can't	parse		request	body
-//	@Failure		400	bad_request_param	some	parameter	of		body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Failure		500	duplicate_creating	create	dataset	repeatedly
-//	@Router			/v1/dataset [post]
+// @Summary		Create
+// @Description	create dataset
+// @Tags			Dataset
+// @Param			body	body	datasetCreateRequest	true	"body of creating dataset"
+// @Accept			json
+// @Success		201	{object}			app.DatasetDTO
+// @Failure		400	bad_request_body	can't	parse		request	body
+// @Failure		400	bad_request_param	some	parameter	of		body	is	invalid
+// @Failure		500	system_error		system	error
+// @Failure		500	duplicate_creating	create	dataset	repeatedly
+// @Router			/v1/dataset [post]
 func (ctl *DatasetController) Create(ctx *gin.Context) {
 	req := datasetCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -174,15 +174,15 @@ func (ctl *DatasetController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(d))
 }
 
-//	@Summary		Delete
-//	@Description	delete dataset
-//	@Tags			Dataset
-//	@Param			owner	path	string	true	"owner of dataset"
-//	@Param			name	path	string	true	"name of dataset"
-//	@Accept			json
-//	@Success		204
-//	@Produce		json
-//	@Router			/v1/dataset/{owner}/{name} [delete]
+// @Summary		Delete
+// @Description	delete dataset
+// @Tags			Dataset
+// @Param			owner	path	string	true	"owner of dataset"
+// @Param			name	path	string	true	"name of dataset"
+// @Accept			json
+// @Success		204
+// @Produce		json
+// @Router			/v1/dataset/{owner}/{name} [delete]
 func (ctl *DatasetController) Delete(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -238,14 +238,14 @@ func (ctl *DatasetController) Delete(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		Update
-//	@Description	update property of dataset
-//	@Tags			Dataset
-//	@Param			id		path	string					true	"id of dataset"
-//	@Param			body	body	datasetUpdateRequest	true	"body of updating dataset"
-//	@Accept			json
-//	@Produce		json
-//	@Router			/v1/dataset/{owner}/{id} [put]
+// @Summary		Update
+// @Description	update property of dataset
+// @Tags			Dataset
+// @Param			id		path	string					true	"id of dataset"
+// @Param			body	body	datasetUpdateRequest	true	"body of updating dataset"
+// @Accept			json
+// @Produce		json
+// @Router			/v1/dataset/{owner}/{id} [put]
 func (ctl *DatasetController) Update(ctx *gin.Context) {
 	req := datasetUpdateRequest{}
 
@@ -311,15 +311,15 @@ func (ctl *DatasetController) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData(d))
 }
 
-//	@Summary		Get
-//	@Description	get dataset
-//	@Tags			Dataset
-//	@Param			owner	path	string	true	"owner of dataset"
-//	@Param			name	path	string	true	"name of dataset"
-//	@Accept			json
-//	@Success		200	{object}	datasetDetail
-//	@Produce		json
-//	@Router			/v1/dataset/{owner}/{name} [get]
+// @Summary		Get
+// @Description	get dataset
+// @Tags			Dataset
+// @Param			owner	path	string	true	"owner of dataset"
+// @Param			name	path	string	true	"name of dataset"
+// @Accept			json
+// @Success		200	{object}	datasetDetail
+// @Produce		json
+// @Router			/v1/dataset/{owner}/{name} [get]
 func (ctl *DatasetController) Get(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -393,19 +393,19 @@ func (ctl *DatasetController) Get(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(detail))
 }
 
-//	@Summary		List
-//	@Description	list dataset
-//	@Tags			Dataset
-//	@Param			owner			path	string	true	"owner of dataset"
-//	@Param			name			query	string	false	"name of dataset"
-//	@Param			repo_type		query	string	false	"repo type of dataset, value can be public or private"
-//	@Param			count_per_page	query	int		false	"count per page"
-//	@Param			page_num		query	int		false	"page num which starts from 1"
-//	@Param			sort_by			query	string	false	"sort keys, value can be update_time, first_letter, download_count"
-//	@Accept			json
-//	@Success		200	{object}	datasetsInfo
-//	@Produce		json
-//	@Router			/v1/dataset/{owner} [get]
+// @Summary		List
+// @Description	list dataset
+// @Tags			Dataset
+// @Param			owner			path	string	true	"owner of dataset"
+// @Param			name			query	string	false	"name of dataset"
+// @Param			repo_type		query	string	false	"repo type of dataset, value can be public or private"
+// @Param			count_per_page	query	int		false	"count per page"
+// @Param			page_num		query	int		false	"page num which starts from 1"
+// @Param			sort_by			query	string	false	"sort keys, value can be update_time, first_letter, download_count"
+// @Accept			json
+// @Success		200	{object}	datasetsInfo
+// @Produce		json
+// @Router			/v1/dataset/{owner} [get]
 func (ctl *DatasetController) List(ctx *gin.Context) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
@@ -469,20 +469,20 @@ func (ctl *DatasetController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(&result))
 }
 
-//	@Summary		ListGlobal
-//	@Description	list global public dataset
-//	@Tags			Dataset
-//	@Param			name			query	string	false	"name of dataset"
-//	@Param			tags			query	string	false	"tags, separate multiple tags with commas"
-//	@Param			tag_kinds		query	string	false	"tag kinds, separate multiple kinds with commas"
-//	@Param			level			query	string	false	"dataset level, such as official, good"
-//	@Param			count_per_page	query	int		false	"count per page"
-//	@Param			page_num		query	int		false	"page num which starts from 1"
-//	@Param			sort_by			query	string	false	"sort keys, value can be update_time, first_letter, download_count"
-//	@Accept			json
-//	@Success		200	{object}	app.GlobalDatasetsDTO
-//	@Produce		json
-//	@Router			/v1/dataset [get]
+// @Summary		ListGlobal
+// @Description	list global public dataset
+// @Tags			Dataset
+// @Param			name			query	string	false	"name of dataset"
+// @Param			tags			query	string	false	"tags, separate multiple tags with commas"
+// @Param			tag_kinds		query	string	false	"tag kinds, separate multiple kinds with commas"
+// @Param			level			query	string	false	"dataset level, such as official, good"
+// @Param			count_per_page	query	int		false	"count per page"
+// @Param			page_num		query	int		false	"page num which starts from 1"
+// @Param			sort_by			query	string	false	"sort keys, value can be update_time, first_letter, download_count"
+// @Accept			json
+// @Success		200	{object}	app.GlobalDatasetsDTO
+// @Produce		json
+// @Router			/v1/dataset [get]
 func (ctl *DatasetController) ListGlobal(ctx *gin.Context) {
 	cmd, err := ctl.getListGlobalResourceParameter(ctx)
 	if err != nil {
@@ -503,15 +503,15 @@ func (ctl *DatasetController) ListGlobal(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(result))
 }
 
-//	@Summary		SetTags
-//	@Description	set tags for dataset
-//	@Tags			Dataset
-//	@Param			owner	path	string						true	"owner of dataset"
-//	@Param			id		path	string						true	"id of dataset"
-//	@Param			body	body	resourceTagsUpdateRequest	true	"body of tags"
-//	@Accept			json
-//	@Success		202
-//	@Router			/v1/dataset/{owner}/{id}/tags [put]
+// @Summary		SetTags
+// @Description	set tags for dataset
+// @Tags			Dataset
+// @Param			owner	path	string						true	"owner of dataset"
+// @Param			id		path	string						true	"id of dataset"
+// @Param			body	body	resourceTagsUpdateRequest	true	"body of tags"
+// @Accept			json
+// @Success		202
+// @Router			/v1/dataset/{owner}/{id}/tags [put]
 func (ctl *DatasetController) SetTags(ctx *gin.Context) {
 	req := resourceTagsUpdateRequest{}
 

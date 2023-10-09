@@ -323,11 +323,11 @@ type Province interface {
 }
 
 func NewProvince(v string) (Province, error) {
-	if utils.StrLen(v) > 15 {
+	v = utils.XSSFilter(v)
+
+	if utils.StrLen(v) > 20 || utils.StrLen(v) < 2 {
 		return nil, errors.New("invalid province")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return province(v), nil
 }
@@ -344,11 +344,11 @@ type City interface {
 }
 
 func NewCity(v string) (City, error) {
-	if utils.StrLen(v) > 20 {
+	v = utils.XSSFilter(v)
+
+	if utils.StrLen(v) > 20 || utils.StrLen(v) < 2 {
 		return nil, errors.New("invalid city")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return city(v), nil
 }
@@ -365,11 +365,11 @@ type CompetitorName interface {
 }
 
 func NewCompetitorName(v string) (CompetitorName, error) {
-	if v == "" || len(v) > 30 {
+	v = utils.XSSFilter(v)
+
+	if v == "" || utils.StrLen(v) > 30 {
 		return nil, errors.New("invalid competitor name")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return competitorName(v), nil
 }
@@ -386,11 +386,11 @@ type TeamName interface {
 }
 
 func NewTeamName(v string) (TeamName, error) {
-	if v == "" || utils.StrLen(v) > 15 || len(v) > 40 {
+	v = utils.XSSFilter(v)
+
+	if utils.StrLen(v) > 20 {
 		return nil, errors.New("invalid team name")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return teamName(v), nil
 }
@@ -449,5 +449,32 @@ func NewCompetitionTag(v string) (CompetitionTag, error) {
 type competitionTag string
 
 func (r competitionTag) CompetitionTag() string {
+	return string(r)
+}
+
+const (
+	languageEN = "en"
+	languageZH = "zh"
+)
+
+// Language
+type Language interface {
+	Language() string
+}
+
+func NewLanguage(v string) (Language, error) {
+	b := v == languageEN ||
+		v == languageZH
+
+	if b {
+		return dpLanguage(v), nil
+	}
+
+	return nil, errors.New("invalid competition status")
+}
+
+type dpLanguage string
+
+func (r dpLanguage) Language() string {
 	return string(r)
 }

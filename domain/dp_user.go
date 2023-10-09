@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	libutil "github.com/opensourceways/community-robot-lib/utils"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 // Account
@@ -13,7 +14,7 @@ type Account interface {
 }
 
 func NewAccount(v string) (Account, error) {
-	if v == "" || strings.ToLower(v) == "root" || !reName.MatchString(v) {
+	if v == "" || strings.ToLower(v) == "root" || !utils.IsUserName(v) {
 		return nil, errors.New("invalid user name")
 	}
 

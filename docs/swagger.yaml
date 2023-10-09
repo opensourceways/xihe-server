@@ -23,6 +23,78 @@ definitions:
       type:
         type: string
     type: object
+  app.ApiApplyRecordDTO:
+    properties:
+      apply_at:
+        type: string
+      enabled:
+        type: boolean
+      endpoint:
+        type: string
+      model_name:
+        type: string
+      name:
+        type: string
+      token:
+        type: string
+      user:
+        type: string
+    type: object
+  app.ApiInfoDTO:
+    properties:
+      doc:
+        type: string
+      endpoint:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  app.AsgDTO:
+    properties:
+      asg_id:
+        type: string
+      asg_name:
+        type: string
+      course_name:
+        type: string
+      deadline:
+        type: string
+      desc:
+        type: string
+    type: object
+  app.AsgWorkDTO:
+    properties:
+      deadline:
+        type: string
+      desc:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      score:
+        type: number
+      status:
+        type: string
+    type: object
+  app.BaiChuanDTO:
+    properties:
+      text:
+        type: string
+    type: object
+  app.CertInfoDTO:
+    properties:
+      cert:
+        type: string
+      is_pass:
+        type: boolean
+      name:
+        type: string
+      owner:
+        type: string
+    type: object
   app.ChallengeCompetitorInfoDTO:
     properties:
       ai_question:
@@ -74,13 +146,6 @@ definitions:
       spec:
         type: string
     type: object
-  app.CodeGeexDTO:
-    properties:
-      finish:
-        type: string
-      result:
-        type: string
-    type: object
   app.CompetitionSubmissionDTO:
     properties:
       file_name:
@@ -115,12 +180,18 @@ definitions:
         type: string
       id:
         type: string
+      lang:
+        type: string
       name:
         type: string
       poster:
         type: string
       status:
         type: string
+      tags:
+        items:
+          type: string
+        type: array
     type: object
   app.CompetitionTeamDTO:
     properties:
@@ -169,6 +240,64 @@ definitions:
       version:
         type: string
     type: object
+  app.CourseDTO:
+    properties:
+      count:
+        type: integer
+      desc:
+        type: string
+      doc:
+        type: string
+      duration:
+        type: string
+      forum:
+        type: string
+      host:
+        type: string
+      hours:
+        type: integer
+      id:
+        type: string
+      is_apply:
+        type: boolean
+      name:
+        type: string
+      poster:
+        type: string
+      sections:
+        items:
+          $ref: '#/definitions/app.SectionDTO'
+        type: array
+      status:
+        type: string
+      teacher:
+        type: string
+      type:
+        type: string
+    type: object
+  app.CourseSummaryDTO:
+    properties:
+      count:
+        type: integer
+      desc:
+        type: string
+      duration:
+        type: string
+      host:
+        type: string
+      hours:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      poster:
+        type: string
+      status:
+        type: string
+      type:
+        type: string
+    type: object
   app.DatasetDTO:
     properties:
       created_at:
@@ -195,6 +324,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -216,6 +347,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -228,15 +361,6 @@ definitions:
           $ref: '#/definitions/domain.Tags'
         type: array
       name:
-        type: string
-    type: object
-  app.EvaluateDTO:
-    properties:
-      access_url:
-        type: string
-      error:
-        type: string
-      evaluate_id:
         type: string
     type: object
   app.FinetuneSummaryDTO:
@@ -296,6 +420,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -328,6 +454,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -366,6 +494,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -387,6 +517,21 @@ definitions:
       inference_id:
         type: string
     type: object
+  app.LessonDTO:
+    properties:
+      desc:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      points:
+        items:
+          $ref: '#/definitions/app.PointDTO'
+        type: array
+      video:
+        type: string
+    type: object
   app.LikeDTO:
     properties:
       resource:
@@ -396,7 +541,7 @@ definitions:
     type: object
   app.LoginDTO:
     properties:
-      access:
+      email:
         type: string
       info:
         type: string
@@ -436,6 +581,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -457,7 +604,34 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
+        type: string
+    type: object
+  app.PointDTO:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      video:
+        type: string
+    type: object
+  app.PointsDetailDTO:
+    properties:
+      desc:
+        type: string
+      id:
+        description: serial number
+        type: string
+      points:
+        type: integer
+      task:
+        type: string
+      time:
+        type: integer
+      time_str:
         type: string
     type: object
   app.ProjectSummaryDTO:
@@ -484,7 +658,26 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
+        type: string
+    type: object
+  app.ProjectSummuryDTO:
+    properties:
+      cover_id:
+        type: string
+      create_at:
+        type: string
+      download_count:
+        type: integer
+      fork_count:
+        type: integer
+      like_count:
+        type: integer
+      name:
+        type: string
+      owner:
         type: string
     type: object
   app.RankingDTO:
@@ -495,6 +688,13 @@ definitions:
         type: string
       team_name:
         type: string
+    type: object
+  app.RelateProjectDTO:
+    properties:
+      related_project:
+        items:
+          $ref: '#/definitions/app.ProjectSummuryDTO'
+        type: array
     type: object
   app.RepoFileDownloadDTO:
     properties:
@@ -526,6 +726,8 @@ definitions:
         type: integer
       id:
         type: string
+      level:
+        type: string
       like_count:
         type: integer
       name:
@@ -537,6 +739,12 @@ definitions:
           name:
             type: string
         type: object
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
       type:
         type: string
       update_at:
@@ -568,6 +776,42 @@ definitions:
         $ref: '#/definitions/app.ResourceSearchDTO'
       user:
         $ref: '#/definitions/app.UserSearchDTO'
+    type: object
+  app.SectionDTO:
+    properties:
+      id:
+        type: string
+      lessons:
+        items:
+          $ref: '#/definitions/app.LessonDTO'
+        type: array
+      name:
+        type: string
+    type: object
+  app.TaskCompletionInfoDTO:
+    properties:
+      addr:
+        type: string
+      completed:
+        type: boolean
+      name:
+        type: string
+      points:
+        type: integer
+    type: object
+  app.TaskDocDTO:
+    properties:
+      content:
+        type: string
+    type: object
+  app.TasksCompletionInfoDTO:
+    properties:
+      kind:
+        type: string
+      tasks:
+        items:
+          $ref: '#/definitions/app.TaskCompletionInfoDTO'
+        type: array
     type: object
   app.TrainingSummaryDTO:
     properties:
@@ -614,6 +858,8 @@ definitions:
         type: boolean
       is_finalist:
         type: boolean
+      lang:
+        type: string
       name:
         type: string
       phase:
@@ -622,6 +868,10 @@ definitions:
         type: string
       status:
         type: string
+      tags:
+        items:
+          type: string
+        type: array
       team_id:
         type: string
       team_role:
@@ -655,6 +905,31 @@ definitions:
           $ref: '#/definitions/app.FinetuneSummaryDTO'
         type: array
       expiry:
+        type: integer
+    type: object
+  app.UserPointsDetailsDTO:
+    properties:
+      details:
+        items:
+          $ref: '#/definitions/app.PointsDetailDTO'
+        type: array
+      total:
+        type: integer
+    type: object
+  app.UserRegisterInfoDTO:
+    properties:
+      account: {}
+      city: {}
+      detail:
+        additionalProperties:
+          type: string
+        type: object
+      email: {}
+      identity: {}
+      name: {}
+      phone: {}
+      province: {}
+      version:
         type: integer
     type: object
   app.UserSearchDTO:
@@ -736,13 +1011,6 @@ definitions:
       team_name:
         type: string
     type: object
-  controller.CodeGeexRequest:
-    properties:
-      content:
-        type: string
-      lang:
-        type: string
-    type: object
   controller.CompetitorApplyRequest:
     properties:
       city:
@@ -779,23 +1047,6 @@ definitions:
   controller.DeleteMemberRequest:
     properties:
       competitor_account:
-        type: string
-    type: object
-  controller.EvaluateCreateRequest:
-    properties:
-      batch_size_scope:
-        items:
-          type: string
-        type: array
-      learning_rate_scope:
-        items:
-          type: string
-        type: array
-      momentum_scope:
-        items:
-          type: string
-        type: array
-      type:
         type: string
     type: object
   controller.FinetuneCreateRequest:
@@ -918,6 +1169,18 @@ definitions:
       competitor_account:
         type: string
     type: object
+  controller.aiDetectorReq:
+    properties:
+      lang:
+        type: string
+      text:
+        type: string
+    type: object
+  controller.aiDetectorResp:
+    properties:
+      is_machine:
+        type: boolean
+    type: object
   controller.aiQuestionAnswerSubmitRequest:
     properties:
       answer:
@@ -933,6 +1196,21 @@ definitions:
     properties:
       score:
         type: integer
+    type: object
+  controller.baichuanReq:
+    properties:
+      repetition_penalty:
+        type: number
+      sampling:
+        type: boolean
+      temperature:
+        type: number
+      text:
+        type: string
+      top_k:
+        type: integer
+      top_p:
+        type: number
     type: object
   controller.canApplyResourceNameResp:
     properties:
@@ -975,6 +1253,12 @@ definitions:
         type: string
       repo_type:
         type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
     type: object
   controller.datasetDetail:
     properties:
@@ -1014,6 +1298,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -1022,6 +1308,8 @@ definitions:
       desc:
         type: string
       name:
+        type: string
+      title:
         type: string
       type:
         type: string
@@ -1059,6 +1347,39 @@ definitions:
       account:
         type: string
     type: object
+  controller.homeElectricityInfo:
+    properties:
+      comp:
+        items:
+          $ref: '#/definitions/app.CompetitionSummaryDTO'
+        type: array
+      course:
+        items:
+          $ref: '#/definitions/app.CourseSummaryDTO'
+        type: array
+      dataset:
+        $ref: '#/definitions/app.GlobalDatasetsDTO'
+      model:
+        $ref: '#/definitions/app.GlobalModelsDTO'
+      project:
+        $ref: '#/definitions/app.GlobalProjectsDTO'
+    type: object
+  controller.homeInfo:
+    properties:
+      comp:
+        items:
+          $ref: '#/definitions/app.CompetitionSummaryDTO'
+        type: array
+      course:
+        items:
+          $ref: '#/definitions/app.CourseSummaryDTO'
+        type: array
+    type: object
+  controller.isApplyResp:
+    properties:
+      is_apply:
+        type: boolean
+    type: object
   controller.likeCreateRequest:
     properties:
       name:
@@ -1093,6 +1414,12 @@ definitions:
       protocol:
         type: string
       repo_type:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
         type: string
     type: object
   controller.modelDetail:
@@ -1133,6 +1460,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       updated_at:
         type: string
     type: object
@@ -1141,6 +1470,8 @@ definitions:
       desc:
         type: string
       name:
+        type: string
+      title:
         type: string
       type:
         type: string
@@ -1209,6 +1540,12 @@ definitions:
         type: string
       repo_type:
         type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
       training:
         type: string
       type:
@@ -1256,6 +1593,8 @@ definitions:
         items:
           type: string
         type: array
+      title:
+        type: string
       training:
         type: string
       type:
@@ -1277,6 +1616,8 @@ definitions:
       desc:
         type: string
       name:
+        type: string
+      title:
         type: string
       type:
         type: string
@@ -1406,6 +1747,8 @@ definitions:
         type: string
       is_follower:
         type: boolean
+      points:
+        type: integer
     type: object
   controller.wukongAddLikeResp:
     properties:
@@ -1430,13 +1773,6 @@ definitions:
         type: integer
     type: object
   controller.wukongHFRequest:
-    properties:
-      desc:
-        type: string
-      style:
-        type: string
-    type: object
-  controller.wukongICBCRequest:
     properties:
       desc:
         type: string
@@ -1476,67 +1812,6 @@ definitions:
 info:
   contact: {}
 paths:
-  /:
-    get:
-      consumes:
-      - application/json
-      description: callback of authentication by authing
-      parameters:
-      - description: authing code
-        in: query
-        name: code
-        required: true
-        type: string
-      - description: redirect uri
-        in: query
-        name: redirect_uri
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/app.UserDTO'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-        "501":
-          description: Not Implemented
-          schema:
-            type: duplicate_creating
-      tags:
-      - Login
-  /{account}:
-    get:
-      consumes:
-      - application/json
-      description: get info of login
-      parameters:
-      - description: account
-        in: path
-        name: account
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/app.LoginDTO'
-        "400":
-          description: Bad Request
-          schema:
-            type: bad_request_param
-        "401":
-          description: Unauthorized
-          schema:
-            type: not_allowed
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - Login
   /{account}/gitlab:
     get:
       consumes:
@@ -1563,6 +1838,150 @@ paths:
             type: not_allowed
       tags:
       - User
+  /{account}/gitlab/refresh:
+    get:
+      consumes:
+      - application/json
+      description: refresh platform token of user
+      parameters:
+      - description: account
+        in: path
+        name: account
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "401":
+          description: Unauthorized
+          schema:
+            type: not_allowed
+      tags:
+      - User
+  /v1/bigmodel/ai_detector:
+    post:
+      consumes:
+      - application/json
+      description: detecte if text generate by ai
+      parameters:
+      - description: body of ai detector
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.aiDetectorReq'
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/controller.aiDetectorResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/api/{model}:
+    post:
+      consumes:
+      - application/json
+      description: generates pictures by WuKong
+      parameters:
+      - description: body of wukong
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.wukongRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.wukongPicturesGenerateResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/api/apply/{model}:
+    get:
+      consumes:
+      - application/json
+      description: is user applied for api
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.isApplyResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+    post:
+      consumes:
+      - application/json
+      description: generates pictures by WuKong-hf
+      parameters:
+      - description: body of wukong
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.wukongHFRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.wukongPicturesGenerateResp'
+        "404":
+          description: Not Found
+          schema:
+            type: bigmodel_sensitive_info
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/api/get/:
+    get:
+      consumes:
+      - application/json
+      description: get user apply record
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ApiApplyRecordDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/apiinfo/get/{model}:
+    get:
+      consumes:
+      - application/json
+      description: get api info
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.ApiInfoDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
   /v1/bigmodel/ask:
     post:
       consumes:
@@ -1586,45 +2005,23 @@ paths:
             type: system_error
       tags:
       - BigModel
-  /v1/bigmodel/ask_hf:
+  /v1/bigmodel/baichuan2_7b_chat:
     post:
       consumes:
       - application/json
-      description: vqa for hf
+      description: conversational AI
       parameters:
-      - description: picture
-        in: formData
-        name: picture
-        required: true
-        type: file
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.describePictureResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
-  /v1/bigmodel/codegeex:
-    post:
-      consumes:
-      - application/json
-      description: codegeex big model
-      parameters:
-      - description: codegeex body
+      - description: body of baichuan
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/controller.CodeGeexRequest'
+          $ref: '#/definitions/controller.baichuanReq'
       responses:
-        "201":
-          description: Created
+        "202":
+          description: Accepted
           schema:
-            $ref: '#/definitions/app.CodeGeexDTO'
+            $ref: '#/definitions/app.BaiChuanDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -1636,28 +2033,6 @@ paths:
       consumes:
       - application/json
       description: describe a picture
-      parameters:
-      - description: picture
-        in: formData
-        name: picture
-        required: true
-        type: file
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.describePictureResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
-  /v1/bigmodel/describe_picture_hf:
-    post:
-      consumes:
-      - application/json
-      description: describe a picture for hf
       parameters:
       - description: picture
         in: formData
@@ -1700,28 +2075,6 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/controller.luojiaResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
-  /v1/bigmodel/luojia_hf:
-    post:
-      consumes:
-      - application/json
-      description: luojia for hf
-      parameters:
-      - description: picture
-        in: formData
-        name: picture
-        required: true
-        type: file
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.describePictureResp'
         "500":
           description: Internal Server Error
           schema:
@@ -2112,60 +2465,6 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/controller.wukongPicturesGenerateResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
-  /v1/bigmodel/wukong_hf:
-    post:
-      consumes:
-      - application/json
-      description: generates pictures by WuKong-hf
-      parameters:
-      - description: body of wukong
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.wukongHFRequest'
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.wukongPicturesGenerateResp'
-        "404":
-          description: Not Found
-          schema:
-            type: bigmodel_sensitive_info
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
-  /v1/bigmodel/wukong_icbc:
-    post:
-      consumes:
-      - application/json
-      description: generates pictures by WuKong-icbc
-      parameters:
-      - description: body of wukong
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.wukongICBCRequest'
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.wukongPicturesGenerateResp'
-        "404":
-          description: Not Found
-          schema:
-            type: bigmodel_sensitive_info
         "500":
           description: Internal Server Error
           schema:
@@ -2710,6 +3009,23 @@ paths:
       summary: TransferLeader
       tags:
       - Competition
+  /v1/competition/reginfo:
+    get:
+      consumes:
+      - application/json
+      description: get register info
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.UserRegisterInfoDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetRegisterInfo
+      tags:
+      - Competition
   /v1/course:
     get:
       consumes:
@@ -2730,7 +3046,9 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/app.CourseSummaryDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2756,7 +3074,9 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/app.AsgDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2776,8 +3096,10 @@ paths:
         required: true
         type: string
       responses:
-        "201":
-          description: ""
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.CourseDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2801,8 +3123,10 @@ paths:
         name: status
         type: string
       responses:
-        "201":
-          description: ""
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.AsgWorkDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2823,7 +3147,9 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/app.RelateProjectDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2844,7 +3170,9 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/app.CertInfoDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2940,7 +3268,9 @@ paths:
       description: get register info
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/app.UserRegisterInfoDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -3186,89 +3516,6 @@ paths:
       summary: Check
       tags:
       - Dataset
-  /v1/evaluate/project/{pid}/training/{tid}/evaluate:
-    post:
-      consumes:
-      - application/json
-      description: create evaluate
-      parameters:
-      - description: project id
-        in: path
-        name: pid
-        required: true
-        type: string
-      - description: training id
-        in: path
-        name: tid
-        required: true
-        type: string
-      - description: body of creating inference
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.EvaluateCreateRequest'
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/app.EvaluateDTO'
-        "400":
-          description: Bad Request
-          schema:
-            type: bad_request_body
-        "401":
-          description: Unauthorized
-          schema:
-            type: bad_request_param
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      summary: Create
-      tags:
-      - Evaluate
-  /v1/evaluate/project/{pid}/training/{tid}/evaluate/{id}:
-    get:
-      consumes:
-      - application/json
-      description: watch evaluate
-      parameters:
-      - description: project id
-        in: path
-        name: pid
-        required: true
-        type: string
-      - description: training id
-        in: path
-        name: tid
-        required: true
-        type: string
-      - description: evaluate id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/app.EvaluateDTO'
-        "400":
-          description: Bad Request
-          schema:
-            type: bad_request_body
-        "401":
-          description: Unauthorized
-          schema:
-            type: bad_request_param
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      summary: Watch
-      tags:
-      - Evaluate
   /v1/finetune:
     get:
       consumes:
@@ -3420,12 +3667,31 @@ paths:
       description: list the courses and competitions
       responses:
         "200":
-          description: ""
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.homeInfo'
         "500":
           description: Internal Server Error
           schema:
             type: system_error
       summary: ListAll
+      tags:
+      - HomePage
+  /v1/homepage/electricity:
+    get:
+      consumes:
+      - application/json
+      description: list the project dataset model courses and competitions
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.homeElectricityInfo'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: ListAllElectricity
       tags:
       - HomePage
   /v1/inference/project/{owner}/{pid}:
@@ -3464,6 +3730,67 @@ paths:
       summary: Create
       tags:
       - Inference
+  /v1/login:
+    get:
+      consumes:
+      - application/json
+      description: callback of authentication by authing
+      parameters:
+      - description: authing code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: redirect uri
+        in: query
+        name: redirect_uri
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.UserDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+        "501":
+          description: Not Implemented
+          schema:
+            type: duplicate_creating
+      tags:
+      - Login
+  /v1/login/{account}:
+    get:
+      consumes:
+      - application/json
+      description: get info of login
+      parameters:
+      - description: account
+        in: path
+        name: account
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.LoginDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "401":
+          description: Unauthorized
+          schema:
+            type: not_allowed
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - Login
   /v1/model:
     get:
       consumes:
@@ -4301,6 +4628,41 @@ paths:
       summary: DownloadRepo
       tags:
       - RepoFile
+  /v1/repo/{type}/{user}/{name}/app:
+    get:
+      consumes:
+      - application/json
+      description: repo file contain app
+      parameters:
+      - description: user
+        in: path
+        name: user
+        required: true
+        type: string
+      - description: repo name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: repo file path
+        in: path
+        name: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: ContainApp
+      tags:
+      - RepoFile
   /v1/repo/{type}/{user}/{name}/file/{path}:
     get:
       consumes:
@@ -4410,6 +4772,41 @@ paths:
       summary: List
       tags:
       - RepoFile
+  /v1/repo/{type}/{user}/{name}/readme:
+    get:
+      consumes:
+      - application/json
+      description: repo file contain readme
+      parameters:
+      - description: user
+        in: path
+        name: user
+        required: true
+        type: string
+      - description: repo name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: repo file path
+        in: path
+        name: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: ""
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: ContainReadme
+      tags:
+      - RepoFile
   /v1/search:
     get:
       consumes:
@@ -4432,6 +4829,20 @@ paths:
             type: system_error
       tags:
       - Search
+  /v1/signin:
+    put:
+      consumes:
+      - application/json
+      description: user sign in
+      responses:
+        "202":
+          description: ""
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - Login
   /v1/tags/{type}:
     get:
       consumes:
@@ -4943,6 +5354,30 @@ paths:
             type: system_error
       tags:
       - Following
+  /v1/user/info/{account}:
+    get:
+      consumes:
+      - application/json
+      description: get user apply info
+      parameters:
+      - description: body of creating user
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.userCreateRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.UserDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_body
+      summary: GetInfo
+      tags:
+      - User
   /v1/user/like:
     delete:
       consumes:
@@ -5042,4 +5477,55 @@ paths:
             type: system_error
       tags:
       - Like
+  /v1/user_points:
+    get:
+      consumes:
+      - application/json
+      description: get user points details
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.UserPointsDetailsDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: get user points details
+      tags:
+      - UserPoints
+  /v1/user_points/taskdoc:
+    get:
+      consumes:
+      - application/json
+      description: task doc
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.TaskDocDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: task doc
+      tags:
+      - UserPoints
+  /v1/user_points/tasks:
+    get:
+      consumes:
+      - application/json
+      description: tasks of day
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.TasksCompletionInfoDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: tasks of day
+      tags:
+      - UserPoints
 swagger: "2.0"

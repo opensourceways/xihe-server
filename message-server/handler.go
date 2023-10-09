@@ -3,24 +3,17 @@ package main
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
-	asyncdomain "github.com/opensourceways/xihe-server/async-server/domain"
-	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
-	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
-	bigmodelmessage "github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
-	userapp "github.com/opensourceways/xihe-server/user/app"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 var _ message.EventHandler = (*handler)(nil)
@@ -41,14 +34,11 @@ type relatedResourceHanler struct {
 type handler struct {
 	log *logrus.Entry
 
-	maxRetry         int
-	trainingEndpoint string
+	maxRetry int
 
-	user      userapp.UserService
 	model     app.ModelMessageService
 	dataset   app.DatasetMessageService
 	project   app.ProjectMessageService
-	training  app.TrainingService
 	finetune  app.FinetuneMessageService
 	evaluate  app.EvaluateMessageService
 	inference app.InferenceMessageService
@@ -138,26 +128,6 @@ func (h *handler) getHandlerForEventRelatedResource(
 	return
 }
 
-func (h *handler) HandleEventAddFollowing(f *userdomain.FollowerInfo) error {
-	return h.do(func(bool) (err error) {
-		if err = h.user.AddFollower(f); err == nil {
-			return
-		}
-
-		if _, ok := err.(repository.ErrorDuplicateCreating); ok {
-			err = nil
-		}
-
-		return
-	})
-}
-
-func (h *handler) HandleEventRemoveFollowing(f *userdomain.FollowerInfo) (err error) {
-	return h.do(func(bool) error {
-		return h.user.RemoveFollower(f)
-	})
-}
-
 func (h *handler) HandleEventAddLike(obj *domain.ResourceObject) error {
 	lh := h.getResourceHandler(obj.Type)
 
@@ -241,33 +211,6 @@ func (h *handler) HandleEventDownload(obj *domain.ResourceObject) error {
 	})
 }
 
-func (h *handler) HandleEventCreateTraining(info *domain.TrainingIndex) error {
-	// wait for the sync of model and dataset
-	time.Sleep(10 * time.Second)
-
-	return h.retry(
-		func(lastChance bool) error {
-			retry, err := h.training.CreateTrainingJob(
-				info, h.trainingEndpoint, lastChance,
-			)
-			if err != nil {
-				h.log.Errorf(
-					"handle training(%s/%s/%s) failed, err:%s",
-					info.Project.Owner.Account(), info.Project.Id,
-					info.TrainingId, err.Error(),
-				)
-
-				if !retry {
-					return nil
-				}
-			}
-
-			return err
-		},
-		10*time.Second,
-	)
-}
-
 func (h *handler) HandleEventCreateFinetune(index *domain.FinetuneIndex) error {
 	h.log.Debugf("start handle finetune: %s/%s", index.Owner.Account(), index.Id)
 
@@ -327,140 +270,6 @@ func (h *handler) HandleEventCreateEvaluate(info *message.EvaluateInfo) error {
 func (h *handler) HandleEventPodSubscribe(info *cloudtypes.PodInfo) error {
 	return h.do(func(bool) error {
 		if err := h.cloud.CreatePodInstance(info); err != nil {
-			if err != nil {
-				h.log.Error(err)
-			}
-		}
-
-		return nil
-	})
-}
-
-// bigmodel
-func (h *handler) HandleEventBigModelWuKongInferenceStart(msg *bigmodelmessage.MsgTask) error {
-	user, err := domain.NewAccount(msg.User)
-	if err != nil {
-		return err
-	}
-
-	desc, err := bigmodeldomain.NewWuKongPictureDesc(msg.Details["desc"])
-	if err != nil {
-		return err
-	}
-
-	tt, err := asyncdomain.NewTaskType(msg.Details["task_type"])
-	if err != nil {
-		return err
-	}
-
-	v := asyncdomain.WuKongRequest{
-		User:     user,
-		TaskType: tt,
-		Style:    msg.Details["style"],
-		Desc:     desc,
-	}
-
-	return h.do(func(bool) error {
-		if err := h.async.CreateWuKongTask(&v); err != nil {
-			if err != nil {
-				h.log.Error(err)
-			}
-		}
-
-		return nil
-	})
-
-}
-
-func (h *handler) HandleEventBigModelWuKongInferenceError(msg *bigmodelmessage.MsgTask) error {
-	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
-	if err != nil {
-		return err
-	}
-
-	taskId, err := strconv.Atoi(msg.Details["task_id"])
-	if err != nil {
-		return err
-	}
-	v := asyncrepo.WuKongResp{
-		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(taskId),
-			Status: status,
-		},
-	}
-
-	if msg.Details != nil {
-		if v.Links, err = asyncdomain.NewLinks(msg.Details["error"]); err != nil { // TODO do't use links to save error
-			return err
-		}
-	}
-
-	return h.do(func(bool) error {
-		if err := h.async.UpdateWuKongTask(&v); err != nil {
-			if err != nil {
-				h.log.Error(err)
-			}
-		}
-
-		return nil
-	})
-
-}
-
-func (h *handler) HandleEventBigModelWuKongAsyncTaskStart(msg *bigmodelmessage.MsgTask) error {
-	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
-	if err != nil {
-		return err
-	}
-
-	taskId, err := strconv.Atoi(msg.Details["task_id"])
-	if err != nil {
-		return err
-	}
-	v := asyncrepo.WuKongResp{
-		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(taskId),
-			Status: status,
-		},
-	}
-
-	return h.do(func(bool) error {
-		if err := h.async.UpdateWuKongTask(&v); err != nil {
-			if err != nil {
-				h.log.Error(err)
-			}
-		}
-
-		return nil
-	})
-
-}
-
-func (h *handler) HandleEventBigModelWuKongAsyncTaskFinish(msg *bigmodelmessage.MsgTask) error {
-	status, err := asyncdomain.NewTaskStatus(msg.Details["status"])
-	if err != nil {
-		return err
-	}
-
-	taskId, err := strconv.Atoi(msg.Details["task_id"])
-	if err != nil {
-		return err
-	}
-	v := asyncrepo.WuKongResp{
-		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(taskId),
-			Status: status,
-		},
-	}
-
-	if msg.Details != nil {
-		if v.Links, err = asyncdomain.NewLinks(msg.Details["links"]); err != nil {
-			return err
-		}
-	}
-
-	return h.do(func(bool) error {
-		if err := h.async.UpdateWuKongTask(&v); err != nil {
 			if err != nil {
 				h.log.Error(err)
 			}

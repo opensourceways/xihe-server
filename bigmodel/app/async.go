@@ -16,7 +16,7 @@ type AsyncBigModelService interface {
 
 func NewAsyncBigModelService(
 	fm bigmodel.BigModel,
-	sender message.AsyncMessageProducer,
+	sender message.MessageProducer,
 ) AsyncBigModelService {
 	return &asyncBigModelService{
 		fm:     fm,
@@ -26,16 +26,20 @@ func NewAsyncBigModelService(
 
 type asyncBigModelService struct {
 	fm     bigmodel.BigModel
-	sender message.AsyncMessageProducer
+	sender message.MessageProducer
 }
 
 func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKongCmd) (err error) {
 	// 1. inference
-	_ = s.sender.AddOperateLogForAccessBigModel(user, domain.BigmodelWuKong)
+	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
+		Account:      user,
+		BigModelType: domain.BigmodelWuKong,
+	})
 
-	msg := new(message.MsgTask)
-	msg.WuKongAsyncTaskStart(tid, user.Account())
-	s.sender.SendBigModelMsg(msg)
+	s.sender.SendWuKongAsyncTaskStart(&domain.WuKongAsyncTaskStartEvent{
+		Account: user,
+		TaskId:  tid,
+	})
 
 	links, err := s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, cmd.EsType)
 	if err != nil {
@@ -43,18 +47,21 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 			err = errors.New("internal error")
 		}
 
-		msgError := new(message.MsgTask)
-		msgError.WuKongInferenceError(tid, user.Account(), err.Error())
-		s.sender.SendBigModelMsg(msgError)
+		s.sender.SendWuKongInferenceError(&domain.WuKongInferenceErrorEvent{
+			Account: user,
+			TaskId:  tid,
+			ErrMsg:  err.Error(),
+		})
 
 		return
 	}
 
 	// 3. send msg
-	msgFinish := new(message.MsgTask)
-	msgFinish.WuKongAsyncInferenceFinish(tid, user.Account(), links)
-
-	return s.sender.SendBigModelMsg(msgFinish)
+	return s.sender.SendWuKongAsyncInferenceFinish(&domain.WuKongAsyncInferenceFinishEvent{
+		Account: user,
+		TaskId:  tid,
+		Links:   links,
+	})
 }
 
 func (s *asyncBigModelService) GetIdleEndpoint(bid string) (c int, err error) {

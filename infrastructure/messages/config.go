@@ -1,7 +1,5 @@
 package messages
 
-var topics Topics
-
 type Topics struct {
 	Like            string `json:"like"             required:"true"`
 	Fork            string `json:"fork"             required:"true"`
@@ -16,5 +14,4 @@ type Topics struct {
 	RelatedResource string `json:"related_resource" required:"true"`
 	Cloud           string `json:"cloud"            required:"true"`
 	Async           string `json:"async"            required:"true"`
-	BigModel        string `json:"bigmodel"         required:"true"`
 }

@@ -135,11 +135,9 @@ func (do *ComputeDO) toCompute() (r domain.Compute, err error) {
 		return
 	}
 
-	if r.Version, err = domain.NewComputeVersion(do.Version); err != nil {
+	if r.Flavor, r.Version, err = domain.NewComputeFlavorVersion(do.Flavor, do.Type, do.Version); err != nil {
 		return
 	}
-
-	r.Flavor, err = domain.NewComputeFlavor(do.Flavor)
 
 	return
 }
@@ -166,7 +164,9 @@ func (do *InputDO) toInput() (r domain.Input, err error) {
 	}
 
 	r.RepoId = do.RepoId
-	r.File = do.File
+	if r.File, err = domain.NewInputeFilePath(do.File); err != nil {
+		return
+	}
 
 	return
 }
@@ -244,7 +244,7 @@ func (impl training) toInputDOs(v []domain.Input) []InputDO {
 			Key:    item.Key.CustomizedKey(),
 			User:   item.User.Account(),
 			Type:   item.Type.ResourceType(),
-			File:   item.File,
+			File:   item.File.InputeFilePath(),
 			RepoId: item.RepoId,
 		}
 	}

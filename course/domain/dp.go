@@ -2,6 +2,7 @@ package domain
 
 import (
 	"errors"
+	"fmt"
 	"net/url"
 
 	"github.com/opensourceways/xihe-server/utils"
@@ -17,6 +18,7 @@ const (
 	courseTypeScholar     = "scholar"
 	courseTypeIndustry    = "industry"
 	courseTypeElectricity = "electricity"
+	courseTypeScientific  = "scientific_computing"
 
 	studentIdentityStudent   = "student"
 	studentIdentityTeacher   = "teacher"
@@ -36,8 +38,14 @@ type StudentName interface {
 }
 
 func NewStudentName(v string) (StudentName, error) {
-	if v == "" || len(v) > 30 {
+	if v == "" {
 		return nil, errors.New("empty value")
+	}
+
+	v = utils.XSSFilter(v)
+
+	if max := 20; utils.StrLen(v) > max {
+		return nil, fmt.Errorf("the length of name should be less than %d", max)
 	}
 
 	return studentName(v), nil
@@ -117,11 +125,11 @@ type Province interface {
 }
 
 func NewProvince(v string) (Province, error) {
+	v = utils.XSSFilter(v)
+
 	if utils.StrLen(v) > 15 {
 		return nil, errors.New("invalid province")
 	}
-
-	v = utils.XSSFilter(v)
 
 	return province(v), nil
 }
@@ -168,7 +176,8 @@ func NewCourseType(v string) (CourseType, error) {
 		v == courseTypeNLP ||
 		v == courseTypeIndustry ||
 		v == courseTypeScholar ||
-		v == courseTypeElectricity
+		v == courseTypeElectricity ||
+		v == courseTypeScientific
 
 	if b {
 		return courseType(v), nil
@@ -554,8 +563,8 @@ type SectionId interface {
 }
 
 func NewSectionId(v string) (SectionId, error) {
-	if v == "" || len(v) > 15 {
-		return nil, errors.New("empty section id")
+	if v == "" || len(v) > 50 {
+		return nil, errors.New("invalid section id")
 	}
 
 	return sectionId(v), nil
@@ -573,8 +582,8 @@ type LessonId interface {
 }
 
 func NewLessonId(v string) (LessonId, error) {
-	if v == "" || len(v) > 15 {
-		return nil, errors.New("empty lesson id")
+	if v == "" || len(v) > 50 {
+		return nil, errors.New("invalid lesson id")
 	}
 	return lessonId(v), nil
 }

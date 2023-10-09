@@ -30,8 +30,11 @@ func (req *FinetuneCreateRequest) toCmd(user domain.Account) (
 	m := map[string]string{}
 	if len(req.Hyperparameters) > 0 {
 		for i := range req.Hyperparameters {
-			item := &req.Hyperparameters[i]
+			if req.Hyperparameters[i].Value == "" {
+				continue
+			}
 
+			item := &req.Hyperparameters[i]
 			m[item.Key] = item.Value
 		}
 	}

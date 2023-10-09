@@ -17,16 +17,22 @@ import (
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 	bigmodelasynccli "github.com/opensourceways/xihe-server/bigmodel/infrastructure/asynccli"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	bigmodelmsg "github.com/opensourceways/xihe-server/bigmodel/infrastructure/messageadapter"
 	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
+	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
+	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
+	competitionusercli "github.com/opensourceways/xihe-server/competition/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
+	coursemsg "github.com/opensourceways/xihe-server/course/infrastructure/messageadapter"
 	courserepo "github.com/opensourceways/xihe-server/course/infrastructure/repositoryimpl"
-	usercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
+	courseusercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -38,7 +44,12 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/infrastructure/trainingimpl"
+	pointsapp "github.com/opensourceways/xihe-server/points/app"
+	pointsservice "github.com/opensourceways/xihe-server/points/domain/service"
+	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
+	"github.com/opensourceways/xihe-server/points/infrastructure/taskdocimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
 
@@ -47,7 +58,11 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	r.Use(gin.Recovery())
 	r.Use(logRequest())
 
-	setRouter(r, cfg)
+	if err := setRouter(r, cfg); err != nil {
+		logrus.Error(err)
+
+		return
+	}
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
@@ -60,7 +75,7 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 }
 
 // setRouter init router
-func setRouter(engine *gin.Engine, cfg *config.Config) {
+func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	docs.SwaggerInfo.BasePath = "/api"
 	docs.SwaggerInfo.Title = "xihe"
 	docs.SwaggerInfo.Description = "set header: 'PRIVATE-TOKEN=xxx'"
@@ -86,9 +101,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		mongodb.NewDatasetMapper(collections.Dataset),
 	)
 
-	// user := repositories.NewUserRepository(
-	// 	mongodb.NewUserMapper(collections.User),
-	// )
 	user := userrepoimpl.NewUserRepo(
 		mongodb.NewCollection(collections.User),
 	)
@@ -144,11 +156,19 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 	gitlabUser := gitlab.NewUserSerivce()
 	gitlabRepo := gitlab.NewRepoFile()
 	authingUser := authingimpl.NewAuthingUser()
-	sender := messages.NewMessageSender()
-	trainingAdapter := trainingimpl.NewTraining(&cfg.Training)
+	publisher := kafka.PublisherAdapter()
+	operater := kafka.OperateLogPublisherAdapter(cfg.MQTopics.OperateLog, publisher)
+	trainingAdapter := trainingimpl.NewTraining(&cfg.Training.Config)
+	repoAdapter := messages.NewDownloadMessageAdapter(cfg.MQTopics.Download, &cfg.Download, publisher, operater)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)
+	likeAdapter := messages.NewLikeMessageAdapter(cfg.MQTopics.Like, &cfg.Like, publisher)
+
+	// sender
+	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
+	// resource producer
+	resProducer := messages.NewResourceMessageAdapter(&cfg.Resource, publisher, operater)
 
 	userRegService := userapp.NewRegService(
 		userrepoimpl.NewUserRegRepo(
@@ -156,7 +176,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		),
 	)
 
-	loginService := app.NewLoginService(login)
+	loginService := app.NewLoginService(
+		login, messages.NewSignInMessageAdapter(&cfg.SignIn, publisher),
+	)
 
 	asyncAppService := asyncapp.NewTaskService(asyncrepoimpl.NewAsyncTaskRepo(&cfg.Postgresql.Async))
 
@@ -164,22 +186,24 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		competitionrepo.NewCompetitionRepo(mongodb.NewCollection(collections.Competition)),
 		competitionrepo.NewWorkRepo(mongodb.NewCollection(collections.CompetitionWork)),
 		competitionrepo.NewPlayerRepo(mongodb.NewCollection(collections.CompetitionPlayer)),
-		sender, uploader,
+		competitionmsg.MessageAdapter(&cfg.Competition.Message, publisher), uploader,
+		competitionusercli.NewUserCli(userRegService),
 	)
 
 	courseAppService := courseapp.NewCourseService(
-		usercli.NewUserCli(userRegService),
+		courseusercli.NewUserCli(userRegService),
 		proj,
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
 		courserepo.NewRecordRepo(mongodb.NewCollection(collections.CourseRecord)),
+		coursemsg.MessageAdapter(&cfg.Course.Message, publisher),
 	)
 
 	cloudAppService := cloudapp.NewCloudService(
 		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
 		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
-		sender,
+		cloudmsg.NewPublisher(&cfg.Cloud, publisher),
 	)
 
 	bigmodelAppService := bigmodelapp.NewBigModelService(
@@ -188,43 +212,57 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		bigmodelrepo.NewWuKongRepo(mongodb.NewCollection(collections.WuKong)),
 		bigmodelrepo.NewWuKongPictureRepo(mongodb.NewCollection(collections.WuKongPicture)),
 		bigmodelasynccli.NewAsyncCli(asyncAppService),
-		sender,
+		bigmodelmsg.NewMessageAdapter(&cfg.BigModel.Message, publisher),
+		bigmodelrepo.NewApiService(mongodb.NewCollection(collections.ApiApply)),
+		bigmodelrepo.NewApiInfo(mongodb.NewCollection(collections.ApiInfo)),
+		userRegService,
 	)
 
-	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, sender)
+	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, resProducer)
 
-	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, sender)
+	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
 
-	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, sender)
+	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, resProducer)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
+
+	pointsAppService, err := addRouterForUserPointsController(v1, cfg)
+	if err != nil {
+		return err
+	}
+
+	userAppService := userapp.NewUserService(
+		user, gitlabUser, usermsg.MessageAdapter(&cfg.User.Message, publisher),
+		pointsAppService, controller.EncryptHelperToken(),
+	)
+
 	{
 		controller.AddRouterForProjectController(
-			v1, user, proj, model, dataset, activity, tags, like, sender,
+			v1, user, proj, model, dataset, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
 		controller.AddRouterForModelController(
-			v1, user, model, proj, dataset, activity, tags, like, sender,
+			v1, user, model, proj, dataset, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
 		controller.AddRouterForDatasetController(
-			v1, user, dataset, model, proj, activity, tags, like, sender,
+			v1, user, dataset, model, proj, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
 		controller.AddRouterForUserController(
-			v1, user, gitlabUser,
-			authingUser, loginService, sender,
+			v1, userAppService, user,
+			authingUser, loginService, userRegService,
 		)
 
 		controller.AddRouterForLoginController(
-			v1, user, gitlabUser, authingUser, login, sender,
+			v1, userAppService, authingUser, loginService,
 		)
 
 		controller.AddRouterForLikeController(
-			v1, like, user, proj, model, dataset, activity, sender,
+			v1, like, user, proj, model, dataset, activity, likeAdapter,
 		)
 
 		controller.AddRouterForActivityController(
@@ -236,11 +274,14 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForBigModelController(
-			v1, bigmodelAppService,
+			v1, bigmodelAppService, userRegService,
 		)
 
 		controller.AddRouterForTrainingController(
-			v1, trainingAdapter, training, model, proj, dataset, sender,
+			v1, trainingAdapter, training, model, proj, dataset,
+			messages.NewTrainingMessageAdapter(
+				&cfg.Training.Message, publisher,
+			),
 		)
 
 		controller.AddRouterForFinetuneController(
@@ -248,7 +289,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForRepoFileController(
-			v1, gitlabRepo, model, proj, dataset, sender, user, gitlabUser,
+			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,
 		)
 
 		controller.AddRouterForInferenceController(
@@ -260,7 +301,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		)
 
 		controller.AddRouterForCompetitionController(
-			v1, competitionAppService, proj,
+			v1, competitionAppService, userRegService, proj,
 		)
 
 		controller.AddRouterForChallengeController(
@@ -278,11 +319,46 @@ func setRouter(engine *gin.Engine, cfg *config.Config) {
 		controller.AddRouterForCloudController(
 			v1, cloudAppService,
 		)
-
 	}
 
 	engine.UseRawPath = true
 	engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
+	return nil
+}
+
+func addRouterForUserPointsController(g *gin.RouterGroup, cfg *config.Config) (
+	pointsapp.UserPointsAppService, error,
+) {
+	collections := &cfg.Mongodb.Collections
+
+	taskRepo := pointsrepo.TaskAdapter(
+		mongodb.NewCollection(collections.PointsTask),
+	)
+
+	taskdoc, err := taskdocimpl.Init(&cfg.Points.TaskDoc)
+	if err != nil {
+		return nil, err
+	}
+
+	taskService, err := pointsservice.InitTaskService(taskRepo, taskdoc)
+	if err != nil {
+		return nil, err
+	}
+
+	pointsAppService := pointsapp.NewUserPointsAppService(
+		taskRepo,
+		pointsrepo.UserPointsAdapter(
+			mongodb.NewCollection(collections.UserPoints), &cfg.Points.Repo,
+		),
+	)
+
+	controller.AddRouterForUserPointsController(
+		g, pointsAppService,
+		pointsapp.NewTaskAppService(taskService, taskRepo),
+	)
+
+	return pointsAppService, nil
 }
 
 func logRequest() gin.HandlerFunc {

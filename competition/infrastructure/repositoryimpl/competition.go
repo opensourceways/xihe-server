@@ -46,14 +46,19 @@ func (impl competitionRepoImpl) docFilter(cid string) bson.M {
 	}
 }
 
-func (impl competitionRepoImpl) FindCompetition(cid string) (
+func (impl competitionRepoImpl) FindCompetition(opt *repository.CompetitionGetOption) (
 	c domain.Competition, err error,
 ) {
 	var v dCompetition
 
 	f := func(ctx context.Context) error {
-		filter := impl.docFilter(cid)
+		filter := bson.M{}
 
+		filter[fieldId] = opt.CompetitionId
+
+		if opt.Lang != nil {
+			filter[fieldLanguage] = opt.Lang.Language()
+		}
 		return impl.cli.GetDoc(ctx, filter, nil, &v)
 	}
 
@@ -111,6 +116,10 @@ func (impl competitionRepoImpl) FindCompetitions(opt *repository.CompetitionList
 
 		if opt.Tag != nil {
 			filter[fieldTags] = opt.Tag.CompetitionTag()
+		}
+
+		if opt.Lang != nil {
+			filter[fieldLanguage] = opt.Lang.Language()
 		}
 
 		return impl.cli.GetDocs(ctx, filter, nil, &v)

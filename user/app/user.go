@@ -3,10 +3,11 @@ package app
 import (
 	"encoding/hex"
 
-	"github.com/opensourceways/xihe-server/domain/message"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
+	"github.com/opensourceways/xihe-server/user/domain/message"
+	pointsPort "github.com/opensourceways/xihe-server/user/domain/points"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -20,6 +21,7 @@ type UserService interface {
 	NewPlatformAccountWithUpdate(*CreatePlatformAccountCmd) error
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
 
+	UserInfo(domain.Account) (UserInfoDTO, error)
 	GetByAccount(domain.Account) (UserDTO, error)
 	GetByFollower(owner, follower domain.Account) (UserDTO, bool, error)
 
@@ -38,13 +40,15 @@ type UserService interface {
 func NewUserService(
 	repo repository.User,
 	ps platform.User,
-	sender message.Sender,
+	sender message.MessageProducer,
+	points pointsPort.Points,
 	encryption utils.SymmetricEncryption,
 ) UserService {
 	return userService{
 		ps:         ps,
 		repo:       repo,
 		sender:     sender,
+		points:     points,
 		encryption: encryption,
 	}
 }
@@ -52,7 +56,8 @@ func NewUserService(
 type userService struct {
 	ps         platform.User
 	repo       repository.User
-	sender     message.Sender
+	sender     message.MessageProducer
+	points     pointsPort.Points
 	encryption utils.SymmetricEncryption
 }
 
@@ -70,6 +75,20 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 	s.toUserDTO(&u, &dto)
 
 	_ = s.sender.AddOperateLogForNewUser(u.Account)
+	
+	_ = s.sender.SendUserSignedUpEvent(&domain.UserSignedUpEvent{
+		Account: cmd.Account,
+	})
+
+	return
+}
+
+func (s userService) UserInfo(account domain.Account) (dto UserInfoDTO, err error) {
+	if dto.UserDTO, err = s.GetByAccount(account); err != nil {
+		return
+	}
+
+	dto.Points, err = s.points.Points(account)
 
 	return
 }

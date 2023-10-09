@@ -6,6 +6,9 @@ RUN cd /go/src/github.com/opensourceways/xihe-server/internal-server && GO111MOD
 
 # copy binary config and utils
 FROM alpine:latest
+
+RUN adduser mindspore -u 5000 -D
+USER mindspore
 WORKDIR /opt/app/
 
 COPY  --from=BUILDER /go/src/github.com/opensourceways/xihe-server/internal-server/internal-server /opt/app

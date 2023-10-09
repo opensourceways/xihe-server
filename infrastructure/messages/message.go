@@ -12,7 +12,7 @@ const (
 	actionExtend = "extend"
 )
 
-type msgOperateLog struct {
+type MsgOperateLog struct {
 	When int64             `json:"when"`
 	User string            `json:"user"`
 	Type string            `json:"type"`
@@ -23,12 +23,6 @@ type msgFollower struct {
 	Action   string `json:"action"`
 	User     string `json:"user"`
 	Follower string `json:"follower"`
-}
-
-type msgLike struct {
-	Action string `json:"action"`
-
-	Resource resourceObject `json:"resource"`
 }
 
 type msgTraining struct {

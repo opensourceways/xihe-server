@@ -18,12 +18,13 @@ import (
 var reTimestamp = regexp.MustCompile("/[1-9][0-9]{9,}/")
 
 type wukongInfo struct {
-	cli         obsService
-	cfg         WuKong
-	maxBatch    int
-	endpoints   chan string
-	endpoints4  chan string
-	endpointsHF chan string
+	cli           obsService
+	cfg           WuKong
+	maxBatch      int
+	endpoints     chan string
+	endpoints4    chan string
+	endpointsHF   chan string
+	endpointsUser chan string
 }
 
 func newWuKongInfo(cfg *Config) (wukongInfo, error) {
@@ -44,6 +45,7 @@ func newWuKongInfo(cfg *Config) (wukongInfo, error) {
 	es, _ := ce.parse(ce.WuKong)
 	es4, _ := ce.parse(ce.WuKong4IMG)
 	eshf, _ := ce.parse(ce.WuKongHF)
+	esus, _ := ce.parse(ce.WuKongUser)
 
 	// init endpoints
 	info.endpoints = make(chan string, len(es))
@@ -61,6 +63,12 @@ func newWuKongInfo(cfg *Config) (wukongInfo, error) {
 	info.endpointsHF = make(chan string, len(eshf))
 	for _, e := range eshf {
 		info.endpointsHF <- e
+	}
+
+	// init endpoint_user
+	info.endpointsUser = make(chan string, len(esus))
+	for _, e := range esus {
+		info.endpointsUser <- e
 	}
 
 	return info, nil
@@ -113,6 +121,8 @@ func (s *service) GenPicturesByWuKong(
 		es = s.wukongInfo.endpoints4
 	case string(domain.BigmodelWuKongHF):
 		es = s.wukongInfo.endpointsHF
+	case string(domain.BigmodelWuKongUser):
+		es = s.wukongInfo.endpointsUser
 	}
 
 	if err := s.doIfFree(es, f); err != nil {

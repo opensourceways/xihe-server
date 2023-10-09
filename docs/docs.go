@@ -16,36 +16,31 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/": {
-            "get": {
-                "description": "callback of authentication by authing",
+        "/v1/bigmodel/ai_detector": {
+            "post": {
+                "description": "detecte if text generate by ai",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Login"
+                    "BigModel"
                 ],
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "authing code",
-                        "name": "code",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "redirect uri",
-                        "name": "redirect_uri",
-                        "in": "query",
-                        "required": true
+                        "description": "body of ai detector",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.aiDetectorReq"
+                        }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "$ref": "#/definitions/app.UserDTO"
+                            "$ref": "#/definitions/controller.aiDetectorResp"
                         }
                     },
                     "500": {
@@ -53,11 +48,156 @@ const docTemplate = `{
                         "schema": {
                             "type": "system_error"
                         }
-                    },
-                    "501": {
-                        "description": "Not Implemented",
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/api/apply/{model}": {
+            "get": {
+                "description": "is user applied for api",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
-                            "type": "duplicate_creating"
+                            "$ref": "#/definitions/controller.isApplyResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "generates pictures by WuKong-hf",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "parameters": [
+                    {
+                        "description": "body of wukong",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.wukongHFRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.wukongPicturesGenerateResp"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "bigmodel_sensitive_info"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/api/get/": {
+            "get": {
+                "description": "get user apply record",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.ApiApplyRecordDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/api/{model}": {
+            "post": {
+                "description": "generates pictures by WuKong",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "parameters": [
+                    {
+                        "description": "body of wukong",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.wukongRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.wukongPicturesGenerateResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/apiinfo/get/{model}": {
+            "get": {
+                "description": "get api info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.ApiInfoDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
                         }
                     }
                 }
@@ -99,9 +239,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/bigmodel/ask_hf": {
+        "/v1/bigmodel/baichuan2_7b_chat": {
             "post": {
-                "description": "vqa for hf",
+                "description": "conversational AI",
                 "consumes": [
                     "application/json"
                 ],
@@ -110,54 +250,20 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
-                        "type": "file",
-                        "description": "picture",
-                        "name": "picture",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/controller.describePictureResp"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/bigmodel/codegeex": {
-            "post": {
-                "description": "codegeex big model",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "BigModel"
-                ],
-                "parameters": [
-                    {
-                        "description": "codegeex body",
+                        "description": "body of baichuan",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.CodeGeexRequest"
+                            "$ref": "#/definitions/controller.baichuanReq"
                         }
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "202": {
+                        "description": "Accepted",
                         "schema": {
-                            "$ref": "#/definitions/app.CodeGeexDTO"
+                            "$ref": "#/definitions/app.BaiChuanDTO"
                         }
                     },
                     "500": {
@@ -172,40 +278,6 @@ const docTemplate = `{
         "/v1/bigmodel/describe_picture": {
             "post": {
                 "description": "describe a picture",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "BigModel"
-                ],
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "picture",
-                        "name": "picture",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/controller.describePictureResp"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/bigmodel/describe_picture_hf": {
-            "post": {
-                "description": "describe a picture for hf",
                 "consumes": [
                     "application/json"
                 ],
@@ -274,40 +346,6 @@ const docTemplate = `{
                         "description": "Created",
                         "schema": {
                             "$ref": "#/definitions/controller.luojiaResp"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/bigmodel/luojia_hf": {
-            "post": {
-                "description": "luojia for hf",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "BigModel"
-                ],
-                "parameters": [
-                    {
-                        "type": "file",
-                        "description": "picture",
-                        "name": "picture",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/controller.describePictureResp"
                         }
                     },
                     "500": {
@@ -926,90 +964,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/bigmodel/wukong_hf": {
-            "post": {
-                "description": "generates pictures by WuKong-hf",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "BigModel"
-                ],
-                "parameters": [
-                    {
-                        "description": "body of wukong",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.wukongHFRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/controller.wukongPicturesGenerateResp"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "bigmodel_sensitive_info"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/bigmodel/wukong_icbc": {
-            "post": {
-                "description": "generates pictures by WuKong-icbc",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "BigModel"
-                ],
-                "parameters": [
-                    {
-                        "description": "body of wukong",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.wukongICBCRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/controller.wukongPicturesGenerateResp"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "bigmodel_sensitive_info"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/challenge": {
             "get": {
                 "description": "get detail of challenge",
@@ -1290,6 +1244,32 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/app.CompetitionSummaryDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/competition/reginfo": {
+            "get": {
+                "description": "get register info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Competition"
+                ],
+                "summary": "GetRegisterInfo",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.UserRegisterInfoDTO"
                         }
                     },
                     "500": {
@@ -1860,7 +1840,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.CourseSummaryDTO"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1899,7 +1882,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.AsgDTO"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1922,7 +1908,10 @@ const docTemplate = `{
                 "summary": "GetRegisterInfo",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.UserRegisterInfoDTO"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1953,8 +1942,11 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.CourseDTO"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -1991,8 +1983,11 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": ""
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.AsgWorkDTO"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2024,7 +2019,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.RelateProjectDTO"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2056,7 +2054,10 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.CertInfoDTO"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2548,130 +2549,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/evaluate/project/{pid}/training/{tid}/evaluate": {
-            "post": {
-                "description": "create evaluate",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Evaluate"
-                ],
-                "summary": "Create",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "project id",
-                        "name": "pid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "training id",
-                        "name": "tid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "body of creating inference",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.EvaluateCreateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/app.EvaluateDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "bad_request_body"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "bad_request_param"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/evaluate/project/{pid}/training/{tid}/evaluate/{id}": {
-            "get": {
-                "description": "watch evaluate",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Evaluate"
-                ],
-                "summary": "Watch",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "project id",
-                        "name": "pid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "training id",
-                        "name": "tid",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "evaluate id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/app.EvaluateDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "bad_request_body"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "bad_request_param"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/finetune": {
             "get": {
                 "description": "list finetunes",
@@ -2903,7 +2780,36 @@ const docTemplate = `{
                 "summary": "ListAll",
                 "responses": {
                     "200": {
-                        "description": ""
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.homeInfo"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/homepage/electricity": {
+            "get": {
+                "description": "list the project dataset model courses and competitions",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "HomePage"
+                ],
+                "summary": "ListAllElectricity",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.homeElectricityInfo"
+                        }
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -2957,6 +2863,99 @@ const docTemplate = `{
                         "description": "Unauthorized",
                         "schema": {
                             "type": "bad_request_param"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/login": {
+            "get": {
+                "description": "callback of authentication by authing",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "authing code",
+                        "name": "code",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "redirect uri",
+                        "name": "redirect_uri",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.UserDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    },
+                    "501": {
+                        "description": "Not Implemented",
+                        "schema": {
+                            "type": "duplicate_creating"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/login/{account}": {
+            "get": {
+                "description": "get info of login",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "account",
+                        "name": "account",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.LoginDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "not_allowed"
                         }
                     },
                     "500": {
@@ -4220,6 +4219,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/repo/{type}/{user}/{name}/app": {
+            "get": {
+                "description": "repo file contain app",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RepoFile"
+                ],
+                "summary": "ContainApp",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user",
+                        "name": "user",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "repo name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "repo file path",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/repo/{type}/{user}/{name}/file/{path}": {
             "get": {
                 "description": "Download repo file",
@@ -4382,6 +4433,58 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/repo/{type}/{user}/{name}/readme": {
+            "get": {
+                "description": "repo file contain readme",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "RepoFile"
+                ],
+                "summary": "ContainReadme",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user",
+                        "name": "user",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "repo name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "repo file path",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/search": {
             "get": {
                 "description": "search resource and user",
@@ -4406,6 +4509,28 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/app.SearchDTO"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/signin": {
+            "put": {
+                "description": "user sign in",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Login"
+                ],
+                "responses": {
+                    "202": {
+                        "description": ""
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -5191,6 +5316,43 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/user/info/{account}": {
+            "get": {
+                "description": "get user apply info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "GetInfo",
+                "parameters": [
+                    {
+                        "description": "body of creating user",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.userCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.UserDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_body"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/user/like": {
             "post": {
                 "description": "create a like",
@@ -5343,41 +5505,73 @@ const docTemplate = `{
                 }
             }
         },
-        "/{account}": {
+        "/v1/user_points": {
             "get": {
-                "description": "get info of login",
+                "description": "get user points details",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
-                    "Login"
+                    "UserPoints"
                 ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "account",
-                        "name": "account",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
+                "summary": "get user points details",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.LoginDTO"
+                            "$ref": "#/definitions/app.UserPointsDetailsDTO"
                         }
                     },
-                    "400": {
-                        "description": "Bad Request",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
-                            "type": "bad_request_param"
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user_points/taskdoc": {
+            "get": {
+                "description": "task doc",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserPoints"
+                ],
+                "summary": "task doc",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.TaskDocDTO"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
-                            "type": "not_allowed"
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user_points/tasks": {
+            "get": {
+                "description": "tasks of day",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "UserPoints"
+                ],
+                "summary": "tasks of day",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.TasksCompletionInfoDTO"
                         }
                     },
                     "500": {
@@ -5413,6 +5607,43 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/controller.platformInfo"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "not_allowed"
+                        }
+                    }
+                }
+            }
+        },
+        "/{account}/gitlab/refresh": {
+            "get": {
+                "description": "refresh platform token of user",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "account",
+                        "name": "account",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
                     },
                     "400": {
                         "description": "Bad Request",
@@ -5464,6 +5695,117 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.ApiApplyRecordDTO": {
+            "type": "object",
+            "properties": {
+                "apply_at": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "model_name": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "user": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.ApiInfoDTO": {
+            "type": "object",
+            "properties": {
+                "doc": {
+                    "type": "string"
+                },
+                "endpoint": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.AsgDTO": {
+            "type": "object",
+            "properties": {
+                "asg_id": {
+                    "type": "string"
+                },
+                "asg_name": {
+                    "type": "string"
+                },
+                "course_name": {
+                    "type": "string"
+                },
+                "deadline": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.AsgWorkDTO": {
+            "type": "object",
+            "properties": {
+                "deadline": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "score": {
+                    "type": "number"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.BaiChuanDTO": {
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CertInfoDTO": {
+            "type": "object",
+            "properties": {
+                "cert": {
+                    "type": "string"
+                },
+                "is_pass": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
                     "type": "string"
                 }
             }
@@ -5547,17 +5889,6 @@ const docTemplate = `{
                 }
             }
         },
-        "app.CodeGeexDTO": {
-            "type": "object",
-            "properties": {
-                "finish": {
-                    "type": "string"
-                },
-                "result": {
-                    "type": "string"
-                }
-            }
-        },
         "app.CompetitionSubmissionDTO": {
             "type": "object",
             "properties": {
@@ -5610,6 +5941,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "lang": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -5618,6 +5952,12 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
@@ -5694,6 +6034,94 @@ const docTemplate = `{
                 }
             }
         },
+        "app.CourseDTO": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "doc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "forum": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "hours": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_apply": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "poster": {
+                    "type": "string"
+                },
+                "sections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.SectionDTO"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "teacher": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.CourseSummaryDTO": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "hours": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "poster": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "app.DatasetDTO": {
             "type": "object",
             "properties": {
@@ -5733,6 +6161,9 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -5765,6 +6196,9 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -5783,20 +6217,6 @@ const docTemplate = `{
                     }
                 },
                 "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.EvaluateDTO": {
-            "type": "object",
-            "properties": {
-                "access_url": {
-                    "type": "string"
-                },
-                "error": {
-                    "type": "string"
-                },
-                "evaluate_id": {
                     "type": "string"
                 }
             }
@@ -5888,6 +6308,9 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -5936,6 +6359,9 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                },
+                "title": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
@@ -5995,6 +6421,9 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -6028,6 +6457,29 @@ const docTemplate = `{
                 }
             }
         },
+        "app.LessonDTO": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "points": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.PointDTO"
+                    }
+                },
+                "video": {
+                    "type": "string"
+                }
+            }
+        },
         "app.LikeDTO": {
             "type": "object",
             "properties": {
@@ -6042,7 +6494,7 @@ const docTemplate = `{
         "app.LoginDTO": {
             "type": "object",
             "properties": {
-                "access": {
+                "email": {
                     "type": "string"
                 },
                 "info": {
@@ -6103,6 +6555,9 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -6135,7 +6590,48 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.PointDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "video": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.PointsDetailDTO": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "string"
+                },
+                "id": {
+                    "description": "serial number",
+                    "type": "string"
+                },
+                "points": {
+                    "type": "integer"
+                },
+                "task": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "integer"
+                },
+                "time_str": {
                     "type": "string"
                 }
             }
@@ -6176,7 +6672,36 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.ProjectSummuryDTO": {
+            "type": "object",
+            "properties": {
+                "cover_id": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "download_count": {
+                    "type": "integer"
+                },
+                "fork_count": {
+                    "type": "integer"
+                },
+                "like_count": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
                     "type": "string"
                 }
             }
@@ -6192,6 +6717,17 @@ const docTemplate = `{
                 },
                 "team_name": {
                     "type": "string"
+                }
+            }
+        },
+        "app.RelateProjectDTO": {
+            "type": "object",
+            "properties": {
+                "related_project": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.ProjectSummuryDTO"
+                    }
                 }
             }
         },
@@ -6241,6 +6777,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "level": {
+                    "type": "string"
+                },
                 "like_count": {
                     "type": "integer"
                 },
@@ -6257,6 +6796,15 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
                 },
                 "type": {
                     "type": "string"
@@ -6305,6 +6853,62 @@ const docTemplate = `{
                 },
                 "user": {
                     "$ref": "#/definitions/app.UserSearchDTO"
+                }
+            }
+        },
+        "app.SectionDTO": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "lessons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.LessonDTO"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.TaskCompletionInfoDTO": {
+            "type": "object",
+            "properties": {
+                "addr": {
+                    "type": "string"
+                },
+                "completed": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "points": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.TaskDocDTO": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.TasksCompletionInfoDTO": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string"
+                },
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.TaskCompletionInfoDTO"
+                    }
                 }
             }
         },
@@ -6376,6 +6980,9 @@ const docTemplate = `{
                 "is_finalist": {
                     "type": "boolean"
                 },
+                "lang": {
+                    "type": "string"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -6387,6 +6994,12 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "team_id": {
                     "type": "string"
@@ -6438,6 +7051,41 @@ const docTemplate = `{
                     }
                 },
                 "expiry": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.UserPointsDetailsDTO": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.PointsDetailDTO"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "app.UserRegisterInfoDTO": {
+            "type": "object",
+            "properties": {
+                "account": {},
+                "city": {},
+                "detail": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "email": {},
+                "identity": {},
+                "name": {},
+                "phone": {},
+                "province": {},
+                "version": {
                     "type": "integer"
                 }
             }
@@ -6563,17 +7211,6 @@ const docTemplate = `{
                 }
             }
         },
-        "controller.CodeGeexRequest": {
-            "type": "object",
-            "properties": {
-                "content": {
-                    "type": "string"
-                },
-                "lang": {
-                    "type": "string"
-                }
-            }
-        },
         "controller.CompetitorApplyRequest": {
             "type": "object",
             "properties": {
@@ -6629,32 +7266,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "competitor_account": {
-                    "type": "string"
-                }
-            }
-        },
-        "controller.EvaluateCreateRequest": {
-            "type": "object",
-            "properties": {
-                "batch_size_scope": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "learning_rate_scope": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "momentum_scope": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "type": {
                     "type": "string"
                 }
             }
@@ -6844,6 +7455,25 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.aiDetectorReq": {
+            "type": "object",
+            "properties": {
+                "lang": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.aiDetectorResp": {
+            "type": "object",
+            "properties": {
+                "is_machine": {
+                    "type": "boolean"
+                }
+            }
+        },
         "controller.aiQuestionAnswerSubmitRequest": {
             "type": "object",
             "properties": {
@@ -6866,6 +7496,29 @@ const docTemplate = `{
             "properties": {
                 "score": {
                     "type": "integer"
+                }
+            }
+        },
+        "controller.baichuanReq": {
+            "type": "object",
+            "properties": {
+                "repetition_penalty": {
+                    "type": "number"
+                },
+                "sampling": {
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "top_k": {
+                    "type": "integer"
+                },
+                "top_p": {
+                    "type": "number"
                 }
             }
         },
@@ -6931,6 +7584,15 @@ const docTemplate = `{
                 },
                 "repo_type": {
                     "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
@@ -6991,6 +7653,9 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -7003,6 +7668,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "type": {
@@ -7062,6 +7730,57 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.homeElectricityInfo": {
+            "type": "object",
+            "properties": {
+                "comp": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.CompetitionSummaryDTO"
+                    }
+                },
+                "course": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.CourseSummaryDTO"
+                    }
+                },
+                "dataset": {
+                    "$ref": "#/definitions/app.GlobalDatasetsDTO"
+                },
+                "model": {
+                    "$ref": "#/definitions/app.GlobalModelsDTO"
+                },
+                "project": {
+                    "$ref": "#/definitions/app.GlobalProjectsDTO"
+                }
+            }
+        },
+        "controller.homeInfo": {
+            "type": "object",
+            "properties": {
+                "comp": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.CompetitionSummaryDTO"
+                    }
+                },
+                "course": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.CourseSummaryDTO"
+                    }
+                }
+            }
+        },
+        "controller.isApplyResp": {
+            "type": "object",
+            "properties": {
+                "is_apply": {
+                    "type": "boolean"
+                }
+            }
+        },
         "controller.likeCreateRequest": {
             "type": "object",
             "properties": {
@@ -7114,6 +7833,15 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "repo_type": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
                     "type": "string"
                 }
             }
@@ -7175,6 +7903,9 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "updated_at": {
                     "type": "string"
                 }
@@ -7187,6 +7918,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "type": {
@@ -7294,6 +8028,15 @@ const docTemplate = `{
                 "repo_type": {
                     "type": "string"
                 },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
                 "training": {
                     "type": "string"
                 },
@@ -7365,6 +8108,9 @@ const docTemplate = `{
                         "type": "string"
                     }
                 },
+                "title": {
+                    "type": "string"
+                },
                 "training": {
                     "type": "string"
                 },
@@ -7397,6 +8143,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "name": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "type": {
@@ -7596,6 +8345,9 @@ const docTemplate = `{
                 },
                 "is_follower": {
                     "type": "boolean"
+                },
+                "points": {
+                    "type": "integer"
                 }
             }
         },
@@ -7635,17 +8387,6 @@ const docTemplate = `{
             }
         },
         "controller.wukongHFRequest": {
-            "type": "object",
-            "properties": {
-                "desc": {
-                    "type": "string"
-                },
-                "style": {
-                    "type": "string"
-                }
-            }
-        },
-        "controller.wukongICBCRequest": {
             "type": "object",
             "properties": {
                 "desc": {

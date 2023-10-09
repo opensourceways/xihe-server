@@ -5,6 +5,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 // user
@@ -39,6 +40,12 @@ func (cmd *UserCreateCmd) toUser() domain.User {
 	}
 }
 
+type UserInfoDTO struct {
+	Points int `json:"points"`
+
+	UserDTO
+}
+
 type UserDTO struct {
 	Id      string `json:"id"`
 	Email   string `json:"email"`
@@ -58,26 +65,31 @@ type UserDTO struct {
 }
 
 type UpdateUserBasicInfoCmd struct {
-	Bio      domain.Bio
-	Email    domain.Email
-	AvatarId domain.AvatarId
+	Bio           domain.Bio
+	Email         domain.Email
+	AvatarId      domain.AvatarId
+	bioChanged    bool
+	avatarChanged bool
+	emailChanged  bool
 }
 
 func (cmd *UpdateUserBasicInfoCmd) toUser(u *domain.User) (changed bool) {
 	if cmd.AvatarId != nil && !domain.IsSameDomainValue(cmd.AvatarId, u.AvatarId) {
 		u.AvatarId = cmd.AvatarId
-		changed = true
+		cmd.avatarChanged = true
 	}
 
 	if cmd.Bio != nil && !domain.IsSameDomainValue(cmd.Bio, u.Bio) {
 		u.Bio = cmd.Bio
-		changed = true
+		cmd.bioChanged = true
 	}
 
 	if cmd.Email != nil && u.Email.Email() != cmd.Email.Email() {
 		u.Email = cmd.Email
-		changed = true
+		cmd.emailChanged = true
 	}
+
+	changed = cmd.avatarChanged || cmd.bioChanged || cmd.emailChanged
 
 	return
 }
@@ -153,4 +165,23 @@ type RefreshTokenCmd struct {
 	Account     domain.Account
 	Id          string
 	NamespaceId string
+}
+
+func (cmd *UserRegisterInfoCmd) Validate() error {
+	b := cmd.Account != nil &&
+		cmd.Name != nil &&
+		cmd.Email != nil &&
+		cmd.Identity != nil
+
+	if !b {
+		return errors.New("invalid cmd")
+	}
+
+	for i := range cmd.Detail {
+		if utils.StrLen(cmd.Detail[i]) > 20 {
+			return errors.New("invalid detail")
+		}
+	}
+
+	return nil
 }

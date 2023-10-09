@@ -6,9 +6,11 @@ import (
 
 	"github.com/opensourceways/community-robot-lib/logrusutil"
 	liboptions "github.com/opensourceways/community-robot-lib/options"
+	redislib "github.com/opensourceways/redis-lib"
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/config"
@@ -16,7 +18,6 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
-	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/server"
 )
@@ -77,7 +78,7 @@ func main() {
 	}
 
 	// bigmodel
-	if err := bigmodels.Init(&cfg.BigModel); err != nil {
+	if err := bigmodels.Init(&cfg.BigModel.Config); err != nil {
 		logrus.Fatalf("initialize big model failed, err:%s", err.Error())
 	}
 
@@ -87,7 +88,7 @@ func main() {
 	}
 
 	// competition
-	if err := competitionimpl.Init(&cfg.Competition); err != nil {
+	if err := competitionimpl.Init(&cfg.Competition.Config); err != nil {
 		logrus.Fatalf("initialize competition failed, err:%s", err.Error())
 	}
 
@@ -104,11 +105,18 @@ func main() {
 	}
 
 	// mq
-	if err := messages.Init(cfg.GetMQConfig(), log, cfg.MQ.Topics); err != nil {
+	redisCfg := cfg.GetRedisConfig()
+	if err = redislib.Init(&redisCfg); err != nil {
+		log.Fatalf("initialize redis of mq failed, err:%v", err)
+	}
+
+	defer redislib.Close()
+
+	if err = kafka.Init(&cfg.MQ, log, redislib.DAO()); err != nil {
 		log.Fatalf("initialize mq failed, err:%v", err)
 	}
 
-	defer messages.Exit(log)
+	defer kafka.Exit()
 
 	// mongo
 	m := &cfg.Mongodb

@@ -8,6 +8,7 @@
 xihe-server
 message-server/message-server
 internal-server/internal-server
+async-server/async-server
 test
 
 # Test binary, built with `go test -c`
