@@ -86,7 +86,18 @@ type BaiChuanInput struct {
 type GLM2Input struct {
 	Text              GLM2Text
 	Sampling          bool
-	History           []GLM2History
+	History           []History
+	TopK              TopK
+	TopP              TopP
+	Temperature       Temperature
+	RepetitionPenalty RepetitionPenalty
+}
+
+// llama2
+type LLAMA2Input struct {
+	Text              LLAMA2Text
+	Sampling          bool
+	History           []History
 	TopK              TopK
 	TopP              TopP
 	Temperature       Temperature

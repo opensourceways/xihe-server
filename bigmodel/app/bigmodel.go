@@ -82,6 +82,9 @@ type BigModelService interface {
 
 	// glm2
 	GLM2(*GLM2Cmd) (string, error)
+
+	// llama2
+	LLAMA2(*LLAMA2Cmd) (string, error)
 }
 
 func NewBigModelService(
