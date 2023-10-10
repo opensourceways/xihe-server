@@ -59,7 +59,7 @@ func (s *service) LLAMA2(ch chan string, input *domain.LLAMA2Input) (err error) 
 		return
 	}
 
-	if err = s.doIfFreeNoEndpointReturn(s.llama2Info.endpoints, f); err != nil {
+	if err = s.doWaitAndEndpointNotReturned(s.llama2Info.endpoints, f); err != nil {
 		return
 	}
 
