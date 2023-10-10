@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/opensourceways/community-robot-lib/utils"
 
@@ -140,35 +141,25 @@ func (s *service) doIfFree(
 	}
 }
 
-func (s *service) doIfFreeNoEndpointReturn(
+func (s *service) doWaitAndEndpointNotReturned(
 	ec chan string,
 	f func(chan string, string) error,
 ) error {
 	select {
 	case e := <-ec:
-		err := f(ec, e)
-
-		return err
-
-	default:
+		return f(ec, e)
+	case <-time.After(2 * 60 * time.Second):
 		return bigmodel.NewErrorBusySource(errors.New("access overload, please try again later"))
 	}
 }
 
-func (s *service) GetIdleEndpoint(bid string) (c int, err error) {
-
+func (s *service) GetIdleEndpoint(bid string) (int, error) {
 	switch bid {
 	case "wukong":
-		c = len(s.wukongInfo.endpoints)
-
-		return
+		return len(s.wukongInfo.endpoints), nil
 	case "wukong_4img":
-		c = len(s.wukongInfo.endpoints4)
-
-		return
+		return len(s.wukongInfo.endpoints4), nil
 	default:
-		err = errors.New("internal error, cannot found this bigmodel")
+		return 0, errors.New("internal error, cannot found this bigmodel")
 	}
-
-	return
 }
