@@ -59,7 +59,7 @@ func (s *service) GLM2(ch chan string, input *domain.GLM2Input) (err error) {
 		return
 	}
 
-	if err = s.doIfFreeNoEndpointReturn(s.glm2Info.endpoints, f); err != nil {
+	if err = s.doWaitAndEndpointNotReturned(s.glm2Info.endpoints, f); err != nil {
 		return
 	}
 
