@@ -11,6 +11,10 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	aiccapp "github.com/opensourceways/xihe-server/aiccfinetune/app"
+	aiccimpl "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/aiccfinetuneimpl"
+	aiccmsg "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/messageadapter"
+	aiccrepo "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/app"
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
@@ -162,8 +166,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	repoAdapter := messages.NewDownloadMessageAdapter(cfg.MQTopics.Download, &cfg.Download, publisher, operater)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
+	aiccUploader := aiccimpl.NewAICCUploadService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)
+
 	likeAdapter := messages.NewLikeMessageAdapter(cfg.MQTopics.Like, &cfg.Like, publisher)
+
+	aiccFinetune := aiccimpl.NewAICCFinetune(&cfg.AICCFinetune.Config)
 
 	// sender
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
@@ -219,6 +227,16 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	)
 
 	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, resProducer)
+
+	aiccAppService := aiccapp.NewAICCFinetuneService(
+		aiccFinetune,
+		aiccmsg.NewMessageAdapter(&cfg.AICCFinetune.Message, publisher),
+		aiccUploader,
+		aiccrepo.NewAICCFinetuneRepo(mongodb.NewCollection(collections.AICCFinetune)),
+		5,
+	)
+
+	// projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, sender)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
 
@@ -282,6 +300,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 			messages.NewTrainingMessageAdapter(
 				&cfg.Training.Message, publisher,
 			),
+		)
+
+		controller.AddRouterForAICCFinetuneController(
+			v1, aiccAppService,
 		)
 
 		controller.AddRouterForFinetuneController(

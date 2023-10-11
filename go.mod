@@ -13,8 +13,9 @@ require (
 	github.com/opensourceways/kafka-lib v0.0.0-20230905120934-4961d2b76841
 	github.com/opensourceways/redis-lib v0.0.0-20230830095926-13d246a18179
 	github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db
+	github.com/opensourceways/xihe-aicc-finetune v0.0.0-20230920034014-a8ff56b9eb1a
 	github.com/opensourceways/xihe-finetune v0.0.0-20230703130658-2d606e66b81d
-	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26
+	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230915024045-ad233b63c099
 	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20230703131431-fce5fcec1fc8
 	github.com/opensourceways/xihe-training-center v0.0.0-20230703124658-67fdc0c1cc65
 	github.com/panjf2000/ants/v2 v2.5.0

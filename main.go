@@ -9,6 +9,7 @@ import (
 	redislib "github.com/opensourceways/redis-lib"
 	"github.com/sirupsen/logrus"
 
+	"github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/aiccfinetuneimpl"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
@@ -90,6 +91,11 @@ func main() {
 	// competition
 	if err := competitionimpl.Init(&cfg.Competition.Config); err != nil {
 		logrus.Fatalf("initialize competition failed, err:%s", err.Error())
+	}
+
+	// aiccfinetune
+	if err := aiccfinetuneimpl.Init(&cfg.AICCFinetune.Config); err != nil {
+		logrus.Fatalf("initialize aiccfinetune failed, err:%s", err.Error())
 	}
 
 	// authing
