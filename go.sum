@@ -325,10 +325,12 @@ github.com/opensourceways/redis-lib v0.0.0-20230830095926-13d246a18179 h1:9YNcE9
 github.com/opensourceways/redis-lib v0.0.0-20230830095926-13d246a18179/go.mod h1:KeuoqWTYtmtDy4tHYkHt2xDSPtOi1WXR1uL8EwTTG6g=
 github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db h1:syzeracFtgfmSWpKvhhvx46RcjsZSjdubbVWO83eDA8=
 github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db/go.mod h1:dQQwRnyuxQIF+E2471Qx6OpMiuTMRO9NGhV4Azduwc8=
+github.com/opensourceways/xihe-aicc-finetune v0.0.0-20230920034014-a8ff56b9eb1a h1:r5T/zjPYUcXP26jK9kGYpAbN+etxVz+1p0dJXKxQXdI=
+github.com/opensourceways/xihe-aicc-finetune v0.0.0-20230920034014-a8ff56b9eb1a/go.mod h1:KOPZySmbVjgsnqgwCy9hZeDpwakCGDVmOF1o2lU2+Ko=
 github.com/opensourceways/xihe-finetune v0.0.0-20230703130658-2d606e66b81d h1:KrecNVMTX02fT5vhxuIuCb8DXsDWW/zFLjo25MQ7H4A=
 github.com/opensourceways/xihe-finetune v0.0.0-20230703130658-2d606e66b81d/go.mod h1:fZypgtqm+NRikSUYolrwNRCFTHkXCtItgeyjhlCkG5M=
-github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26 h1:63pThXt1AFaPtN5UOwtl1VLbNrMEbES+MqLaD9CS2DQ=
-github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26/go.mod h1:oDg3IkriEaMnfzSah7fscVp8nq7+baTNPelKPgHSrqY=
+github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230915024045-ad233b63c099 h1:9QBE26mR0Q51dveEaeTOsg7jpMHyZEMq2KSs+JZGM3g=
+github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230915024045-ad233b63c099/go.mod h1:7UOKgqW7cqnBqlqIzN1F7jVF3o26DtG17FEf7d7PzMo=
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20230703131431-fce5fcec1fc8 h1:CY9pphKrF8ev9NIB7Qg20/96xi0bQ4OOpJT6N/ss95g=
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20230703131431-fce5fcec1fc8/go.mod h1:pEjAO/MBVrAotuagabTQIbegdso3PK3G25teL5o3FLI=
 github.com/opensourceways/xihe-training-center v0.0.0-20230703124658-67fdc0c1cc65 h1:PmkMlkL/bOVXGFeO07u4d+RSG6JVh+bggKIalVrP5Cg=
