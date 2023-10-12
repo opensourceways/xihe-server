@@ -37,7 +37,7 @@ func (impl *finetuneImpl) CreateJob(info *domain.FinetuneIndex, cfg *domain.Fine
 	opt := sdk.FinetuneCreateOption{
 		User:            info.Owner.Account(),
 		Id:              info.Id,
-		Name:            cfg.Name.TrainingName(),
+		Name:            cfg.Name.FinetuneName(),
 		Task:            p.Task(),
 		Model:           p.Model(),
 		Hyperparameters: p.Hyperparameters(),

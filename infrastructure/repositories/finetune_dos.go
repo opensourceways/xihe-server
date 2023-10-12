@@ -33,7 +33,7 @@ func (impl finetuneImpl) toUserFinetuneDO(
 			Owner: user.Account(),
 		},
 		FinetuneConfigDO: FinetuneConfigDO{
-			Name:            obj.Name.TrainingName(),
+			Name:            obj.Name.FinetuneName(),
 			Model:           p.Model(),
 			Task:            p.Task(),
 			Hyperparameters: p.Hyperparameters(),
@@ -50,7 +50,7 @@ type FinetuneConfigDO struct {
 }
 
 func (do *FinetuneConfigDO) toFinetuneConfig(cfg *domain.FinetuneConfig) (err error) {
-	if cfg.Name, err = domain.NewTrainingName(do.Name); err != nil {
+	if cfg.Name, err = domain.NewFinetuneName(do.Name); err != nil {
 		return
 	}
 

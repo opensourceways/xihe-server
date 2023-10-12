@@ -38,6 +38,9 @@ type Config struct {
 	MinTrainingNameLength int `json:"min_training_name_length"`
 	MaxTrainingDescLength int `json:"max_training_desc_length"`
 
+	MaxFinetuneNameLength int `json:"max_finetune_name_length"`
+	MinFinetuneNameLength int `json:"min_finetune_name_length"`
+
 	WuKongPictureMaxDescLength int `json:"wukong_picture_max_desc_length"`
 
 	// Key is the finetue model name
@@ -79,6 +82,14 @@ func (cfg *Config) SetDefault() {
 
 	if cfg.MinTrainingNameLength == 0 {
 		cfg.MinTrainingNameLength = 5
+	}
+
+	if cfg.MaxFinetuneNameLength == 0 {
+		cfg.MaxFinetuneNameLength = 25
+	}
+
+	if cfg.MinFinetuneNameLength == 0 {
+		cfg.MinFinetuneNameLength = 1
 	}
 
 	if cfg.MaxTrainingDescLength == 0 {

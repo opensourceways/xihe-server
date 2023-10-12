@@ -23,7 +23,7 @@ func (req *FinetuneCreateRequest) toCmd(user domain.Account) (
 ) {
 	cmd.User = user
 
-	if cmd.Name, err = domain.NewTrainingName(req.Name); err != nil {
+	if cmd.Name, err = domain.NewFinetuneName(req.Name); err != nil {
 		return
 	}
 

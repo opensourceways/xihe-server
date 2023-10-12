@@ -18,7 +18,7 @@ type Finetune struct {
 }
 
 type FinetuneConfig struct {
-	Name  TrainingName
+	Name  FinetuneName
 	Param FinetuneParameter
 }
 
