@@ -74,11 +74,11 @@ func (cfg *Config) SetDefault() {
 	}
 
 	if cfg.MaxTrainingNameLength == 0 {
-		cfg.MaxTrainingNameLength = 50
+		cfg.MaxTrainingNameLength = 25
 	}
 
 	if cfg.MinTrainingNameLength == 0 {
-		cfg.MinTrainingNameLength = 5
+		cfg.MinTrainingNameLength = 1
 	}
 
 	if cfg.MaxTrainingDescLength == 0 {
