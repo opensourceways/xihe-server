@@ -48,7 +48,7 @@ func (s finetuneService) toFinetuneSummaryDTO(
 	}
 
 	dto.Id = t.Id
-	dto.Name = t.Name.TrainingName()
+	dto.Name = t.Name.FinetuneName()
 	dto.Error = t.Error
 	dto.Status = status
 	dto.IsDone = s.isJobDone(status)

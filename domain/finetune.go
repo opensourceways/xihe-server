@@ -117,7 +117,7 @@ type FinetuneJobDetail struct {
 
 type FinetuneSummary struct {
 	Id        string
-	Name      TrainingName
+	Name      FinetuneName
 	CreatedAt int64
 
 	FinetuneJobDetail

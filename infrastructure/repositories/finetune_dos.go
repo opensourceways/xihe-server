@@ -98,7 +98,7 @@ type FinetuneSummaryDO struct {
 }
 
 func (do *FinetuneSummaryDO) toFinetuneSummary(obj *domain.FinetuneSummary) (err error) {
-	if obj.Name, err = domain.NewTrainingName(do.Name); err != nil {
+	if obj.Name, err = domain.NewFinetuneName(do.Name); err != nil {
 		return
 	}
 
