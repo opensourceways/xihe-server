@@ -2,6 +2,7 @@ package message
 
 import (
 	kfklib "github.com/opensourceways/kafka-lib/agent"
+	"github.com/opensourceways/xihe-server/domain"
 )
 
 type MsgOperateLog struct {
@@ -30,7 +31,7 @@ type Publisher interface {
 }
 
 type OperateLogPublisher interface {
-	SendOperateLog(user string, t string, info map[string]string) error
+	SendOperateLog(user domain.Account, t string, info map[string]string) error
 }
 
 type Subscriber interface {
