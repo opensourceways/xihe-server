@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/kafka-lib/mq"
 
 	"github.com/opensourceways/xihe-server/common/domain/message"
+	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -63,10 +64,15 @@ type operatePublisherAdapter struct {
 	publisher publisherAdapter
 }
 
-func (o operatePublisherAdapter) SendOperateLog(u string, t string, info map[string]string) error {
+func (o operatePublisherAdapter) SendOperateLog(u domain.Account, t string, info map[string]string) error {
+	user := ""
+	if u != nil {
+		user = u.Account()
+	}
+
 	return o.publisher.Publish(o.topic, &message.MsgOperateLog{
 		When: utils.Now(),
-		User: u,
+		User: user,
 		Type: t,
 		Info: info,
 	}, nil)
