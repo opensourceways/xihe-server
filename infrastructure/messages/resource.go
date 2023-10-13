@@ -20,7 +20,7 @@ type resourceMessageAdapter struct {
 func (s *resourceMessageAdapter) AddOperateLogForCreateResource(
 	obj domain.ResourceObject, name domain.ResourceName,
 ) error {
-	return s.operateLog.SendOperateLog(obj.Owner.Account(), "resource", map[string]string{
+	return s.operateLog.SendOperateLog(obj.Owner, "resource", map[string]string{
 		"id":   obj.Id,
 		"name": name.ResourceName(),
 		"type": obj.Type.ResourceType(),

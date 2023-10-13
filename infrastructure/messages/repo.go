@@ -34,7 +34,7 @@ type DownloadProducerConfig struct {
 }
 
 func (s *downloadMessageAdapter) AddOperateLogForDownloadFile(u domain.Account, repo message.RepoFile) error {
-	return s.operateLog.SendOperateLog(u.Account(), "download", map[string]string{
+	return s.operateLog.SendOperateLog(u, "download", map[string]string{
 		"user": repo.User.Account(),
 		"repo": repo.Name.ResourceName(),
 		"path": repo.Path.FilePath(),
