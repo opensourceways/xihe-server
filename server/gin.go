@@ -369,12 +369,14 @@ func logRequest() gin.HandlerFunc {
 
 		endTime := time.Now()
 
+		l := controller.GetOperateLog(c)
 		logrus.Infof(
-			"| %d | %d | %s | %s |",
+			"| %d | %d | %s | %s | %s",
 			c.Writer.Status(),
 			endTime.Sub(startTime),
 			c.Request.Method,
 			c.Request.RequestURI,
+			l,
 		)
 	}
 }
