@@ -147,7 +147,11 @@ func (s *service) doWaitAndEndpointNotReturned(
 ) error {
 	select {
 	case e := <-ec:
-		return f(ec, e)
+		err := f(ec, e)
+		if err != nil {
+			ec <- e // return endpoint to channel while function returns error
+		}
+		return err
 	case <-time.After(2 * 60 * time.Second):
 		return bigmodel.NewErrorBusySource(errors.New("access overload, please try again later"))
 	}
