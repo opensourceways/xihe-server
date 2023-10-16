@@ -5,7 +5,7 @@ RUN dnf update -y && \
 
 # build binary
 COPY . /go/src/github.com/opensourceways/xihe-server
-RUN cd /go/src/github.com/opensourceways/xihe-server/message-server && GO111MODULE=on CGO_ENABLED=0 go build
+RUN cd /go/src/github.com/opensourceways/xihe-server/message-server && GO111MODULE=on CGO_ENABLED=0 go build -buildmode=pie --ldflags "-s -linkmode 'external' -extldflags '-Wl,-z,now'"
 
 # copy binary config and utils
 FROM openeuler/openeuler:22.03
