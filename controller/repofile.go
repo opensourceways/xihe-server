@@ -79,6 +79,8 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create repo file")
+
 	info, err := ctl.getRepoFileInfo(ctx, pl.DomainAccount())
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
@@ -136,6 +138,8 @@ func (ctl *RepoFileController) Update(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update repo file")
+
 	info, err := ctl.getRepoFileInfo(ctx, pl.DomainAccount())
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
@@ -183,6 +187,8 @@ func (ctl *RepoFileController) Delete(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete repo file")
+
 	info, err := ctl.getRepoFileInfo(ctx, pl.DomainAccount())
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
@@ -218,6 +224,8 @@ func (ctl *RepoFileController) DeleteDir(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete repo directory")
 
 	info, err := ctl.getRepoDirInfo(ctx, pl.DomainAccount())
 	if err != nil {

@@ -85,6 +85,9 @@ func (ctl *UserController) Create(ctx *gin.Context) {
 		return
 	}
 
+	pl, _, _ := ctl.checkUserApiToken(ctx, false)
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create user")
+
 	req := userCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -161,6 +164,8 @@ func (ctl *UserController) Update(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user basic info")
 
 	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd); err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
@@ -394,6 +399,8 @@ func (ctl *UserController) SendBindEmail(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "send code to user")
+
 	req := EmailSend{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -434,6 +441,8 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "bind email according to the code")
 
 	req := EmailCode{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {

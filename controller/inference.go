@@ -47,17 +47,17 @@ type InferenceController struct {
 	inferenceBootFile domain.FilePath
 }
 
-//	@Summary		Create
-//	@Description	create inference
-//	@Tags			Inference
-//	@Param			owner	path	string	true	"project owner"
-//	@Param			pid		path	string	true	"project id"
-//	@Accept			json
-//	@Success		201	{object}			app.InferenceDTO
-//	@Failure		400	bad_request_body	can't	parse		request	body
-//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/inference/project/{owner}/{pid} [get]
+// @Summary		Create
+// @Description	create inference
+// @Tags			Inference
+// @Param			owner	path	string	true	"project owner"
+// @Param			pid		path	string	true	"project id"
+// @Accept			json
+// @Success		201	{object}			app.InferenceDTO
+// @Failure		400	bad_request_body	can't	parse		request	body
+// @Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/inference/project/{owner}/{pid} [get]
 func (ctl *InferenceController) Create(ctx *gin.Context) {
 	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, true)
 	if !ok {

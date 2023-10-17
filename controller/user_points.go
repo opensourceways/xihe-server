@@ -28,13 +28,13 @@ type UserPointsController struct {
 	ts app.TaskAppService
 }
 
-//	@Summary		get user points details
-//	@Description		get user points details
-//	@Tags			UserPoints
-//	@Accept			json
-//	@Success		200	{object}	app.UserPointsDetailsDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/user_points [get]
+// @Summary		get user points details
+// @Description		get user points details
+// @Tags			UserPoints
+// @Accept			json
+// @Success		200	{object}	app.UserPointsDetailsDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/user_points [get]
 func (ctl *UserPointsController) PointsDetails(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -55,13 +55,13 @@ func (ctl *UserPointsController) PointsDetails(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		tasks of day
-//	@Description		tasks of day
-//	@Tags			UserPoints
-//	@Accept			json
-//	@Success		200	{object}	app.TasksCompletionInfoDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/user_points/tasks [get]
+// @Summary		tasks of day
+// @Description		tasks of day
+// @Tags			UserPoints
+// @Accept			json
+// @Success		200	{object}	app.TasksCompletionInfoDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/user_points/tasks [get]
 func (ctl *UserPointsController) TasksOfDay(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -82,13 +82,13 @@ func (ctl *UserPointsController) TasksOfDay(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		task doc
-//	@Description		task doc
-//	@Tags			UserPoints
-//	@Accept			json
-//	@Success		200	{object}	app.TaskDocDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/user_points/taskdoc [get]
+// @Summary		task doc
+// @Description		task doc
+// @Tags			UserPoints
+// @Accept			json
+// @Success		200	{object}	app.TaskDocDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/user_points/taskdoc [get]
 func (ctl *UserPointsController) TasksDoc(ctx *gin.Context) {
 	lang, err := ctl.languageRuquested(ctx)
 	if err != nil {

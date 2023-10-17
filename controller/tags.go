@@ -26,13 +26,13 @@ type TagsController struct {
 	s app.TagsService
 }
 
-//	@Title			List
-//	@Description	list tags
-//	@Tags			Tags
-//	@Accept			json
-//	@Success		200	{object}		app.DomainTagsDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/tags/{type} [get]
+// @Title			List
+// @Description	list tags
+// @Tags			Tags
+// @Accept			json
+// @Success		200	{object}		app.DomainTagsDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/tags/{type} [get]
 func (ctl *TagsController) List(ctx *gin.Context) {
 	names := apiConfig.Tags.getDomains(ctx.Param("type"))
 	if len(names) == 0 {

@@ -148,6 +148,8 @@ func (ctl *DatasetController) Create(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "creat dataset")
+
 	if pl.isNotMe(cmd.Owner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorNotAllowed,
@@ -206,6 +208,8 @@ func (ctl *DatasetController) Delete(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete dataset")
 
 	if pl.isNotMe(owner) {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
@@ -280,6 +284,8 @@ func (ctl *DatasetController) Update(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update propery of dataset")
 
 	if pl.isNotMe(owner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -544,6 +550,9 @@ func (ctl *DatasetController) SetTags(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	pl, _, _ := ctl.checkUserApiToken(ctx, false)
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "set tags for dataset")
 
 	if err = ctl.s.SetTags(&d, &cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

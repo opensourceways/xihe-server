@@ -169,6 +169,8 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create project")
+
 	pr := ctl.newPlatformRepository(
 		pl.PlatformToken, pl.PlatformUserNamespaceId,
 	)
@@ -227,6 +229,8 @@ func (ctl *ProjectController) Delete(ctx *gin.Context) {
 
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "deleta project")
 
 	proj, err := ctl.repo.GetByName(owner, name)
 	if err != nil {
@@ -301,6 +305,8 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update project")
 
 	proj, err := ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
@@ -574,6 +580,8 @@ func (ctl *ProjectController) Fork(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "fork project")
+
 	proj, err := ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -671,6 +679,8 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related model to project")
+
 	index := domain.ResourceIndex{
 		Owner: owner,
 		Id:    data.Id,
@@ -714,10 +724,12 @@ func (ctl *ProjectController) RemoveRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	_, proj, ok := ctl.checkPermission(ctx)
+	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "remove related model to project")
 
 	index := domain.ResourceIndex{
 		Owner: cmd.Owner,
@@ -785,6 +797,8 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related dataset to project")
+
 	index := domain.ResourceIndex{
 		Owner: owner,
 		Id:    data.Id,
@@ -828,10 +842,12 @@ func (ctl *ProjectController) RemoveRelatedDataset(ctx *gin.Context) {
 		return
 	}
 
-	_, proj, ok := ctl.checkPermission(ctx)
+	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "remove related dateset to project")
 
 	index := domain.ResourceIndex{
 		Owner: cmd.Owner,
@@ -883,10 +899,12 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 		return
 	}
 
-	_, proj, ok := ctl.checkPermission(ctx)
+	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "set tags for project")
 
 	if err = ctl.s.SetTags(&proj, &cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

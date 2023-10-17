@@ -162,6 +162,8 @@ func (ctl *ModelController) Create(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create model")
+
 	pr := ctl.newPlatformRepository(
 		pl.PlatformToken, pl.PlatformUserNamespaceId,
 	)
@@ -220,6 +222,8 @@ func (ctl *ModelController) Delete(ctx *gin.Context) {
 
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete model")
 
 	m, err := ctl.repo.GetByName(owner, name)
 	if err != nil {
@@ -293,6 +297,8 @@ func (ctl *ModelController) Update(ctx *gin.Context) {
 
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update property of model")
 
 	m, err := ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
@@ -560,6 +566,8 @@ func (ctl *ModelController) AddRelatedDataset(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related dataset to model")
+
 	index := domain.ResourceIndex{
 		Owner: owner,
 		Id:    data.Id,
@@ -603,10 +611,12 @@ func (ctl *ModelController) RemoveRelatedDataset(ctx *gin.Context) {
 		return
 	}
 
-	_, m, ok := ctl.checkPermission(ctx)
+	pl, m, ok := ctl.checkPermission(ctx)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "remove related dataset to model")
 
 	index := domain.ResourceIndex{
 		Owner: cmd.Owner,
@@ -658,10 +668,12 @@ func (ctl *ModelController) SetTags(ctx *gin.Context) {
 		return
 	}
 
-	_, m, ok := ctl.checkPermission(ctx)
+	pl, m, ok := ctl.checkPermission(ctx)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "set tags for model")
 
 	if err = ctl.s.SetTags(&m, &cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

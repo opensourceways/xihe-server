@@ -86,6 +86,8 @@ func (ctl *LikeController) Create(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create a like")
+
 	if err := ctl.s.Create(pl.DomainAccount(), cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
@@ -129,6 +131,8 @@ func (ctl *LikeController) Delete(ctx *gin.Context) {
 
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete a like")
 
 	if err := ctl.s.Delete(pl.DomainAccount(), cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

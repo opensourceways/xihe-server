@@ -40,13 +40,13 @@ type HomeController struct {
 	dataset app.DatasetService
 }
 
-//	@Summary		ListAll
-//	@Description	list the courses and competitions
-//	@Tags			HomePage
-//	@Accept			json
-//	@Success		200	{object}		homeInfo
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/homepage [get]
+// @Summary		ListAll
+// @Description	list the courses and competitions
+// @Tags			HomePage
+// @Accept			json
+// @Success		200	{object}		homeInfo
+// @Failure		500	system_error	system	error
+// @Router			/v1/homepage [get]
 func (ctl *HomeController) ListAll(ctx *gin.Context) {
 	_, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -73,13 +73,13 @@ func (ctl *HomeController) ListAll(ctx *gin.Context) {
 	ctl.sendRespOfGet(ctx, info)
 }
 
-//	@Summary		ListAllElectricity
-//	@Description	list the project dataset model courses and competitions
-//	@Tags			HomePage
-//	@Accept			json
-//	@Success		200	{object}		homeElectricityInfo
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/homepage/electricity [get]
+// @Summary		ListAllElectricity
+// @Description	list the project dataset model courses and competitions
+// @Tags			HomePage
+// @Accept			json
+// @Success		200	{object}		homeElectricityInfo
+// @Failure		500	system_error	system	error
+// @Router			/v1/homepage/electricity [get]
 func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
 	_, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {

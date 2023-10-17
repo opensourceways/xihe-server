@@ -47,15 +47,15 @@ type CourseController struct {
 	user    userrepo.User
 }
 
-//	@Summary		Apply
-//	@Description	apply the course
-//	@Tags			Course
-//	@Param			id		path	string				true	"course id"
-//	@Param			body	body	StudentApplyRequest	true	"body of applying"
-//	@Accept			json
-//	@Success		201
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/{id}/player [post]
+// @Summary		Apply
+// @Description	apply the course
+// @Tags			Course
+// @Param			id		path	string				true	"course id"
+// @Param			body	body	StudentApplyRequest	true	"body of applying"
+// @Accept			json
+// @Success		201
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/{id}/player [post]
 func (ctl *CourseController) Apply(ctx *gin.Context) {
 	req := StudentApplyRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -68,6 +68,8 @@ func (ctl *CourseController) Apply(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "apply the course")
 
 	cmd, err := req.toCmd(ctx.Param("id"), pl.DomainAccount())
 	if err != nil {
@@ -83,16 +85,16 @@ func (ctl *CourseController) Apply(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		List
-//	@Description	list the course
-//	@Tags			Course
-//	@Param			status	query	string	false	"course status, such as over, preparing, in-progress"
-//	@Param			type	query	string	false	"course type, such as ai, mindspore, foundation"
-//	@Param			mine	query	string	false	"just list courses of player, if it is set"
-//	@Accept			json
-//	@Success		200	{object}		app.CourseSummaryDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course [get]
+// @Summary		List
+// @Description	list the course
+// @Tags			Course
+// @Param			status	query	string	false	"course status, such as over, preparing, in-progress"
+// @Param			type	query	string	false	"course type, such as ai, mindspore, foundation"
+// @Param			mine	query	string	false	"just list courses of player, if it is set"
+// @Accept			json
+// @Success		200	{object}		app.CourseSummaryDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/course [get]
 func (ctl *CourseController) List(ctx *gin.Context) {
 	var cmd app.CourseListCmd
 	var err error
@@ -140,14 +142,14 @@ func (ctl *CourseController) List(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		Get
-//	@Description	get course infomation
-//	@Tags			Course
-//	@Param			id	path	string	true	"course id"
-//	@Accept			json
-//	@Success		200	{object}		app.CourseDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/{id} [get]
+// @Summary		Get
+// @Description	get course infomation
+// @Tags			Course
+// @Param			id	path	string	true	"course id"
+// @Accept			json
+// @Success		200	{object}		app.CourseDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/{id} [get]
 func (ctl *CourseController) Get(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -163,20 +165,22 @@ func (ctl *CourseController) Get(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		AddCourseRelatedProject
-//	@Description	add related project
-//	@Tags			Course
-//	@Param			id		path	string							true	"course id"
-//	@Param			body	body	AddCourseRelatedProjectRequest	true	"project info"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/{id}/realted_project [put]
+// @Summary		AddCourseRelatedProject
+// @Description	add related project
+// @Tags			Course
+// @Param			id		path	string							true	"course id"
+// @Param			body	body	AddCourseRelatedProjectRequest	true	"project info"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/{id}/realted_project [put]
 func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related project")
 
 	req := AddCourseRelatedProjectRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -219,15 +223,15 @@ func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		ListAssignments
-//	@Description	list assignments
-//	@Tags			Course
-//	@Param			id		path	string	true	"course id"
-//	@Param			status	query	string	false	"assignments status, such as finish"
-//	@Accept			json
-//	@Success		200	{object}		app.AsgWorkDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/{id}/asg/list [get]
+// @Summary		ListAssignments
+// @Description	list assignments
+// @Tags			Course
+// @Param			id		path	string	true	"course id"
+// @Param			status	query	string	false	"assignments status, such as finish"
+// @Accept			json
+// @Success		200	{object}		app.AsgWorkDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/{id}/asg/list [get]
 func (ctl *CourseController) ListAssignments(ctx *gin.Context) {
 
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, false)
@@ -260,14 +264,14 @@ func (ctl *CourseController) ListAssignments(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		GetSubmissions
-//	@Description	get submissions
-//	@Tags			Course
-//	@Param			id	path	string	true	"course id"
-//	@Accept			json
-//	@Success		200	{object}		app.RelateProjectDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/{id}/asg/result [get]
+// @Summary		GetSubmissions
+// @Description	get submissions
+// @Tags			Course
+// @Param			id	path	string	true	"course id"
+// @Accept			json
+// @Success		200	{object}		app.RelateProjectDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/{id}/asg/result [get]
 func (ctl *CourseController) GetSubmissions(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
@@ -303,14 +307,14 @@ func (ctl *CourseController) GetSubmissions(ctx *gin.Context) {
 
 }
 
-//	@Summary		GetCertification
-//	@Description	get certification
-//	@Tags			Course
-//	@Param			id	path	string	true	"course id"
-//	@Accept			json
-//	@Success		200	{object}		app.CertInfoDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/{id}/cert [get]
+// @Summary		GetCertification
+// @Description	get certification
+// @Tags			Course
+// @Param			id	path	string	true	"course id"
+// @Accept			json
+// @Success		200	{object}		app.CertInfoDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/{id}/cert [get]
 func (ctl *CourseController) GetCertification(ctx *gin.Context) {
 
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, false)
@@ -332,13 +336,13 @@ func (ctl *CourseController) GetCertification(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		GetRegisterInfo
-//	@Description	get register info
-//	@Tags			Course
-//	@Accept			json
-//	@Success		200	{object}		app.UserRegisterInfoDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/reginfo [get]
+// @Summary		GetRegisterInfo
+// @Description	get register info
+// @Tags			Course
+// @Accept			json
+// @Success		200	{object}		app.UserRegisterInfoDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/reginfo [get]
 func (ctl *CourseController) GetRegisterInfo(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
@@ -353,15 +357,15 @@ func (ctl *CourseController) GetRegisterInfo(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		GetAssignment
-//	@Description	Get assignment
-//	@Tags			Course
-//	@Param			id		path	string	true	"course id"
-//	@Param			asgid	path	string	true	"asg id"
-//	@Accept			json
-//	@Success		200	{object}		app.AsgDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/:id/asg/:asgid [get]
+// @Summary		GetAssignment
+// @Description	Get assignment
+// @Tags			Course
+// @Param			id		path	string	true	"course id"
+// @Param			asgid	path	string	true	"asg id"
+// @Accept			json
+// @Success		200	{object}		app.AsgDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/:id/asg/:asgid [get]
 func (ctl *CourseController) GetAssignment(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
@@ -381,20 +385,22 @@ func (ctl *CourseController) GetAssignment(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		AddPlayRecord
-//	@Description	add play record
-//	@Tags			Course
-//	@Param			id		path	string				true	"course id"
-//	@Param			body	body	PlayRecordRequest	true	"record info"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/course/{id}/record [put]
+// @Summary		AddPlayRecord
+// @Description	add play record
+// @Tags			Course
+// @Param			id		path	string				true	"course id"
+// @Param			body	body	PlayRecordRequest	true	"record info"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/course/{id}/record [put]
 func (ctl *CourseController) AddPlayRecord(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add play record")
 
 	req := PlayRecordRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {

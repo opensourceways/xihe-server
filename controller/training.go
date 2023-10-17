@@ -57,17 +57,17 @@ type TrainingController struct {
 	dataset repository.Dataset
 }
 
-//	@Summary		Create
-//	@Description	create training
-//	@Tags			Training
-//	@Param			pid		path	string					true	"project id"
-//	@Param			body	body	TrainingCreateRequest	true	"body of creating training"
-//	@Accept			json
-//	@Success		201	{object}			trainingCreateResp
-//	@Failure		400	bad_request_body	can't	parse		request	body
-//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/train/project/{pid}/training [post]
+// @Summary		Create
+// @Description	create training
+// @Tags			Training
+// @Param			pid		path	string					true	"project id"
+// @Param			body	body	TrainingCreateRequest	true	"body of creating training"
+// @Accept			json
+// @Success		201	{object}			trainingCreateResp
+// @Failure		400	bad_request_body	can't	parse		request	body
+// @Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/train/project/{pid}/training [post]
 func (ctl *TrainingController) Create(ctx *gin.Context) {
 	req := TrainingCreateRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -80,6 +80,8 @@ func (ctl *TrainingController) Create(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create training")
 
 	cmd := new(app.TrainingCreateCmd)
 
@@ -124,22 +126,25 @@ func (ctl *TrainingController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newResponseData(trainingCreateResp{v}))
 }
 
-//	@Summary		Recreate
-//	@Description	recreate training
-//	@Tags			Training
-//	@Param			pid	path	string	true	"project id"
-//	@Param			id	path	string	true	"training id"
-//	@Accept			json
-//	@Success		201	{object}			trainingCreateResp
-//	@Failure		400	bad_request_body	can't	parse		request	body
-//	@Failure		401	bad_request_param	some	parameter	of		body	is	invalid
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/train/project/{pid}/training/{id} [post]
+// @Summary		Recreate
+// @Description	recreate training
+// @Tags			Training
+// @Param			pid	path	string	true	"project id"
+// @Param			id	path	string	true	"training id"
+// @Accept			json
+// @Success		201	{object}			trainingCreateResp
+// @Failure		400	bad_request_body	can't	parse		request	body
+// @Failure		401	bad_request_param	some	parameter	of		body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/train/project/{pid}/training/{id} [post]
 func (ctl *TrainingController) Recreate(ctx *gin.Context) {
 	info, ok := ctl.getTrainingInfo(ctx)
 	if !ok {
 		return
 	}
+
+	pl, _, _ := ctl.checkUserApiToken(ctx, false)
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "recreate training")
 
 	v, err := ctl.ts.Recreate(&info)
 	if err != nil {
@@ -154,20 +159,23 @@ func (ctl *TrainingController) Recreate(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, newResponseData(trainingCreateResp{v}))
 }
 
-//	@Summary		Delete
-//	@Description	delete training
-//	@Tags			Training
-//	@Param			pid	path	string	true	"project id"
-//	@Param			id	path	string	true	"training id"
-//	@Accept			json
-//	@Success		204
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/train/project/{pid}/training/{id} [delete]
+// @Summary		Delete
+// @Description	delete training
+// @Tags			Training
+// @Param			pid	path	string	true	"project id"
+// @Param			id	path	string	true	"training id"
+// @Accept			json
+// @Success		204
+// @Failure		500	system_error	system	error
+// @Router			/v1/train/project/{pid}/training/{id} [delete]
 func (ctl *TrainingController) Delete(ctx *gin.Context) {
 	info, ok := ctl.getTrainingInfo(ctx)
 	if !ok {
 		return
 	}
+
+	pl, _, _ := ctl.checkUserApiToken(ctx, false)
+        prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete training")
 
 	if err := ctl.ts.Delete(&info); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -181,20 +189,23 @@ func (ctl *TrainingController) Delete(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
-//	@Summary		Terminate
-//	@Description	terminate training
-//	@Tags			Training
-//	@Param			pid	path	string	true	"project id"
-//	@Param			id	path	string	true	"training id"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/train/project/{pid}/training/{id} [put]
+// @Summary		Terminate
+// @Description	terminate training
+// @Tags			Training
+// @Param			pid	path	string	true	"project id"
+// @Param			id	path	string	true	"training id"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/train/project/{pid}/training/{id} [put]
 func (ctl *TrainingController) Terminate(ctx *gin.Context) {
 	info, ok := ctl.getTrainingInfo(ctx)
 	if !ok {
 		return
 	}
+
+	pl, _, _ := ctl.checkUserApiToken(ctx, false)
+        prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "terminate training")
 
 	if err := ctl.ts.Terminate(&info); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -208,15 +219,15 @@ func (ctl *TrainingController) Terminate(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData("success"))
 }
 
-//	@Summary		Get
-//	@Description	get training info
-//	@Tags			Training
-//	@Param			pid	path	string	true	"project id"
-//	@Param			id	path	string	true	"training id"
-//	@Accept			json
-//	@Success		200	{object}		trainingDetail
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/train/project/{pid}/training/{id} [get]
+// @Summary		Get
+// @Description	get training info
+// @Tags			Training
+// @Param			pid	path	string	true	"project id"
+// @Param			id	path	string	true	"training id"
+// @Accept			json
+// @Success		200	{object}		trainingDetail
+// @Failure		500	system_error	system	error
+// @Router			/v1/train/project/{pid}/training/{id} [get]
 func (ctl *TrainingController) Get(ctx *gin.Context) {
 	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
@@ -315,14 +326,14 @@ func (ctl *TrainingController) watchTraining(ws *websocket.Conn, index *domain.T
 	}
 }
 
-//	@Summary		List
-//	@Description	get trainings
-//	@Tags			Training
-//	@Param			pid	path	string	true	"project id"
-//	@Accept			json
-//	@Success		200	{object}		app.TrainingSummaryDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/train/project/{pid}/training [get]
+// @Summary		List
+// @Description	get trainings
+// @Tags			Training
+// @Param			pid	path	string	true	"project id"
+// @Accept			json
+// @Success		200	{object}		app.TrainingSummaryDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/train/project/{pid}/training [get]
 func (ctl *TrainingController) List(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -339,14 +350,14 @@ func (ctl *TrainingController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(v))
 }
 
-//	@Summary		List
-//	@Description	get trainings
-//	@Tags			Training
-//	@Param			pid	path	string	true	"project id"
-//	@Accept			json
-//	@Success		200	{object}		app.TrainingSummaryDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/train/project/{pid}/training/ws [get]
+// @Summary		List
+// @Description	get trainings
+// @Tags			Training
+// @Param			pid	path	string	true	"project id"
+// @Accept			json
+// @Success		200	{object}		app.TrainingSummaryDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/train/project/{pid}/training/ws [get]
 func (ctl *TrainingController) ListByWS(ctx *gin.Context) {
 	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
@@ -452,16 +463,16 @@ func (ctl *TrainingController) watchTrainings(ws *websocket.Conn, user domain.Ac
 	}
 }
 
-//	@Summary		GetLog
-//	@Description	get log url of training for downloading
-//	@Tags			Training
-//	@Param			pid		path	string	true	"project id"
-//	@Param			id		path	string	true	"training id"
-//	@Param			type	path	string	true	"training result: log, output"
-//	@Accept			json
-//	@Success		200	{object}		trainingLogResp
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/train/project/{pid}/training/{id}/result/{type} [get]
+// @Summary		GetLog
+// @Description	get log url of training for downloading
+// @Tags			Training
+// @Param			pid		path	string	true	"project id"
+// @Param			id		path	string	true	"training id"
+// @Param			type	path	string	true	"training result: log, output"
+// @Accept			json
+// @Success		200	{object}		trainingLogResp
+// @Failure		500	system_error	system	error
+// @Router			/v1/train/project/{pid}/training/{id}/result/{type} [get]
 func (ctl *TrainingController) GetResultDownloadURL(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {

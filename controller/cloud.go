@@ -31,13 +31,13 @@ type CloudController struct {
 	s app.CloudService
 }
 
-//	@Summary		List
-//	@Description	list cloud config
-//	@Tags			Cloud
-//	@Accept			json
-//	@Success		200	{object}		[]app.CloudDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/cloud [get]
+// @Summary		List
+// @Description	list cloud config
+// @Tags			Cloud
+// @Accept			json
+// @Success		200	{object}		[]app.CloudDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/cloud [get]
 func (ctl *CloudController) List(ctx *gin.Context) {
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -59,14 +59,14 @@ func (ctl *CloudController) List(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		Subscribe
-//	@Description	subscribe cloud
-//	@Tags			Cloud
-//	@Param			body	body	cloudSubscribeRequest	true	"body of subscribe cloud"
-//	@Accept			json
-//	@Success		201
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/cloud/subscribe [post]
+// @Summary		Subscribe
+// @Description	subscribe cloud
+// @Tags			Cloud
+// @Param			body	body	cloudSubscribeRequest	true	"body of subscribe cloud"
+// @Accept			json
+// @Success		201
+// @Failure		500	system_error	system	error
+// @Router			/v1/cloud/subscribe [post]
 func (ctl *CloudController) Subscribe(ctx *gin.Context) {
 	req := cloudSubscribeRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -79,6 +79,8 @@ func (ctl *CloudController) Subscribe(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "subscribe cloud")
 
 	cmd := req.toCmd(pl.DomainAccount())
 	if err := cmd.Validate(); err != nil {
@@ -96,15 +98,15 @@ func (ctl *CloudController) Subscribe(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		Get
-//	@Description	get cloud pod
-//	@Tags			Cloud
-//	@Param			cid	path	string	true	"cloud config id"
-//	@Accept			json
-//	@Success		201	{object}			app.InferenceDTO
-//	@Failure		400	bad_request_body	can't	parse	request	body
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/cloud/{cid} [get]
+// @Summary		Get
+// @Description	get cloud pod
+// @Tags			Cloud
+// @Param			cid	path	string	true	"cloud config id"
+// @Accept			json
+// @Success		201	{object}			app.InferenceDTO
+// @Failure		400	bad_request_body	can't	parse	request	body
+// @Failure		500	system_error		system	error
+// @Router			/v1/cloud/{cid} [get]
 func (ctl *CloudController) Get(ctx *gin.Context) {
 	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
@@ -173,15 +175,15 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
 }
 
-//	@Summary		GetHttp
-//	@Description	get cloud pod
-//	@Tags			Cloud
-//	@Param			cid	path	string	true	"cloud config id"
-//	@Accept			json
-//	@Success		201	{object}			app.InferenceDTO
-//	@Failure		400	bad_request_body	can't	parse	request	body
-//	@Failure		500	system_error		system	error
-//	@Router			/v1/cloud/{cid} [get]
+// @Summary		GetHttp
+// @Description	get cloud pod
+// @Tags			Cloud
+// @Param			cid	path	string	true	"cloud config id"
+// @Accept			json
+// @Success		201	{object}			app.InferenceDTO
+// @Failure		400	bad_request_body	can't	parse	request	body
+// @Failure		500	system_error		system	error
+// @Router			/v1/cloud/{cid} [get]
 func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {

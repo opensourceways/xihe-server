@@ -51,15 +51,15 @@ type CompetitionController struct {
 	project repository.Project
 }
 
-//	@Summary		Apply
-//	@Description	apply the competition
-//	@Tags			Competition
-//	@Param			id		path	string						true	"competition id"
-//	@Param			body	body	cc.CompetitorApplyRequest	true	"body of applying"
-//	@Accept			json
-//	@Success		201
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/competitor [post]
+// @Summary		Apply
+// @Description	apply the competition
+// @Tags			Competition
+// @Param			id		path	string						true	"competition id"
+// @Param			body	body	cc.CompetitorApplyRequest	true	"body of applying"
+// @Accept			json
+// @Success		201
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/competitor [post]
 func (ctl *CompetitionController) Apply(ctx *gin.Context) {
 	req := cc.CompetitorApplyRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -72,6 +72,8 @@ func (ctl *CompetitionController) Apply(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "apply the competition")
 
 	cmd, err := req.ToCmd(pl.DomainAccount())
 	if err != nil {
@@ -87,14 +89,14 @@ func (ctl *CompetitionController) Apply(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		Get
-//	@Description	get detail of competition
-//	@Tags			Competition
-//	@Param			id	path	string	true	"competition id"
-//	@Accept			json
-//	@Success		200	{object}		app.UserCompetitionDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id} [get]
+// @Summary		Get
+// @Description	get detail of competition
+// @Tags			Competition
+// @Param			id	path	string	true	"competition id"
+// @Accept			json
+// @Success		200	{object}		app.UserCompetitionDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id} [get]
 func (ctl *CompetitionController) Get(ctx *gin.Context) {
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -129,15 +131,15 @@ func (ctl *CompetitionController) Get(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		List
-//	@Description	list competitions
-//	@Tags			Competition
-//	@Param			status	query	string	false	"competition status, such as over, preparing, in-progress"
-//	@Param			mine	query	string	false	"just list competitions of competitor, if it is set"
-//	@Accept			json
-//	@Success		200	{object}		app.CompetitionSummaryDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition [get]
+// @Summary		List
+// @Description	list competitions
+// @Tags			Competition
+// @Param			status	query	string	false	"competition status, such as over, preparing, in-progress"
+// @Param			mine	query	string	false	"just list competitions of competitor, if it is set"
+// @Accept			json
+// @Success		200	{object}		app.CompetitionSummaryDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition [get]
 func (ctl *CompetitionController) List(ctx *gin.Context) {
 	cmd := app.CompetitionListCMD{}
 	var err error
@@ -195,15 +197,15 @@ func (ctl *CompetitionController) List(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		CreateTeam
-//	@Description	create team of competition
-//	@Tags			Competition
-//	@Param			id		path	string					true	"competition id"
-//	@Param			body	body	cc.CreateTeamRequest	true	"body of creating team"
-//	@Accept			json
-//	@Success		201
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/team [post]
+// @Summary		CreateTeam
+// @Description	create team of competition
+// @Tags			Competition
+// @Param			id		path	string					true	"competition id"
+// @Param			body	body	cc.CreateTeamRequest	true	"body of creating team"
+// @Accept			json	
+// @Success		201
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/team [post]
 func (ctl *CompetitionController) CreateTeam(ctx *gin.Context) {
 	req := cc.CreateTeamRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -216,6 +218,8 @@ func (ctl *CompetitionController) CreateTeam(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create a team of competition")
 
 	cmd, err := req.ToCmd(pl.DomainAccount())
 	if err != nil {
@@ -231,15 +235,15 @@ func (ctl *CompetitionController) CreateTeam(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		JoinTeam
-//	@Description	join a team of competition
-//	@Tags			Competition
-//	@Param			id		path	string				true	"competition id"
-//	@Param			body	body	cc.JoinTeamRequest	true	"body of joining team"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/team [put]
+// @Summary		JoinTeam
+// @Description	join a team of competition
+// @Tags			Competition
+// @Param			id		path	string				true	"competition id"
+// @Param			body	body	cc.JoinTeamRequest	true	"body of joining team"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/team [put]
 func (ctl *CompetitionController) JoinTeam(ctx *gin.Context) {
 	req := cc.JoinTeamRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -252,6 +256,8 @@ func (ctl *CompetitionController) JoinTeam(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "join a team of competition")
 
 	cmd, err := req.ToCmd(pl.DomainAccount())
 	if err != nil {
@@ -267,14 +273,14 @@ func (ctl *CompetitionController) JoinTeam(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		GetMyTeam
-//	@Description	get team of competition
-//	@Tags			Competition
-//	@Param			id	path	string	true	"competition id"
-//	@Accept			json
-//	@Success		200	{object}		app.CompetitionTeamDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/team [get]
+// @Summary		GetMyTeam
+// @Description	get team of competition
+// @Tags			Competition
+// @Param			id	path	string	true	"competition id"
+// @Accept			json
+// @Success		200	{object}		app.CompetitionTeamDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/team [get]
 func (ctl *CompetitionController) GetMyTeam(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -289,14 +295,14 @@ func (ctl *CompetitionController) GetMyTeam(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		GetRankingList
-//	@Description	get ranking list of competition
-//	@Tags			Competition
-//	@Param			id	path	string	true	"competition id"
-//	@Accept			json
-//	@Success		200	{object}		app.CompetitonRankingDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/ranking [get]
+// @Summary		GetRankingList
+// @Description	get ranking list of competition
+// @Tags			Competition
+// @Param			id	path	string	true	"competition id"
+// @Accept			json
+// @Success		200	{object}		app.CompetitonRankingDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/ranking [get]
 func (ctl *CompetitionController) GetRankingList(ctx *gin.Context) {
 	data, err := ctl.s.GetRankingList(ctx.Param("id"))
 	if err != nil {
@@ -306,14 +312,14 @@ func (ctl *CompetitionController) GetRankingList(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		GetSubmissions
-//	@Description	get submissions
-//	@Tags			Competition
-//	@Param			id	path	string	true	"competition id"
-//	@Accept			json
-//	@Success		200	{object}		app.CompetitionSubmissionsDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/submissions [get]
+// @Summary		GetSubmissions
+// @Description	get submissions
+// @Tags			Competition
+// @Param			id	path	string	true	"competition id"
+// @Accept			json
+// @Success		200	{object}		app.CompetitionSubmissionsDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/submissions [get]
 func (ctl *CompetitionController) GetSubmissions(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -332,20 +338,22 @@ func (ctl *CompetitionController) GetSubmissions(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		Submit
-//	@Description	submit
-//	@Tags			Competition
-//	@Param			id		path		string	true	"competition id"
-//	@Param			file	formData	file	true	"result file"
-//	@Accept			json
-//	@Success		201	{object}		app.CompetitionSubmissionDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/submissions [post]
+// @Summary		Submit
+// @Description	submit
+// @Tags			Competition
+// @Param			id		path		string	true	"competition id"
+// @Param			file	formData	file	true	"result file"
+// @Accept			json
+// @Success		201	{object}		app.CompetitionSubmissionDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/submissions [post]
 func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "submit")
 
 	f, err := ctx.FormFile("file")
 	if err != nil {
@@ -395,20 +403,22 @@ func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		AddRelatedProject
-//	@Description	add related project
-//	@Tags			Competition
-//	@Param			id		path	string						true	"competition id"
-//	@Param			body	body	cc.AddRelatedProjectRequest	true	"project info"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/realted_project [put]
+// @Summary		AddRelatedProject
+// @Description	add related project
+// @Tags			Competition
+// @Param			id		path	string						true	"competition id"
+// @Param			body	body	cc.AddRelatedProjectRequest	true	"project info"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/realted_project [put]
 func (ctl *CompetitionController) AddRelatedProject(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related project")
 
 	req := cc.AddRelatedProjectRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -451,15 +461,15 @@ func (ctl *CompetitionController) AddRelatedProject(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		ChangeName
-//	@Description	change name of a team
-//	@Tags			Competition
-//	@Param			id		path	string						true	"competition id"
-//	@Param			body	body	cc.ChangeTeamNameRequest	true	"body of team name"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/team/action/change_name [put]
+// @Summary		ChangeName
+// @Description	change name of a team
+// @Tags			Competition
+// @Param			id		path	string						true	"competition id"
+// @Param			body	body	cc.ChangeTeamNameRequest	true	"body of team name"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/team/action/change_name [put]
 func (ctl *CompetitionController) ChangeName(ctx *gin.Context) {
 	req := cc.ChangeTeamNameRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -472,6 +482,8 @@ func (ctl *CompetitionController) ChangeName(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "change a team name")
 
 	cmd, err := req.ToCmd(pl.DomainAccount())
 	if err != nil {
@@ -487,15 +499,15 @@ func (ctl *CompetitionController) ChangeName(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		TransferLeader
-//	@Description	transfer leader to a member
-//	@Tags			Competition
-//	@Param			id		path	string						true	"competition id"
-//	@Param			body	body	cc.TransferLeaderRequest	true	"body of member"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/team/action/transfer_leader [put]
+// @Summary		TransferLeader
+// @Description	transfer leader to a member
+// @Tags			Competition
+// @Param			id		path	string						true	"competition id"
+// @Param			body	body	cc.TransferLeaderRequest	true	"body of member"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/team/action/transfer_leader [put]
 func (ctl *CompetitionController) TransferLeader(ctx *gin.Context) {
 	req := cc.TransferLeaderRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -508,6 +520,8 @@ func (ctl *CompetitionController) TransferLeader(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "transfer leader to a member")
 
 	cmd, err := req.ToCmd(pl.DomainAccount())
 	if err != nil {
@@ -523,19 +537,21 @@ func (ctl *CompetitionController) TransferLeader(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		QuitTeam
-//	@Description	quit team
-//	@Tags			Competition
-//	@Param			id	path	string	true	"competition id"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/team/action/quit [put]
+// @Summary		QuitTeam
+// @Description	quit team
+// @Tags			Competition
+// @Param			id	path	string	true	"competition id"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/team/action/quit [put]
 func (ctl *CompetitionController) QuitTeam(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "quit team")
 
 	err := ctl.s.QuitTeam(ctx.Param("id"), pl.DomainAccount())
 	if err != nil {
@@ -545,15 +561,15 @@ func (ctl *CompetitionController) QuitTeam(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		DeleteMember
-//	@Description	delete member of a team
-//	@Tags			Competition
-//	@Param			id		path	string					true	"competition id"
-//	@Param			body	body	cc.DeleteMemberRequest	true	"body of delete member"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/team/action/delete_member [put]
+// @Summary		DeleteMember
+// @Description	delete member of a team
+// @Tags			Competition
+// @Param			id		path	string					true	"competition id"
+// @Param			body	body	cc.DeleteMemberRequest	true	"body of delete member"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/team/action/delete_member [put]
 func (ctl *CompetitionController) DeleteMember(ctx *gin.Context) {
 	req := cc.DeleteMemberRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -566,6 +582,8 @@ func (ctl *CompetitionController) DeleteMember(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete member of a team")
 
 	cmd, err := req.ToCmd(pl.DomainAccount())
 	if err != nil {
@@ -581,19 +599,21 @@ func (ctl *CompetitionController) DeleteMember(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		Dissolve
-//	@Description	dissolve a team
-//	@Tags			Competition
-//	@Param			id	path	string	true	"competition id"
-//	@Accept			json
-//	@Success		202
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/{id}/team/action/dissolve [put]
+// @Summary		Dissolve
+// @Description	dissolve a team
+// @Tags			Competition
+// @Param			id	path	string	true	"competition id"
+// @Accept			json
+// @Success		202
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/{id}/team/action/dissolve [put]
 func (ctl *CompetitionController) Dissolve(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "dissolve a team")
 
 	err := ctl.s.DissolveTeam(ctx.Param("id"), pl.DomainAccount())
 	if err != nil {
@@ -603,13 +623,13 @@ func (ctl *CompetitionController) Dissolve(ctx *gin.Context) {
 	}
 }
 
-//	@Summary		GetRegisterInfo
-//	@Description	get register info
-//	@Tags			Competition
-//	@Accept			json
-//	@Success		200	{object}		app.UserRegisterInfoDTO
-//	@Failure		500	system_error	system	error
-//	@Router			/v1/competition/reginfo [get]
+// @Summary		GetRegisterInfo
+// @Description	get register info
+// @Tags			Competition
+// @Accept			json
+// @Success		200	{object}		app.UserRegisterInfoDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/competition/reginfo [get]
 func (ctl *CompetitionController) GetRegisterInfo(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)

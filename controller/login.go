@@ -295,6 +295,8 @@ func (ctl *LoginController) SignIn(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "user sign in")
+
 	if err := ctl.ls.SignIn(pl.DomainAccount()); err != nil {
 		ctl.sendCodeMessage(ctx, "", err)
 	} else {
