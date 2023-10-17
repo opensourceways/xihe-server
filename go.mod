@@ -11,7 +11,7 @@ require (
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.11
 	github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb
 	github.com/opensourceways/kafka-lib v0.0.0-20230905120934-4961d2b76841
-	github.com/opensourceways/redis-lib v0.0.0-20230830095926-13d246a18179
+	github.com/opensourceways/redis-lib v0.0.0-20231017144431-262c6f22f36a
 	github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db
 	github.com/opensourceways/xihe-finetune v0.0.0-20230703130658-2d606e66b81d
 	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20230317111524-e67370a0eb26
