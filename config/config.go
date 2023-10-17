@@ -70,6 +70,7 @@ func (cfg *Config) GetRedisConfig() redislib.Config {
 		Password: cfg.Redis.DB.Password,
 		DB:       cfg.Redis.DB.DB,
 		Timeout:  cfg.Redis.DB.Timeout,
+		DBCert:   cfg.Redis.DB.DBCert,
 	}
 }
 
