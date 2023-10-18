@@ -8,6 +8,7 @@ type Config struct {
 	KeyPair  string `json:"key_pair"  required:"true"`
 	DB       int    `json:"db"`
 	Timeout  int64  `json:"timeout"`
+	DBCert   string `json:"db_cert"  required:"true"`
 }
 
 func (p *Config) SetDefault() {
