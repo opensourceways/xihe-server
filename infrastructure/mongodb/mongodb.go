@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"time"
@@ -25,9 +26,8 @@ func Initialize(conn, dbName, dbCert string) error {
 	}
 
 	pool := x509.NewCertPool()
-	ok := pool.AppendCertsFromPEM([]byte(ca))
-	if !ok {
-		return err
+	if !pool.AppendCertsFromPEM(ca) {
+		return fmt.Errorf("faild to append certs from PEM")
 	}
 
 	tlsConfig := &tls.Config{

@@ -321,12 +321,8 @@ github.com/opensourceways/community-robot-lib v0.0.0-20230111083119-2d2c0df320bb
 github.com/opensourceways/go-gitee v0.0.0-20220714075315-cb246f1dfb96/go.mod h1:yvVsEMhp7frMblzN1sco4C7cRlnlpqkkn3O2JQNdRu0=
 github.com/opensourceways/kafka-lib v0.0.0-20230905120934-4961d2b76841 h1:+t7oDeW8mnRvdSumxeySYYQpjK3HDFsieKIu25D/fpE=
 github.com/opensourceways/kafka-lib v0.0.0-20230905120934-4961d2b76841/go.mod h1:QdqMHorecJ6UC6dL9T1luvKMQm7jNMLOMCD1f/yNSqs=
-github.com/opensourceways/redis-lib v0.0.0-20230830095926-13d246a18179 h1:9YNcE9p1hPMuvhU4IywlCSs1t6LqrRJljXv3LNoqSDU=
-github.com/opensourceways/redis-lib v0.0.0-20230830095926-13d246a18179/go.mod h1:KeuoqWTYtmtDy4tHYkHt2xDSPtOi1WXR1uL8EwTTG6g=
-github.com/opensourceways/redis-lib v0.0.0-20231017123557-34d62d1c7a09 h1:P9iSD2DlLTRzSPnhWMf/wu0KVObQ+h6gQOMxSSyQ8rY=
-github.com/opensourceways/redis-lib v0.0.0-20231017123557-34d62d1c7a09/go.mod h1:KeuoqWTYtmtDy4tHYkHt2xDSPtOi1WXR1uL8EwTTG6g=
-github.com/opensourceways/redis-lib v0.0.0-20231017144431-262c6f22f36a h1:X6yzcrdSOzoarP42g2RVg3bBZPtofu5sNv26JzIlBbc=
-github.com/opensourceways/redis-lib v0.0.0-20231017144431-262c6f22f36a/go.mod h1:KeuoqWTYtmtDy4tHYkHt2xDSPtOi1WXR1uL8EwTTG6g=
+github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0 h1:x5UpMjd7cBML+3zqCggPO3Ry/5DxRLqiY0M7AtikON0=
+github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0/go.mod h1:KeuoqWTYtmtDy4tHYkHt2xDSPtOi1WXR1uL8EwTTG6g=
 github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db h1:syzeracFtgfmSWpKvhhvx46RcjsZSjdubbVWO83eDA8=
 github.com/opensourceways/server-common-lib v0.0.0-20230208064916-61fc43dfb8db/go.mod h1:dQQwRnyuxQIF+E2471Qx6OpMiuTMRO9NGhV4Azduwc8=
 github.com/opensourceways/xihe-finetune v0.0.0-20230703130658-2d606e66b81d h1:KrecNVMTX02fT5vhxuIuCb8DXsDWW/zFLjo25MQ7H4A=
