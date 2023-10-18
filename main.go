@@ -106,7 +106,7 @@ func main() {
 
 	// mq
 	redisCfg := cfg.GetRedisConfig()
-	if err = redislib.Init(&redisCfg); err != nil {
+	if err = redislib.Init(&redisCfg, false); err != nil {
 		log.Fatalf("initialize redis of mq failed, err:%v", err)
 	}
 
