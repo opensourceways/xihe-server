@@ -1,6 +1,8 @@
 package main
 
 import (
+	aiccmq "github.com/opensourceways/xihe-server/aiccfinetune/messagequeue"
+
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
@@ -35,16 +37,17 @@ type configuration struct {
 	MaxRetry         int    `json:"max_retry"`
 	FinetuneEndpoint string `json:"finetune_endpoint"  required:"true"`
 
-	Inference  inferenceimpl.Config        `json:"inference"    required:"true"`
-	Evaluate   evaluateConfig              `json:"evaluate"     required:"true"`
-	Cloud      cloudConfig                 `json:"cloud"        required:"true"`
-	Mongodb    config.Mongodb              `json:"mongodb"      required:"true"`
-	Postgresql PostgresqlConfig            `json:"postgresql"   required:"true"`
-	Domain     domain.Config               `json:"domain"       required:"true"`
-	MQ         kafka.Config                `json:"mq"           required:"true"`
-	MQTopics   mqTopics                    `json:"mq_topics"    required:"true"`
-	Points     pointsConfig                `json:"points"`
-	Training   messagequeue.TrainingConfig `json:"training"`
+	Inference    inferenceimpl.Config        `json:"inference"    required:"true"`
+	Evaluate     evaluateConfig              `json:"evaluate"     required:"true"`
+	Cloud        cloudConfig                 `json:"cloud"        required:"true"`
+	Mongodb      config.Mongodb              `json:"mongodb"      required:"true"`
+	Postgresql   PostgresqlConfig            `json:"postgresql"   required:"true"`
+	Domain       domain.Config               `json:"domain"       required:"true"`
+	MQ           kafka.Config                `json:"mq"           required:"true"`
+	MQTopics     mqTopics                    `json:"mq_topics"    required:"true"`
+	Points       pointsConfig                `json:"points"`
+	Training     messagequeue.TrainingConfig `json:"training"`
+	AICCFinetune aiccmq.AICCFinetuneConfig   `json:"aiccfinetune"`
 }
 
 type PostgresqlConfig struct {
@@ -190,4 +193,7 @@ type mqTopics struct {
 
 	//user
 	User userConfig `json:"user"`
+
+	// aicc finetune
+	AICCFinetuneCreated string `json:"aicc_finetune_created" required:"true"`
 }

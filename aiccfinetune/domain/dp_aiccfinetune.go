@@ -6,23 +6,17 @@ import (
 	"path/filepath"
 	"regexp"
 
+	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
 	rootDirectory = ""
 
-	computeTypeAscend = "Ascend-Powered-Engine"
-	computeTypeMPI    = "MPI"
+	finetuneTaskFinetune  = "finetune"
+	finetuneTaskInference = "inference"
 
-	computeFlaverAscend = "modelarts.kat1.xlarge.public"
-	computeFlaverGPU    = "modelarts.p3.large.public"
-
-	computeVersionCudaMS13   = "mindspore_1.3.0-cuda_10.1-py_3.7-ubuntu_1804-x86_64"
-	computeVersionCannMS17   = "mindspore_1.7.0-cann_5.1.0-py_3.7-euler_2.8.3-aarch64"
-	computeVersionCannMS19_1 = "mindspore_1.9.0-cann_6.0.RC1-py_3.7-ubuntu_18.04-amd64"
-	computeVersionCannMS19_2 = "mindspore_1.9.0-cann_6.0.RC1-py_3.9-ubuntu_18.04-amd64"
-	computeVersionCannMS20   = "mindspore_2.0.0-cann_6.3.RC1-py_3.9-ubuntu_18.04-amd64"
+	modelNameWukong = "wukong"
 )
 
 var (
@@ -30,57 +24,57 @@ var (
 	reFile      = regexp.MustCompile("^[a-zA-Z0-9_.-]+$")
 )
 
-// TrainingName
-type TrainingName interface {
-	TrainingName() string
+// FinetuneName
+type FinetuneName interface {
+	FinetuneName() string
 }
 
-func NewTrainingName(v string) (TrainingName, error) {
+func NewFinetuneName(v string) (FinetuneName, error) {
 	v = utils.XSSFilter(v)
 
-	max := DomainConfig.MaxTrainingNameLength
-	min := DomainConfig.MinTrainingNameLength
+	max := 30
+	min := 3
 
 	if n := utils.StrLen(v); n > max || n < min {
 		return nil, fmt.Errorf("name's length should be between %d to %d", min, max)
 	}
 
-	if !ReName.MatchString(v) {
+	if !types.ReName.MatchString(v) {
 		return nil, errors.New("invalid name")
 	}
 
-	return trainingName(v), nil
+	return finetuneName(v), nil
 }
 
-type trainingName string
+type finetuneName string
 
-func (r trainingName) TrainingName() string {
+func (r finetuneName) FinetuneName() string {
 	return string(r)
 }
 
-// TrainingDesc
-type TrainingDesc interface {
-	TrainingDesc() string
+// FinetuneDesc
+type FinetuneDesc interface {
+	FinetuneDesc() string
 }
 
-func NewTrainingDesc(v string) (TrainingDesc, error) {
+func NewFinetuneDesc(v string) (FinetuneDesc, error) {
 	if v == "" {
-		return trainingDesc(v), nil
+		return finetuneDesc(v), nil
 	}
 
 	v = utils.XSSFilter(v)
 
-	max := DomainConfig.MaxTrainingDescLength
+	max := 100
 	if utils.StrLen(v) > max {
 		return nil, fmt.Errorf("the length of desc should be less than %d", max)
 	}
 
-	return trainingDesc(v), nil
+	return finetuneDesc(v), nil
 }
 
-type trainingDesc string
+type finetuneDesc string
 
-func (r trainingDesc) TrainingDesc() string {
+func (r finetuneDesc) FinetuneDesc() string {
 	return string(r)
 }
 
@@ -156,96 +150,6 @@ func (r filePath) FilePath() string {
 	return string(r)
 }
 
-// ComputeType
-type ComputeType interface {
-	ComputeType() string
-}
-
-func NewComputeType(v string) (ComputeType, error) {
-	if v == "" {
-		return nil, errors.New("empty compute type")
-	}
-
-	b := v == computeTypeAscend ||
-		v == computeTypeMPI
-	if !b {
-		return nil, errors.New("invalid compute type")
-	}
-
-	return computeType(v), nil
-}
-
-type computeType string
-
-func (r computeType) ComputeType() string {
-	return string(r)
-}
-
-// ComputeVersion
-type ComputeVersion interface {
-	ComputeVersion() string
-}
-
-func NewComputeVersion(v string) (ComputeVersion, error) {
-	if v == "" {
-		return nil, errors.New("empty compute version")
-	}
-
-	b := v == computeVersionCudaMS13 ||
-		v == computeVersionCannMS17 ||
-		v == computeVersionCannMS19_1 ||
-		v == computeVersionCannMS19_2 ||
-		v == computeVersionCannMS20
-
-	if !b {
-		return nil, errors.New("invalid compute type")
-	}
-
-	return computeVersion(v), nil
-}
-
-type computeVersion string
-
-func (r computeVersion) ComputeVersion() string {
-	return string(r)
-}
-
-// ComputeFlavor
-type ComputeFlavor interface {
-	ComputeFlavor() string
-}
-
-func NewComputeFlavorVersion(flaver string, t string, version string) (ComputeFlavor, ComputeVersion, error) {
-	if flaver == "" || t == "" {
-		return nil, nil, errors.New("empty compute flavor or version")
-	}
-
-	b1 := t == computeTypeAscend && flaver == computeFlaverAscend
-	b2 := t == computeTypeMPI && flaver == computeFlaverGPU
-	if b1 {
-		b1 = version == computeVersionCannMS17 ||
-			version == computeVersionCannMS19_1 ||
-			version == computeVersionCannMS19_2 ||
-			version == computeVersionCannMS20
-	}
-
-	if b2 {
-		b2 = version == computeVersionCudaMS13
-	}
-
-	if b1 || b2 {
-		return computeFlavor(flaver), computeVersion(version), nil
-	}
-
-	return nil, nil, errors.New("invalid compute flaver or version")
-}
-
-type computeFlavor string
-
-func (r computeFlavor) ComputeFlavor() string {
-	return string(r)
-}
-
 // CustomizedKey
 type CustomizedKey interface {
 	CustomizedKey() string
@@ -310,5 +214,46 @@ func NewInputeFilePath(v string) (InputeFilePath, error) {
 type inputeFilePath string
 
 func (r inputeFilePath) InputeFilePath() string {
+	return string(r)
+}
+
+// FinetuneTask
+type FinetuneTask interface {
+	FinetuneTask() string
+}
+
+func NewFinetuneTask(v string) (FinetuneTask, error) {
+	b := v == finetuneTaskFinetune ||
+		v == finetuneTaskInference
+	if !b {
+		return nil, fmt.Errorf("invalid task %s", v)
+	}
+
+	return finetuneTask(v), nil
+}
+
+type finetuneTask string
+
+func (r finetuneTask) FinetuneTask() string {
+	return string(r)
+}
+
+// ModelName
+type ModelName interface {
+	ModelName() string
+}
+
+func NewModelName(v string) (ModelName, error) {
+	b := v == modelNameWukong
+	if !b {
+		return nil, fmt.Errorf("invalid model name %s", v)
+	}
+
+	return modelName(v), nil
+}
+
+type modelName string
+
+func (r modelName) ModelName() string {
 	return string(r)
 }

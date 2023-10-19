@@ -71,4 +71,9 @@ const (
 	ErrorFinetuneExccedMaxNum     = "finetune_excced_max_num"
 	ErrorFinetuneNoPermission     = "finetune_no_permission"
 	ErrorFinetuneRunningJobExists = "finetune_running_job_exists"
+
+	ErrorAICCFinetuneNoLog        = "aicc_finetune_no_log"
+	ErrorAICCFinetuneNoOutput     = "aicc_finetune_no_output"
+	ErrorAICCFinetuneNotFound     = "aicc_finetune_not_found"
+	ErrorAICCFinetuneExccedMaxNum = "aicc_finetune_excced_max_num" // excced max training num for a user
 )

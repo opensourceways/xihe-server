@@ -7,6 +7,7 @@ import (
 
 	"github.com/opensourceways/community-robot-lib/logrusutil"
 	liboptions "github.com/opensourceways/community-robot-lib/options"
+	"github.com/opensourceways/xihe-grpc-protocol/grpc/aiccfinetune"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/cloud"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/competition"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
@@ -16,6 +17,9 @@ import (
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/training"
 	"github.com/sirupsen/logrus"
 
+	aiccapp "github.com/opensourceways/xihe-server/aiccfinetune/app"
+	aiccdomain "github.com/opensourceways/xihe-server/aiccfinetune/domain"
+	aiccrepo "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/app"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	clouddomain "github.com/opensourceways/xihe-server/cloud/domain"
@@ -145,6 +149,13 @@ func main() {
 		),
 	)
 
+	// aiccfinetune
+	aiccfinetuneService := aiccapp.NewAICCFinetuneInternalService(
+		aiccrepo.NewAICCFinetuneRepo(
+			mongodb.NewCollection(collections.AICCFinetune),
+		),
+	)
+
 	// cfg
 	cfg.initDomainConfig()
 
@@ -157,6 +168,7 @@ func main() {
 	s.RegisterInferenceServer(inferenceServer{inferenceService})
 	s.RegisterCloudServer(cloudServer{cloudService})
 	s.RegisterCompetitionServer(competitionServer{competitionService})
+	s.RegisterAICCFinetuneServer(aiccFinetuneServer{aiccfinetuneService})
 
 	if err := s.Run(strconv.Itoa(o.service.Port)); err != nil {
 		log.Errorf("start server failed, err:%s", err.Error())
@@ -311,6 +323,39 @@ func (t competitionServer) SetSubmissionInfo(
 			Id:     v.Id,
 			Status: v.Status,
 			Score:  v.Score,
+		},
+	)
+}
+
+// competition
+type aiccFinetuneServer struct {
+	service aiccapp.AICCFinetuneInternalService
+}
+
+func (t aiccFinetuneServer) SetAICCFinetuneInfo(
+	index *aiccfinetune.AICCFinetuneIndex, info *aiccfinetune.AICCFinetuneInfo,
+) error {
+	u, err := domain.NewAccount(index.User)
+	if err != nil {
+		return nil
+	}
+
+	model, err := aiccdomain.NewModelName(index.Model)
+	if err != nil {
+		return nil
+	}
+	return t.service.UpdateJobDetails(
+		&aiccdomain.AICCFinetuneIndex{
+			Model: model,
+			User:  u,
+
+			FinetuneId: index.Id,
+		},
+		&aiccapp.JobDetail{
+			Duration:   info.Duration,
+			Status:     info.Status,
+			LogPath:    info.LogPath,
+			OutputPath: info.OutputZipPath,
 		},
 	)
 }
