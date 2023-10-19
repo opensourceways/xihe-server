@@ -67,6 +67,8 @@ func (ctl *AICCFinetuneController) Create(ctx *gin.Context) {
 		return
 	}
 
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create aicc finetune")
+
 	cmd := new(app.AICCFinetuneCreateCmd)
 	cmd.User = pl.DomainAccount()
 
@@ -111,6 +113,9 @@ func (ctl *AICCFinetuneController) Delete(ctx *gin.Context) {
 		return
 	}
 
+	pl, _, _ := ctl.checkUserApiToken(ctx, false)
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete aicc finetune")
+
 	if err := ctl.as.Delete(&info); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
@@ -137,6 +142,9 @@ func (ctl *AICCFinetuneController) Terminate(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	pl, _, _ := ctl.checkUserApiToken(ctx, false)
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "terminate aicc finetune")
 
 	if err := ctl.as.Terminate(&info); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -500,6 +508,8 @@ func (ctl *AICCFinetuneController) UploadData(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "upload data")
 
 	model, err := domain.NewModelName(ctx.Param("model"))
 	if err != nil {
