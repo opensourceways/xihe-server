@@ -35,11 +35,7 @@ func Init(cfg *Config) error {
 	}
 
 	fm.vqaInfo = newVQAInfo(cfg)
-	fm.panguInfo = newPanGuInfo(cfg)
 	fm.luojiaInfo = newLuoJiaInfo(cfg)
-	fm.codegeexInfo = newCodeGeexInfo(cfg)
-	fm.pictureGenInfo = newPictureGenInfo(cfg)
-	fm.pictureDescInfo = newPictureDescInfo(cfg)
 	fm.aiDetectorInfo = newAIDetectorInfo(cfg)
 	fm.wukongInfo, err = newWuKongInfo(cfg)
 	fm.baichuanInfo, err = newBaiChuanInfo(cfg)
@@ -60,17 +56,13 @@ type service struct {
 
 	hc utils.HttpClient
 
-	vqaInfo         vqaInfo
-	panguInfo       panguInfo
-	wukongInfo      wukongInfo
-	luojiaInfo      luojiaInfo
-	codegeexInfo    codegeexInfo
-	pictureGenInfo  pictureGenInfo
-	pictureDescInfo pictureDescInfo
-	aiDetectorInfo  aiDetectorInfo
-	baichuanInfo    baichuanInfo
-	glm2Info        glm2Info
-	llama2Info      llama2Info
+	vqaInfo        vqaInfo
+	wukongInfo     wukongInfo
+	luojiaInfo     luojiaInfo
+	aiDetectorInfo aiDetectorInfo
+	baichuanInfo   baichuanInfo
+	glm2Info       glm2Info
+	llama2Info     llama2Info
 }
 
 func (s *service) token() (string, error) {

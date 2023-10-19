@@ -23,26 +23,11 @@ import (
 )
 
 type BigModelService interface {
-	// taichu
-	DescribePicture(types.Account, io.Reader, string, int64) (string, error)
-	DescribePictureHF(*DescribePictureCmd) (string, error)
-	GenPicture(GenPictureCmd) (string, string, error)
-	GenPictures(GenPictureCmd) ([]string, string, error)
-	Ask(types.Account, domain.Question, string) (string, string, error)
-	VQAUploadPicture(io.Reader, types.Account, string) error
-	VQAHF(*VQAHFCmd) (string, string, error)
-
 	// luojia
 	LuoJiaUploadPicture(io.Reader, types.Account) error
 	LuoJia(types.Account) (string, error)
 	ListLuoJiaRecord(types.Account) ([]LuoJiaRecordDTO, error)
 	LuoJiaHF(*LuoJiaHFCmd) (string, error)
-
-	// pangu
-	PanGu(types.Account, string) (string, string, error)
-
-	// codegeex
-	CodeGeex(types.Account, *CodeGeexCmd) (CodeGeexDTO, string, error)
 
 	// wukong
 	GenWuKongSamples(int) ([]string, error)
