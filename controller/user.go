@@ -32,7 +32,6 @@ func AddRouterForUserController(
 		register: register,
 	}
 
-	rg.POST("/v1/user", ctl.Create) // TODO: delete
 	rg.PUT("/v1/user", ctl.Update)
 	rg.GET("/v1/user", ctl.Get)
 
@@ -61,75 +60,6 @@ type UserController struct {
 	s        userapp.UserService
 	email    userapp.EmailService
 	register userapp.RegService
-}
-
-// @Summary		Create
-// @Description	create user
-// @Tags			User
-// @Param			body	body	userCreateRequest	true	"body of creating user"
-// @Accept			json
-// @Success		201	{object}			app.UserDTO
-// @Failure		400	bad_request_body	can't	parse		request	body
-// @Failure		400	bad_request_param	some	parameter	of		body	is	invalid
-// @Failure		500	system_error		system	error
-// @Failure		500	duplicate_creating	create	user	repeatedly
-// @Router			/v1/user [post]
-func (ctl *UserController) Create(ctx *gin.Context) {
-	token, _, err := ctl.getToken(ctx)
-
-	if err != nil || token != apiConfig.DefaultPassword {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorNotAllowed, "not allow",
-		))
-
-		return
-	}
-
-	pl, _, _ := ctl.checkUserApiToken(ctx, false)
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create user")
-
-	req := userCreateRequest{}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorBadRequestBody,
-			"can't fetch request body",
-		))
-
-		return
-	}
-
-	cmd, err := req.toCmd()
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
-			errorBadRequestParam, err,
-		))
-
-		return
-	}
-
-	d, err := ctl.s.Create(&cmd)
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-
-		return
-	}
-
-	token, csrftoken, err := ctl.newApiToken(ctx, oldUserTokenPayload{
-		Account:                 d.Account,
-		Email:                   d.Email,
-		PlatformToken:           d.Platform.Token,
-		PlatformUserNamespaceId: d.Platform.NamespaceId,
-	})
-	if err != nil {
-		ctl.sendRespWithInternalError(
-			ctx, newResponseCodeError(errorSystemError, err),
-		)
-
-		return
-	}
-
-	ctl.setRespToken(ctx, token, csrftoken, d.Account)
-	ctx.JSON(http.StatusCreated, newResponseData(d))
 }
 
 // @Summary		Update
