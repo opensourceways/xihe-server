@@ -40,16 +40,17 @@ func (cmd *InferenceCreateCmd) Validate() error {
 	return nil
 }
 
-func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit string) {
+func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit, requester string) {
 	v.Project.Id = cmd.ProjectId
 	v.LastCommit = lastCommit
 	v.ProjectName = cmd.ProjectName
 	v.ResourceLevel = cmd.ResourceLevel
 	v.Project.Owner = cmd.ProjectOwner
+	v.Requester = requester
 }
 
 type InferenceService interface {
-	Create(*UserInfo, *InferenceCreateCmd) (InferenceDTO, string, error)
+	Create(string, *UserInfo, *InferenceCreateCmd) (InferenceDTO, string, error)
 	Get(info *InferenceIndex) (InferenceDTO, error)
 }
 
@@ -89,10 +90,10 @@ func (dto *InferenceDTO) canReuseCurrent() bool {
 	return dto.AccessURL != ""
 }
 
-func (s inferenceService) Create(u *UserInfo, cmd *InferenceCreateCmd) (
+func (s inferenceService) Create(user string, owner *UserInfo, cmd *InferenceCreateCmd) (
 	dto InferenceDTO, sha string, err error,
 ) {
-	sha, b, err := s.p.GetDirFileInfo(u, &platform.RepoDirFile{
+	sha, b, err := s.p.GetDirFileInfo(owner, &platform.RepoDirFile{
 		RepoName: cmd.ProjectName,
 		Dir:      cmd.InferenceDir,
 		File:     cmd.BootFile,
@@ -108,7 +109,7 @@ func (s inferenceService) Create(u *UserInfo, cmd *InferenceCreateCmd) (
 	}
 
 	instance := new(domain.Inference)
-	cmd.toInference(instance, sha)
+	cmd.toInference(instance, sha, user)
 
 	dto, version, err := s.check(instance)
 	if err != nil {

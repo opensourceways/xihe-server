@@ -12,6 +12,7 @@ type InferenceInfo struct {
 
 	ProjectName   ResourceName
 	ResourceLevel string
+	Requester     string
 }
 
 type InferenceDetail struct {

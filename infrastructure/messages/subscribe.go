@@ -241,6 +241,7 @@ func (r *register) registerHandlerForInference(handler interface{}) error {
 
 		info := domain.InferenceInfo{
 			InferenceIndex: v,
+			Requester:      body.User,
 		}
 
 		info.ProjectName, err = domain.NewResourceName(body.ProjectName)

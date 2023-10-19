@@ -152,7 +152,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		BootFile:      ctl.inferenceBootFile,
 	}
 
-	dto, lastCommit, err := ctl.s.Create(&u, &cmd)
+	dto, lastCommit, err := ctl.s.Create(pl.Account, &u, &cmd)
 	if err != nil {
 		ws.WriteJSON(newResponseError(err))
 

@@ -1,6 +1,7 @@
 package messages
 
 import (
+	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 )
@@ -33,6 +34,7 @@ type msgInference struct {
 
 	msgCreateInference
 	msgExtendInference
+	common.MsgNormal
 }
 
 type msgCreateInference struct {
