@@ -35,24 +35,10 @@ type BigModel interface {
 	CheckWuKongPicturePublicToLike(types.Account, string) (string, error)
 	CheckWuKongPictureToPublic(types.Account, string) (domain.WuKongPictureMeta, string, error)
 
-	// taichu
-	DescribePicture(io.Reader, string, int64, string) (string, error)
-	GenPicture(types.Account, string) (string, error)
-	GenPictures(types.Account, string) ([]string, error)
-	Ask(domain.Question, string) (string, error)
-	VQAUploadPicture(f io.Reader, u types.Account, fileName string) error
-	AskHF(f io.Reader, u types.Account, ask string) (string, error)
-
 	// luojia
 	LuoJiaUploadPicture(f io.Reader, u types.Account) error
 	LuoJia(string) (string, error)
 	LuoJiaHF(io.Reader) (string, error)
-
-	// pangu
-	PanGu(string) (string, error)
-
-	// codegeex
-	CodeGeex(*CodeGeexReq) (CodeGeexResp, error)
 
 	// ai detector
 	AIDetector(domain.AIDetectorInput) (bool, error)
