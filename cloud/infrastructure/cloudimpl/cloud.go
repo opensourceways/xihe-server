@@ -20,6 +20,7 @@ type cloudpodImpl struct {
 func (impl *cloudpodImpl) Create(info *cloud.CloudPodCreateInfo) error {
 	opt := &sdk.CloudPodCreateOption{
 		PodId:        info.PodId,
+		User:         info.User,
 		SurvivalTime: info.SurvivalTime,
 	}
 

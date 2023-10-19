@@ -51,6 +51,7 @@ func (impl *inferenceImpl) Create(info *inference.InferenceInfo) (int, error) {
 	opt.User = info.Project.Owner.Account()
 	opt.ProjectId = info.Project.Id
 	opt.InferenceId = info.Id
+	opt.Requester = info.Requester
 
 	return survivalTime, impl.cli.CreateInference(&opt)
 }

@@ -1,6 +1,8 @@
 package messages
 
 import (
+	"fmt"
+
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
@@ -35,6 +37,12 @@ func (s *sender) CreateInference(info *domain.InferenceInfo) error {
 	v.Action = actionCreate
 	v.ProjectName = info.ProjectName.ResourceName()
 	v.ResourceLevel = info.ResourceLevel
+	v.MsgNormal = common.MsgNormal{
+		User:      info.Requester,
+		Type:      "",
+		Desc:      fmt.Sprintf("%s start a inference job for %s", info.Requester, info.ProjectName.ResourceName()),
+		CreatedAt: utils.Now(),
+	}
 
 	return s.send(s.topics.Inference, &v)
 
