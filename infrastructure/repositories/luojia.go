@@ -71,15 +71,6 @@ func (impl luojia) toUserLuoJiaRecordDO(
 	do.CreatedAt = r.CreatedAt
 }
 
-func (impl luojia) toLuoJiaRecordIndexDO(
-	r *domain.LuoJiaRecordIndex, do *LuoJiaRecordIndexDO,
-) {
-	*do = LuoJiaRecordIndexDO{
-		User: r.User.Account(),
-		Id:   r.Id,
-	}
-}
-
 type UserLuoJiaRecordDO struct {
 	User string
 

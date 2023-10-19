@@ -48,10 +48,6 @@ func (pl *oldUserTokenPayload) hasEmail() bool {
 	return pl.Email != "" && pl.PlatformToken != ""
 }
 
-type newUserTokenPayload struct {
-	AccessToken string `json:"access_token"`
-}
-
 func AddRouterForLoginController(
 	rg *gin.RouterGroup,
 	us userapp.UserService,

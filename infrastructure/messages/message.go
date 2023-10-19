@@ -19,18 +19,6 @@ type MsgOperateLog struct {
 	Info map[string]string `json:"info,omitempty"`
 }
 
-type msgFollower struct {
-	Action   string `json:"action"`
-	User     string `json:"user"`
-	Follower string `json:"follower"`
-}
-
-type msgTraining struct {
-	User       string `json:"user"`
-	ProjectId  string `json:"pid"`
-	TrainingId string `json:"rid"`
-}
-
 type msgFinetune struct {
 	User string `json:"user"`
 	Id   string `json:"id"`
