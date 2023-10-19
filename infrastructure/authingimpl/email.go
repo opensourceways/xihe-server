@@ -12,11 +12,7 @@ import (
 )
 
 const (
-	resetPassword = "CHANNEL_RESET_PASSWORD"
-	verifyEmail   = "CHANNEL_VERIFY_EMAIL_LINK"
-	changeEmail   = "CHANNEL_UPDATE_EMAIL"
-	bindEmail     = "CHANNEL_BIND_EMAIL"
-	unbindEmail   = "CHANNEL_UNBIND_EMAIL"
+	bindEmail = "CHANNEL_BIND_EMAIL"
 
 	accountTypeEmail = "email"
 

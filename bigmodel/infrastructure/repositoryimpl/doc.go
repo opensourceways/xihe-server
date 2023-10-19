@@ -26,41 +26,6 @@ type DCompetitorInfo struct {
 	Detail   map[string]string `bson:"detail"    json:"detail,omitempty"`
 }
 
-type dAIQuestion struct {
-	Competitors []DCompetitorInfo     `bson:"competitors"   json:"-"`
-	Submissions []dQuestionSubmission `bson:"submissions"   json:"-"`
-}
-
-type dQuestionSubmission struct {
-	Id      string `bson:"id"          json:"id,omitempty"`
-	Date    string `bson:"date"        json:"date,omitempty"`
-	Status  string `bson:"status"      json:"status,omitempty"`
-	Account string `bson:"account"     json:"account,omitempty"`
-	Expiry  int64  `bson:"expiry"      json:"expiry,omitempty"`
-	Score   int    `bson:"score"       json:"score,omitempty"`
-	Times   int    `bson:"times"       json:"times,omitempty"`
-	Version int    `bson:"version"     json:"-"`
-}
-
-type dQuestionPool struct {
-	Choices     []dChoiceQuestion     `bson:"choices"       json:"choices"`
-	Completions []dCompletionQuestion `bson:"completions"   json:"completions"`
-}
-
-type dChoiceQuestion struct {
-	Num     int      `bson:"num"       json:"num"`
-	Desc    string   `bson:"desc"      json:"desc"`
-	Answer  string   `bson:"answer"    json:"answer"`
-	Options []string `bson:"options"   json:"options"`
-}
-
-type dCompletionQuestion struct {
-	Num    int    `bson:"num"          json:"num"`
-	Desc   string `bson:"desc"         json:"desc"`
-	Info   string `bson:"info"         json:"info"`
-	Answer string `bson:"answer"       json:"answer"`
-}
-
 type dLuoJia struct {
 	Owner string       `bson:"owner"   json:"owner"`
 	Items []luojiaItem `bson:"items"   json:"-"`

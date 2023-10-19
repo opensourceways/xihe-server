@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"io"
 
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
@@ -10,12 +9,6 @@ import (
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userd "github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/utils"
-)
-
-const (
-	tempAccountHF       = "wukong_hf"
-	tempAccountVQAHF    = "vqa_hf"
-	tempAccountLuoJiaHF = "luojia_hf"
 )
 
 type describePictureResp struct {
@@ -75,45 +68,6 @@ type pictureUploadResp struct {
 	Path string `json:"path"`
 }
 
-type questionAskHFReq struct {
-	Picture  io.Reader `json:"picture"`
-	Question string    `json:"question"`
-}
-
-func (req *questionAskHFReq) toCmd() (
-	cmd app.VQAHFCmd, err error,
-) {
-	if cmd.User, err = types.NewAccount(tempAccountVQAHF); err != nil {
-		return
-	}
-
-	cmd.Picture = req.Picture
-
-	cmd.Ask = req.Question
-
-	err = cmd.Validate()
-
-	return
-}
-
-type luojiaHFReq struct {
-	Picture io.Reader `json:"picture"`
-}
-
-func (req *luojiaHFReq) toCmd() (
-	cmd app.LuoJiaHFCmd, err error,
-) {
-	if cmd.User, err = types.NewAccount(tempAccountLuoJiaHF); err != nil {
-		return
-	}
-
-	cmd.Picture = req.Picture
-
-	err = cmd.Validate()
-
-	return
-}
-
 type panguRequest struct {
 	Question string `json:"question"`
 }
@@ -124,22 +78,6 @@ type panguResp struct {
 
 type luojiaResp struct {
 	Answer string `json:"answer"`
-}
-
-type CodeGeexRequest struct {
-	Lang    string `json:"lang"`
-	Content string `json:"content"`
-}
-
-func (req *CodeGeexRequest) toCmd() (
-	cmd app.CodeGeexCmd, err error,
-) {
-	cmd.Lang = req.Lang
-	cmd.Content = req.Content
-
-	err = cmd.Validate()
-
-	return
 }
 
 type wukongRequest struct {
@@ -160,27 +98,6 @@ func (req *wukongRequest) toCmd() (cmd app.WuKongCmd, err error) {
 		cmd.EsType = string(domain.BigmodelWuKong4Img)
 	default:
 		cmd.EsType = string(domain.BigmodelWuKong)
-	}
-
-	err = cmd.Validate()
-
-	return
-}
-
-type wukongHFRequest struct {
-	Desc  string `json:"desc"`
-	Style string `json:"style"`
-}
-
-func (req *wukongHFRequest) toCmd() (cmd app.WuKongHFCmd, err error) {
-	if cmd.User, err = types.NewAccount(tempAccountHF); err != nil {
-		return
-	}
-
-	cmd.Style = req.Style
-
-	if cmd.Desc, err = domain.NewWuKongPictureDesc(req.Desc); err != nil {
-		return
 	}
 
 	err = cmd.Validate()

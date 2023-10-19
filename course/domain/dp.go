@@ -14,7 +14,6 @@ const (
 	courseTypeFramework   = "framework"
 	courseTypeCV          = "cv"
 	courseTypeNLP         = "nlp"
-	courseTypeAI4Science  = "ai4science"
 	courseTypeScholar     = "scholar"
 	courseTypeIndustry    = "industry"
 	courseTypeElectricity = "electricity"

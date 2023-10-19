@@ -111,28 +111,6 @@ type WuKongPublicDTO struct { // public
 	WuKongPictureBaseDTO
 }
 
-func (dto *WuKongPublicDTO) toWuKongPublicDTO(
-	p *domain.WuKongPicture, avatar string,
-	isLike bool, likeId string, isDigg bool, link string,
-) {
-	*dto = WuKongPublicDTO{
-		Avatar:    avatar,
-		IsLike:    isLike,
-		LikeID:    likeId,
-		IsDigg:    isDigg,
-		DiggCount: p.DiggCount,
-
-		WuKongPictureBaseDTO: WuKongPictureBaseDTO{
-			Id:        p.Id,
-			Owner:     p.Owner.Account(),
-			Desc:      p.Desc.WuKongPictureDesc(),
-			Style:     p.Style,
-			Link:      link,
-			CreatedAt: p.CreatedAt,
-		},
-	}
-}
-
 type WuKongIsLikeDTO struct {
 	IsLike bool
 	LikeID string

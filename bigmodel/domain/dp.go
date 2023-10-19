@@ -53,11 +53,6 @@ var (
 		"good":     1,
 		"normal":   0,
 	}
-
-	resourceLevelMap = map[string]int{
-		"official": 2,
-		"good":     1,
-	}
 )
 
 // BigmodelType

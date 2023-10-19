@@ -13,29 +13,6 @@ func NewCompetitionRepo(m mongodbClient) repository.Competition {
 	return competitionRepoImpl{m}
 }
 
-func condFieldOfArrayElem(key string) string {
-	return "$$this." + key
-}
-
-func valueInCondForArrayElem(key string, value interface{}) bson.M {
-	return bson.M{"$in": bson.A{value, condFieldOfArrayElem(key)}}
-}
-
-func condForArrayElem(conds bson.A) bson.M {
-	n := len(conds)
-	if n > 1 {
-		return bson.M{"$and": conds}
-	}
-
-	if n == 1 {
-		return conds[0].(bson.M)
-	}
-
-	return bson.M{
-		"$toBool": 1,
-	}
-}
-
 type competitionRepoImpl struct {
 	cli mongodbClient
 }
