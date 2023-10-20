@@ -15,6 +15,7 @@ type Config struct {
 	Life    int    `json:"life"     required:"true"`
 	MaxConn int    `json:"max_conn" required:"true"`
 	MaxIdle int    `json:"max_idle" required:"true"`
+	DBCert  string `json:"db_cert"  required:"true"`
 }
 
 func (p *Config) SetDefault() {
@@ -37,7 +38,7 @@ func (cfg *Config) getLifeDuration() time.Duration {
 
 func (p *Config) dsn() string {
 	return fmt.Sprintf(
-		"host=%v user=%v password=%v dbname=%v port=%v sslmode=disable TimeZone=Asia/Shanghai",
-		p.Host, p.User, p.Pwd, p.Name, p.Port,
+		"host=%v user=%v password=%v dbname=%v port=%v sslmode=verify-ca TimeZone=Asia/Shanghai sslrootcert=%s",
+		p.Host, p.User, p.Pwd, p.Name, p.Port, p.DBCert,
 	)
 }
