@@ -579,6 +579,10 @@ func (ctl baseController) getListResourceParameter(
 		if cmd.CountPerPage, err = strconv.Atoi(v); err != nil {
 			return
 		}
+		if cmd.CountPerPage > 100 || cmd.CountPerPage <= 0 {
+			err = errors.New("bad count_per_page")
+			return
+		}
 	}
 
 	if v := ctl.getQueryParameter(ctx, "page_num"); v != "" {
