@@ -137,6 +137,10 @@ func main() {
 		logrus.Fatalf("init postgresql failed, err:%s", err.Error())
 	}
 
+	if err := os.Remove(cfg.Postgresql.DB.DBCert); err != nil {
+		logrus.Fatalf("postgresql dbcert file delete failed, err:%s", err.Error())
+	}
+
 	// redis
 	if err := redis.Init(&cfg.Redis.DB); err != nil {
 		logrus.Fatalf("init redis failed, err:%s", err.Error())
