@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -652,6 +653,10 @@ func (ctl *BigModelController) GetPublicsGlobal(ctx *gin.Context) {
 	f := func() (err error) {
 		if v := ctl.getQueryParameter(ctx, "count_per_page"); v != "" {
 			if cmd.CountPerPage, err = strconv.Atoi(v); err != nil {
+				return
+			}
+			if cmd.CountPerPage > 100 || cmd.CountPerPage <= 0 {
+				err = errors.New("bad count_per_page")
 				return
 			}
 		}
