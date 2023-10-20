@@ -115,6 +115,10 @@ func main() {
 		logrus.Fatalf("init db, err:%s", err.Error())
 	}
 
+	if err := os.Remove(cfg.Postgresql.DB.DBCert); err != nil {
+		logrus.Fatalf("postgresql dbcert file delete failed, err:%s", err.Error())
+	}
+
 	// cfg
 	cfg.initDomainConfig()
 
