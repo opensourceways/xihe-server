@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 	"strconv"
+	"errors"
 
 	"github.com/gin-gonic/gin"
 
@@ -156,6 +157,14 @@ func (ctl *UserController) genListFollowsCmd(
 
 	if v := ctl.getQueryParameter(ctx, "count_per_page"); v != "" {
 		if cmd.CountPerPage, err = strconv.Atoi(v); err != nil {
+			ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+				errorBadRequestParam, err,
+			))
+
+			return
+		}
+		if cmd.CountPerPage > 50 || cmd.CountPerPage <= 0 {
+			err = errors.New("bad count_per_page")
 			ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 				errorBadRequestParam, err,
 			))
