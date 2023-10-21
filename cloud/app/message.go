@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/cloud/domain/cloud"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
+	"github.com/sirupsen/logrus"
 )
 
 type CloudMessageService interface {
@@ -30,6 +31,7 @@ type cloudMessageService struct {
 
 func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
 	// create pod instance by SDK
+	logrus.Debugf("send create pod info: %#v", p)
 	err := c.manager.Create(
 		&cloud.CloudPodCreateInfo{
 			PodId:        p.Id,

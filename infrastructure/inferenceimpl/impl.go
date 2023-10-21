@@ -2,6 +2,7 @@ package inferenceimpl
 
 import (
 	"github.com/opensourceways/xihe-inference-evaluate/sdk"
+	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/inference"
@@ -53,6 +54,7 @@ func (impl *inferenceImpl) Create(info *inference.InferenceInfo) (int, error) {
 	opt.InferenceId = info.Id
 	opt.Requester = info.Requester
 
+	logrus.Debugf("create inference: %#v", opt)
 	return survivalTime, impl.cli.CreateInference(&opt)
 }
 
