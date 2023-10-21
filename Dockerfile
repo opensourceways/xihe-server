@@ -20,4 +20,10 @@ COPY  --chown=mindspore --from=BUILDER /go/src/github.com/opensourceways/xihe-se
 COPY  --chown=mindspore ./points/infrastructure/taskdocimpl/doc_chinese.tmpl  /opt/app/points/task-docs-templates/doc_chinese.tmpl
 COPY  --chown=mindspore ./points/infrastructure/taskdocimpl/doc_english.tmpl  /opt/app/points/task-docs-templates/doc_english.tmpl
 
+RUN chmod 550 /opt/app/xihe-server
+RUN chmod 640 /opt/app/points/task-docs-templates/doc_chinese.tmpl
+RUN chmod 750 /opt/app/points/task-docs-templates
+RUN chmod 640 /opt/app/points/task-docs-templates/doc_english.tmpl
+RUN chmod 750 /opt/app/points/task-docs-templates
+
 ENTRYPOINT ["/opt/app/xihe-server"]
