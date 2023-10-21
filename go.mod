@@ -10,7 +10,7 @@ require (
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.22.11+incompatible
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.11
 	github.com/opensourceways/community-robot-lib v0.0.0-20231018034126-a664e14dbb9d
-	github.com/opensourceways/kafka-lib v0.0.0-20231016135231-bf184b2d51e7
+	github.com/opensourceways/kafka-lib v0.0.0-20231023142428-b41c4ff141c6
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
 	github.com/opensourceways/server-common-lib v0.0.0-20231016134644-4bd7efe825a9
 	github.com/opensourceways/xihe-aicc-finetune v0.0.0-20230920034014-a8ff56b9eb1a
