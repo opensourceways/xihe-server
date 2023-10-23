@@ -6,7 +6,6 @@ import (
 	"io"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
-	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -158,7 +157,7 @@ type WuKongPicturesListCmd = repository.WuKongPictureListOption
 
 type WuKongAddLikeFromTempCmd struct {
 	User    types.Account
-	OBSPath bigmodeldomain.OBSPath
+	OBSPath domain.OBSPath
 }
 
 type WuKongAddLikeFromPublicCmd struct {
@@ -395,6 +394,31 @@ func (cmd *LLAMA2Cmd) SetDefault() {
 }
 
 type LLAMA2DTO struct {
+	Reply        string `json:"reply"`
+	StreamStatus string `json:"stream_status"`
+}
+
+// skywork 13b
+type SkyWorkCmd struct {
+	CH                chan string
+	User              types.Account
+	History           []domain.History
+	Sampling          bool
+	Text              domain.SkyWorkText
+	TopK              domain.TopK
+	TopP              domain.TopP
+	Temperature       domain.Temperature
+	RepetitionPenalty domain.RepetitionPenalty
+}
+
+func (cmd *SkyWorkCmd) SetDefault() {
+	cmd.TopK, _ = domain.NewTopK(1)
+	cmd.TopP, _ = domain.NewTopP(1)
+	cmd.Temperature, _ = domain.NewTemperature(1)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1)
+}
+
+type SkyWorkDTO struct {
 	Reply        string `json:"reply"`
 	StreamStatus string `json:"stream_status"`
 }
