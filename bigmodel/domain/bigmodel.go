@@ -103,3 +103,14 @@ type LLAMA2Input struct {
 	Temperature       Temperature
 	RepetitionPenalty RepetitionPenalty
 }
+
+// skywork 13b
+type SkyWorkInput struct {
+	Text              SkyWorkText
+	Sampling          bool
+	History           []History
+	TopK              TopK
+	TopP              TopP
+	Temperature       Temperature
+	RepetitionPenalty RepetitionPenalty
+}

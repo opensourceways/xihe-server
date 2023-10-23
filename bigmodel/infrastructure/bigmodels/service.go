@@ -37,10 +37,25 @@ func Init(cfg *Config) error {
 	fm.vqaInfo = newVQAInfo(cfg)
 	fm.luojiaInfo = newLuoJiaInfo(cfg)
 	fm.aiDetectorInfo = newAIDetectorInfo(cfg)
-	fm.wukongInfo, err = newWuKongInfo(cfg)
-	fm.baichuanInfo, err = newBaiChuanInfo(cfg)
-	fm.glm2Info, err = newGLM2Info(cfg)
-	fm.llama2Info, err = newLLAMA2Info(cfg)
+	if fm.wukongInfo, err = newWuKongInfo(cfg); err != nil {
+		return err
+	}
+
+	if fm.baichuanInfo, err = newBaiChuanInfo(cfg); err != nil {
+		return err
+	}
+
+	if fm.glm2Info, err = newGLM2Info(cfg); err != nil {
+		return err
+	}
+
+	if fm.llama2Info, err = newLLAMA2Info(cfg); err != nil {
+		return err
+	}
+
+	if fm.skyWorkInfo, err = newSkyWorkInfo(cfg); err != nil {
+		return err
+	}
 
 	return err
 }
@@ -63,6 +78,7 @@ type service struct {
 	baichuanInfo   baichuanInfo
 	glm2Info       glm2Info
 	llama2Info     llama2Info
+	skyWorkInfo    skyWorkInfo
 }
 
 func (s *service) token() (string, error) {
@@ -139,7 +155,11 @@ func (s *service) doWaitAndEndpointNotReturned(
 ) error {
 	select {
 	case e := <-ec:
-		return f(ec, e)
+		err := f(ec, e)
+		if err != nil {
+			ec <- e // return endpoint to channel while function returns error
+		}
+		return err
 	case <-time.After(2 * 60 * time.Second):
 		return bigmodel.NewErrorBusySource(errors.New("access overload, please try again later"))
 	}

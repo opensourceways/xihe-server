@@ -1,12 +1,12 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 	"time"
-	"errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -56,6 +56,7 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/baichuan2_7b_chat", ctl.BaiChuan)
 	rg.POST("/v1/bigmodel/glm2_6b", ctl.GLM2)
 	rg.POST("/v1/bigmodel/llama2_7b", ctl.LLAMA2)
+	rg.POST("/v1/bigmodel/skywork_13b", ctl.SkyWork)
 
 	// api apply
 	rg.POST("/v1/bigmodel/api/apply/:model", ctl.ApplyApi)
@@ -912,6 +913,73 @@ func (ctl *BigModelController) LLAMA2(ctx *gin.Context) {
 	}
 
 	code, err := ctl.s.LLAMA2(&cmd)
+	if err != nil {
+		ctx.Stream(func(w io.Writer) bool {
+			if code == app.ErrorBigModelRecourseBusy {
+				ctx.SSEvent("message", "access overload, please try again later")
+			} else if code == app.ErrorBigModelSensitiveInfo {
+				ctx.SSEvent("message", "I cannot answer such questions")
+			}
+
+			close(ch)
+
+			return false
+		})
+
+		return
+	}
+
+	ctx.Header("Content-Type", "text/event-stream; charset=utf-8")
+	ctx.Header("Cache-Control", "no-cache")
+	ctx.Header("Connection", "keep-alive")
+
+	ctx.Stream(func(w io.Writer) bool {
+		if msg, ok := <-ch; ok {
+			if msg == "done" {
+				ctx.SSEvent("status", "done")
+				close(ch)
+			} else {
+				ctx.SSEvent("message", msg)
+			}
+			return true
+		}
+		return false
+	})
+}
+
+// @Title			SkyWork
+// @Description	conversational AI
+// @Tags			BigModel
+// @Param			body	body	skyWorkReq	true	"body of skywork"
+// @Accept			json
+// @Success		202	{object}		message
+// @Failure		500	system_error	system	error
+// @Router			/v1/bigmodel/skywork_13b [post]
+func (ctl *BigModelController) SkyWork(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	desc := "launch skywork bigmodel"
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, desc)
+
+	req := skyWorkRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
+
+		return
+	}
+
+	ch := make(chan string)
+	cmd, err := req.toCmd(ch, pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	code, err := ctl.s.SkyWork(&cmd)
 	if err != nil {
 		ctx.Stream(func(w io.Writer) bool {
 			if code == app.ErrorBigModelRecourseBusy {

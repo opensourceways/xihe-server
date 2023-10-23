@@ -24,6 +24,7 @@ const (
 	bigmodelBaiChuan      = "baichuan"
 	bigmodelGLM2          = "glm2"
 	bigmodelLLAMA2        = "llama2"
+	bigmodelSkyWork       = "skywork"
 
 	langZH = "zh"
 	langEN = "en"
@@ -47,6 +48,7 @@ var (
 	BigmodelBaiChuan      = BigmodelType(bigmodelBaiChuan)
 	BigmodelGLM2          = BigmodelType(bigmodelGLM2)
 	BigmodelLLAMA2        = BigmodelType(bigmodelLLAMA2)
+	BigmodelSkyWork       = BigmodelType(bigmodelSkyWork)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
@@ -435,5 +437,28 @@ func NewLLAMA2Text(v string) (LLAMA2Text, error) {
 }
 
 func (t llama2Text) LLAMA2Text() string {
+	return string(t)
+}
+
+// skywork text
+type SkyWorkText interface {
+	SkyWorkText() string
+}
+
+type skyWorkText string
+
+func NewSkyWorkText(v string) (SkyWorkText, error) {
+	if v == "" {
+		return nil, errors.New("no skywork text")
+	}
+
+	if max := 3000; utils.StrLen(v) > max { // TODO: to config
+		return nil, errors.New("invalid skywork text")
+	}
+
+	return skyWorkText(v), nil
+}
+
+func (t skyWorkText) SkyWorkText() string {
 	return string(t)
 }

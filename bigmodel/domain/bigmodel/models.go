@@ -51,4 +51,7 @@ type BigModel interface {
 
 	// llama2
 	LLAMA2(chan string, *domain.LLAMA2Input) error
+
+	// skywork
+	SkyWork(chan string, *domain.SkyWorkInput) error
 }
