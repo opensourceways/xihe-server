@@ -124,7 +124,6 @@ func (impl aiccFinetuneRepoImpl) Get(info *domain.AICCFinetuneIndex) (obj domain
 	} else {
 		v[0].toAICCFinetuneDO(&obj)
 	}
-
 	return
 }
 
@@ -148,6 +147,7 @@ func (impl aiccFinetuneRepoImpl) List(user types.Account, Model domain.ModelName
 				subfieldOfItems(fieldDesc):      1,
 				subfieldOfItems(fieldCreatedAt): 1,
 				subfieldOfItems(fieldDetail):    1,
+				subfieldOfItems(fieldTask):      1,
 			}, &v)
 	}
 
@@ -171,6 +171,7 @@ func (impl aiccFinetuneRepoImpl) List(user types.Account, Model domain.ModelName
 
 func (impl aiccFinetuneRepoImpl) SaveJob(info *domain.AICCFinetuneIndex, job *domain.JobInfo) error {
 	v := dJobInfo{
+
 		Endpoint:  job.Endpoint,
 		JobId:     job.JobId,
 		LogDir:    job.LogDir,
@@ -188,7 +189,7 @@ func (impl aiccFinetuneRepoImpl) SaveJob(info *domain.AICCFinetuneIndex, job *do
 			fieldItems,
 			aiccFinetuneDocFilter(info.User.Account(), info.Model.ModelName()),
 			bson.M{fieldId: info.FinetuneId},
-			doc,
+			bson.M{fieldJob: doc},
 			mongoCmdSet,
 		)
 
@@ -236,10 +237,11 @@ func (impl aiccFinetuneRepoImpl) GetJobDetail(info *domain.AICCFinetuneIndex) (
 		return impl.cli.GetArrayElem(
 			ctx,
 			fieldItems,
-			aiccFinetuneDocFilter(info.User.Account(), info.FinetuneId),
+			aiccFinetuneDocFilter(info.User.Account(), info.Model.ModelName()),
 			bson.M{fieldId: info.FinetuneId},
 			bson.M{
-				subfieldOfItems(fieldJob): 1,
+				subfieldOfItems(fieldJob):    1,
+				subfieldOfItems(fieldDetail): 1,
 			},
 			&v,
 		)
@@ -252,7 +254,8 @@ func (impl aiccFinetuneRepoImpl) GetJobDetail(info *domain.AICCFinetuneIndex) (
 	if len(v) == 0 || len(v[0].Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
-		v[0].Items[0].JobDetail.toAICCFinetuneJobInfo(&job)
+		v[0].Items[0].JobDetail.toAICCFinetuneJobDetail(&job)
+		endpoint = v[0].Items[0].Job.Endpoint
 	}
 
 	return

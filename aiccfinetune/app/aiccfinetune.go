@@ -181,7 +181,7 @@ func (s aiccFinetuneService) Terminate(info *AICCFinetuneIndex) error {
 		return err
 	}
 
-	return s.af.TerminateJob(job.JobId)
+	return s.af.TerminateJob(job.Endpoint, job.JobId)
 }
 
 func (s aiccFinetuneService) GetLogDownloadURL(info *AICCFinetuneIndex) (

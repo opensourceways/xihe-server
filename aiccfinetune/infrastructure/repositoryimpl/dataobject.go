@@ -19,6 +19,7 @@ func (doc aiccFinetuneItem) toAICCFinetuneSummary(s *domain.AICCFinetuneSummary)
 	s.Status = doc.JobDetail.Status
 	s.Id = doc.Id
 	s.Error = doc.JobDetail.Error
+	s.Task = doc.Task
 
 	return
 }
@@ -31,7 +32,7 @@ func (doc dJobInfo) toAICCFinetuneJobInfo(s *domain.JobInfo) (err error) {
 	return
 }
 
-func (doc dJobDetail) toAICCFinetuneJobInfo(s *domain.JobDetail) (err error) {
+func (doc dJobDetail) toAICCFinetuneJobDetail(s *domain.JobDetail) (err error) {
 	s.Status = doc.Status
 	s.Duration = doc.Duration
 	s.Error = doc.Error
@@ -55,9 +56,26 @@ func (doc dAICCFinetune) toAICCFinetuneDO(f *domain.AICCFinetune) (err error) {
 		return
 	}
 
-	if f.AICCFinetuneConfig, err = doc.Items[0].toAICCFinetuneConfig(); err != nil {
+	var jobInfo domain.JobInfo
+	if err = doc.Items[0].Job.toAICCFinetuneJobInfo(&jobInfo); err != nil {
 		return
 	}
+	f.Job = jobInfo
+
+	if f.Name, err = domain.NewFinetuneName(doc.Items[0].Name); err != nil {
+		return
+	}
+
+	if f.Desc, err = domain.NewFinetuneDesc(doc.Items[0].Desc); err != nil {
+		return
+	}
+
+	var jobDetail domain.JobDetail
+	if err = doc.Items[0].JobDetail.toAICCFinetuneJobDetail(&jobDetail); err != nil {
+		return
+	}
+
+	f.JobDetail = jobDetail
 
 	f.CreatedAt = doc.Items[0].CreatedAt
 

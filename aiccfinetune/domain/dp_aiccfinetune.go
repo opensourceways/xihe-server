@@ -238,6 +238,29 @@ func (r finetuneTask) FinetuneTask() string {
 	return string(r)
 }
 
+// FileName
+type FileName interface {
+	FileName() string
+}
+
+func NewFileName(v string, model string, task string) error {
+	fileFinetune := map[string]string{
+		modelNameWukong: "data.zip",
+	}
+	fileInference := map[string]string{
+		modelNameWukong: "lora.ckpt",
+	}
+
+	b1 := task == finetuneTaskFinetune && v == fileFinetune[model]
+	b2 := task == finetuneTaskInference && v == fileInference[model]
+
+	if b1 || b2 {
+		return nil
+	}
+
+	return fmt.Errorf("invalid file name %s", v)
+}
+
 // ModelName
 type ModelName interface {
 	ModelName() string

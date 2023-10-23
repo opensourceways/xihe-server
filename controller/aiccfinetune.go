@@ -553,6 +553,13 @@ func (ctl *AICCFinetuneController) UploadData(ctx *gin.Context) {
 
 	defer p.Close()
 
+	err = domain.NewFileName(f.Filename, model.ModelName(), task.FinetuneTask())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+	}
+
 	cmd := &app.UploadDataCmd{
 		FileName: f.Filename,
 		Data:     p,

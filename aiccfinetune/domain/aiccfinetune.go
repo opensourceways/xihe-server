@@ -55,6 +55,7 @@ type AICCFinetuneSummary struct {
 	Status    string
 	Duration  int
 	CreatedAt int64
+	Task      string
 }
 
 type AICCFinetuneIndex struct {

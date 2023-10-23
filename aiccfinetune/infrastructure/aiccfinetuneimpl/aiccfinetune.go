@@ -71,9 +71,10 @@ func (impl *aiccFinetuneImpl) DeleteJob(endpoint, jobId string) error {
 	return cli.DeleteAICCFinetune(jobId)
 }
 
-func (impl *aiccFinetuneImpl) TerminateJob(jobId string) error {
-	cli := sdk.NewAICCFinetuneCenter(impl.endpoint)
-	return cli.TerminateeAICCFinetune(jobId)
+func (impl *aiccFinetuneImpl) TerminateJob(endpoint string, jobId string) (err error) {
+	cli := sdk.NewAICCFinetuneCenter(endpoint)
+	err = cli.TerminateeAICCFinetune(jobId)
+	return err
 }
 
 func (impl *aiccFinetuneImpl) GetLogPreviewURL(endpoint, jobId string) (string, error) {
@@ -116,11 +117,3 @@ func (impl *aiccFinetuneImpl) toKeyValue(kv []domain.KeyValue) []sdk.KeyValue {
 
 	return r
 }
-
-// type service struct {
-// 	obs obsService
-// }
-
-// func (s *aiccFinetuneImpl) Upload(data io.Reader, path string) error {
-// 	return s.obs.createObject(data, path)
-// }

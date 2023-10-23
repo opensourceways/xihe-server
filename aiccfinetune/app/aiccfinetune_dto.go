@@ -61,6 +61,7 @@ type AICCFinetuneSummaryDTO struct {
 	CreatedAt string `json:"created_at"`
 	IsDone    bool   `json:"is_done"`
 	Duration  int    `json:"duration"`
+	Task      string `json:"task"`
 }
 
 func (s aiccFinetuneService) toAICCFinetuneSummaryDTO(
@@ -79,6 +80,7 @@ func (s aiccFinetuneService) toAICCFinetuneSummaryDTO(
 		IsDone:    s.isJobDone(t.Status),
 		Duration:  t.Duration,
 		CreatedAt: utils.ToDate(t.CreatedAt),
+		Task:      t.Task,
 	}
 
 	if t.Desc != nil {
@@ -87,18 +89,16 @@ func (s aiccFinetuneService) toAICCFinetuneSummaryDTO(
 }
 
 type AICCFinetuneDTO struct {
-	Id        string `json:"id"`
-	ProjectId string `json:"project_id"`
+	Id string `json:"id"`
 
 	Name string `json:"name"`
 	Desc string `json:"desc"`
 
-	IsDone    bool       `json:"is_done"`
-	Error     string     `json:"error"`
-	Status    string     `json:"status"`
-	Duration  int        `json:"duration"`
-	CreatedAt string     `json:"created_at"`
-	Compute   ComputeDTO `json:"compute"`
+	IsDone    bool   `json:"is_done"`
+	Error     string `json:"error"`
+	Status    string `json:"status"`
+	Duration  int    `json:"duration"`
+	CreatedAt string `json:"created_at"`
 
 	LogPreviewURL string `json:"-"`
 }

@@ -12,6 +12,7 @@ const (
 	fieldVersion   = "version"
 	fieldStatus    = "status"
 	fieldItems     = "items"
+	fieldTask      = "task"
 )
 
 type dAICCFinetune struct {
