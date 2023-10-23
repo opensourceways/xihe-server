@@ -76,7 +76,8 @@ type Endpoints struct {
 	AIDetector       string `json:"ai_detector"        required:"true"`
 	BaiChuan         string `json:"baichuan"           required:"true"`
 	GLM2             string `json:"glm"                required:"true"`
-	LLAMA2           string `json:"llama"             required:"true"`
+	LLAMA2           string `json:"llama"              required:"true"`
+	SkyWork          string `json:"skywork"            required:"true"`
 }
 
 func (e *Endpoints) validate() (err error) {
@@ -121,6 +122,22 @@ func (e *Endpoints) validate() (err error) {
 	}
 
 	if _, err = e.parse(e.BaiChuan); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.GLM2); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.GLM2); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.LLAMA2); err != nil {
+		return
+	}
+
+	if _, err = e.parse(e.SkyWork); err != nil {
 		return
 	}
 
