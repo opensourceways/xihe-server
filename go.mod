@@ -13,7 +13,6 @@ require (
 	github.com/opensourceways/kafka-lib v0.0.0-20231023142428-b41c4ff141c6
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
 	github.com/opensourceways/server-common-lib v0.0.0-20231016134644-4bd7efe825a9
-	github.com/opensourceways/xihe-aicc-finetune v0.0.0-20230920034014-a8ff56b9eb1a
 	github.com/opensourceways/xihe-finetune v0.0.0-20231019031507-6825a346902e
 	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20231018090501-e7ea782f5815
 	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20231019142748-5815619c6b5b

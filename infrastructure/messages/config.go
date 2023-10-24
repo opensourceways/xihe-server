@@ -13,5 +13,4 @@ type Topics struct {
 	RelatedResource string `json:"related_resource" required:"true"`
 	Cloud           string `json:"cloud"            required:"true"`
 	Async           string `json:"async"            required:"true"`
-	AICCFinetune    string `json:"aiccfinetune"     required:"true"`
 }
