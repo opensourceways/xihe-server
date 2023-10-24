@@ -55,7 +55,7 @@ import (
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	r := gin.New()
-	r.Use(gin.Recovery())
+	r.Use(recovery())
 	r.Use(logRequest())
 
 	if err := setRouter(r, cfg); err != nil {
@@ -72,6 +72,21 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	defer interrupts.WaitForGracefulShutdown()
 
 	interrupts.ListenAndServe(srv, timeout)
+}
+
+// custom recovery, avoid printing stacks
+func recovery() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				logrus.Error(err)
+
+				c.AbortWithStatus(http.StatusInternalServerError)
+			}
+		}()
+
+		c.Next()
+	}
 }
 
 // setRouter init router
