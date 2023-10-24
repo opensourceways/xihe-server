@@ -1,8 +1,6 @@
 package main
 
 import (
-	aiccmq "github.com/opensourceways/xihe-server/aiccfinetune/messagequeue"
-
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
 	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
@@ -171,7 +169,4 @@ type mqTopics struct {
 
 	//user
 	User userConfig `json:"user"`
-
-	// aicc finetune
-	AICCFinetuneCreated string `json:"aicc_finetune_created" required:"true"`
 }

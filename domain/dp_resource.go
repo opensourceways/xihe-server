@@ -19,8 +19,8 @@ const (
 )
 
 var (
-	ReName         = regexp.MustCompile("^[a-zA-Z0-9_-]+$")
-	reResourceName = ReName
+	reName         = regexp.MustCompile("^[a-zA-Z0-9_-]+$")
+	reResourceName = reName
 
 	resourceLevelMap = map[string]int{
 		"official": 2,

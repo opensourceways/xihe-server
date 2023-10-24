@@ -12,10 +12,6 @@ import (
 	liboptions "github.com/opensourceways/community-robot-lib/options"
 	"github.com/sirupsen/logrus"
 
-	aiccapp "github.com/opensourceways/xihe-server/aiccfinetune/app"
-	aiccimpl "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/aiccfinetuneimpl"
-	aiccrepo "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/repositoryimpl"
-	aiccmq "github.com/opensourceways/xihe-server/aiccfinetune/messagequeue"
 	"github.com/opensourceways/xihe-server/app"
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
@@ -142,12 +138,6 @@ func main() {
 		return
 	}
 
-	// aicc finetune
-	if err = aiccFinetuneSubscribesMessage(cfg); err != nil {
-		logrus.Errorf("aicc finetune subscribes message failed, err:%s", err.Error())
-		return
-	}
-
 	// user
 	if err = userSubscribesMessage(cfg, &cfg.MQTopics.User); err != nil {
 		logrus.Errorf("user subscribes message failed, err:%s", err.Error())
@@ -235,25 +225,6 @@ func trainingSubscribesMessage(log *logrus.Entry, cfg *configuration) error {
 				mongodb.NewTrainingMapper(collections.Training),
 			),
 			nil, 0,
-		),
-		kafka.SubscriberAdapter(),
-	)
-}
-
-func aiccFinetuneSubscribesMessage(cfg *configuration) error {
-	collections := &cfg.Mongodb.Collections
-
-	return aiccmq.Subscribe(
-		cfg.AICCFinetune,
-		cfg.MQTopics.AICCFinetuneCreated,
-		aiccapp.NewAICCFinetuneService(
-			aiccimpl.NewAICCFinetune(&aiccimpl.Config{}),
-			nil,
-			nil,
-			aiccrepo.NewAICCFinetuneRepo(
-				mongodb.NewCollection(collections.AICCFinetune),
-			),
-			0,
 		),
 		kafka.SubscriberAdapter(),
 	)
