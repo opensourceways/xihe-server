@@ -20,4 +20,6 @@ WORKDIR /opt/app/
 
 COPY  --chown=mindspore --from=BUILDER /go/src/github.com/opensourceways/xihe-server/internal-server/internal-server /opt/app
 
+RUN chmod 550 /opt/app/internal-server
+
 ENTRYPOINT ["/opt/app/internal-server"]
