@@ -40,7 +40,6 @@ type handler struct {
 	dataset   app.DatasetMessageService
 	project   app.ProjectMessageService
 	finetune  app.FinetuneMessageService
-	evaluate  app.EvaluateMessageService
 	inference app.InferenceMessageService
 	cloud     cloudapp.CloudMessageService
 	async     asyncapp.AsyncMessageService
@@ -248,17 +247,6 @@ func (h *handler) HandleEventCreateInference(info *domain.InferenceInfo) error {
 func (h *handler) HandleEventExtendInferenceSurvivalTime(info *message.InferenceExtendInfo) error {
 	return h.do(func(bool) error {
 		err := h.inference.ExtendSurvivalTime(info)
-		if err != nil {
-			h.log.Error(err)
-		}
-
-		return err
-	})
-}
-
-func (h *handler) HandleEventCreateEvaluate(info *message.EvaluateInfo) error {
-	return h.do(func(bool) error {
-		err := h.evaluate.CreateEvaluateInstance(info)
 		if err != nil {
 			h.log.Error(err)
 		}
