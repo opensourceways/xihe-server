@@ -67,20 +67,6 @@ func (s *sender) toInferenceMsg(index *domain.InferenceIndex) msgInference {
 	}
 }
 
-// Evaluate
-func (s *sender) CreateEvaluate(info *message.EvaluateInfo) error {
-	v := msgEvaluate{
-		Type:         info.Type,
-		OBSPath:      info.OBSPath,
-		ProjectId:    info.Project.Id,
-		TrainingId:   info.TrainingId,
-		EvaluateId:   info.Id,
-		ProjectOwner: info.Project.Owner.Account(),
-	}
-
-	return s.send(s.topics.Evaluate, &v)
-}
-
 // Competition
 func (s *sender) CalcScore(info *message.SubmissionInfo) error {
 	v := msgSubmission{

@@ -46,15 +46,6 @@ type msgExtendInference struct {
 	Expiry int64 `json:"expiry"`
 }
 
-type msgEvaluate struct {
-	Type         string `json:"type"`
-	OBSPath      string `json:"path"`
-	ProjectId    string `json:"pid"`
-	TrainingId   string `json:"tid"`
-	EvaluateId   string `json:"id"`
-	ProjectOwner string `json:"owner"`
-}
-
 type msgRelatedResources struct {
 	Action    string            `json:"action"`
 	Promoter  resourceObject    `json:"promoter"`

@@ -25,7 +25,6 @@ import (
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
-	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
@@ -293,14 +292,6 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 			),
 			userRepo,
 			inferenceimpl.NewInference(&cfg.Inference),
-		),
-
-		evaluate: app.NewEvaluateMessageService(
-			repositories.NewEvaluateRepository(
-				mongodb.NewEvaluateMapper(collections.Evaluate),
-			),
-			evaluateimpl.NewEvaluate(&cfg.Evaluate.Config),
-			cfg.Evaluate.SurvivalTime,
 		),
 
 		cloud: cloudapp.NewCloudMessageService(

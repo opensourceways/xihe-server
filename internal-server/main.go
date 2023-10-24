@@ -10,7 +10,6 @@ import (
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/aiccfinetune"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/cloud"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/competition"
-	"github.com/opensourceways/xihe-grpc-protocol/grpc/evaluate"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/finetune"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/inference"
 	"github.com/opensourceways/xihe-grpc-protocol/grpc/server"
@@ -134,13 +133,6 @@ func main() {
 		),
 	)
 
-	// evaluate
-	evaluateService := app.NewEvaluateInternalService(
-		repositories.NewEvaluateRepository(
-			mongodb.NewEvaluateMapper(collections.Evaluate),
-		),
-	)
-
 	// cloud
 	cloudService := cloudapp.NewCloudInternalService(
 		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
@@ -168,7 +160,6 @@ func main() {
 
 	s.RegisterFinetuneServer(finetuneServer{finetuneService})
 	s.RegisterTrainingServer(trainingServer{train})
-	s.RegisterEvaluateServer(evaluateServer{evaluateService})
 	s.RegisterInferenceServer(inferenceServer{inferenceService})
 	s.RegisterCloudServer(cloudServer{cloudService})
 	s.RegisterCompetitionServer(competitionServer{competitionService})
@@ -251,35 +242,6 @@ func (t inferenceServer) SetInferenceInfo(index *inference.InferenceIndex, v *in
 			LastCommit: index.LastCommit,
 		},
 		&app.InferenceDetail{
-			Error:     v.Error,
-			AccessURL: v.AccessURL,
-		},
-	)
-}
-
-// evaluate
-type evaluateServer struct {
-	service app.EvaluateInternalService
-}
-
-func (t evaluateServer) SetEvaluateInfo(index *evaluate.EvaluateIndex, v *evaluate.EvaluateInfo) error {
-	u, err := domain.NewAccount(index.User)
-	if err != nil {
-		return nil
-	}
-
-	return t.service.UpdateDetail(
-		&domain.EvaluateIndex{
-			TrainingIndex: domain.TrainingIndex{
-				Project: domain.ResourceIndex{
-					Owner: u,
-					Id:    index.ProjectId,
-				},
-				TrainingId: index.TrainingID,
-			},
-			Id: index.Id,
-		},
-		&app.EvaluateDetail{
 			Error:     v.Error,
 			AccessURL: v.AccessURL,
 		},

@@ -25,7 +25,6 @@ const (
 	handlerNameCreateCloud        = "create_cloud"
 	handlerNameCreateTraining     = "create_training"
 	handlerNameCreateFinetune     = "create_finetune"
-	handlerNameCreateEvaluate     = "create_evaluate"
 	handlerNameCreateInference    = "create_inference"
 )
 
@@ -65,11 +64,6 @@ func Subscribe(
 
 	// inference
 	if err = r.registerHandlerForInference(handler); err != nil {
-		return
-	}
-
-	// evaluate
-	if err = r.registerHandlerForEvaluate(handler); err != nil {
 		return
 	}
 
@@ -268,36 +262,6 @@ func (r *register) registerHandlerForInference(handler interface{}) error {
 	}
 
 	return r.subscribe(r.topics.Inference, handlerNameCreateInference, f)
-}
-
-func (r *register) registerHandlerForEvaluate(handler interface{}) error {
-	h, ok := handler.(message.EvaluateHandler)
-	if !ok {
-		return nil
-	}
-
-	f := func(b []byte, m map[string]string) (err error) {
-		body := msgEvaluate{}
-		if err = json.Unmarshal(b, &body); err != nil {
-			return
-		}
-
-		v := message.EvaluateInfo{}
-
-		if v.Project.Owner, err = domain.NewAccount(body.ProjectOwner); err != nil {
-			return
-		}
-
-		v.Id = body.EvaluateId
-		v.Type = body.Type
-		v.OBSPath = body.OBSPath
-		v.Project.Id = body.ProjectId
-		v.TrainingId = body.TrainingId
-
-		return h.HandleEventCreateEvaluate(&v)
-	}
-
-	return r.subscribe(r.topics.Evaluate, handlerNameCreateEvaluate, f)
 }
 
 func (r *register) registerHandlerForCloud(handler interface{}) error {
