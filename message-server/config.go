@@ -12,7 +12,6 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/infrastructure/evaluateimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
@@ -38,7 +37,6 @@ type configuration struct {
 	FinetuneEndpoint string `json:"finetune_endpoint"  required:"true"`
 
 	Inference    inferenceimpl.Config        `json:"inference"    required:"true"`
-	Evaluate     evaluateConfig              `json:"evaluate"     required:"true"`
 	Cloud        cloudConfig                 `json:"cloud"        required:"true"`
 	Mongodb      config.Mongodb              `json:"mongodb"      required:"true"`
 	Postgresql   PostgresqlConfig            `json:"postgresql"   required:"true"`
@@ -60,7 +58,6 @@ type PostgresqlConfig struct {
 func (cfg *configuration) ConfigItems() []interface{} {
 	return []interface{}{
 		&cfg.Inference,
-		&cfg.Evaluate,
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
 		&cfg.Postgresql.cloudconf,
@@ -98,25 +95,6 @@ func (cfg *configuration) getFinetuneConfig() finetuneimpl.Config {
 	return finetuneimpl.Config{
 		Endpoint: cfg.FinetuneEndpoint,
 	}
-}
-
-// evaluate
-type evaluateConfig struct {
-	SurvivalTime int `json:"survival_time"`
-
-	evaluateimpl.Config
-}
-
-func (cfg *evaluateConfig) SetDefault() {
-	if cfg.SurvivalTime <= 0 {
-		cfg.SurvivalTime = 5 * 3600
-	}
-
-	common.SetDefault(&cfg.Config)
-}
-
-func (cfg *evaluateConfig) Validate() error {
-	return common.Validate(&cfg.Config)
 }
 
 // cloud

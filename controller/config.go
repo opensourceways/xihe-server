@@ -66,12 +66,10 @@ type APIConfig struct {
 	InferenceDir                   string `json:"inference_dir"`
 	InferenceBootFile              string `json:"inference_boot_file"`
 	InferenceTimeout               int    `json:"inference_timeout"`
-	EvaluateTimeout                int    `json:"evaluate_timeout"`
 	PodTimeout                     int    `json:"pod_timeout"`
 	MaxPictureSizeToDescribe       int64  `json:"-"`
 	MaxPictureSizeToVQA            int64  `json:"-"`
 	MaxCompetitionSubmmitFileSzie  int64  `json:"max_competition_submmit_file_size"`
-	MinSurvivalTimeOfEvaluate      int    `json:"min_survival_time_of_evaluate"`
 	MinSurvivalTimeOfInference     int    `json:"min_survival_time_of_inference"`
 	MaxTagsNumToSearchResource     int    `json:"max_tags_num_to_search_resource"`
 	MaxTagKindsNumToSearchResource int    `json:"max_tag_kinds_num_to_search_resource"`
@@ -80,10 +78,6 @@ type APIConfig struct {
 func (cfg *APIConfig) SetDefault() {
 	if cfg.MinSurvivalTimeOfInference <= 0 {
 		cfg.MinSurvivalTimeOfInference = 3600
-	}
-
-	if cfg.MinSurvivalTimeOfEvaluate <= 0 {
-		cfg.MinSurvivalTimeOfEvaluate = 3600
 	}
 
 	if cfg.InferenceDir == "" {
@@ -96,10 +90,6 @@ func (cfg *APIConfig) SetDefault() {
 
 	if cfg.InferenceTimeout <= 0 {
 		cfg.InferenceTimeout = 300
-	}
-
-	if cfg.EvaluateTimeout <= 0 {
-		cfg.EvaluateTimeout = 300
 	}
 
 	if cfg.PodTimeout <= 0 {
