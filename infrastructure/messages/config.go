@@ -8,7 +8,6 @@ type Topics struct {
 	Finetune        string `json:"finetune"         required:"true"`
 	Following       string `json:"following"        required:"true"`
 	Inference       string `json:"inference"        required:"true"`
-	Evaluate        string `json:"evaluate"         required:"true"`
 	Submission      string `json:"submission"       required:"true"`
 	OperateLog      string `json:"operate_log"      required:"true"`
 	RelatedResource string `json:"related_resource" required:"true"`

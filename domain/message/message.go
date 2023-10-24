@@ -5,12 +5,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 )
 
-type EvaluateInfo struct {
-	domain.EvaluateIndex
-	Type    string
-	OBSPath string
-}
-
 type InferenceExtendInfo struct {
 	domain.InferenceInfo
 	Expiry int64
@@ -36,8 +30,6 @@ type Sender interface {
 	CreateInference(*domain.InferenceInfo) error
 	ExtendInferenceSurvivalTime(*InferenceExtendInfo) error
 
-	CreateEvaluate(*EvaluateInfo) error
-
 	CalcScore(*SubmissionInfo) error
 }
 
@@ -48,7 +40,6 @@ type EventHandler interface {
 	DownloadHandler
 	FinetuneHandler
 	InferenceHandler
-	EvaluateHandler
 }
 
 type LikeHandler interface {
@@ -90,8 +81,4 @@ type FinetuneHandler interface {
 type InferenceHandler interface {
 	HandleEventCreateInference(*domain.InferenceInfo) error
 	HandleEventExtendInferenceSurvivalTime(*InferenceExtendInfo) error
-}
-
-type EvaluateHandler interface {
-	HandleEventCreateEvaluate(*EvaluateInfo) error
 }
