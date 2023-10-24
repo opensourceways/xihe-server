@@ -144,13 +144,13 @@ func NewResourceDesc(v string) (ResourceDesc, error) {
 		return resourceDesc(v), nil
 	}
 
+	v = utils.XSSFilter(v)
+
 	if max := DomainConfig.MaxDescLength; utils.StrLen(v) > max {
 		return nil, fmt.Errorf(
 			"the length of desc should be less than %d", max,
 		)
 	}
-
-	v = utils.XSSFilter(v)
 
 	return resourceDesc(v), nil
 }
