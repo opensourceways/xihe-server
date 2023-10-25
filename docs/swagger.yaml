@@ -146,82 +146,15 @@ definitions:
       spec:
         type: string
     type: object
-  app.CompetitionSubmissionDTO:
-    properties:
-      file_name:
-        type: string
-      score:
-        type: number
-      status:
-        type: string
-      submit_at:
-        type: string
-    type: object
-  app.CompetitionSubmissionsDTO:
-    properties:
-      details:
-        items:
-          $ref: '#/definitions/app.CompetitionSubmissionDTO'
-        type: array
-      project:
-        type: string
-    type: object
-  app.CompetitionSummaryDTO:
-    properties:
-      bonus:
-        type: integer
-      count:
-        type: integer
-      desc:
-        type: string
-      duration:
-        type: string
-      host:
-        type: string
-      id:
-        type: string
-      lang:
-        type: string
-      name:
-        type: string
-      poster:
-        type: string
-      status:
-        type: string
-      tags:
-        items:
-          type: string
-        type: array
-    type: object
-  app.CompetitionTeamDTO:
-    properties:
-      members:
-        items:
-          $ref: '#/definitions/app.CompetitionTeamMemberDTO'
-        type: array
-      name:
-        type: string
-    type: object
-  app.CompetitionTeamMemberDTO:
-    properties:
-      account:
-        type: string
-      email:
-        type: string
-      name:
-        type: string
-      role:
-        type: string
-    type: object
   app.CompetitonRankingDTO:
     properties:
       final:
         items:
-          $ref: '#/definitions/app.RankingDTO'
+          $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.RankingDTO'
         type: array
       preliminary:
         items:
-          $ref: '#/definitions/app.RankingDTO'
+          $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.RankingDTO'
         type: array
     type: object
   app.CompletionQuestionDTO:
@@ -548,13 +481,6 @@ definitions:
       user_id:
         type: string
     type: object
-  app.LuoJiaRecordDTO:
-    properties:
-      created_at:
-        type: string
-      id:
-        type: string
-    type: object
   app.ModelDTO:
     properties:
       created_at:
@@ -630,8 +556,6 @@ definitions:
       task:
         type: string
       time:
-        type: integer
-      time_str:
         type: string
     type: object
   app.ProjectSummaryDTO:
@@ -678,15 +602,6 @@ definitions:
       name:
         type: string
       owner:
-        type: string
-    type: object
-  app.RankingDTO:
-    properties:
-      score:
-        type: number
-      submit_at:
-        type: string
-      team_name:
         type: string
     type: object
   app.RelateProjectDTO:
@@ -832,55 +747,6 @@ definitions:
       status:
         type: string
     type: object
-  app.UserCompetitionDTO:
-    properties:
-      bonus:
-        type: integer
-      count:
-        type: integer
-      dataset_doc:
-        type: string
-      dataset_url:
-        type: string
-      desc:
-        type: string
-      doc:
-        type: string
-      duration:
-        type: string
-      forum:
-        type: string
-      host:
-        type: string
-      id:
-        type: string
-      is_competitor:
-        type: boolean
-      is_finalist:
-        type: boolean
-      lang:
-        type: string
-      name:
-        type: string
-      phase:
-        type: string
-      poster:
-        type: string
-      status:
-        type: string
-      tags:
-        items:
-          type: string
-        type: array
-      team_id:
-        type: string
-      team_role:
-        type: string
-      type:
-        type: string
-      winners:
-        type: string
-    type: object
   app.UserDTO:
     properties:
       account:
@@ -940,52 +806,6 @@ definitions:
         type: array
       total:
         type: integer
-    type: object
-  app.WuKongLikeDTO:
-    properties:
-      avatar:
-        type: string
-      created_at:
-        type: string
-      desc:
-        type: string
-      id:
-        type: string
-      is_public:
-        type: boolean
-      link:
-        type: string
-      owner:
-        description: owner of picture
-        type: string
-      style:
-        type: string
-    type: object
-  app.WuKongPublicDTO:
-    properties:
-      avatar:
-        type: string
-      created_at:
-        type: string
-      desc:
-        type: string
-      digg_count:
-        type: integer
-      id:
-        type: string
-      is_digg:
-        type: boolean
-      is_like:
-        type: boolean
-      like_id:
-        type: string
-      link:
-        type: string
-      owner:
-        description: owner of picture
-        type: string
-      style:
-        type: string
     type: object
   app.WuKongRankDTO:
     properties:
@@ -1197,6 +1017,25 @@ definitions:
       score:
         type: integer
     type: object
+  controller.applyApiReq:
+    properties:
+      city:
+        type: string
+      detail:
+        additionalProperties:
+          type: string
+        type: object
+      email:
+        type: string
+      identity:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      province:
+        type: string
+    type: object
   controller.baichuanReq:
     properties:
       repetition_penalty:
@@ -1327,11 +1166,6 @@ definitions:
       total:
         type: integer
     type: object
-  controller.describePictureResp:
-    properties:
-      desc:
-        type: string
-    type: object
   controller.finetuneCreateResp:
     properties:
       id:
@@ -1347,11 +1181,32 @@ definitions:
       account:
         type: string
     type: object
+  controller.glm2Request:
+    properties:
+      history:
+        items:
+          items:
+            type: string
+          type: array
+        type: array
+      repetition_penalty:
+        type: number
+      sampling:
+        type: boolean
+      temperature:
+        type: number
+      text:
+        type: string
+      top_k:
+        type: integer
+      top_p:
+        type: number
+    type: object
   controller.homeElectricityInfo:
     properties:
       comp:
         items:
-          $ref: '#/definitions/app.CompetitionSummaryDTO'
+          $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO'
         type: array
       course:
         items:
@@ -1368,7 +1223,7 @@ definitions:
     properties:
       comp:
         items:
-          $ref: '#/definitions/app.CompetitionSummaryDTO'
+          $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO'
         type: array
       course:
         items:
@@ -1397,6 +1252,27 @@ definitions:
         type: string
       resource_type:
         type: string
+    type: object
+  controller.llama2Request:
+    properties:
+      history:
+        items:
+          items:
+            type: string
+          type: array
+        type: array
+      repetition_penalty:
+        type: number
+      sampling:
+        type: boolean
+      temperature:
+        type: number
+      text:
+        type: string
+      top_k:
+        type: integer
+      top_p:
+        type: number
     type: object
   controller.luojiaResp:
     properties:
@@ -1488,33 +1364,6 @@ definitions:
         type: string
       total:
         type: integer
-    type: object
-  controller.multiplePicturesGenerateResp:
-    properties:
-      pictures:
-        items:
-          type: string
-        type: array
-    type: object
-  controller.panguRequest:
-    properties:
-      question:
-        type: string
-    type: object
-  controller.panguResp:
-    properties:
-      answer:
-        type: string
-    type: object
-  controller.pictureGenerateRequest:
-    properties:
-      desc:
-        type: string
-    type: object
-  controller.pictureGenerateResp:
-    properties:
-      picture:
-        type: string
     type: object
   controller.pictureUploadResp:
     properties:
@@ -1635,18 +1484,6 @@ definitions:
       total:
         type: integer
     type: object
-  controller.questionAskRequest:
-    properties:
-      picture:
-        type: string
-      question:
-        type: string
-    type: object
-  controller.questionAskResp:
-    properties:
-      answer:
-        type: string
-    type: object
   controller.relatedResourceAddRequest:
     properties:
       name:
@@ -1671,6 +1508,27 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  controller.skyWorkRequest:
+    properties:
+      history:
+        items:
+          items:
+            type: string
+          type: array
+        type: array
+      repetition_penalty:
+        type: number
+      sampling:
+        type: boolean
+      temperature:
+        type: number
+      text:
+        type: string
+      top_k:
+        type: integer
+      top_p:
+        type: number
     type: object
   controller.trainingCreateResp:
     properties:
@@ -1772,13 +1630,6 @@ definitions:
       digg_count:
         type: integer
     type: object
-  controller.wukongHFRequest:
-    properties:
-      desc:
-        type: string
-      style:
-        type: string
-    type: object
   controller.wukongPictureLink:
     properties:
       link:
@@ -1807,6 +1658,184 @@ definitions:
           type: string
         type: array
       kind:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_bigmodel_app.WuKongLikeDTO:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      desc:
+        type: string
+      id:
+        type: string
+      is_public:
+        type: boolean
+      link:
+        type: string
+      owner:
+        description: owner of picture
+        type: string
+      style:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO:
+    properties:
+      avatar:
+        type: string
+      created_at:
+        type: string
+      desc:
+        type: string
+      digg_count:
+        type: integer
+      id:
+        type: string
+      is_digg:
+        type: boolean
+      is_like:
+        type: boolean
+      like_id:
+        type: string
+      link:
+        type: string
+      owner:
+        description: owner of picture
+        type: string
+      style:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO:
+    properties:
+      file_name:
+        type: string
+      score:
+        type: number
+      status:
+        type: string
+      submit_at:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionsDTO:
+    properties:
+      details:
+        items:
+          $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO'
+        type: array
+      project:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO:
+    properties:
+      bonus:
+        type: integer
+      count:
+        type: integer
+      desc:
+        type: string
+      duration:
+        type: string
+      host:
+        type: string
+      id:
+        type: string
+      lang:
+        type: string
+      name:
+        type: string
+      poster:
+        type: string
+      status:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    type: object
+  github_com_opensourceways_xihe-server_competition_app.CompetitionTeamDTO:
+    properties:
+      members:
+        items:
+          $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionTeamMemberDTO'
+        type: array
+      name:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_competition_app.CompetitionTeamMemberDTO:
+    properties:
+      account:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_competition_app.RankingDTO:
+    properties:
+      score:
+        type: number
+      submit_at:
+        type: string
+      team_name:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_competition_app.UserCompetitionDTO:
+    properties:
+      bonus:
+        type: integer
+      count:
+        type: integer
+      dataset_doc:
+        type: string
+      dataset_url:
+        type: string
+      desc:
+        type: string
+      doc:
+        type: string
+      duration:
+        type: string
+      forum:
+        type: string
+      host:
+        type: string
+      id:
+        type: string
+      is_competitor:
+        type: boolean
+      is_finalist:
+        type: boolean
+      lang:
+        type: string
+      name:
+        type: string
+      phase:
+        type: string
+      poster:
+        type: string
+      status:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      team_id:
+        type: string
+      team_role:
+        type: string
+      type:
+        type: string
+      winners:
         type: string
     type: object
 info:
@@ -1851,7 +1880,7 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
         "400":
           description: Bad Request
           schema:
@@ -1934,7 +1963,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/controller.wukongHFRequest'
+          $ref: '#/definitions/controller.applyApiReq'
       responses:
         "201":
           description: Created
@@ -1982,29 +2011,6 @@ paths:
             type: system_error
       tags:
       - BigModel
-  /v1/bigmodel/ask:
-    post:
-      consumes:
-      - application/json
-      description: ask question based on a picture
-      parameters:
-      - description: body of ask question
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.questionAskRequest'
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.questionAskResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
   /v1/bigmodel/baichuan2_7b_chat:
     post:
       consumes:
@@ -2028,22 +2034,46 @@ paths:
             type: system_error
       tags:
       - BigModel
-  /v1/bigmodel/describe_picture:
+  /v1/bigmodel/glm2_6b:
     post:
       consumes:
       - application/json
-      description: describe a picture
+      description: conversational AI
       parameters:
-      - description: picture
-        in: formData
-        name: picture
+      - description: body of glm2
+        in: body
+        name: body
         required: true
-        type: file
+        schema:
+          $ref: '#/definitions/controller.glm2Request'
       responses:
-        "201":
-          description: Created
+        "202":
+          description: Accepted
           schema:
-            $ref: '#/definitions/controller.describePictureResp'
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/llama2_7b:
+    post:
+      consumes:
+      - application/json
+      description: conversational AI
+      parameters:
+      - description: body of llama2
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.llama2Request'
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
         "500":
           description: Internal Server Error
           schema:
@@ -2059,7 +2089,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.LuoJiaRecordDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2103,91 +2133,23 @@ paths:
             type: system_error
       tags:
       - BigModel
-  /v1/bigmodel/multiple_pictures:
+  /v1/bigmodel/skywork_13b:
     post:
       consumes:
       - application/json
-      description: generate multiple pictures based on a text
+      description: conversational AI
       parameters:
-      - description: body of generating picture
+      - description: body of skywork
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/controller.pictureGenerateRequest'
+          $ref: '#/definitions/controller.skyWorkRequest'
       responses:
-        "201":
-          description: Created
+        "202":
+          description: Accepted
           schema:
-            $ref: '#/definitions/controller.multiplePicturesGenerateResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
-  /v1/bigmodel/pangu:
-    post:
-      consumes:
-      - application/json
-      description: pan-gu big model
-      parameters:
-      - description: body of pan-gu
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.panguRequest'
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.panguResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
-  /v1/bigmodel/single_picture:
-    post:
-      consumes:
-      - application/json
-      description: generate a picture based on a text
-      parameters:
-      - description: body of generating picture
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.pictureGenerateRequest'
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.pictureGenerateResp'
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      tags:
-      - BigModel
-  /v1/bigmodel/vqa_upload_picture:
-    post:
-      consumes:
-      - application/json
-      description: upload a picture for vqa
-      parameters:
-      - description: picture
-        in: formData
-        name: picture
-        required: true
-        type: file
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/controller.pictureUploadResp'
+            type: string
         "500":
           description: Internal Server Error
           schema:
@@ -2203,7 +2165,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.WuKongLikeDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongLikeDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2299,7 +2261,7 @@ paths:
         type: string
       responses:
         "204":
-          description: ""
+          description: No Content
         "500":
           description: Internal Server Error
           schema:
@@ -2338,7 +2300,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.WuKongPublicDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2373,7 +2335,7 @@ paths:
         type: string
       responses:
         "204":
-          description: ""
+          description: No Content
         "500":
           description: Internal Server Error
           schema:
@@ -2389,7 +2351,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.WuKongPublicDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_bigmodel_app.WuKongPublicDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2425,7 +2387,7 @@ paths:
         type: integer
       responses:
         "201":
-          description: ""
+          description: Created
         "500":
           description: Internal Server Error
           schema:
@@ -2542,7 +2504,7 @@ paths:
           $ref: '#/definitions/controller.competitorApplyRequest'
       responses:
         "201":
-          description: ""
+          description: Created
         "500":
           description: Internal Server Error
           schema:
@@ -2627,7 +2589,7 @@ paths:
           $ref: '#/definitions/controller.cloudSubscribeRequest'
       responses:
         "201":
-          description: ""
+          description: Created
         "500":
           description: Internal Server Error
           schema:
@@ -2653,7 +2615,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.CompetitionSummaryDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2676,7 +2638,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.UserCompetitionDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.UserCompetitionDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2703,7 +2665,7 @@ paths:
           $ref: '#/definitions/controller.CompetitorApplyRequest'
       responses:
         "201":
-          description: ""
+          description: Created
         "500":
           description: Internal Server Error
           schema:
@@ -2753,7 +2715,7 @@ paths:
           $ref: '#/definitions/controller.AddRelatedProjectRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -2776,7 +2738,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.CompetitionSubmissionsDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionsDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2803,7 +2765,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/app.CompetitionSubmissionDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSubmissionDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2826,7 +2788,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.CompetitionTeamDTO'
+            $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionTeamDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2852,7 +2814,7 @@ paths:
           $ref: '#/definitions/controller.CreateTeamRequest'
       responses:
         "201":
-          description: ""
+          description: Created
         "500":
           description: Internal Server Error
           schema:
@@ -2878,7 +2840,7 @@ paths:
           $ref: '#/definitions/controller.JoinTeamRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -2905,7 +2867,7 @@ paths:
           $ref: '#/definitions/controller.ChangeTeamNameRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -2932,7 +2894,7 @@ paths:
           $ref: '#/definitions/controller.DeleteMemberRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -2953,7 +2915,7 @@ paths:
         type: string
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -2974,7 +2936,7 @@ paths:
         type: string
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -3001,7 +2963,7 @@ paths:
           $ref: '#/definitions/controller.TransferLeaderRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -3199,7 +3161,7 @@ paths:
           $ref: '#/definitions/controller.StudentApplyRequest'
       responses:
         "201":
-          description: ""
+          description: Created
         "500":
           description: Internal Server Error
           schema:
@@ -3226,7 +3188,7 @@ paths:
           $ref: '#/definitions/controller.AddCourseRelatedProjectRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -3253,7 +3215,7 @@ paths:
           $ref: '#/definitions/controller.PlayRecordRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -3437,7 +3399,7 @@ paths:
           $ref: '#/definitions/controller.resourceTagsUpdateRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
       summary: SetTags
       tags:
       - Dataset
@@ -3461,7 +3423,7 @@ paths:
       - application/json
       responses:
         "204":
-          description: ""
+          description: No Content
       summary: Delete
       tags:
       - Dataset
@@ -3569,7 +3531,7 @@ paths:
         type: string
       responses:
         "204":
-          description: ""
+          description: No Content
         "500":
           description: Internal Server Error
           schema:
@@ -3589,7 +3551,7 @@ paths:
         type: string
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -3950,7 +3912,7 @@ paths:
           $ref: '#/definitions/controller.resourceTagsUpdateRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
       summary: SetTags
       tags:
       - Model
@@ -3974,7 +3936,7 @@ paths:
       - application/json
       responses:
         "204":
-          description: ""
+          description: No Content
       summary: Delete
       tags:
       - Model
@@ -4053,7 +4015,7 @@ paths:
           $ref: '#/definitions/controller.relatedResourceRemoveRequest'
       responses:
         "204":
-          description: ""
+          description: No Content
       summary: RemoveRelatedDataset
       tags:
       - Model
@@ -4267,7 +4229,7 @@ paths:
           $ref: '#/definitions/controller.resourceTagsUpdateRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
       summary: SetTags
       tags:
       - Project
@@ -4291,7 +4253,7 @@ paths:
       - application/json
       responses:
         "204":
-          description: ""
+          description: No Content
       summary: Delete
       tags:
       - Project
@@ -4370,7 +4332,7 @@ paths:
           $ref: '#/definitions/controller.relatedResourceRemoveRequest'
       responses:
         "204":
-          description: ""
+          description: No Content
       summary: RemoveRelatedDataset
       tags:
       - Project
@@ -4427,7 +4389,7 @@ paths:
           $ref: '#/definitions/controller.relatedResourceRemoveRequest'
       responses:
         "204":
-          description: ""
+          description: No Content
       summary: RemoveRelatedModel
       tags:
       - Project
@@ -4478,7 +4440,7 @@ paths:
         type: string
       responses:
         "204":
-          description: ""
+          description: No Content
         "400":
           description: Bad Request
           schema:
@@ -4508,7 +4470,7 @@ paths:
         type: string
       responses:
         "204":
-          description: ""
+          description: No Content
         "400":
           description: Bad Request
           schema:
@@ -4543,7 +4505,7 @@ paths:
           $ref: '#/definitions/controller.RepoFileCreateRequest'
       responses:
         "201":
-          description: ""
+          description: Created
         "400":
           description: Bad Request
           schema:
@@ -4582,7 +4544,7 @@ paths:
           $ref: '#/definitions/controller.RepoFileUpdateRequest'
       responses:
         "202":
-          description: ""
+          description: Accepted
         "400":
           description: Bad Request
           schema:
@@ -4616,7 +4578,7 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
         "400":
           description: Bad Request
           schema:
@@ -4651,7 +4613,7 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
         "400":
           description: Bad Request
           schema:
@@ -4723,7 +4685,7 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
         "400":
           description: Bad Request
           schema:
@@ -4795,7 +4757,7 @@ paths:
         type: string
       responses:
         "200":
-          description: ""
+          description: OK
         "400":
           description: Bad Request
           schema:
@@ -4836,7 +4798,7 @@ paths:
       description: user sign in
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -4936,7 +4898,7 @@ paths:
         type: string
       responses:
         "204":
-          description: ""
+          description: No Content
         "500":
           description: Internal Server Error
           schema:
@@ -5023,7 +4985,7 @@ paths:
         type: string
       responses:
         "202":
-          description: ""
+          description: Accepted
         "500":
           description: Internal Server Error
           schema:
@@ -5117,33 +5079,6 @@ paths:
       summary: Get
       tags:
       - User
-    post:
-      consumes:
-      - application/json
-      description: create user
-      parameters:
-      - description: body of creating user
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.userCreateRequest'
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/app.UserDTO'
-        "400":
-          description: Bad Request
-          schema:
-            type: bad_request_param
-        "500":
-          description: Internal Server Error
-          schema:
-            type: duplicate_creating
-      summary: Create
-      tags:
-      - User
     put:
       consumes:
       - application/json
@@ -5190,7 +5125,7 @@ paths:
       description: check user email
       responses:
         "200":
-          description: ""
+          description: OK
         "400":
           description: Bad Request
           schema:
@@ -5278,7 +5213,7 @@ paths:
           $ref: '#/definitions/controller.followingCreateRequest'
       responses:
         "201":
-          description: ""
+          description: Created
         "400":
           description: Bad Request
           schema:
@@ -5318,7 +5253,7 @@ paths:
         type: string
       responses:
         "204":
-          description: ""
+          description: No Content
         "400":
           description: Bad Request
           schema:
@@ -5392,7 +5327,7 @@ paths:
           $ref: '#/definitions/controller.likeDeleteRequest'
       responses:
         "204":
-          description: ""
+          description: No Content
         "400":
           description: Bad Request
           schema:
@@ -5428,7 +5363,7 @@ paths:
           $ref: '#/definitions/controller.likeCreateRequest'
       responses:
         "201":
-          description: ""
+          description: Created
         "400":
           description: Bad Request
           schema:
