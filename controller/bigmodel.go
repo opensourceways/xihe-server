@@ -1,12 +1,12 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strconv"
 	"time"
-	"errors"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -813,9 +813,9 @@ func (ctl *BigModelController) BaiChuan(ctx *gin.Context) {
 // @Title			GLM
 // @Description	conversational AI
 // @Tags			BigModel
-// @Param			body	body	glm2Req	true	"body of glm2"
+// @Param			body	body	glm2Request	true	"body of glm2"
 // @Accept			json
-// @Success		202	{object}		message
+// @Success		202	{object}		string
 // @Failure		500	system_error	system	error
 // @Router			/v1/bigmodel/glm2_6b [post]
 func (ctl *BigModelController) GLM2(ctx *gin.Context) {
@@ -882,9 +882,9 @@ func (ctl *BigModelController) GLM2(ctx *gin.Context) {
 // @Title			LLAMA2
 // @Description	conversational AI
 // @Tags			BigModel
-// @Param			body	body	llama2Req	true	"body of llama2"
+// @Param			body	body	llama2Request	true	"body of llama2"
 // @Accept			json
-// @Success		202	{object}		message
+// @Success		202	{object}		string
 // @Failure		500	system_error	system	error
 // @Router			/v1/bigmodel/llama2_7b [post]
 func (ctl *BigModelController) LLAMA2(ctx *gin.Context) {
@@ -949,7 +949,7 @@ func (ctl *BigModelController) LLAMA2(ctx *gin.Context) {
 // @Title			ApplyApi
 // @Description	generates pictures by WuKong-hf
 // @Tags			BigModel
-// @Param			body	body	wukongHFRequest	true	"body of wukong"
+// @Param			body	body	applyApiReq	true	"body of wukong"
 // @Accept			json
 // @Success		201	{object}				wukongPicturesGenerateResp
 // @Failure		500	system_error			system	error
