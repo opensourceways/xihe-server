@@ -169,9 +169,11 @@ func (h *handler) getResourceHandler(t domain.ResourceType) resourceHanler {
 
 	case domain.ResourceTypeModel.ResourceType():
 		return h.model
+
+	default:
+		return nil
 	}
 
-	return nil
 }
 
 func (h *handler) HandleEventFork(index *domain.ResourceIndex) error {

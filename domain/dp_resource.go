@@ -222,7 +222,7 @@ func NewSortType(v string) (SortType, error) {
 		v != SortTypeDownloadCount
 
 	if b {
-		return nil, errors.New("invliad sort type")
+		return nil, errors.New("invalid sort type")
 	}
 
 	return sortType(v), nil

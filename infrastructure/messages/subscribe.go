@@ -106,9 +106,12 @@ func (r *register) registerHandlerForLike(handler interface{}) error {
 
 		case actionRemove:
 			return h.HandleEventRemoveLike(like)
+
+		default:
+			logrus.Warn("unknown action")
+			return
 		}
 
-		return
 	})
 }
 
@@ -172,9 +175,12 @@ func (r *register) registerHandlerForRelatedResource(handler interface{}) error 
 
 		case actionRemove:
 			return body.handle(h.HandleEventRemoveRelatedResource)
+
+		default:
+			logrus.Warn("unknown action")
+			return nil
 		}
 
-		return nil
 	}
 
 	return r.subscribe(
@@ -256,9 +262,12 @@ func (r *register) registerHandlerForInference(handler interface{}) error {
 					Expiry:        body.Expiry,
 				},
 			)
+
+		default:
+			logrus.Warn("unknown action")
+			return nil
 		}
 
-		return nil
 	}
 
 	return r.subscribe(r.topics.Inference, handlerNameCreateInference, f)

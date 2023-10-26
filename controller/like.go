@@ -194,7 +194,10 @@ func (ctl *LikeController) getResourceId(
 		}
 
 		return v.Id, nil
+
+	default:
+		return "", errors.New("unknown resource type")
+
 	}
 
-	return "", errors.New("unknown resource type")
 }

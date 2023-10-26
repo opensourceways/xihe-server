@@ -111,17 +111,19 @@ func isZero(v reflect.Value) bool {
 			return true
 		}
 		return false
+
 	case reflect.Func, reflect.Map, reflect.Slice:
 		return v.IsNil()
+
 	case reflect.Array:
 		z := true
 		for i := 0; i < v.Len(); i++ {
 			z = z && isZero(v.Index(i))
 		}
 		return z
+
 	case reflect.Struct:
 		var t time.Time
-
 		if v.Type() == reflect.TypeOf(t) {
 			if v.Interface().(time.Time).IsZero() {
 				return true
@@ -133,10 +135,10 @@ func isZero(v reflect.Value) bool {
 			z = z && isZero(v.Field(i))
 		}
 		return z
+
+	default:
+		// Compare other types directly:
+		z := reflect.Zero(v.Type())
+		return v.Interface() == z.Interface()
 	}
-
-	// Compare other types directly:
-	z := reflect.Zero(v.Type())
-
-	return v.Interface() == z.Interface()
 }
