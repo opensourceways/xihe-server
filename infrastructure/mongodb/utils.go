@@ -742,7 +742,13 @@ func condForArrayElem(conds bson.A) bson.M {
 	}
 
 	if n == 1 {
-		return conds[0].(bson.M)
+		v, ok := conds[0].(bson.M)
+		if !ok {
+			return bson.M{
+				"$toBool": 1,
+			}
+		}
+		return v
 	}
 
 	return bson.M{

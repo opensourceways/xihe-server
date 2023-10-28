@@ -42,11 +42,11 @@ func (j *JSONMap) Scan(src interface{}) error {
 
 	// string data
 	var jsonData string
-	switch src.(type) {
+	switch v := src.(type) {
 	case string:
-		jsonData = src.(string)
+		jsonData = v
 	case []byte:
-		jsonData = string(src.([]byte))
+		jsonData = string(v)
 	default:
 		return fmt.Errorf("incompatible type for JSONMap")
 	}
