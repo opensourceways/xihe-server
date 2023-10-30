@@ -126,6 +126,7 @@ func isZero(v reflect.Value) bool {
 		var t time.Time
 		if v.Type() == reflect.TypeOf(t) {
 			value, ok := v.Interface().(time.Time)
+
 			return ok && value.IsZero()
 		}
 		z := true
