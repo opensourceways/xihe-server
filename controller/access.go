@@ -42,7 +42,7 @@ func (ctl *accessController) newToken(secret string) (string, error) {
 
 func (ctl *accessController) initByToken(token, secret string) error {
 	t, err := jwt.Parse(token, func(t1 *jwt.Token) (interface{}, error) {
-		if v, ok := t1.Method.(*jwt.SigningMethodHMAC); !ok || v == nil {
+		if _, ok := t1.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method")
 		}
 

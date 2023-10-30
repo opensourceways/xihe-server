@@ -125,10 +125,8 @@ func isZero(v reflect.Value) bool {
 	case reflect.Struct:
 		var t time.Time
 		if v.Type() == reflect.TypeOf(t) {
-			if value, ok := v.Interface().(time.Time); ok {
-				return value.IsZero()
-			}
-			return false
+			value, ok := v.Interface().(time.Time)
+			return ok && value.IsZero()
 		}
 		z := true
 		for i := 0; i < v.NumField(); i++ {
