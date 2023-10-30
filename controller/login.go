@@ -116,6 +116,8 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		utils.DoLog(user.Id, user.Account, "logup", "", "success")
 	}
 
+	prepareOperateLog(ctx, user.Account, OPERATE_TYPE_USER, "user login")
+
 	if err := ctl.newLogin(ctx, info); err != nil {
 		return
 	}
@@ -242,6 +244,8 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 	if !ok {
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "user logout")
 
 	if pl.isNotMe(account) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
