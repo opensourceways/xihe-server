@@ -2,15 +2,12 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
-	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
-	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -36,13 +33,11 @@ type handler struct {
 
 	maxRetry int
 
-	model     app.ModelMessageService
-	dataset   app.DatasetMessageService
-	project   app.ProjectMessageService
-	finetune  app.FinetuneMessageService
-	inference app.InferenceMessageService
-	cloud     cloudapp.CloudMessageService
-	async     asyncapp.AsyncMessageService
+	model    app.ModelMessageService
+	dataset  app.DatasetMessageService
+	project  app.ProjectMessageService
+	finetune app.FinetuneMessageService
+	async    asyncapp.AsyncMessageService
 }
 
 func (h *handler) HandleEventAddRelatedResource(info *message.RelatedResource) error {
@@ -235,40 +230,6 @@ func (h *handler) HandleEventCreateFinetune(index *domain.FinetuneIndex) error {
 	)
 }
 
-func (h *handler) HandleEventCreateInference(info *domain.InferenceInfo) error {
-	return h.do(func(bool) error {
-		err := h.inference.CreateInferenceInstance(info)
-		if err != nil {
-			h.log.Error(err)
-		}
-
-		return err
-	})
-}
-
-func (h *handler) HandleEventExtendInferenceSurvivalTime(info *message.InferenceExtendInfo) error {
-	return h.do(func(bool) error {
-		err := h.inference.ExtendSurvivalTime(info)
-		if err != nil {
-			h.log.Error(err)
-		}
-
-		return err
-	})
-}
-
-func (h *handler) HandleEventPodSubscribe(info *cloudtypes.PodInfo) error {
-	return h.do(func(bool) error {
-		if err := h.cloud.CreatePodInstance(info); err != nil {
-			if err != nil {
-				h.log.Error(err)
-			}
-		}
-
-		return nil
-	})
-}
-
 func (h *handler) do(f func(bool) error) (err error) {
 	return h.retry(f, sleepTime)
 }
@@ -291,10 +252,6 @@ func (h *handler) retry(f func(bool) error, interval time.Duration) (err error) 
 	time.Sleep(interval)
 
 	return f(true)
-}
-
-func (h *handler) errMaxRetry(err error) error {
-	return fmt.Errorf("exceed max retry num, last err:%v", err)
 }
 
 func isResourceNotExists(err error) bool {

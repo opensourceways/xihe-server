@@ -16,13 +16,9 @@ import (
 	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
 	asyncrepo "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelmq "github.com/opensourceways/xihe-server/bigmodel/messagequeue"
-	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
-	"github.com/opensourceways/xihe-server/cloud/infrastructure/cloudimpl"
-	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
-	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	"github.com/opensourceways/xihe-server/infrastructure/mongodb"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
@@ -233,8 +229,6 @@ func trainingSubscribesMessage(log *logrus.Entry, cfg *configuration) error {
 func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 	collections := &cfg.Mongodb.Collections
 
-	userRepo := userrepo.NewUserRepo(mongodb.NewCollection(collections.User))
-
 	h := &handler{
 		log:      log,
 		maxRetry: cfg.MaxRetry,
@@ -255,20 +249,6 @@ func newHandler(cfg *configuration, log *logrus.Entry) *handler {
 			repositories.NewModelRepository(
 				mongodb.NewModelMapper(collections.Model),
 			),
-		),
-
-		inference: app.NewInferenceMessageService(
-			repositories.NewInferenceRepository(
-				mongodb.NewInferenceMapper(collections.Inference),
-			),
-			userRepo,
-			inferenceimpl.NewInference(&cfg.Inference),
-		),
-
-		cloud: cloudapp.NewCloudMessageService(
-			cloudrepo.NewPodRepo(&cfg.Postgresql.cloudconf),
-			cloudimpl.NewCloud(&cfg.Cloud.Config),
-			int64(cfg.Cloud.SurvivalTime),
 		),
 
 		async: asyncapp.NewAsyncMessageService(

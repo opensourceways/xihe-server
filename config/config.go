@@ -6,8 +6,6 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodel "github.com/opensourceways/xihe-server/bigmodel/config"
-	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
-	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
@@ -56,7 +54,6 @@ type Config struct {
 	MQTopics    messages.Topics                 `json:"mq_topics"    required:"true"`
 	SignIn      messages.SignInConfig           `json:"sign_in"      required:"true"`
 	Points      pointsConfig                    `json:"points"`
-	Cloud       cloudmsg.Config                 `json:"cloud"        required:"true"`
 	Course      course.Config                   `json:"course"       required:"true"`
 	Resource    messages.ResourceConfig         `json:"resource"     required:"true"`
 	Download    messages.DownloadProducerConfig `json:"download"     required:"true"`
@@ -86,7 +83,6 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.Domain,
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
-		&cfg.Postgresql.Cloud,
 		&cfg.Redis.DB,
 		&cfg.Gitlab,
 		&cfg.App,
@@ -95,7 +91,6 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.MQTopics,
 		&cfg.SignIn,
 		&cfg.Points,
-		&cfg.Cloud,
 		&cfg.Download,
 		&cfg.Course,
 		&cfg.Resource,
@@ -134,7 +129,6 @@ type Mongodb struct {
 type PostgresqlConfig struct {
 	DB pgsql.Config `json:"db" required:"true"`
 
-	Cloud cloudrepoimpl.Config
 	Async asyncrepoimpl.Config
 }
 

@@ -19,9 +19,6 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	bigmodelmsg "github.com/opensourceways/xihe-server/bigmodel/infrastructure/messageadapter"
 	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
-	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
-	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
-	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
 	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
@@ -132,12 +129,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
-	inference := repositories.NewInferenceRepository(
-		mongodb.NewInferenceMapper(
-			collections.Inference,
-		),
-	)
-
 	tags := repositories.NewTagsRepository(
 		mongodb.NewTagsMapper(collections.Tag),
 	)
@@ -198,12 +189,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
 		courserepo.NewRecordRepo(mongodb.NewCollection(collections.CourseRecord)),
 		coursemsg.MessageAdapter(&cfg.Course.Message, publisher),
-	)
-
-	cloudAppService := cloudapp.NewCloudService(
-		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
-		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
-		cloudmsg.NewPublisher(&cfg.Cloud, publisher),
 	)
 
 	bigmodelAppService := bigmodelapp.NewBigModelService(
@@ -292,10 +277,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,
 		)
 
-		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, inference, proj, sender,
-		)
-
 		controller.AddRouterForSearchController(
 			v1, user, proj, model, dataset,
 		)
@@ -314,10 +295,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForHomeController(
 			v1, courseAppService, competitionAppService, projectService, modelService, datasetService,
-		)
-
-		controller.AddRouterForCloudController(
-			v1, cloudAppService,
 		)
 	}
 

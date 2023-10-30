@@ -39,7 +39,6 @@ type EventHandler interface {
 	ForkHandler
 	DownloadHandler
 	FinetuneHandler
-	InferenceHandler
 }
 
 type LikeHandler interface {
