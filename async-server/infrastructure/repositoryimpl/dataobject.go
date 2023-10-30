@@ -23,9 +23,9 @@ func (table *TAsyncTask) toWuKongTask(p *repository.WuKongTask) (err error) {
 		return
 	}
 
-	if v := table.MetaData["s/links/desc"]; v != nil {
-		if links, ok := v.(string); ok {
-			if p.Desc, err = bigmodeldomain.NewWuKongPictureDesc(links); err != nil {
+	if v := table.MetaData["desc"]; v != nil {
+		if desc, ok := v.(string); ok {
+			if p.Desc, err = bigmodeldomain.NewWuKongPictureDesc(desc); err != nil {
 				return
 			}
 		}
