@@ -8,13 +8,14 @@ import (
 )
 
 type competitorApplyRequest struct {
-	Name     string            `json:"name"`
-	City     string            `json:"city"`
-	Email    string            `json:"email"`
-	Phone    string            `json:"phone"`
-	Identity string            `json:"identity"`
-	Province string            `json:"province"`
-	Detail   map[string]string `json:"detail"`
+	Name      string            `json:"name"`
+	City      string            `json:"city"`
+	Email     string            `json:"email"`
+	Phone     string            `json:"phone"`
+	Identity  string            `json:"identity"`
+	Province  string            `json:"province"`
+	Detail    map[string]string `json:"detail"`
+	Agreement bool              `json:"agreement"`
 }
 
 func (req *competitorApplyRequest) toCmd(user domain.Account) (cmd app.CompetitorApplyCmd, err error) {

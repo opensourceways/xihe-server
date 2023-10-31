@@ -71,6 +71,11 @@ func (ctl *CourseController) Apply(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "apply the course")
 
+	if !req.Agreement {
+		ctl.sendBadRequestParamWithMsg(ctx, "do not sign the agreement")
+		return
+	}
+
 	cmd, err := req.toCmd(ctx.Param("id"), pl.DomainAccount())
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))

@@ -103,6 +103,11 @@ func (ctl *ChallengeController) Apply(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "apply the challenge")
 
+	if !req.Agreement {
+		ctl.sendBadRequestParamWithMsg(ctx, "do not sign the agreement")
+		return
+	}
+
 	cmd, err := req.toCmd(pl.DomainAccount())
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(

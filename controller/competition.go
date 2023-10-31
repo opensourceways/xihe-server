@@ -75,6 +75,11 @@ func (ctl *CompetitionController) Apply(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "apply the competition")
 
+	if !req.Agreement {
+		ctl.sendBadRequestParamWithMsg(ctx, "do not sign the agreement")
+		return
+	}
+
 	cmd, err := req.ToCmd(pl.DomainAccount())
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
@@ -202,7 +207,7 @@ func (ctl *CompetitionController) List(ctx *gin.Context) {
 // @Tags			Competition
 // @Param			id		path	string					true	"competition id"
 // @Param			body	body	cc.CreateTeamRequest	true	"body of creating team"
-// @Accept			json	
+// @Accept			json
 // @Success		201
 // @Failure		500	system_error	system	error
 // @Router			/v1/competition/{id}/team [post]

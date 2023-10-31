@@ -1051,6 +1051,11 @@ func (ctl *BigModelController) ApplyApi(ctx *gin.Context) {
 		return
 	}
 
+	if !req.Agreement {
+		ctl.sendBadRequestParamWithMsg(ctx, "do not sign the agreement")
+		return
+	}
+
 	cmd, err := req.toCmd(pl.DomainAccount())
 	if err != nil {
 		ctl.sendBadRequestParam(ctx, err)
