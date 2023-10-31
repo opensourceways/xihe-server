@@ -19,6 +19,8 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	bigmodelmsg "github.com/opensourceways/xihe-server/bigmodel/infrastructure/messageadapter"
 	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
+	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
+	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
 	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
@@ -203,6 +205,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		userRegService,
 	)
 
+	cloudAppService := cloudapp.NewCloudService(
+		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
+		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
+	)
+
 	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, resProducer)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
@@ -295,6 +302,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForHomeController(
 			v1, courseAppService, competitionAppService, projectService, modelService, datasetService,
+		)
+
+		controller.AddRouterForCloudController(
+			v1, cloudAppService,
 		)
 	}
 

@@ -1035,81 +1035,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/cloud/subscribe": {
-            "post": {
-                "description": "subscribe cloud",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Cloud"
-                ],
-                "summary": "Subscribe",
-                "parameters": [
-                    {
-                        "description": "body of subscribe cloud",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.cloudSubscribeRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/cloud/{cid}": {
-            "get": {
-                "description": "get cloud pod",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Cloud"
-                ],
-                "summary": "GetHttp",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "cloud config id",
-                        "name": "cid",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/app.InferenceDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "bad_request_body"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/competition": {
             "get": {
                 "description": "list competitions",
@@ -2704,60 +2629,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controller.homeElectricityInfo"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/inference/project/{owner}/{pid}": {
-            "get": {
-                "description": "create inference",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Inference"
-                ],
-                "summary": "Create",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "project owner",
-                        "name": "owner",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "project id",
-                        "name": "pid",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/app.InferenceDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "bad_request_body"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "bad_request_param"
                         }
                     },
                     "500": {
@@ -6194,20 +6065,6 @@ const docTemplate = `{
                 }
             }
         },
-        "app.InferenceDTO": {
-            "type": "object",
-            "properties": {
-                "access_url": {
-                    "type": "string"
-                },
-                "error": {
-                    "type": "string"
-                },
-                "inference_id": {
-                    "type": "string"
-                }
-            }
-        },
         "app.LessonDTO": {
             "type": "object",
             "properties": {
@@ -7136,14 +6993,6 @@ const docTemplate = `{
             "properties": {
                 "can_apply": {
                     "type": "boolean"
-                }
-            }
-        },
-        "controller.cloudSubscribeRequest": {
-            "type": "object",
-            "properties": {
-                "cloud_id": {
-                    "type": "string"
                 }
             }
         },

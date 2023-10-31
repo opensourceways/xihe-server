@@ -6,6 +6,7 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodel "github.com/opensourceways/xihe-server/bigmodel/config"
+	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
@@ -130,6 +131,7 @@ type PostgresqlConfig struct {
 	DB pgsql.Config `json:"db" required:"true"`
 
 	Async asyncrepoimpl.Config
+	Cloud cloudrepoimpl.Config
 }
 
 type Redis struct {

@@ -441,15 +441,6 @@ definitions:
       total:
         type: integer
     type: object
-  app.InferenceDTO:
-    properties:
-      access_url:
-        type: string
-      error:
-        type: string
-      inference_id:
-        type: string
-    type: object
   app.LessonDTO:
     properties:
       desc:
@@ -1055,11 +1046,6 @@ definitions:
     properties:
       can_apply:
         type: boolean
-    type: object
-  controller.cloudSubscribeRequest:
-    properties:
-      cloud_id:
-        type: string
     type: object
   controller.competitorApplyRequest:
     properties:
@@ -2548,55 +2534,6 @@ paths:
       summary: List
       tags:
       - Cloud
-  /v1/cloud/{cid}:
-    get:
-      consumes:
-      - application/json
-      description: get cloud pod
-      parameters:
-      - description: cloud config id
-        in: path
-        name: cid
-        required: true
-        type: string
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/app.InferenceDTO'
-        "400":
-          description: Bad Request
-          schema:
-            type: bad_request_body
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      summary: GetHttp
-      tags:
-      - Cloud
-  /v1/cloud/subscribe:
-    post:
-      consumes:
-      - application/json
-      description: subscribe cloud
-      parameters:
-      - description: body of subscribe cloud
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.cloudSubscribeRequest'
-      responses:
-        "201":
-          description: Created
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      summary: Subscribe
-      tags:
-      - Cloud
   /v1/competition:
     get:
       consumes:
@@ -3656,42 +3593,6 @@ paths:
       summary: ListAllElectricity
       tags:
       - HomePage
-  /v1/inference/project/{owner}/{pid}:
-    get:
-      consumes:
-      - application/json
-      description: create inference
-      parameters:
-      - description: project owner
-        in: path
-        name: owner
-        required: true
-        type: string
-      - description: project id
-        in: path
-        name: pid
-        required: true
-        type: string
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/app.InferenceDTO'
-        "400":
-          description: Bad Request
-          schema:
-            type: bad_request_body
-        "401":
-          description: Unauthorized
-          schema:
-            type: bad_request_param
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      summary: Create
-      tags:
-      - Inference
   /v1/login:
     get:
       consumes:
