@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	liburl "net/url"
 	"path/filepath"
 	"strings"
 
@@ -57,8 +58,7 @@ func (impl *repoFile) Download(
 	token string, info *platform.RepoFileInfo,
 ) (data []byte, notFound bool, err error) {
 	req, err := http.NewRequest(
-		http.MethodGet,
-		impl.baseURL(info)+"/raw?ref="+defaultBranch, nil,
+		http.MethodGet, impl.baseURL(info)+"/raw?ref="+defaultBranch, nil,
 	)
 	if err != nil {
 		return
@@ -110,9 +110,11 @@ func (impl *repoFile) GenLFSDownloadURL(sha string) (string, error) {
 }
 
 func (impl *repoFile) baseURL(info *platform.RepoFileInfo) string {
-	return endpoint + fmt.Sprintf(
-		"/projects/%s/repository/files/%s", info.RepoId,
-		strings.Replace(info.Path.FilePath(), "/", "%2F", -1),
+	return fmt.Sprintf(
+		"%s/projects/%s/repository/files/%s",
+		endpoint,
+		liburl.PathEscape(info.RepoId),
+		liburl.PathEscape(info.Path.FilePath()),
 	)
 }
 
@@ -305,7 +307,10 @@ func (impl *repoFile) deleteMultiFiles(
 		Actions:    actions,
 	}
 
-	url := endpoint + fmt.Sprintf("/projects/%s/repository/commits", info.RepoId)
+	url := fmt.Sprintf(
+		"%s/projects/%s/repository/commits",
+		endpoint, liburl.PathEscape(info.RepoId),
+	)
 
 	req, err := impl.newRequest(u.Token, url, http.MethodPost, &commit)
 	if err != nil {
@@ -377,7 +382,10 @@ func (impl *repoFile) DownloadRepo(
 	u *platform.UserInfo, repoId string,
 	handle func(io.Reader, int64),
 ) error {
-	url := endpoint + fmt.Sprintf("/projects/%s/repository/archive.zip", repoId)
+	url := fmt.Sprintf(
+		"%s/projects/%s/repository/archive.zip",
+		endpoint, liburl.PathEscape(repoId),
+	)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
