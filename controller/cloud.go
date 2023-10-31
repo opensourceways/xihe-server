@@ -8,7 +8,6 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/opensourceways/xihe-server/cloud/app"
-	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForCloudController(
@@ -20,7 +19,6 @@ func AddRouterForCloudController(
 	}
 
 	rg.GET("/v1/cloud", ctl.List)
-	rg.POST("/v1/cloud/subscribe", checkUserEmailMiddleware(&ctl.baseController), ctl.Subscribe)
 	rg.GET("/v1/cloud/:cid", ctl.Get)
 	rg.GET("/v1/cloud/pod/:cid", ctl.GetHttp)
 }
@@ -56,45 +54,6 @@ func (ctl *CloudController) List(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, data)
-	}
-}
-
-// @Summary		Subscribe
-// @Description	subscribe cloud
-// @Tags			Cloud
-// @Param			body	body	cloudSubscribeRequest	true	"body of subscribe cloud"
-// @Accept			json
-// @Success		201
-// @Failure		500	system_error	system	error
-// @Router			/v1/cloud/subscribe [post]
-func (ctl *CloudController) Subscribe(ctx *gin.Context) {
-	req := cloudSubscribeRequest{}
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctl.sendBadRequestBody(ctx)
-
-		return
-	}
-
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
-	if !ok {
-		return
-	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "subscribe cloud")
-
-	cmd := req.toCmd(pl.DomainAccount())
-	if err := cmd.Validate(); err != nil {
-		ctl.sendBadRequestBody(ctx)
-
-		return
-	}
-
-	if code, err := ctl.s.SubscribeCloud(&cmd); err != nil {
-		ctl.sendCodeMessage(ctx, code, err)
-	} else {
-		utils.DoLog("", pl.Account, "create jupyter", cmd.CloudId, "success")
-
-		ctl.sendRespOfPost(ctx, "success")
 	}
 }
 

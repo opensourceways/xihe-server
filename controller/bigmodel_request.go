@@ -1,79 +1,15 @@
 package controller
 
 import (
-	"errors"
-
 	"github.com/opensourceways/xihe-server/bigmodel/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	types "github.com/opensourceways/xihe-server/domain"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userd "github.com/opensourceways/xihe-server/user/domain"
-	"github.com/opensourceways/xihe-server/utils"
 )
-
-type describePictureResp struct {
-	Desc string `json:"desc"`
-}
-
-type pictureGenerateRequest struct {
-	Desc string `json:"desc"`
-}
-
-func (req *pictureGenerateRequest) toCmd(user types.Account) (cmd app.GenPictureCmd, err error) {
-	if cmd.Desc, err = domain.NewDesc(req.Desc); err != nil {
-		return
-	}
-
-	cmd.User = user
-
-	return
-}
-
-type pictureGenerateResp struct {
-	Picture string `json:"picture"`
-}
-
-type multiplePicturesGenerateResp struct {
-	Pictures []string `json:"pictures"`
-}
-
-type questionAskRequest struct {
-	Question string `json:"question"`
-	Picture  string `json:"picture"`
-}
-
-func (req *questionAskRequest) toCmd() (
-	q domain.Question, p string, err error,
-) {
-	if q, err = domain.NewQuestion(req.Question); err != nil {
-		return
-	}
-
-	if req.Picture == "" || !utils.IsPictureName(req.Picture) {
-		err = errors.New("invalid picture")
-
-		return
-	}
-
-	p = req.Picture
-
-	return
-}
-
-type questionAskResp struct {
-	Answer string `json:"answer"`
-}
 
 type pictureUploadResp struct {
 	Path string `json:"path"`
-}
-
-type panguRequest struct {
-	Question string `json:"question"`
-}
-
-type panguResp struct {
-	Answer string `json:"answer"`
 }
 
 type luojiaResp struct {
