@@ -226,8 +226,10 @@ func (ctl *UserController) RefreshGitlabToken(ctx *gin.Context) {
 	}
 
 	if err := ctl.s.RefreshGitlabToken(&cmd); err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseError(err))
-
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorSystemError,
+			"can't refresh token",
+		))
 		return
 	}
 

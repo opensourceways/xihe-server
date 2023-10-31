@@ -109,7 +109,7 @@ func (m *administrator) RefreshToken(userId string) (string, error) {
 	}
 	tokens, _, err := m.cli.PersonalAccessTokens.ListPersonalAccessTokens(&opt)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	for _, token := range tokens {
