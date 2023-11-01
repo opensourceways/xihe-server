@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	kfk "github.com/opensourceways/kafka-lib/agent"
-	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
-	asyncdomain "github.com/opensourceways/xihe-server/async-server/domain"
-	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
+	asyncapp "github.com/opensourceways/xihe-extra-services/async-server/app"
+	asyncdomain "github.com/opensourceways/xihe-extra-services/async-server/domain"
+	asyncrepo "github.com/opensourceways/xihe-extra-services/async-server/domain/repository"
 	bigmodeldomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	comsg "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"

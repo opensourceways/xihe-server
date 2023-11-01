@@ -1,8 +1,8 @@
 package asynccli
 
 import (
-	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
-	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
+	asyncapp "github.com/opensourceways/xihe-extra-services/async-server/app"
+	asyncrepo "github.com/opensourceways/xihe-extra-services/async-server/domain/repository"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/async"
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
 	types "github.com/opensourceways/xihe-server/domain"

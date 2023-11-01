@@ -1,7 +1,7 @@
 package repository
 
 import (
-	asyncdomain "github.com/opensourceways/xihe-server/async-server/domain"
+	asyncdomain "github.com/opensourceways/xihe-extra-services/async-server/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
 	types "github.com/opensourceways/xihe-server/domain"
@@ -35,4 +35,3 @@ type WuKongPicture interface {
 	GetOfficialPublicsGlobal() ([]domain.WuKongPicture, error)
 	UpdatePublicPicture(types.Account, string, int, *domain.WuKongPicture) error
 }
-

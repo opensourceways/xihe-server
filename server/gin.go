@@ -11,9 +11,9 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
+	asyncapp "github.com/opensourceways/xihe-extra-services/async-server/app"
+	asyncrepoimpl "github.com/opensourceways/xihe-extra-services/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/app"
-	asyncapp "github.com/opensourceways/xihe-server/async-server/app"
-	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 	bigmodelasynccli "github.com/opensourceways/xihe-server/bigmodel/infrastructure/asynccli"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"

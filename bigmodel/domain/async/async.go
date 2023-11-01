@@ -1,7 +1,7 @@
 package async
 
 import (
-	asyncrepo "github.com/opensourceways/xihe-server/async-server/domain/repository"
+	asyncrepo "github.com/opensourceways/xihe-extra-services/async-server/domain/repository"
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
 	types "github.com/opensourceways/xihe-server/domain"
 )

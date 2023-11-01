@@ -3,8 +3,8 @@ package config
 import (
 	redislib "github.com/opensourceways/redis-lib"
 
+	asyncrepoimpl "github.com/opensourceways/xihe-extra-services/async-server/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/app"
-	asyncrepoimpl "github.com/opensourceways/xihe-server/async-server/infrastructure/repositoryimpl"
 	bigmodel "github.com/opensourceways/xihe-server/bigmodel/config"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	common "github.com/opensourceways/xihe-server/common/config"
