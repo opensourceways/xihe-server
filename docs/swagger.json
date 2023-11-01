@@ -6640,6 +6640,9 @@
         "controller.CompetitorApplyRequest": {
             "type": "object",
             "properties": {
+                "agreement": {
+                    "type": "boolean"
+                },
                 "city": {
                     "type": "string"
                 },
@@ -6780,6 +6783,9 @@
         "controller.StudentApplyRequest": {
             "type": "object",
             "properties": {
+                "agreement": {
+                    "type": "boolean"
+                },
                 "city": {
                     "type": "string"
                 },
@@ -6928,6 +6934,9 @@
         "controller.applyApiReq": {
             "type": "object",
             "properties": {
+                "agreement": {
+                    "type": "boolean"
+                },
                 "city": {
                     "type": "string"
                 },
@@ -6988,6 +6997,9 @@
         "controller.competitorApplyRequest": {
             "type": "object",
             "properties": {
+                "agreement": {
+                    "type": "boolean"
+                },
                 "city": {
                     "type": "string"
                 },

@@ -6651,6 +6651,9 @@ const docTemplate = `{
         "controller.CompetitorApplyRequest": {
             "type": "object",
             "properties": {
+                "agreement": {
+                    "type": "boolean"
+                },
                 "city": {
                     "type": "string"
                 },
@@ -6791,6 +6794,9 @@ const docTemplate = `{
         "controller.StudentApplyRequest": {
             "type": "object",
             "properties": {
+                "agreement": {
+                    "type": "boolean"
+                },
                 "city": {
                     "type": "string"
                 },
@@ -6939,6 +6945,9 @@ const docTemplate = `{
         "controller.applyApiReq": {
             "type": "object",
             "properties": {
+                "agreement": {
+                    "type": "boolean"
+                },
                 "city": {
                     "type": "string"
                 },
@@ -6999,6 +7008,9 @@ const docTemplate = `{
         "controller.competitorApplyRequest": {
             "type": "object",
             "properties": {
+                "agreement": {
+                    "type": "boolean"
+                },
                 "city": {
                     "type": "string"
                 },

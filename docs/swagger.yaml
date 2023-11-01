@@ -824,6 +824,8 @@ definitions:
     type: object
   controller.CompetitorApplyRequest:
     properties:
+      agreement:
+        type: boolean
       city:
         type: string
       detail:
@@ -914,6 +916,8 @@ definitions:
     type: object
   controller.StudentApplyRequest:
     properties:
+      agreement:
+        type: boolean
       city:
         type: string
       detail:
@@ -1010,6 +1014,8 @@ definitions:
     type: object
   controller.applyApiReq:
     properties:
+      agreement:
+        type: boolean
       city:
         type: string
       detail:
@@ -1049,6 +1055,8 @@ definitions:
     type: object
   controller.competitorApplyRequest:
     properties:
+      agreement:
+        type: boolean
       city:
         type: string
       detail:
