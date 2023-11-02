@@ -69,6 +69,9 @@ func toUserDoc(u domain.User, doc *DUser) {
 		PlatformToken:           u.PlatformToken,
 		PlatformUserId:          u.PlatformUser.Id,
 		PlatformUserNamespaceId: u.PlatformUser.NamespaceId,
+		UserAgreement:           u.UserAgreement,
+		CourseAgreement:         u.CourseAgreement,
+		FinetuneAgreement:       u.FinetuneAgreement,
 	}
 
 	if u.Bio != nil {
@@ -99,6 +102,9 @@ func toUser(doc DUser, u *domain.User) (err error) {
 	u.PlatformToken = doc.PlatformToken
 	u.PlatformUser.Id = doc.PlatformUserId
 	u.PlatformUser.NamespaceId = doc.PlatformUserNamespaceId
+	u.CourseAgreement = doc.CourseAgreement
+	u.FinetuneAgreement = doc.FinetuneAgreement
+	u.UserAgreement = doc.UserAgreement
 
 	return
 }

@@ -33,6 +33,7 @@ func AddRouterForUserController(
 	}
 
 	rg.PUT("/v1/user", ctl.Update)
+	rg.PUT("/v1/user/agreement", ctl.UpdateAgreement)
 	rg.GET("/v1/user", ctl.Get)
 
 	rg.POST("/v1/user/following", ctl.AddFollowing)
@@ -106,6 +107,41 @@ func (ctl *UserController) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData(m))
 }
 
+// @Summary		Update Agreement
+// @Description	update user agreement info
+// @Tags			User
+// @Param			body	body	UserAgreement	true	"body of update user agreement"
+// @Accept			json
+// @Produce		json
+// @Router			/v1/user/agreement [put]
+func (ctl *UserController) UpdateAgreement(ctx *gin.Context) {
+	m := UserAgreement{}
+
+	if err := ctx.ShouldBindJSON(&m); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody,
+			"can't fetch request body",
+		))
+
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user agreement info")
+
+	if err := ctl.s.UpdateAgreement(pl.DomainAccount(), m.Type); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseError(err))
+
+		return
+	}
+
+	ctx.JSON(http.StatusAccepted, newResponseData(nil))
+}
+
 // @Summary		Get
 // @Description	get user
 // @Tags			User
@@ -158,6 +194,9 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 			ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		} else {
 			u.Email = ""
+			u.CourseAgreement = ""
+			u.FinetuneAgreement = ""
+			u.UserAgreement = ""
 			resp(&u, 0, false)
 		}
 
@@ -170,6 +209,9 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 			ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		} else {
 			u.Email = ""
+			u.CourseAgreement = ""
+			u.FinetuneAgreement = ""
+			u.UserAgreement = ""
 			resp(&u, 0, isFollower)
 		}
 

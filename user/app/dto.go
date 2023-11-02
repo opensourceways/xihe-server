@@ -57,6 +57,10 @@ type UserDTO struct {
 	FollowerCount  int `json:"follower_count"`
 	FollowingCount int `json:"following_count"`
 
+	CourseAgreement   string `json:"course_agreement"`
+	FinetuneAgreement string `json:"finetune_agreement"`
+	UserAgreement     string `json:"user_agreement"`
+
 	Platform struct {
 		UserId      string
 		Token       string

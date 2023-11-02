@@ -3,8 +3,10 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/course/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/sirupsen/logrus"
 )
 
 func (s *courseService) Apply(cmd *PlayerApplyCmd) (code string, err error) {
@@ -40,6 +42,22 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (code string, err error) {
 	if err = s.userCli.AddUserRegInfo(&p.Student); err != nil {
 		return
 	}
+
+	ver := app.GetCurrentCourseAgree()
+	user, err := s.userRepo.GetByAccount(cmd.Account)
+	if err != nil {
+		return
+	}
+
+	if user.CourseAgreement != ver {
+		user.CourseAgreement = ver
+		logrus.Debugf("User %s user agreement updated from %s to %s ",
+			user.Account.Account(), user.CourseAgreement, ver)
+		if _, err = s.userRepo.Save(&user); err != nil {
+			return
+		}
+	}
+
 	s.producer.SendCourseAppliedEvent(&domain.CourseAppliedEvent{
 		Account:    cmd.Account,
 		CourseName: course.Name,

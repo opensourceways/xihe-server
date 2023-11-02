@@ -9,6 +9,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/challenge"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 func AddRouterForChallengeController(
@@ -16,10 +17,10 @@ func AddRouterForChallengeController(
 	crepo repository.Competition,
 	qrepo repository.AIQuestion,
 	h challenge.Challenge,
-
+	user userrepo.User,
 ) {
 	ctl := ChallengeController{
-		s: app.NewChallengeService(crepo, qrepo, h, encryptHelper),
+		s: app.NewChallengeService(crepo, qrepo, h, encryptHelper, user),
 	}
 
 	rg.GET("/v1/challenge", ctl.Get)

@@ -181,6 +181,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		competitionrepo.NewPlayerRepo(mongodb.NewCollection(collections.CompetitionPlayer)),
 		competitionmsg.MessageAdapter(&cfg.Competition.Message, publisher), uploader,
 		competitionusercli.NewUserCli(userRegService),
+		user,
 	)
 
 	courseAppService := courseapp.NewCourseService(
@@ -191,6 +192,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
 		courserepo.NewRecordRepo(mongodb.NewCollection(collections.CourseRecord)),
 		coursemsg.MessageAdapter(&cfg.Course.Message, publisher),
+		user,
 	)
 
 	bigmodelAppService := bigmodelapp.NewBigModelService(
@@ -293,7 +295,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForChallengeController(
-			v1, competition, aiquestion, challengeHelper,
+			v1, competition, aiquestion, challengeHelper, user,
 		)
 
 		controller.AddRouterForCourseController(

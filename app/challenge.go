@@ -6,10 +6,13 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/challenge"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+	"github.com/sirupsen/logrus"
 )
 
 type ChallengeService interface {
@@ -29,6 +32,7 @@ type challengeService struct {
 	aiQuestionRepo  repository.AIQuestion
 	helper          challenge.Challenge
 	encryption      utils.SymmetricEncryption
+	userRepo        userrepo.User
 }
 
 func NewChallengeService(
@@ -36,6 +40,7 @@ func NewChallengeService(
 	aiQuestionRepo repository.AIQuestion,
 	helper challenge.Challenge,
 	encryption utils.SymmetricEncryption,
+	userRepo userrepo.User,
 ) ChallengeService {
 	v := helper.GetChallenge()
 
@@ -45,6 +50,7 @@ func NewChallengeService(
 		encryption:      encryption,
 		helper:          helper,
 		delimiter:       ",-;",
+		userRepo:        userRepo,
 	}
 
 	s.comptitions = make([]domain.CompetitionIndex, len(v.Competition))
@@ -74,6 +80,21 @@ func (s *challengeService) Apply(cmd *CompetitorApplyCmd) error {
 	err := s.aiQuestionRepo.SaveCompetitor(s.aiQuestion.AIQuestionId, c)
 	if err != nil && !repository.IsErrorDuplicateCreating(err) {
 		return err
+	}
+
+	ver := app.GetCurrentCourseAgree()
+	user, err := s.userRepo.GetByAccount(cmd.Account)
+	if err != nil {
+		return err
+	}
+
+	if user.CourseAgreement != ver {
+		user.CourseAgreement = ver
+		logrus.Debugf("User %s challenge agreement updated from %s to %s ",
+			user.Account.Account(), user.CourseAgreement, ver)
+		if _, err = s.userRepo.Save(&user); err != nil {
+			return err
+		}
 	}
 
 	return nil

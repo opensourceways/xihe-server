@@ -9,6 +9,7 @@ import (
 	redislib "github.com/opensourceways/redis-lib"
 	"github.com/sirupsen/logrus"
 
+	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
@@ -139,6 +140,9 @@ func main() {
 	if err := redis.Init(&cfg.Redis.DB); err != nil {
 		logrus.Fatalf("init redis failed, err:%s", err.Error())
 	}
+
+	// agreement
+	app.Init(&cfg.Agreement)
 
 	// cfg
 	cfg.InitDomainConfig()

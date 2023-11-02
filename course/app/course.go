@@ -9,6 +9,7 @@ import (
 	projdomain "github.com/opensourceways/xihe-server/domain"
 	projectrepo "github.com/opensourceways/xihe-server/domain/repository"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 type CourseService interface {
@@ -28,6 +29,7 @@ type CourseService interface {
 
 func NewCourseService(
 	userCli user.User,
+
 	projectRepo projectrepo.Project,
 
 	courseRepo repository.Course,
@@ -35,6 +37,7 @@ func NewCourseService(
 	workRepo repository.Work,
 	recordRepo repository.Record,
 	producer message.MessageProducer,
+	userRepo userrepo.User,
 ) *courseService {
 	return &courseService{
 		userCli:     userCli,
@@ -45,11 +48,13 @@ func NewCourseService(
 		workRepo:   workRepo,
 		recordRepo: recordRepo,
 		producer:   producer,
+		userRepo:   userRepo,
 	}
 }
 
 type courseService struct {
 	userCli     user.User
+	userRepo    userrepo.User
 	projectRepo projectrepo.Project
 
 	courseRepo repository.Course

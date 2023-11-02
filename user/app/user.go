@@ -2,7 +2,9 @@ package app
 
 import (
 	"encoding/hex"
+	"fmt"
 
+	"github.com/opensourceways/xihe-server/agreement/app"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
@@ -10,6 +12,7 @@ import (
 	pointsPort "github.com/opensourceways/xihe-server/user/domain/points"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+	"github.com/sirupsen/logrus"
 )
 
 type UserService interface {
@@ -20,6 +23,7 @@ type UserService interface {
 	UpdatePlateformToken(*UpdatePlateformTokenCmd) error
 	NewPlatformAccountWithUpdate(*CreatePlatformAccountCmd) error
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
+	UpdateAgreement(u domain.Account, t app.AgreementType) error
 
 	UserInfo(domain.Account) (UserInfoDTO, error)
 	GetByAccount(domain.Account) (UserDTO, error)
@@ -62,9 +66,11 @@ type userService struct {
 }
 
 func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
-	// TODO keep transaction
-
 	v := cmd.toUser()
+	// set agreement
+	v.UserAgreement = app.GetCurrentUserAgree()
+	v.CourseAgreement = app.GetCurrentCourseAgree()
+	v.FinetuneAgreement = app.GetCurrentFinetuneAgree()
 
 	// update user
 	u, err := s.repo.Save(&v)
@@ -75,7 +81,7 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 	s.toUserDTO(&u, &dto)
 
 	_ = s.sender.AddOperateLogForNewUser(u.Account)
-	
+
 	_ = s.sender.SendUserSignedUpEvent(&domain.UserSignedUpEvent{
 		Account: cmd.Account,
 	})
@@ -89,6 +95,32 @@ func (s userService) UserInfo(account domain.Account) (dto UserInfoDTO, err erro
 	}
 
 	dto.Points, err = s.points.Points(account)
+
+	return
+}
+
+func (s userService) UpdateAgreement(u domain.Account, t app.AgreementType) (err error) {
+	user, err := s.repo.GetByAccount(u)
+	if err != nil {
+		return
+	}
+
+	// update agreement
+	switch t {
+	case app.Course:
+		user.CourseAgreement = app.GetCurrentCourseAgree()
+	case app.Finetune:
+		user.FinetuneAgreement = app.GetCurrentFinetuneAgree()
+	case app.User:
+		user.UserAgreement = app.GetCurrentUserAgree()
+	default:
+		str := fmt.Sprintf("Invalid agreement type :%s", t)
+		logrus.Error(str)
+		return fmt.Errorf("%s", str)
+	}
+
+	// update userinfo
+	_, err = s.repo.Save(&user)
 
 	return
 }
@@ -240,6 +272,9 @@ func (s userService) toUserDTO(u *domain.User, dto *UserDTO) {
 	dto.Platform.Token = u.PlatformToken
 	dto.Platform.UserId = u.PlatformUser.Id
 	dto.Platform.NamespaceId = u.PlatformUser.NamespaceId
+	dto.CourseAgreement = u.CourseAgreement
+	dto.UserAgreement = u.UserAgreement
+	dto.FinetuneAgreement = u.FinetuneAgreement
 }
 
 func (s userService) encryptToken(d string) (string, error) {

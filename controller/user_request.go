@@ -1,6 +1,7 @@
 package controller
 
 import (
+	agreement "github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/user/domain"
 )
@@ -25,6 +26,10 @@ func (req *userBasicInfoUpdateRequest) toCmd() (
 	}
 
 	return
+}
+
+type UserAgreement struct {
+	Type agreement.AgreementType `json:"type"`
 }
 
 type userCreateRequest struct {

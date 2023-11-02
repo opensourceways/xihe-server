@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/async"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
@@ -20,6 +21,7 @@ import (
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+	"github.com/sirupsen/logrus"
 )
 
 type BigModelService interface {
@@ -753,6 +755,24 @@ func (s bigModelService) ApplyApi(user types.Account, model domain.ModelName, to
 		Enabled:   true,
 	}
 	err = s.apiService.ApplyApi(&a)
+	if err != nil {
+		return
+	}
+
+	ver := app.GetCurrentCourseAgree()
+	u, err := s.user.GetByAccount(user)
+	if err != nil {
+		return
+	}
+
+	if u.CourseAgreement != ver {
+		u.CourseAgreement = ver
+		logrus.Debugf("User %s api agreement updated from %s to %s ",
+			user.Account(), u.CourseAgreement, ver)
+		if _, err = s.user.Save(&u); err != nil {
+			return
+		}
+	}
 	return
 }
 

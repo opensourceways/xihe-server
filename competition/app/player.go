@@ -3,11 +3,13 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/competition/domain"
 	"github.com/opensourceways/xihe-server/competition/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+	"github.com/sirupsen/logrus"
 )
 
 func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code string, err error) {
@@ -39,13 +41,29 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 		return
 	}
 
+	if err = s.userCli.AddUserRegInfo(&p.Leader); err != nil {
+		return
+	}
+
+	ver := app.GetCurrentCourseAgree()
+	user, err := s.userRepo.GetByAccount(cmd.Account)
+	if err != nil {
+		return
+	}
+
+	if user.CourseAgreement != ver {
+		user.CourseAgreement = ver
+		logrus.Debugf("User %s competition agreement updated from %s to %s ",
+			user.Account.Account(), user.CourseAgreement, ver)
+		if _, err = s.userRepo.Save(&user); err != nil {
+			return
+		}
+	}
+
 	s.producer.SendCompetitorAppliedEvent(&domain.CompetitorAppliedEvent{
 		Account:         cmd.Account,
 		CompetitionName: competition.Name,
 	})
-
-	err = s.userCli.AddUserRegInfo(&p.Leader)
-
 	return
 }
 

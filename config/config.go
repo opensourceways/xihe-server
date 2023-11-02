@@ -4,6 +4,7 @@ import (
 	redislib "github.com/opensourceways/redis-lib"
 
 	asyncrepoimpl "github.com/opensourceways/xihe-extra-services/async-server/infrastructure/repositoryimpl"
+	agreement "github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/app"
 	bigmodel "github.com/opensourceways/xihe-server/bigmodel/config"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
@@ -60,6 +61,7 @@ type Config struct {
 	Download    messages.DownloadProducerConfig `json:"download"     required:"true"`
 	User        userConfig                      `json:"user"`
 	Like        messages.LikeConfig             `json:"like"`
+	Agreement   agreement.Config                `json:"agreement"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -97,6 +99,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.Resource,
 		&cfg.User,
 		&cfg.Like,
+		&cfg.Agreement,
 	}
 }
 

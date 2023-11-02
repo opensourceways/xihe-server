@@ -8,6 +8,7 @@ import (
 	"github.com/opensourceways/xihe-server/competition/domain/user"
 	types "github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 type CompetitionService interface {
@@ -42,6 +43,7 @@ func NewCompetitionService(
 	producer message.MessageProducer,
 	uploader uploader.SubmissionFileUploader,
 	userCli user.User,
+	user userrepo.User,
 ) *competitionService {
 	return &competitionService{
 		repo:             repo,
@@ -50,6 +52,7 @@ func NewCompetitionService(
 		producer:         producer,
 		submissionServie: domain.NewSubmissionService(uploader),
 		userCli:          userCli,
+		userRepo:         user,
 	}
 }
 
@@ -60,6 +63,7 @@ type competitionService struct {
 	producer         message.MessageProducer
 	submissionServie domain.SubmissionService
 	userCli          user.User
+	userRepo         userrepo.User
 }
 
 // show competition detail

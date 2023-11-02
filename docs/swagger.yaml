@@ -23,6 +23,16 @@ definitions:
       type:
         type: string
     type: object
+  app.AgreementType:
+    enum:
+    - course
+    - finetune
+    - user
+    type: string
+    x-enum-varnames:
+    - Course
+    - Finetune
+    - User
   app.ApiApplyRecordDTO:
     properties:
       apply_at:
@@ -746,13 +756,19 @@ definitions:
         type: string
       bio:
         type: string
+      course_agreement:
+        type: string
       email:
+        type: string
+      finetune_agreement:
         type: string
       follower_count:
         type: integer
       following_count:
         type: integer
       id:
+        type: string
+      user_agreement:
         type: string
     type: object
   app.UserFinetunesDTO:
@@ -983,6 +999,11 @@ definitions:
     properties:
       competitor_account:
         type: string
+    type: object
+  controller.UserAgreement:
+    properties:
+      type:
+        $ref: '#/definitions/app.AgreementType'
     type: object
   controller.aiDetectorReq:
     properties:
@@ -1589,7 +1610,11 @@ definitions:
         type: string
       bio:
         type: string
+      course_agreement:
+        type: string
       email:
+        type: string
+      finetune_agreement:
         type: string
       follower_count:
         type: integer
@@ -1601,6 +1626,8 @@ definitions:
         type: boolean
       points:
         type: integer
+      user_agreement:
+        type: string
     type: object
   controller.wukongAddLikeResp:
     properties:
@@ -5027,6 +5054,24 @@ paths:
             type: system_error
       tags:
       - Activity
+  /v1/user/agreement:
+    put:
+      consumes:
+      - application/json
+      description: update user agreement info
+      parameters:
+      - description: body of update user agreement
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UserAgreement'
+      produces:
+      - application/json
+      responses: {}
+      summary: Update Agreement
+      tags:
+      - User
   /v1/user/check_email:
     get:
       consumes:

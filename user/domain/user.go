@@ -16,6 +16,10 @@ type User struct {
 	PlatformUser  PlatformUser
 	PlatformToken string
 
+	CourseAgreement   string
+	FinetuneAgreement string
+	UserAgreement     string
+
 	Version int
 
 	// following fileds is not under the controlling of version

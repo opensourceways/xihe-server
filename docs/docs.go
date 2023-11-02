@@ -4778,6 +4778,33 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/user/agreement": {
+            "put": {
+                "description": "update user agreement info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update Agreement",
+                "parameters": [
+                    {
+                        "description": "body of update user agreement",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.UserAgreement"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/v1/user/check_email": {
             "get": {
                 "description": "check user email",
@@ -5423,6 +5450,19 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "app.AgreementType": {
+            "type": "string",
+            "enum": [
+                "course",
+                "finetune",
+                "user"
+            ],
+            "x-enum-varnames": [
+                "Course",
+                "Finetune",
+                "User"
+            ]
         },
         "app.ApiApplyRecordDTO": {
             "type": "object",
@@ -6533,7 +6573,13 @@ const docTemplate = `{
                 "bio": {
                     "type": "string"
                 },
+                "course_agreement": {
+                    "type": "string"
+                },
                 "email": {
+                    "type": "string"
+                },
+                "finetune_agreement": {
                     "type": "string"
                 },
                 "follower_count": {
@@ -6543,6 +6589,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "id": {
+                    "type": "string"
+                },
+                "user_agreement": {
                     "type": "string"
                 }
             }
@@ -6895,6 +6944,14 @@ const docTemplate = `{
             "properties": {
                 "competitor_account": {
                     "type": "string"
+                }
+            }
+        },
+        "controller.UserAgreement": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "$ref": "#/definitions/app.AgreementType"
                 }
             }
         },
@@ -7827,7 +7884,13 @@ const docTemplate = `{
                 "bio": {
                     "type": "string"
                 },
+                "course_agreement": {
+                    "type": "string"
+                },
                 "email": {
+                    "type": "string"
+                },
+                "finetune_agreement": {
                     "type": "string"
                 },
                 "follower_count": {
@@ -7844,6 +7907,9 @@ const docTemplate = `{
                 },
                 "points": {
                     "type": "integer"
+                },
+                "user_agreement": {
+                    "type": "string"
                 }
             }
         },

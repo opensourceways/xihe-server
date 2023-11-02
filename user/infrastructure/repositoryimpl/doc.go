@@ -26,6 +26,10 @@ type DUser struct {
 	PlatformUserId          string `bson:"uid"        json:"uid"`
 	PlatformUserNamespaceId string `bson:"nid"        json:"nid"`
 
+	CourseAgreement   string `bson:"course_agreement"        json:"course_agreement"`
+	FinetuneAgreement string `bson:"finetune_agreement"        json:"finetune_agreement"`
+	UserAgreement     string `bson:"user_agreement"        json:"user_agreement"`
+
 	Follower  []string `bson:"follower"   json:"-"`
 	Following []string `bson:"following"  json:"-"`
 
