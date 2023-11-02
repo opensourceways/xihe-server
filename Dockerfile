@@ -17,6 +17,10 @@ RUN mkdir /opt/app -p
 RUN chmod 700 /opt/app
 RUN chown mindspore:mindspore /opt/app
 
+RUN echo "umask 027" >> /home/mindspore/.bashrc && rm -rf /tmp/*
+RUN echo 'set +o history' >> /home/mindspore/.bashrc
+RUN echo 'set +o history' >> /root/.bashrc
+
 USER mindspore
 WORKDIR /opt/app/
 
