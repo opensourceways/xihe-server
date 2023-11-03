@@ -17,9 +17,9 @@ RUN mkdir /opt/app -p
 RUN chmod 700 /opt/app
 RUN chown mindspore:mindspore /opt/app
 
-RUN echo "umask 027" >> /home/mindspore/.bashrc && rm -rf /tmp/*
-RUN echo 'set +o history' >> /home/mindspore/.bashrc
 RUN echo 'set +o history' >> /root/.bashrc
+RUN sed -i 's/^PASS_MAX_DAYS.*/PASS_MAX_DAYS   90/' /etc/login.defs
+RUN rm -rf /tmp/*
 
 USER mindspore
 WORKDIR /opt/app/
@@ -33,5 +33,8 @@ RUN chmod 640 /opt/app/points/task-docs-templates/doc_chinese.tmpl
 RUN chmod 640 /opt/app/points/task-docs-templates/doc_english.tmpl
 RUN chmod 750 /opt/app/points/task-docs-templates
 RUN chmod 750 /opt/app/points
+
+RUN echo "umask 027" >> /home/mindspore/.bashrc
+RUN echo 'set +o history' >> /home/mindspore/.bashrc
 
 ENTRYPOINT ["/opt/app/xihe-server"]
