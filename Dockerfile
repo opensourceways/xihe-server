@@ -13,6 +13,10 @@ RUN dnf -y update && \
     groupadd -g 5000 mindspore && \
     useradd -u 5000 -g mindspore -s /bin/bash -m mindspore
 
+RUN mkdir /opt/app -p
+RUN chmod 700 /opt/app
+RUN chown mindspore:mindspore /opt/app
+
 USER mindspore
 WORKDIR /opt/app/
 
@@ -22,8 +26,8 @@ COPY  --chown=mindspore ./points/infrastructure/taskdocimpl/doc_english.tmpl  /o
 
 RUN chmod 550 /opt/app/xihe-server
 RUN chmod 640 /opt/app/points/task-docs-templates/doc_chinese.tmpl
-RUN chmod 750 /opt/app/points/task-docs-templates
 RUN chmod 640 /opt/app/points/task-docs-templates/doc_english.tmpl
 RUN chmod 750 /opt/app/points/task-docs-templates
+RUN chmod 750 /opt/app/points
 
 ENTRYPOINT ["/opt/app/xihe-server"]
