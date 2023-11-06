@@ -108,11 +108,26 @@ func (s userService) UpdateAgreement(u domain.Account, t app.AgreementType) (err
 	// update agreement
 	switch t {
 	case app.Course:
-		user.CourseAgreement = app.GetCurrentCourseAgree()
+		ver := app.GetCurrentCourseAgree()
+		if user.CourseAgreement == ver {
+			logrus.Infoln("no need update course agreement")
+			return nil
+		}
+		user.CourseAgreement = ver
 	case app.Finetune:
-		user.FinetuneAgreement = app.GetCurrentFinetuneAgree()
+		ver := app.GetCurrentFinetuneAgree()
+		if user.FinetuneAgreement == ver {
+			logrus.Infoln("no need update finetune agreement")
+			return nil
+		}
+		user.FinetuneAgreement = ver
 	case app.User:
-		user.UserAgreement = app.GetCurrentUserAgree()
+		ver := app.GetCurrentUserAgree()
+		if user.UserAgreement == ver {
+			logrus.Infoln("no need update user agreement")
+			return nil
+		}
+		user.UserAgreement = ver
 	default:
 		str := fmt.Sprintf("Invalid agreement type :%s", t)
 		logrus.Error(str)
