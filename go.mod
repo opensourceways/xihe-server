@@ -10,9 +10,7 @@ require (
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.23.9+incompatible
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.64
 	github.com/opensourceways/community-robot-lib v0.0.0-20231106030104-fefc5fa67771
-	github.com/opensourceways/kafka-lib v0.0.0-20231023142428-b41c4ff141c6
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
-	github.com/opensourceways/xihe-extra-services v0.0.0-20231101110507-78ecf342c89c
 	github.com/opensourceways/xihe-finetune v0.0.0-20231025112302-d48154d5ce22
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
 	github.com/sirupsen/logrus v1.9.3
@@ -21,10 +19,10 @@ require (
 	github.com/swaggo/swag v1.16.2
 	github.com/xanzy/go-gitlab v0.93.2
 	go.mongodb.org/mongo-driver v1.12.1
-	gorm.io/driver/postgres v1.5.4
-	gorm.io/gorm v1.25.5
-	k8s.io/apimachinery v0.28.3
-	sigs.k8s.io/yaml v1.4.0
+	gorm.io/driver/postgres v1.5.0
+	gorm.io/gorm v1.25.4
+	k8s.io/apimachinery v0.28.2
+	sigs.k8s.io/yaml v1.3.0
 )
 
 require (
@@ -82,7 +80,6 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/onsi/gomega v1.27.10 // indirect
-	github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
@@ -105,5 +102,6 @@ require (
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
