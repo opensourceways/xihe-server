@@ -12,7 +12,7 @@ require (
 	github.com/opensourceways/community-robot-lib v0.0.0-20231106030104-fefc5fa67771
 	github.com/opensourceways/kafka-lib v0.0.0-20231023142428-b41c4ff141c6
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
-	github.com/opensourceways/xihe-extra-services v0.0.0-20231101104637-29564f757b49
+	github.com/opensourceways/xihe-extra-services v0.0.0-20231101110507-78ecf342c89c
 	github.com/opensourceways/xihe-finetune v0.0.0-20231025112302-d48154d5ce22
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
 	github.com/sirupsen/logrus v1.9.3
@@ -62,7 +62,8 @@ require (
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
-	github.com/jackc/pgx/v5 v5.4.3 // indirect
+	github.com/jackc/pgx/v5 v5.5.0 // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.7.6 // indirect
@@ -96,9 +97,9 @@ require (
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.13.0 // indirect
-	golang.org/x/sync v0.4.0 // indirect
+	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
