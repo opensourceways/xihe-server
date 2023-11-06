@@ -514,7 +514,7 @@ func (ctl *RepoFileController) List(ctx *gin.Context) {
 }
 
 func (ctl *RepoFileController) checkForView(ctx *gin.Context) (
-	pl oldUserTokenPayload,
+	pl *oldUserTokenPayload,
 	u platform.UserInfo,
 	repoInfo resourceSummary, ok bool,
 ) {

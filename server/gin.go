@@ -63,6 +63,8 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 		return
 	}
 
+	r.Use(controller.ClearSenstiveInfoMiddleware())
+
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", port),
 		Handler: r,

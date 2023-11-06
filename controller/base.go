@@ -26,6 +26,7 @@ const (
 	Token              = "token"
 	encodeUsername     = "encode-username"
 	headerSecWebsocket = "Sec-Websocket-Protocol"
+	PayLoad            = "PAYLOAD"
 
 	roleIndividuals = "individuals"
 	fileReadme      = "README.md"
@@ -57,13 +58,14 @@ func (ctl baseController) newApiToken(ctx *gin.Context, pl interface{}) (
 		return "", "", err
 	}
 
-	ct := ac.genCSRFToken(t)
+	// clear token and csrf-token memory
+	defer utils.ClearStringMemory(t)
 
 	if token, err = ctl.encryptData(t); err != nil {
 		return
 	}
 
-	if csrftoken, err = ctl.encryptDataForCSRF(ct); err != nil {
+	if csrftoken, err = ctl.encryptDataForCSRF(t); err != nil {
 		return
 	}
 
@@ -121,6 +123,7 @@ func (ctl baseController) checkCSRFToken(
 
 		return
 	}
+	defer utils.ClearByteArrayMemory(csrfbyte)
 
 	if !verifyCSRFToken(tokenbyte, csrfbyte) {
 		ctx.JSON(
@@ -144,8 +147,8 @@ func (ctl baseController) refreshDoubleToken(ac accessController) (token, csrfto
 		}
 	}
 
-	if w := ac.genCSRFToken(decode); len(w) != 0 {
-		if t, err := ctl.encryptDataForCSRF(w); err == nil {
+	if len(decode) != 0 {
+		if t, err := ctl.encryptDataForCSRF(decode); err == nil {
 			csrftoken = t
 		}
 	}
@@ -155,38 +158,41 @@ func (ctl baseController) refreshDoubleToken(ac accessController) (token, csrfto
 
 func (ctl baseController) checkApiToken(
 	ctx *gin.Context, token string, csrftoken string, pl interface{}, refresh bool,
-) (ok bool) {
+) bool {
 	ac, tokenbyte, ok := ctl.checkToken(ctx, token, pl)
 	if !ok {
-		return
+		return ok
 	}
+	defer utils.ClearByteArrayMemory(tokenbyte)
 
 	if ok = ctl.checkCSRFToken(ctx, tokenbyte, csrftoken); !ok {
-		return
+		return ok
 	}
 
 	if !refresh {
-		return
+		return ok
 	}
 
 	token, csrftoken = ctl.refreshDoubleToken(ac)
+	defer utils.ClearStringMemory(token, csrftoken)
 
-	payload, good := ac.Payload.(*oldUserTokenPayload)
-	if !good {
-		return good
+	payload, ok := ac.Payload.(*oldUserTokenPayload)
+	if !ok {
+		logrus.Warnf("payload assert error")
+		return ok
 	}
 
 	if err := ctl.setRespToken(ctx, token, csrftoken, payload.Account); err != nil {
 		logrus.Debugf("set resp token error: %s", err.Error())
 	}
 
-	return
+	return ok
 }
 
 func (ctl baseController) checkUserApiToken(
 	ctx *gin.Context, allowVistor bool,
 ) (
-	pl oldUserTokenPayload, visitor bool, ok bool,
+	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
 	return ctl.checkUserApiTokenBase(ctx, allowVistor, true)
 }
@@ -194,7 +200,7 @@ func (ctl baseController) checkUserApiToken(
 func (ctl baseController) checkUserApiTokenNoRefresh(
 	ctx *gin.Context, allowVistor bool,
 ) (
-	pl oldUserTokenPayload, visitor bool, ok bool,
+	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
 	return ctl.checkUserApiTokenBase(ctx, allowVistor, false)
 }
@@ -202,7 +208,7 @@ func (ctl baseController) checkUserApiTokenNoRefresh(
 func (ctl baseController) checkUserApiTokenBase(
 	ctx *gin.Context, allowVistor bool, refresh bool,
 ) (
-	pl oldUserTokenPayload, visitor bool, ok bool,
+	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
 	token, err := ctl.getCookieToken(ctx)
 	if err != nil {
@@ -232,7 +238,11 @@ func (ctl baseController) checkUserApiTokenBase(
 		return
 	}
 
-	ok = ctl.checkApiToken(ctx, token, csrftoken, &pl, refresh)
+	pl = new(oldUserTokenPayload)
+	ok = ctl.checkApiToken(ctx, token, csrftoken, pl, refresh)
+
+	// set payload address in context
+	ctx.Set(PayLoad, pl)
 
 	return
 }
@@ -299,7 +309,7 @@ func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, usern
 func (ctl *baseController) checkTokenForWebsocket(
 	ctx *gin.Context, allowVistor bool,
 ) (
-	pl oldUserTokenPayload, csrftoken string, visitor, ok bool,
+	pl *oldUserTokenPayload, csrftoken string, visitor, ok bool,
 ) {
 	csrftoken = ctl.getTokenForWebsocket(ctx)
 
@@ -321,7 +331,11 @@ func (ctl *baseController) checkTokenForWebsocket(
 		return
 	}
 
-	ok = ctl.checkCSRFTokenForWebSocket(ctx, csrftoken, &pl)
+	pl = new(oldUserTokenPayload)
+	ok = ctl.checkCSRFTokenForWebSocket(ctx, csrftoken, pl)
+
+	// set payload address in context
+	ctx.Set(PayLoad, pl)
 
 	return
 }
@@ -372,18 +386,6 @@ func (ctl *baseController) languageRuquested(ctx *gin.Context) (common.Language,
 	return v, nil
 }
 
-func (ctl *baseController) getToken(ctx *gin.Context) (token, csrftoken string, err error) {
-	if token, err = ctl.getCookieToken(ctx); err != nil {
-		return
-	}
-
-	if csrftoken, err = ctl.getCSRFToken(ctx); err != nil {
-		return
-	}
-
-	return
-}
-
 func (ctl baseController) checkCSRFTokenForWebSocket(
 	ctx *gin.Context, csrftoken string, pl interface{},
 ) (ok bool) {
@@ -396,6 +398,7 @@ func (ctl baseController) checkCSRFTokenForWebSocket(
 
 		return
 	}
+	defer utils.ClearByteArrayMemory(ctokenbyte)
 
 	ac := accessController{
 		Payload: pl,
@@ -420,6 +423,9 @@ func (ctl baseController) checkCSRFTokenForWebSocket(
 
 	ok = true
 
+	// set payload address in context
+	ctx.Set(PayLoad, pl)
+
 	return
 }
 
@@ -438,6 +444,7 @@ func (ctl baseController) getRemoteAddr(ctx *gin.Context) (string, error) {
 // crypt for token
 func (ctl baseController) encryptData(d string) (string, error) {
 	t, err := encryptHelper.Encrypt([]byte(d))
+
 	if err != nil {
 		return "", err
 	}

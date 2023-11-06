@@ -916,7 +916,7 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 }
 
 func (ctl *ProjectController) checkPermission(ctx *gin.Context) (
-	info oldUserTokenPayload, proj domain.Project, ok bool,
+	info *oldUserTokenPayload, proj domain.Project, ok bool,
 ) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
