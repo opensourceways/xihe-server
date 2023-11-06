@@ -37,10 +37,15 @@ func (ctl *accessController) newToken(secret string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims = jwt.MapClaims(body)
 
-	return token.SignedString([]byte(secret))
+	encodeToken, err2 := token.SignedString([]byte(secret))
+	utils.ClearStringMemory(secret)
+
+	return encodeToken, err2
 }
 
 func (ctl *accessController) initByToken(token, secret string) error {
+	defer utils.ClearStringMemory(token, secret)
+
 	t, err := jwt.Parse(token, func(t1 *jwt.Token) (interface{}, error) {
 		if _, ok := t1.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method")
@@ -69,18 +74,14 @@ func (ctl *accessController) initByToken(token, secret string) error {
 }
 
 func verifyCSRFToken(tokenbyte, csrftoken []byte) (ok bool) {
-	token := string(tokenbyte)
-
-	return string(csrftoken) == token
+	return string(csrftoken) == string(tokenbyte)
 }
 
 func (ctl *accessController) refreshToken(expiry int64, secret string) (string, error) {
+	defer utils.ClearStringMemory(secret)
+
 	ctl.Expiry = utils.Expiry(expiry)
 	return ctl.newToken(secret)
-}
-
-func (ctl *accessController) genCSRFToken(token string) (ct string) {
-	return token
 }
 
 func (ctl *accessController) verify(roles []string) error {

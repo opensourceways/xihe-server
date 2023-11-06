@@ -685,7 +685,7 @@ func (ctl *ModelController) SetTags(ctx *gin.Context) {
 }
 
 func (ctl *ModelController) checkPermission(ctx *gin.Context) (
-	info oldUserTokenPayload, m domain.Model, ok bool,
+	info *oldUserTokenPayload, m domain.Model, ok bool,
 ) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
