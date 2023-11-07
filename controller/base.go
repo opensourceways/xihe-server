@@ -657,6 +657,7 @@ func (ctl baseController) checkBigmodelApiToken(ctx *gin.Context) (user string, 
 	if err != nil {
 		return
 	}
+	defer utils.ClearByteArrayMemory(deToken)
 
 	strs := strings.Split(string(deToken), "+")
 	user = strs[0]
