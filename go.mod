@@ -12,7 +12,7 @@ require (
 	github.com/opensourceways/community-robot-lib v0.0.0-20231018034126-a664e14dbb9d
 	github.com/opensourceways/kafka-lib v0.0.0-20231023142428-b41c4ff141c6
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
-	github.com/opensourceways/xihe-extra-services v0.0.0-20231101104637-29564f757b49
+	github.com/opensourceways/xihe-extra-services v0.0.0-20231107072416-a53383bfd6df
 	github.com/opensourceways/xihe-finetune v0.0.0-20231025112302-d48154d5ce22
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
 	github.com/sirupsen/logrus v1.9.3
@@ -21,10 +21,10 @@ require (
 	github.com/swaggo/swag v1.16.2
 	github.com/xanzy/go-gitlab v0.93.2
 	go.mongodb.org/mongo-driver v1.12.1
-	gorm.io/driver/postgres v1.5.4
-	gorm.io/gorm v1.25.5
-	k8s.io/apimachinery v0.28.3
-	sigs.k8s.io/yaml v1.4.0
+	gorm.io/driver/postgres v1.5.3
+	gorm.io/gorm v1.25.4
+	k8s.io/apimachinery v0.28.2
+	sigs.k8s.io/yaml v1.3.0
 )
 
 require (
@@ -62,7 +62,8 @@ require (
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
-	github.com/jackc/pgx/v5 v5.4.3 // indirect
+	github.com/jackc/pgx/v5 v5.5.0 // indirect
+	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
 	github.com/jcmturner/gofork v1.7.6 // indirect
@@ -95,13 +96,14 @@ require (
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.13.0 // indirect
-	golang.org/x/sync v0.4.0 // indirect
+	golang.org/x/sync v0.5.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
