@@ -11,7 +11,7 @@ FROM openeuler/openeuler:22.03
 RUN dnf -y update && \
     dnf in -y shadow && \
     groupadd -g 5000 mindspore && \
-    useradd -u 5000 -g mindspore -s /bin/bash -m mindspore
+    useradd -u 5000 -g mindspore -s /sbin/nologin -m mindspore
 
 RUN mkdir /opt/app -p
 RUN chmod 700 /opt/app
