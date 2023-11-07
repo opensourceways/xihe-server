@@ -14,6 +14,7 @@ RUN dnf -y update && \
     groupadd -g 5000 mindspore && \
     useradd -u 5000 -g mindspore -s /sbin/nologin -m mindspore
 
+RUN echo > /etc/issue && echo > /issue.net && echo > /etc/motd
 RUN mkdir /opt/app -p
 RUN chmod 700 /opt/app
 RUN chown mindspore:mindspore /opt/app
