@@ -1,9 +1,9 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"strconv"
-	"errors"
 
 	"github.com/gin-gonic/gin"
 
@@ -44,8 +44,12 @@ func (ctl *UserController) AddFollowing(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "add a following")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add a following")
+
 	if pl.isMyself(user) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorNotAllowed, "can't add yourself as your following",
@@ -53,8 +57,6 @@ func (ctl *UserController) AddFollowing(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add a following")
 
 	if _, err = ctl.repo.GetByAccount(user); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -96,8 +98,12 @@ func (ctl *UserController) RemoveFollowing(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "remove a following")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "remove a following")
+
 	if pl.isMyself(user) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorNotAllowed, "invalid operation",
@@ -105,8 +111,6 @@ func (ctl *UserController) RemoveFollowing(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "remove a following")
 
 	f := &userdomain.FollowerInfo{
 		User:     user,

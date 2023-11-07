@@ -93,6 +93,7 @@ func (ctl *UserController) Update(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "update user basic info")
 		return
 	}
 
@@ -370,6 +371,7 @@ func (ctl *UserController) CheckEmail(ctx *gin.Context) {
 func (ctl *UserController) SendBindEmail(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "send code to user")
 		return
 	}
 
@@ -413,6 +415,7 @@ func (ctl *UserController) SendBindEmail(ctx *gin.Context) {
 func (ctl *UserController) BindEmail(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "bind email according to the code")
 		return
 	}
 

@@ -145,6 +145,7 @@ func (ctl *DatasetController) Create(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "creat dataset")
 		return
 	}
 
@@ -206,6 +207,7 @@ func (ctl *DatasetController) Delete(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "delete dataset")
 		return
 	}
 
@@ -282,6 +284,7 @@ func (ctl *DatasetController) Update(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "update propery of dataset")
 		return
 	}
 
@@ -546,12 +549,12 @@ func (ctl *DatasetController) SetTags(ctx *gin.Context) {
 		return
 	}
 
-	d, ok := ctl.checkPermission(ctx)
+	pl, d, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_SYSTEM, "set tags for dataset")
 		return
 	}
 
-	pl, _, _ := ctl.checkUserApiToken(ctx, false)
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "set tags for dataset")
 
 	if err = ctl.s.SetTags(&d, &cmd); err != nil {
@@ -563,7 +566,9 @@ func (ctl *DatasetController) SetTags(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, newResponseData("success"))
 }
 
-func (ctl *DatasetController) checkPermission(ctx *gin.Context) (d domain.Dataset, ok bool) {
+func (ctl *DatasetController) checkPermission(ctx *gin.Context) (
+	info oldUserTokenPayload, d domain.Dataset, ok bool,
+) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
@@ -593,6 +598,7 @@ func (ctl *DatasetController) checkPermission(ctx *gin.Context) (d domain.Datase
 		return
 	}
 
+	info = pl
 	ok = true
 
 	return

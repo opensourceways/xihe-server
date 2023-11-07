@@ -61,6 +61,7 @@ func (ctl *FinetuneController) Create(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "create finetune")
 		return
 	}
 
@@ -91,6 +92,7 @@ func (ctl *FinetuneController) Create(ctx *gin.Context) {
 func (ctl *FinetuneController) Delete(ctx *gin.Context) {
 	index, ok := ctl.finetuneIndex(ctx)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "delete finetune")
 		return
 	}
 
@@ -115,6 +117,7 @@ func (ctl *FinetuneController) Delete(ctx *gin.Context) {
 func (ctl *FinetuneController) Terminate(ctx *gin.Context) {
 	index, ok := ctl.finetuneIndex(ctx)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "terminate finetune")
 		return
 	}
 

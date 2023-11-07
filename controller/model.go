@@ -150,8 +150,11 @@ func (ctl *ModelController) Create(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "create model")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create model")
 
 	if pl.isNotMe(cmd.Owner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -161,8 +164,6 @@ func (ctl *ModelController) Create(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create model")
 
 	pr := ctl.newPlatformRepository(
 		pl.PlatformToken, pl.PlatformUserNamespaceId,
@@ -211,8 +212,11 @@ func (ctl *ModelController) Delete(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "delete model")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete model")
 
 	if pl.isNotMe(owner) {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
@@ -222,8 +226,6 @@ func (ctl *ModelController) Delete(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete model")
 
 	m, err := ctl.repo.GetByName(owner, name)
 	if err != nil {
@@ -286,8 +288,11 @@ func (ctl *ModelController) Update(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "update property of model")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update property of model")
 
 	if pl.isNotMe(owner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -297,8 +302,6 @@ func (ctl *ModelController) Update(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update property of model")
 
 	m, err := ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
@@ -554,8 +557,11 @@ func (ctl *ModelController) AddRelatedDataset(ctx *gin.Context) {
 
 	pl, m, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_SYSTEM, "add related dataset to model")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related dataset to model")
 
 	if pl.isNotMe(owner) && data.IsPrivate() {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
@@ -565,8 +571,6 @@ func (ctl *ModelController) AddRelatedDataset(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related dataset to model")
 
 	index := domain.ResourceIndex{
 		Owner: owner,
@@ -613,6 +617,7 @@ func (ctl *ModelController) RemoveRelatedDataset(ctx *gin.Context) {
 
 	pl, m, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_SYSTEM, "remove related dataset to model")
 		return
 	}
 
@@ -670,6 +675,7 @@ func (ctl *ModelController) SetTags(ctx *gin.Context) {
 
 	pl, m, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_SYSTEM, "set tags for model")
 		return
 	}
 

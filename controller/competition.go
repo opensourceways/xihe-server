@@ -70,6 +70,7 @@ func (ctl *CompetitionController) Apply(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "apply the competition")
 		return
 	}
 
@@ -221,6 +222,7 @@ func (ctl *CompetitionController) CreateTeam(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "create a team of competition")
 		return
 	}
 
@@ -259,6 +261,7 @@ func (ctl *CompetitionController) JoinTeam(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "join a team of competition")
 		return
 	}
 
@@ -355,6 +358,7 @@ func (ctl *CompetitionController) GetSubmissions(ctx *gin.Context) {
 func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "submit")
 		return
 	}
 
@@ -420,6 +424,7 @@ func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 func (ctl *CompetitionController) AddRelatedProject(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "add related project")
 		return
 	}
 
@@ -485,6 +490,7 @@ func (ctl *CompetitionController) ChangeName(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "change a team name")
 		return
 	}
 
@@ -523,6 +529,7 @@ func (ctl *CompetitionController) TransferLeader(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "transfer leader to a member")
 		return
 	}
 
@@ -553,6 +560,7 @@ func (ctl *CompetitionController) TransferLeader(ctx *gin.Context) {
 func (ctl *CompetitionController) QuitTeam(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "quit team")
 		return
 	}
 
@@ -585,6 +593,7 @@ func (ctl *CompetitionController) DeleteMember(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "delete member of a team")
 		return
 	}
 
@@ -615,6 +624,7 @@ func (ctl *CompetitionController) DeleteMember(ctx *gin.Context) {
 func (ctl *CompetitionController) Dissolve(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "dissolve a team")
 		return
 	}
 

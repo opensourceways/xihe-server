@@ -157,8 +157,11 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "create project")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create project")
 
 	if pl.isNotMe(cmd.Owner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -168,8 +171,6 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create project")
 
 	pr := ctl.newPlatformRepository(
 		pl.PlatformToken, pl.PlatformUserNamespaceId,
@@ -218,8 +219,11 @@ func (ctl *ProjectController) Delete(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "deleta project")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "deleta project")
 
 	if pl.isNotMe(owner) {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
@@ -229,8 +233,6 @@ func (ctl *ProjectController) Delete(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "deleta project")
 
 	proj, err := ctl.repo.GetByName(owner, name)
 	if err != nil {
@@ -294,8 +296,11 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "update project")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update project")
 
 	if pl.isNotMe(owner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -305,8 +310,6 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update project")
 
 	proj, err := ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
@@ -569,8 +572,11 @@ func (ctl *ProjectController) Fork(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "fork project")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "fork project")
 
 	if !pl.isNotMe(owner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
@@ -579,8 +585,6 @@ func (ctl *ProjectController) Fork(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "fork project")
 
 	proj, err := ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
@@ -667,8 +671,11 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 
 	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "add related model to project")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related model to project")
 
 	if pl.isNotMe(owner) && data.IsPrivate() {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
@@ -678,8 +685,6 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related model to project")
 
 	index := domain.ResourceIndex{
 		Owner: owner,
@@ -726,6 +731,7 @@ func (ctl *ProjectController) RemoveRelatedModel(ctx *gin.Context) {
 
 	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "remove related model to project")
 		return
 	}
 
@@ -785,8 +791,11 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 
 	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "add related dataset to project")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related dataset to project")
 
 	if pl.isNotMe(owner) && data.IsPrivate() {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
@@ -796,8 +805,6 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "add related dataset to project")
 
 	index := domain.ResourceIndex{
 		Owner: owner,
@@ -844,6 +851,7 @@ func (ctl *ProjectController) RemoveRelatedDataset(ctx *gin.Context) {
 
 	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "remove related dateset to project")
 		return
 	}
 
@@ -901,6 +909,7 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 
 	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "set tags for project")
 		return
 	}
 

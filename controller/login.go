@@ -100,6 +100,7 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 	}
 
 	user, err := ctl.us.GetByAccount(info.Name)
+	prepareOperateLog(ctx, user.Account, OPERATE_TYPE_USER, "user login")
 	if err != nil {
 		if d := newResponseError(err); d.Code != errorResourceNotExists {
 			ctl.sendRespWithInternalError(ctx, d)
@@ -115,8 +116,6 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 
 		utils.DoLog(user.Id, user.Account, "logup", "", "success")
 	}
-
-	prepareOperateLog(ctx, user.Account, OPERATE_TYPE_USER, "user login")
 
 	if err := ctl.newLogin(ctx, info); err != nil {
 		return
@@ -242,6 +241,7 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiTokenNoRefresh(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "user logout")
 		return
 	}
 
@@ -292,6 +292,7 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 func (ctl *LoginController) SignIn(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiTokenNoRefresh(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "user sign in")
 		return
 	}
 

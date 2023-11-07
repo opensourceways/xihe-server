@@ -78,6 +78,7 @@ func (ctl *TrainingController) Create(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "create training")
 		return
 	}
 
@@ -138,13 +139,15 @@ func (ctl *TrainingController) Create(ctx *gin.Context) {
 // @Failure		500	system_error		system	error
 // @Router			/v1/train/project/{pid}/training/{id} [post]
 func (ctl *TrainingController) Recreate(ctx *gin.Context) {
-	info, ok := ctl.getTrainingInfo(ctx)
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "recreate training")
 		return
 	}
 
-	pl, _, _ := ctl.checkUserApiToken(ctx, false)
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "recreate training")
+
+	info, _ := ctl.getTrainingInfo(ctx)
 
 	v, err := ctl.ts.Recreate(&info)
 	if err != nil {
@@ -169,13 +172,15 @@ func (ctl *TrainingController) Recreate(ctx *gin.Context) {
 // @Failure		500	system_error	system	error
 // @Router			/v1/train/project/{pid}/training/{id} [delete]
 func (ctl *TrainingController) Delete(ctx *gin.Context) {
-	info, ok := ctl.getTrainingInfo(ctx)
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "delete training")
 		return
 	}
 
-	pl, _, _ := ctl.checkUserApiToken(ctx, false)
-        prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete training")
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete training")
+
+	info, _ := ctl.getTrainingInfo(ctx)
 
 	if err := ctl.ts.Delete(&info); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -199,13 +204,15 @@ func (ctl *TrainingController) Delete(ctx *gin.Context) {
 // @Failure		500	system_error	system	error
 // @Router			/v1/train/project/{pid}/training/{id} [put]
 func (ctl *TrainingController) Terminate(ctx *gin.Context) {
-	info, ok := ctl.getTrainingInfo(ctx)
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "terminate training")
 		return
 	}
 
-	pl, _, _ := ctl.checkUserApiToken(ctx, false)
-        prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "terminate training")
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "terminate training")
+
+	info, _ := ctl.getTrainingInfo(ctx)
 
 	if err := ctl.ts.Terminate(&info); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

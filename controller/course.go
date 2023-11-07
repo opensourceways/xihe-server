@@ -66,6 +66,7 @@ func (ctl *CourseController) Apply(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "apply the course")
 		return
 	}
 
@@ -182,6 +183,7 @@ func (ctl *CourseController) Get(ctx *gin.Context) {
 func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "add related project")
 		return
 	}
 
@@ -402,6 +404,7 @@ func (ctl *CourseController) GetAssignment(ctx *gin.Context) {
 func (ctl *CourseController) AddPlayRecord(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "add play record")
 		return
 	}
 

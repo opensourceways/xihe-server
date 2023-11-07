@@ -76,8 +76,12 @@ func (ctl *LikeController) Create(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "create a like")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create a like")
+
 	if !pl.isNotMe(cmd.ResourceOwner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorNotAllowed, "can't like yourself",
@@ -85,8 +89,6 @@ func (ctl *LikeController) Create(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create a like")
 
 	if err := ctl.s.Create(pl.DomainAccount(), cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -122,8 +124,12 @@ func (ctl *LikeController) Delete(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "delete a like")
 		return
 	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete a like")
+
 	if !pl.isNotMe(cmd.ResourceOwner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorNotAllowed, "can't delete like of yourself",
@@ -131,8 +137,6 @@ func (ctl *LikeController) Delete(ctx *gin.Context) {
 
 		return
 	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete a like")
 
 	if err := ctl.s.Delete(pl.DomainAccount(), cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

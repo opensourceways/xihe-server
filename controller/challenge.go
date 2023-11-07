@@ -99,6 +99,7 @@ func (ctl *ChallengeController) Apply(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "apply the challenge")
 		return
 	}
 
@@ -176,6 +177,7 @@ func (ctl *ChallengeController) Submit(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "submit answer of ai question")
 		return
 	}
 

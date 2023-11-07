@@ -76,6 +76,7 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "create repo file")
 		return
 	}
 
@@ -135,6 +136,7 @@ func (ctl *RepoFileController) Update(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "update repo file")
 		return
 	}
 
@@ -184,6 +186,7 @@ func (ctl *RepoFileController) Update(ctx *gin.Context) {
 func (ctl *RepoFileController) Delete(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "delete repo file")
 		return
 	}
 
@@ -222,6 +225,7 @@ func (ctl *RepoFileController) Delete(ctx *gin.Context) {
 func (ctl *RepoFileController) DeleteDir(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "delete repo directory")
 		return
 	}
 
