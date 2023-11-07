@@ -8,8 +8,9 @@ import (
 
 	"github.com/opensourceways/community-robot-lib/utils"
 
-	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
+	"github.com/opensourceways/xihe-server/user/domain"
+	serverUtils "github.com/opensourceways/xihe-server/utils"
 )
 
 var userInstance *user
@@ -88,6 +89,7 @@ func (impl *user) GetByCode(code, redirectURI string) (login authing.Login, err 
 	if err = impl.getAccessTokenByCode(code, redirectURI, &v); err != nil {
 		return
 	}
+	defer serverUtils.ClearStringMemory(v.AccessToken)
 
 	if v.IdToken == "" {
 		err = errors.New("no id token")
