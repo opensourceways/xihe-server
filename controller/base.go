@@ -194,7 +194,16 @@ func (ctl baseController) checkUserApiToken(
 ) (
 	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
-	return ctl.checkUserApiTokenBase(ctx, allowVistor, true)
+	pl, visitor, ok = ctl.checkUserApiTokenBase(ctx, allowVistor, true)
+	if !ok {
+		if pl == nil || pl.Account == "" {
+			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check api token")
+		} else {
+			prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_SYSTEM, "check api token")
+		}
+	}
+
+	return pl, visitor, ok
 }
 
 func (ctl baseController) checkUserApiTokenNoRefresh(
@@ -202,7 +211,16 @@ func (ctl baseController) checkUserApiTokenNoRefresh(
 ) (
 	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
-	return ctl.checkUserApiTokenBase(ctx, allowVistor, false)
+	pl, visitor, ok = ctl.checkUserApiTokenBase(ctx, allowVistor, false)
+	if !ok {
+		if pl == nil || pl.Account == "" {
+			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check api token")
+		} else {
+			prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_SYSTEM, "check api token")
+		}
+	}
+
+	return pl, visitor, ok
 }
 
 func (ctl baseController) checkUserApiTokenBase(
@@ -326,6 +344,7 @@ func (ctl *baseController) checkTokenForWebsocket(
 				http.StatusUnauthorized,
 				newResponseCodeMsg(errorBadRequestHeader, "no token"),
 			)
+			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check token for web socket")
 		}
 
 		return
@@ -333,6 +352,14 @@ func (ctl *baseController) checkTokenForWebsocket(
 
 	pl = new(oldUserTokenPayload)
 	ok = ctl.checkCSRFTokenForWebSocket(ctx, csrftoken, pl)
+	if !ok {
+		if pl == nil || pl.Account == "" {
+			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check token for web socket")
+		} else {
+			prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_SYSTEM, "check token for web socket")
+		}
+
+	}
 
 	// set payload address in context
 	ctx.Set(PayLoad, pl)
@@ -655,6 +682,7 @@ func (ctl baseController) checkBigmodelApiToken(ctx *gin.Context) (user string, 
 	v := ctx.GetHeader(Token)
 	deToken, err := ctl.decryptData(v)
 	if err != nil {
+		prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check bigmodel api token")
 		return
 	}
 	defer utils.ClearByteArrayMemory(deToken)
@@ -664,6 +692,12 @@ func (ctl baseController) checkBigmodelApiToken(ctx *gin.Context) (user string, 
 
 	time, err := strconv.ParseInt(strs[1], 10, 64)
 	if err != nil {
+		if user == "" {
+			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check bigmodel api token")
+		} else {
+			prepareOperateLog(ctx, user, OPERATE_TYPE_SYSTEM, "check bigmodel api token")
+		}
+
 		return
 	}
 
@@ -671,6 +705,12 @@ func (ctl baseController) checkBigmodelApiToken(ctx *gin.Context) (user string, 
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorBadRequestParam, "token expire",
 		))
+		if user == "" {
+			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check bigmodel api token")
+		} else {
+			prepareOperateLog(ctx, user, OPERATE_TYPE_SYSTEM, "check bigmodel api token")
+		}
+
 		return
 	}
 
