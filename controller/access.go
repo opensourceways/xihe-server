@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -37,14 +38,11 @@ func (ctl *accessController) newToken(secret string) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims = jwt.MapClaims(body)
 
-	encodeToken, err2 := token.SignedString([]byte(secret))
-	utils.ClearStringMemory(secret)
-
-	return encodeToken, err2
+	return token.SignedString([]byte(secret))
 }
 
 func (ctl *accessController) initByToken(token, secret string) error {
-	defer utils.ClearStringMemory(token, secret)
+	defer utils.ClearStringMemory(token)
 
 	t, err := jwt.Parse(token, func(t1 *jwt.Token) (interface{}, error) {
 		if _, ok := t1.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -74,12 +72,10 @@ func (ctl *accessController) initByToken(token, secret string) error {
 }
 
 func verifyCSRFToken(tokenbyte, csrftoken []byte) (ok bool) {
-	return string(csrftoken) == string(tokenbyte)
+	return bytes.Equal(csrftoken, tokenbyte)
 }
 
 func (ctl *accessController) refreshToken(expiry int64, secret string) (string, error) {
-	defer utils.ClearStringMemory(secret)
-
 	ctl.Expiry = utils.Expiry(expiry)
 	return ctl.newToken(secret)
 }
