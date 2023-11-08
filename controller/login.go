@@ -98,6 +98,7 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 
 		return
 	}
+	defer utils.ClearStringMemory(info.AccessToken)
 
 	user, err := ctl.us.GetByAccount(info.Name)
 	if err != nil {
