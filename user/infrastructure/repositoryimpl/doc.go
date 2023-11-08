@@ -23,6 +23,7 @@ type DUser struct {
 	Bio                     string `bson:"bio"        json:"bio"`
 	AvatarId                string `bson:"avatar_id"  json:"avatar_id"`
 	PlatformToken           string `bson:"token"      json:"token"`
+	PlatformTokenCreateAt   int64  `bson:"token_create_time"      json:"token_create_time"`
 	PlatformUserId          string `bson:"uid"        json:"uid"`
 	PlatformUserNamespaceId string `bson:"nid"        json:"nid"`
 

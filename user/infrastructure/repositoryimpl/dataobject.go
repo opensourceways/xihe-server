@@ -66,7 +66,8 @@ func toUserDoc(u domain.User, doc *DUser) {
 		Name:                    u.Account.Account(),
 		Email:                   u.Email.Email(),
 		AvatarId:                u.AvatarId.AvatarId(),
-		PlatformToken:           u.PlatformToken,
+		PlatformToken:           u.PlatformToken.Token,
+		PlatformTokenCreateAt:   u.PlatformToken.CreateAt,
 		PlatformUserId:          u.PlatformUser.Id,
 		PlatformUserNamespaceId: u.PlatformUser.NamespaceId,
 		UserAgreement:           u.UserAgreement,
@@ -99,7 +100,8 @@ func toUser(doc DUser, u *domain.User) (err error) {
 
 	u.Id = doc.Id.Hex()
 	u.Version = doc.Version
-	u.PlatformToken = doc.PlatformToken
+	u.PlatformToken.Token = doc.PlatformToken
+	u.PlatformToken.CreateAt = doc.PlatformTokenCreateAt
 	u.PlatformUser.Id = doc.PlatformUserId
 	u.PlatformUser.NamespaceId = doc.PlatformUserNamespaceId
 	u.CourseAgreement = doc.CourseAgreement

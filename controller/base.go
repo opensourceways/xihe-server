@@ -372,6 +372,7 @@ func (ctl *baseController) getCookieToken(ctx *gin.Context) (token string, err e
 	// get encode username
 	u, err := getCookieValue(ctx, PrivateToken)
 	if err != nil {
+		logrus.Warnf("failed to get cookie token %s", err)
 		return "", nil
 	}
 
@@ -381,6 +382,7 @@ func (ctl *baseController) getCookieToken(ctx *gin.Context) (token string, err e
 	// get token from redis
 	token, err = ctl.newRepo().Get(u)
 	if err != nil {
+		logrus.Warnf("failed to get cookie token from redis %s", err)
 		return "", nil
 	}
 

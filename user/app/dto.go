@@ -65,6 +65,7 @@ type UserDTO struct {
 		UserId      string
 		Token       string
 		NamespaceId string
+		CreateAt    int64
 	} `json:"-"`
 }
 
@@ -150,7 +151,7 @@ type CreatePlatformAccountCmd struct {
 
 type PlatformInfoDTO struct {
 	PlatformUser  domain.PlatformUser
-	PlatformToken string
+	PlatformToken domain.PlatformToken
 }
 
 type UpdatePlateformInfoCmd struct {
@@ -162,7 +163,7 @@ type UpdatePlateformInfoCmd struct {
 
 type UpdatePlateformTokenCmd struct {
 	User          domain.Account
-	PlatformToken string
+	PlatformToken domain.PlatformToken
 }
 
 type RefreshTokenCmd struct {

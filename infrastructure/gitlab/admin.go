@@ -1,6 +1,7 @@
 package gitlab
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -75,10 +76,10 @@ func (m *administrator) New(u platform.UserOption) (r userdomain.PlatformUser, e
 	return
 }
 
-func (m *administrator) NewToken(u userdomain.PlatformUser) (string, error) {
+func (m *administrator) NewToken(u userdomain.PlatformUser) (t userdomain.PlatformToken, err error) {
 	uid, err := strconv.Atoi(u.Id)
 	if err != nil {
-		return "", err
+		return
 	}
 
 	name := "___"
@@ -92,16 +93,19 @@ func (m *administrator) NewToken(u userdomain.PlatformUser) (string, error) {
 	)
 
 	if err != nil {
-		return "", err
+		return
 	}
 
-	return v.Token, nil
+	t.Token = v.Token
+	t.CreateAt = v.CreatedAt.Unix()
+
+	return
 }
 
-func (m *administrator) RefreshToken(userId string) (string, error) {
+func (m *administrator) RefreshToken(userId string) (t userdomain.PlatformToken, err error) {
 	uid, err := strconv.Atoi(userId)
 	if err != nil {
-		return "", err
+		return
 	}
 
 	opt := sdk.ListPersonalAccessTokensOptions{
@@ -109,14 +113,14 @@ func (m *administrator) RefreshToken(userId string) (string, error) {
 	}
 	tokens, _, err := m.cli.PersonalAccessTokens.ListPersonalAccessTokens(&opt)
 	if err != nil {
-		return "", err
+		return
 	}
 
 	for _, token := range tokens {
 		if token.Active {
-			_, err := m.cli.PersonalAccessTokens.RevokePersonalAccessToken(token.ID)
+			_, err = m.cli.PersonalAccessTokens.RevokePersonalAccessToken(token.ID)
 			if err != nil {
-				return "", err
+				return
 			}
 		}
 
@@ -133,8 +137,37 @@ func (m *administrator) RefreshToken(userId string) (string, error) {
 	)
 
 	if err != nil {
-		return "", err
+		return
 	}
 
-	return v.Token, nil
+	t.Token = v.Token
+	t.CreateAt = v.CreatedAt.Unix()
+
+	return
+}
+
+func (m *administrator) GetToken(userId string) (result userdomain.PlatformToken, err error) {
+	uid, err := strconv.Atoi(userId)
+	if err != nil {
+		return
+	}
+
+	opt := sdk.ListPersonalAccessTokensOptions{
+		UserID: &uid,
+	}
+	tokens, _, err := m.cli.PersonalAccessTokens.ListPersonalAccessTokens(&opt)
+	if err != nil {
+		return
+	}
+
+	for _, token := range tokens {
+		// we just have one active token
+		if token.Active {
+			result.CreateAt = token.CreatedAt.Unix()
+			return
+		}
+	}
+
+	err = fmt.Errorf("token not found")
+	return
 }

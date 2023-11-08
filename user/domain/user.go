@@ -14,7 +14,7 @@ type User struct {
 	AvatarId AvatarId
 
 	PlatformUser  PlatformUser
-	PlatformToken string
+	PlatformToken PlatformToken
 
 	CourseAgreement   string
 	FinetuneAgreement string
@@ -30,6 +30,11 @@ type User struct {
 type PlatformUser struct {
 	Id          string
 	NamespaceId string
+}
+
+type PlatformToken struct {
+	Token    string `json:"token"`
+	CreateAt int64  `json:"create_at"`
 }
 
 type FollowerInfo struct {

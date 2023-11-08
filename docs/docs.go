@@ -5335,46 +5335,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/{account}/gitlab": {
-            "get": {
-                "description": "get code platform info of user",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "account",
-                        "name": "account",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/controller.platformInfo"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "bad_request_param"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "type": "not_allowed"
-                        }
-                    }
-                }
-            }
-        },
         "/{account}/gitlab/refresh": {
             "get": {
                 "description": "refresh platform token of user",
@@ -5394,8 +5354,11 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK"
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "type": "created"
+                        }
                     },
                     "400": {
                         "description": "Bad Request",
@@ -7535,14 +7498,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "path": {
-                    "type": "string"
-                }
-            }
-        },
-        "controller.platformInfo": {
-            "type": "object",
-            "properties": {
-                "token": {
                     "type": "string"
                 }
             }

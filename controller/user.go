@@ -1,14 +1,17 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
 )
@@ -43,7 +46,7 @@ func AddRouterForUserController(
 	rg.GET("/v1/user/follower/:account", ctl.ListFollower)
 
 	rg.GET("/v1/user/:account/gitlab", checkUserEmailMiddleware(&ctl.baseController), ctl.GitlabToken)
-	rg.GET("/v1/user/:account/gitlab/refresh", checkUserEmailMiddleware(&ctl.baseController), ctl.RefreshGitlabToken)
+	rg.POST("/v1/user/:account/gitlab/refresh", checkUserEmailMiddleware(&ctl.baseController), ctl.RefreshGitlabToken)
 
 	// email
 	rg.GET("/v1/user/check_email", checkUserEmailMiddleware(&ctl.baseController))
@@ -170,6 +173,7 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
+		logrus.Errorln("failed to get user info")
 		return
 	}
 
@@ -185,6 +189,9 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 
 	if visitor {
 		if target == nil {
+			// clear cookie if we got an invalid user info
+			ctl.cleanCookie(ctx)
+
 			ctx.JSON(http.StatusOK, newResponseData(nil))
 			return
 		}
@@ -231,10 +238,10 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 // @Tags			User
 // @Param			account	path	string	true	"account"
 // @Accept			json
-// @Success		200
+// @Success		201 created PlatformToken
 // @Failure		400	bad_request_param	account	is	invalid
 // @Failure		401	not_allowed			can't	get	info	of	other	user
-// @Router			/{account}/gitlab/refresh [get]
+// @Router			/{account}/gitlab/refresh [post]
 func (ctl *UserController) RefreshGitlabToken(ctx *gin.Context) {
 	account, err := domain.NewAccount(ctx.Param("account"))
 	if err != nil {
@@ -268,6 +275,7 @@ func (ctl *UserController) RefreshGitlabToken(ctx *gin.Context) {
 	}
 
 	if err := ctl.s.RefreshGitlabToken(&cmd); err != nil {
+		logrus.Errorf("failed to refresh token %s", err)
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorSystemError,
 			"can't refresh token",
@@ -305,7 +313,10 @@ func (ctl *UserController) RefreshGitlabToken(ctx *gin.Context) {
 		ctl.setRespToken(ctx, token, csrftoken, usernew.Account)
 	}
 
-	ctl.sendRespOfPost(ctx, "success")
+	ctl.sendRespOfPost(ctx, userdomain.PlatformToken{
+		Token:    usernew.Platform.Token,
+		CreateAt: usernew.Platform.CreateAt,
+	})
 }
 
 // @Title			GitLabToken
@@ -341,11 +352,21 @@ func (ctl *UserController) GitlabToken(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, newResponseData(platformInfo{pl.PlatformToken}))
+	usernew, err := ctl.s.GetByAccount(pl.DomainAccount())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, newResponseCodeMsg(
+			errorNotAllowed,
+			fmt.Sprintf("can't get token of user %s ", pl.Account),
+		))
+
+		return
+	}
+
+	ctx.JSON(http.StatusOK, newResponseData(platformInfo{usernew.Platform.CreateAt}))
 }
 
 type platformInfo struct {
-	Token string `json:"token"`
+	CreateAt int64 `json:"create_at"`
 }
 
 // @Title			CheckEmail

@@ -146,9 +146,20 @@ func (s userService) GetByAccount(account domain.Account) (dto UserDTO, err erro
 		return
 	}
 
-	if v.PlatformToken != "" {
-		token := v.PlatformToken
-		v.PlatformToken, err = s.decryptToken(token)
+	if v.PlatformToken.CreateAt == 0 && v.PlatformToken.Token != "" {
+		if t, err := s.ps.GetToken(v.PlatformUser.Id); err == nil {
+			v.PlatformToken.CreateAt = t.CreateAt
+			//try our best to update the create_at filed
+			logrus.Infof("will update token create_at for %s", v.Account.Account())
+			_, _ = s.repo.Save(&v)
+		} else {
+			logrus.Warnf("get token for %s failed: %s", v.Account.Account(), err)
+		}
+	}
+
+	if v.PlatformToken.Token != "" {
+		token := v.PlatformToken.Token
+		v.PlatformToken.Token, err = s.decryptToken(token)
 		if err != nil {
 			return
 		}
@@ -218,12 +229,15 @@ func (s userService) CreatePlatformAccount(cmd *CreatePlatformAccountCmd) (dto P
 		return
 	}
 
-	eToken, err := s.encryptToken(token)
+	eToken, err := s.encryptToken(token.Token)
 	if err != nil {
 		return
 	}
 
-	dto.PlatformToken = eToken
+	dto.PlatformToken = domain.PlatformToken{
+		Token:    eToken,
+		CreateAt: token.CreateAt,
+	}
 
 	return
 }
@@ -284,7 +298,8 @@ func (s userService) toUserDTO(u *domain.User, dto *UserDTO) {
 	dto.FollowerCount = u.FollowerCount
 	dto.FollowingCount = u.FollowingCount
 
-	dto.Platform.Token = u.PlatformToken
+	dto.Platform.Token = u.PlatformToken.Token
+	dto.Platform.CreateAt = u.PlatformToken.CreateAt
 	dto.Platform.UserId = u.PlatformUser.Id
 	dto.Platform.NamespaceId = u.PlatformUser.NamespaceId
 	dto.CourseAgreement = u.CourseAgreement
@@ -320,14 +335,17 @@ func (s userService) RefreshGitlabToken(cmd *RefreshTokenCmd) (err error) {
 		return
 	}
 
-	eToken, err := s.encryptToken(token)
+	eToken, err := s.encryptToken(token.Token)
 	if err != nil {
 		return
 	}
 
 	updatecmd := &UpdatePlateformTokenCmd{
-		User:          cmd.Account,
-		PlatformToken: eToken,
+		User: cmd.Account,
+		PlatformToken: domain.PlatformToken{
+			Token:    eToken,
+			CreateAt: token.CreateAt,
+		},
 	}
 
 	for i := 0; i <= 5; i++ {
