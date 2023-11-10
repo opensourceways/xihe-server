@@ -535,7 +535,7 @@ func (ctl baseController) cleanCookie(ctx *gin.Context) {
 		logrus.Warnf("encode username convert error")
 	}
 
-	ctl.newRepo().Expire(u, 0)
+	_ = ctl.newRepo().Expire(u, 0)
 
 	setCookie(ctx, csrfToken, "", false, time.Now().AddDate(0, 0, -1))
 }
