@@ -231,7 +231,7 @@ func (s finetuneMessageService) CreateFinetuneJob(
 		return
 	}
 
-	s.repo.UpdateJobDetail(info, &FinetuneJobDetail{
+	err = s.repo.UpdateJobDetail(info, &FinetuneJobDetail{
 		Status: trainingStatusScheduleFailed,
 		Error:  err.Error(),
 	})
