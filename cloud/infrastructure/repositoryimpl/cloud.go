@@ -28,7 +28,9 @@ func (impl *cloudRepoImpl) ListCloudConf() (conf []domain.CloudConf, err error) 
 
 	conf = make([]domain.CloudConf, len(v))
 	for i := range v {
-		v[i].toCloudConf(&conf[i])
+		if err = v[i].toCloudConf(&conf[i]); err != nil {
+			return
+		}
 	}
 
 	return
