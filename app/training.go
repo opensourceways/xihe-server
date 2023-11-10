@@ -252,7 +252,7 @@ func (s trainingService) CreateTrainingJob(
 	}
 
 	if lastChance {
-		s.repo.UpdateJobDetail(info, &JobDetail{
+		err = s.repo.UpdateJobDetail(info, &JobDetail{
 			Status: trainingStatusScheduleFailed,
 			Error:  err.Error(),
 		})
