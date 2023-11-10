@@ -31,11 +31,13 @@ func (s *service) PanGu(question string) (answer string, err error) {
 		return
 	}
 
-	s.doIfFree(s.panguInfo.endpoints, func(e string) error {
+	if err = s.doIfFree(s.panguInfo.endpoints, func(e string) error {
 		answer, err = s.sendReqToPangu(e, question)
 
 		return err
-	})
+	}); err != nil {
+		return
+	}
 
 	return
 }

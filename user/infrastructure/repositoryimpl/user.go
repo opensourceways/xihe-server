@@ -161,7 +161,9 @@ func (impl *userRepoImpl) GetByFollower(owner, follower domain.Account) (
 	}
 
 	item := &v[0]
-	toUser(item.DUser, &u)
+	if err = toUser(item.DUser, &u); err != nil {
+		return
+	}
 
 	u.FollowerCount = item.FollowerCount
 	u.FollowingCount = item.FollowingCount
@@ -204,7 +206,9 @@ func (impl *userRepoImpl) FindUsersInfo(accounts []domain.Account) (r []domain.U
 
 	r = make([]domain.UserInfo, len(v))
 	for i := range v {
-		toUserInfo(v[i], &r[i])
+		if err := toUserInfo(v[i], &r[i]); err != nil {
+			return nil, err
+		}
 	}
 
 	return r, nil
@@ -512,7 +516,9 @@ func (impl *userRepoImpl) listFollowsDirectly(accounts []string, isFollower bool
 	r := make([]domain.FollowerUserInfo, len(v))
 	for i := range v {
 		item := &v[i]
-		toFollowerUserInfo(*item, &r[i])
+		if err := toFollowerUserInfo(*item, &r[i]); err != nil {
+			return nil, err
+		}
 		r[i].IsFollower = isFollower
 	}
 
@@ -559,7 +565,9 @@ func (impl *userRepoImpl) listFollows(follower string, accounts []string) (
 	r := make([]domain.FollowerUserInfo, len(v))
 	for i := range v {
 		item := &v[i]
-		toFollowerUserInfo(item.DUser, &r[i])
+		if err = toFollowerUserInfo(item.DUser, &r[i]); err != nil {
+			return nil, err
+		}
 		r[i].IsFollower = item.IsFollower
 	}
 

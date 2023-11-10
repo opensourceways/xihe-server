@@ -42,11 +42,13 @@ func (s *service) LuoJiaUploadPicture(f io.Reader, user domain.Account) error {
 }
 
 func (s *service) LuoJia(question string) (answer string, err error) {
-	s.doIfFree(s.luojiaInfo.endpoints, func(e string) error {
+	if err = s.doIfFree(s.luojiaInfo.endpoints, func(e string) error {
 		answer, err = s.sendReqToLuojia(e, question)
 
 		return err
-	})
+	}); err != nil {
+		return
+	}
 
 	return
 }

@@ -302,7 +302,9 @@ func (ctl *UserController) RefreshGitlabToken(ctx *gin.Context) {
 	token, csrftoken := f()
 
 	if token != "" {
-		ctl.setRespToken(ctx, token, csrftoken, usernew.Account)
+		if err = ctl.setRespToken(ctx, token, csrftoken, usernew.Account); err != nil {
+			return
+		}
 	}
 
 	ctl.sendRespOfPost(ctx, "success")
@@ -462,7 +464,9 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 	} else {
 		token, csrftoken := f()
 		if token != "" {
-			ctl.setRespToken(ctx, token, csrftoken, pl.Account)
+			if err := ctl.setRespToken(ctx, token, csrftoken, pl.Account); err != nil {
+				return
+			}
 		}
 
 		ctl.sendRespOfPost(ctx, "success")

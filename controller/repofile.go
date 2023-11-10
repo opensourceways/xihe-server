@@ -315,7 +315,7 @@ func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 		RepoId: repoInfo.RepoId,
 	}
 
-	ctl.s.DownloadRepo(&u, r, func(data io.Reader, n int64) {
+	err := ctl.s.DownloadRepo(&u, r, func(data io.Reader, n int64) {
 		ctx.DataFromReader(
 			http.StatusOK, n, "application/octet-stream", data,
 			map[string]string{
@@ -327,6 +327,9 @@ func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 			},
 		)
 	})
+	if err != nil {
+		return
+	}
 }
 
 // @Summary		Preview

@@ -28,7 +28,11 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (code string, err error) {
 	}
 
 	p := cmd.toPlayer()
-	p.CreateToday()
+
+	if err = p.CreateToday(); err != nil {
+		return
+	}
+
 	p.NewId()
 
 	if err = s.playerRepo.SavePlayer(&p); err != nil {
@@ -58,10 +62,12 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (code string, err error) {
 		}
 	}
 
-	s.producer.SendCourseAppliedEvent(&domain.CourseAppliedEvent{
+	if err = s.producer.SendCourseAppliedEvent(&domain.CourseAppliedEvent{
 		Account:    cmd.Account,
 		CourseName: course.Name,
-	})
+	}); err != nil {
+		return
+	}
 
 	return
 }

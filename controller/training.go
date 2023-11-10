@@ -175,7 +175,7 @@ func (ctl *TrainingController) Delete(ctx *gin.Context) {
 	}
 
 	pl, _, _ := ctl.checkUserApiToken(ctx, false)
-        prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete training")
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "delete training")
 
 	if err := ctl.ts.Delete(&info); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -205,7 +205,7 @@ func (ctl *TrainingController) Terminate(ctx *gin.Context) {
 	}
 
 	pl, _, _ := ctl.checkUserApiToken(ctx, false)
-        prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "terminate training")
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "terminate training")
 
 	if err := ctl.ts.Terminate(&info); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -431,7 +431,9 @@ func (ctl *TrainingController) watchTrainings(ws *websocket.Conn, user domain.Ac
 
 			done, index := finished(v)
 			if done {
-				ws.WriteJSON(newResponseData(v))
+				if err = ws.WriteJSON(newResponseData(v)); err != nil {
+					return
+				}
 
 				break
 			}

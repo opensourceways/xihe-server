@@ -116,7 +116,9 @@ func (col like) HasLike(owner string, do *repositories.ResourceObjectDO) (b bool
 		return nil
 	}
 
-	withContext(f)
+	if withContext(f); err != nil {
+		return
+	}
 
 	return
 }

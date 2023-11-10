@@ -34,11 +34,13 @@ func (s *service) CodeGeex(question *bigmodel.CodeGeexReq) (r bigmodel.CodeGeexR
 		return
 	}
 
-	s.doIfFree(s.codegeexInfo.endpoints, func(e string) error {
+	if err = s.doIfFree(s.codegeexInfo.endpoints, func(e string) error {
 		r, err = s.sendReqToCodeGeex(e, question)
 
 		return nil
-	})
+	}); err != nil {
+		return
+	}
 
 	return
 }
