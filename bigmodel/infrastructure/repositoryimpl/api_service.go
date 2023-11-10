@@ -82,7 +82,9 @@ func (impl *apiServiceRepoImpl) GetApiByUser(user types.Account) (u []domain.Use
 
 	u = make([]domain.UserApiRecord, len(v))
 	for i := range v {
-		v[i].toUserApiRecord(&u[i])
+		if err = v[i].toUserApiRecord(&u[i]); err != nil {
+			return
+		}
 	}
 
 	return
