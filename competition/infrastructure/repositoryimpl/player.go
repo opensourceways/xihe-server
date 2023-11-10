@@ -66,8 +66,8 @@ func (impl playerRepoImpl) AddPlayer(p *domain.Player) error {
 
 func (repo playerRepoImpl) genPlayerDoc(p *domain.Player) (bson.M, error) {
 	cs := make([]dCompetitor, p.CompetitorsCount())
-	for i, m := range p.Members() {
-		cs[i+1] = toCompetitorDoc(&m)
+	for i := range p.Members() {
+		cs[i+1] = toCompetitorDoc(&p.Members()[i])
 	}
 	cs[0] = toCompetitorDoc(&p.Leader)
 
