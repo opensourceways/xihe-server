@@ -45,7 +45,7 @@ definitions:
         type: string
       name:
         type: string
-      token:
+      update_at:
         type: string
       user:
         type: string
@@ -1380,6 +1380,13 @@ definitions:
       total:
         type: integer
     type: object
+  controller.newApiTokenResp:
+    properties:
+      date:
+        type: string
+      token:
+        type: string
+    type: object
   controller.pictureUploadResp:
     properties:
       path:
@@ -1989,11 +1996,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/controller.wukongPicturesGenerateResp'
-        "404":
-          description: Not Found
-          schema:
-            type: bigmodel_sensitive_info
+            $ref: '#/definitions/controller.newApiTokenResp'
         "500":
           description: Internal Server Error
           schema:
@@ -2010,6 +2013,22 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/app.ApiApplyRecordDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/api/refresh/{model}:
+    get:
+      consumes:
+      - application/json
+      description: refresh api token
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.newApiTokenResp'
         "500":
           description: Internal Server Error
           schema:

@@ -87,13 +87,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/controller.wukongPicturesGenerateResp"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "type": "bigmodel_sensitive_info"
+                            "$ref": "#/definitions/controller.newApiTokenResp"
                         }
                     },
                     "500": {
@@ -119,6 +113,31 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/app.ApiApplyRecordDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/api/refresh/{model}": {
+            "get": {
+                "description": "refresh api token",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.newApiTokenResp"
                         }
                     },
                     "500": {
@@ -5471,7 +5490,7 @@
                 "name": {
                     "type": "string"
                 },
-                "token": {
+                "update_at": {
                     "type": "string"
                 },
                 "user": {
@@ -7517,6 +7536,17 @@
                 },
                 "total": {
                     "type": "integer"
+                }
+            }
+        },
+        "controller.newApiTokenResp": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
                 }
             }
         },
