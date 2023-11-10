@@ -60,10 +60,11 @@ func (s *competitionService) Apply(cid string, cmd *CompetitorApplyCmd) (code st
 		}
 	}
 
-	s.producer.SendCompetitorAppliedEvent(&domain.CompetitorAppliedEvent{
+	err = s.producer.SendCompetitorAppliedEvent(&domain.CompetitorAppliedEvent{
 		Account:         cmd.Account,
 		CompetitionName: competition.Name,
 	})
+
 	return
 }
 
