@@ -574,7 +574,9 @@ func (s bigModelService) CancelPublic(user types.Account, pid string) (err error
 		return
 	}
 
-	s.fm.DeleteWuKongPicture(v.OBSPath.OBSPath())
+	if err = s.fm.DeleteWuKongPicture(v.OBSPath.OBSPath()); err != nil {
+		return
+	}
 
 	return
 }
