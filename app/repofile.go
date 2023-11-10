@@ -6,6 +6,8 @@ import (
 	"io"
 	"sort"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -206,7 +208,9 @@ func (s *repoFileService) DownloadRepo(
 ) error {
 	err := s.rf.DownloadRepo(u, e.RepoId, handle)
 	if err == nil && e.Account != nil {
-		s.sender.SendRepoDownloaded(e)
+		if err2 := s.sender.SendRepoDownloaded(e); err2 != nil {
+			logrus.Warnf("send repo downloaded failed, err: %s", err2.Error())
+		}
 	}
 
 	return err
