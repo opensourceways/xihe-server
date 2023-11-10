@@ -66,8 +66,9 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	r.Use(controller.ClearSenstiveInfoMiddleware())
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", port),
-		Handler: r,
+		Addr:              fmt.Sprintf(":%d", port),
+		ReadHeaderTimeout: time.Duration(cfg.ReadHeaderTimeout) * time.Second,
+		Handler:           r,
 	}
 
 	defer interrupts.WaitForGracefulShutdown()

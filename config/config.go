@@ -36,8 +36,9 @@ func LoadConfig(path string, cfg *Config) error {
 }
 
 type Config struct {
-	MaxRetry        int `json:"max_retry"`
-	ActivityKeepNum int `json:"activity_keep_num"`
+	MaxRetry          int `json:"max_retry"`
+	ActivityKeepNum   int `json:"activity_keep_num"`
+	ReadHeaderTimeout int `json:"read_header_timeout"`
 
 	Competition competition.Config              `json:"competition"  required:"true"`
 	Challenge   challengeimpl.Config            `json:"challenge"    required:"true"`
@@ -110,6 +111,10 @@ func (cfg *Config) setDefault() {
 
 	if cfg.ActivityKeepNum <= 0 {
 		cfg.ActivityKeepNum = 25
+	}
+
+	if cfg.ReadHeaderTimeout <= 0 {
+		cfg.ReadHeaderTimeout = 10
 	}
 
 	common.SetDefault(cfg)
