@@ -62,7 +62,7 @@ func (impl luojiaRepoImpl) Save(ur *domain.UserLuoJiaRecord) (r domain.LuoJiaRec
 		return
 	}
 
-	if withContext(f); err != nil {
+	if err = withContext(f); err != nil {
 		return
 	}
 
