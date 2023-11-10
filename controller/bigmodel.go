@@ -64,6 +64,7 @@ func AddRouterForBigModelController(
 	rg.GET("/v1/bigmodel/api/apply/:model", ctl.IsApplied)
 	rg.POST("/v1/bigmodel/api/wukong", ctl.WukongAPI)
 	rg.GET("/v1/bigmodel/apiinfo/get/:model", ctl.GetApiInfo)
+	rg.GET("/v1/bigmodel/api/refresh/:model", ctl.RefreshApiToken)
 }
 
 type BigModelController struct {
@@ -1019,19 +1020,18 @@ func (ctl *BigModelController) SkyWork(ctx *gin.Context) {
 // @Tags			BigModel
 // @Param			body	body	applyApiReq	true	"body of wukong"
 // @Accept			json
-// @Success		201	{object}				wukongPicturesGenerateResp
+// @Success		201	{object}				newApiTokenResp
 // @Failure		500	system_error			system	error
-// @Failure		404	bigmodel_sensitive_info	picture	error
 // @Router			/v1/bigmodel/api/apply/{model} [post]
 func (ctl *BigModelController) ApplyApi(ctx *gin.Context) {
-	model, err := domain.NewModelName(ctx.Param("model"))
-	if err != nil {
-		ctl.sendBadRequestParam(ctx, err)
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
 		return
 	}
 
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
-	if !ok {
+	model, err := domain.NewModelName(ctx.Param("model"))
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
 		return
 	}
 
@@ -1083,7 +1083,7 @@ func (ctl *BigModelController) ApplyApi(ctx *gin.Context) {
 	}
 }
 
-// @Title			WuKong
+// @Title			WuKongAPI
 // @Description	generates pictures by WuKong
 // @Tags			BigModel
 // @Param			body	body	wukongRequest	true	"body of wukong"
@@ -1111,9 +1111,22 @@ func (ctl *BigModelController) WukongAPI(ctx *gin.Context) {
 		return
 	}
 
-	_, err = ctl.s.GetApplyRecordByModel(ac, model)
+	r, err := ctl.s.GetApplyRecordByModel(ac, model)
 	if err != nil {
 		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	deToken, err := ctl.decryptDataForToken(r)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+	if ctx.GetHeader(Token) != string(deToken) {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestParam, "invalid token",
+		))
 		return
 	}
 
@@ -1145,23 +1158,13 @@ func (ctl *BigModelController) WukongAPI(ctx *gin.Context) {
 // @Failure		500	system_error	system	error
 // @Router			/v1/bigmodel/api/get/ [get]
 func (ctl *BigModelController) GetUserApplyRecord(ctx *gin.Context) {
-	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
 
-	v, err := ctl.s.GetApplyRecordByUser(pl.DomainAccount())
-
-	for i := range v {
-		deToken, err := ctl.decryptDataForToken(v[i].Token)
-		if err != nil {
-			return
-		}
-		v[i].Token = string(deToken)
-	}
-
-	if err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+	if v, err := ctl.s.GetApplyRecordByUser(pl.DomainAccount()); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, v)
 	}
@@ -1186,14 +1189,10 @@ func (ctl *BigModelController) IsApplied(ctx *gin.Context) {
 		return
 	}
 
-	b, err := ctl.s.IsApplyModel(pl.DomainAccount(), model)
-	resp := isApplyResp{
-		IsApply: b,
-	}
-	if err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+	if b, err := ctl.s.IsApplyModel(pl.DomainAccount(), model); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
-		ctl.sendRespOfGet(ctx, resp)
+		ctl.sendRespOfGet(ctx, isApplyResp{b})
 	}
 }
 
@@ -1205,7 +1204,7 @@ func (ctl *BigModelController) IsApplied(ctx *gin.Context) {
 // @Failure		500	system_error	system	error
 // @Router			/v1/bigmodel/apiinfo/get/{model} [get]
 func (ctl *BigModelController) GetApiInfo(ctx *gin.Context) {
-	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
 	}
@@ -1222,10 +1221,47 @@ func (ctl *BigModelController) GetApiInfo(ctx *gin.Context) {
 		return
 	}
 
-	v, err := ctl.s.GetApiInfo(model)
-	if err != nil {
-		ctl.sendCodeMessage(ctx, "", err)
+	if v, err := ctl.s.GetApiInfo(model); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, v)
+	}
+}
+
+// @Title			RefreshApiToken
+// @Description	refresh api token
+// @Tags			BigModel
+// @Accept			json
+// @Success		200	{object}		newApiTokenResp
+// @Failure		500	system_error	system	error
+// @Router			/v1/bigmodel/api/refresh/{model} [get]
+func (ctl *BigModelController) RefreshApiToken(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	model, err := domain.NewModelName(ctx.Param("model"))
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+		return
+	}
+
+	v := pl.Account + "+" + strconv.FormatInt(utils.Now(), 10)
+	newToken, err := ctl.encryptData(v)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+	enNewToken, err := ctl.encryptDataForToken(newToken)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+
+	if date, err := ctl.s.UpdateToken(pl.DomainAccount(), model, enNewToken); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, newApiTokenResp{newToken, date})
 	}
 }

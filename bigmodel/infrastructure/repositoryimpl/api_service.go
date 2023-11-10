@@ -40,7 +40,6 @@ func (impl *apiServiceRepoImpl) ApplyApi(d *domain.UserApiRecord) error {
 }
 
 func (impl *apiServiceRepoImpl) GetApiByUserModel(user types.Account, model domain.ModelName) (u domain.UserApiRecord, err error) {
-
 	v := new(dApiApply)
 
 	f := func(ctx context.Context) error {
@@ -64,7 +63,6 @@ func (impl *apiServiceRepoImpl) GetApiByUserModel(user types.Account, model doma
 }
 
 func (impl *apiServiceRepoImpl) GetApiByUser(user types.Account) (u []domain.UserApiRecord, err error) {
-
 	var v []dApiApply
 
 	f := func(ctx context.Context) error {
@@ -89,7 +87,6 @@ func (impl *apiServiceRepoImpl) GetApiByUser(user types.Account) (u []domain.Use
 }
 
 func (impl *apiServiceRepoImpl) AddApiCallCount(user types.Account, model domain.ModelName, version int) error {
-
 	f := func(ctx context.Context) error {
 		return impl.cli.UpdateIncDoc(
 			ctx,
@@ -121,6 +118,27 @@ func (a *dApiApply) toUserApiRecord(d *domain.UserApiRecord) (err error) {
 	d.UpdateAt = a.UpdateAt
 	d.Version = a.Version
 	return
+}
+
+func (impl *apiServiceRepoImpl) UpdateToken(user types.Account, model domain.ModelName, token string, date string, version int) (err error) {
+	filter := bson.M{fiedUser: user.Account(), fieldModelName: model.ModelName()}
+
+	f := func(ctx context.Context) error {
+		err = impl.cli.UpdateDoc(
+			ctx,
+			filter,
+			bson.M{fieldToken: token, fieldUpdateAt: date},
+			mongoCmdSet,
+			version,
+		)
+		return err
+	}
+
+	if err = withContext(f); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func toApiApplyDoc(d *domain.UserApiRecord) (bson.M, error) {

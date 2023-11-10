@@ -13,6 +13,8 @@ const (
 	fieldModelName = "model_name"
 	fieldEnabled   = "enabled"
 	fieldCallCount = "call_count"
+	fieldToken     = "token"
+	fieldUpdateAt  = "update_at"
 )
 
 type DCompetitorInfo struct {

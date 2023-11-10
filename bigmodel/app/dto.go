@@ -285,8 +285,8 @@ type ApiApplyRecordDTO struct {
 	User      string `json:"user"`
 	Name      string `json:"name"`
 	Endpoint  string `json:"endpoint"`
-	Token     string `json:"token"`
 	ApplyAt   string `json:"apply_at"`
+	UpdateAt  string `json:"update_at"`
 	ModelName string `json:"model_name"`
 	Enabled   bool   `json:"enabled"`
 }
@@ -300,7 +300,7 @@ func (s bigModelService) toApiApplyRecordDTO(
 		User:      v.User.Account(),
 		Name:      info.Name,
 		ApplyAt:   v.ApplyAt,
-		Token:     v.Token,
+		UpdateAt:  v.UpdateAt,
 		ModelName: v.ModelName.ModelName(),
 		Enabled:   v.Enabled,
 		Endpoint:  info.Endpoint,

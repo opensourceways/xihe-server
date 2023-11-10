@@ -245,6 +245,11 @@ type isApplyResp struct {
 	IsApply bool `json:"is_apply"`
 }
 
+type newApiTokenResp struct {
+	Token string `json:"token"`
+	Date  string `json:"date"`
+}
+
 // baichuan
 type baichuanReq struct {
 	Text              string  `json:"text"`

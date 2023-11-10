@@ -54,9 +54,10 @@ type BigModelService interface {
 	//api service
 	ApplyApi(types.Account, domain.ModelName, string) error
 	WukongApi(types.Account, domain.ModelName, *WuKongApiCmd) (map[string]string, string, error)
-	GetApplyRecordByModel(types.Account, domain.ModelName) (ApiApplyRecordDTO, error)
+	GetApplyRecordByModel(types.Account, domain.ModelName) (string, error)
 	GetApplyRecordByUser(types.Account) ([]ApiApplyRecordDTO, error)
 	IsApplyModel(types.Account, domain.ModelName) (bool, error)
+	UpdateToken(types.Account, domain.ModelName, string) (string, error)
 
 	//api info
 	GetApiInfo(model domain.ModelName) (ApiInfoDTO, error)
@@ -776,22 +777,17 @@ func (s bigModelService) ApplyApi(user types.Account, model domain.ModelName, to
 	return
 }
 
-func (s bigModelService) GetApplyRecordByModel(user types.Account, model domain.ModelName) (a ApiApplyRecordDTO, err error) {
+func (s bigModelService) GetApplyRecordByModel(user types.Account, model domain.ModelName) (token string, err error) {
 	v, err := s.apiService.GetApiByUserModel(user, model)
 	if err != nil {
 		return
 	}
 	if !v.Enabled {
 		err = errors.New("invalid token")
+		return
 	}
 
-	a = ApiApplyRecordDTO{
-		User:      v.User.Account(),
-		ApplyAt:   v.ApplyAt,
-		Token:     v.Token,
-		ModelName: v.ModelName.ModelName(),
-	}
-
+	token = v.Token
 	return
 }
 
@@ -828,5 +824,21 @@ func (s bigModelService) GetApiInfo(model domain.ModelName) (a ApiInfoDTO, err e
 		return
 	}
 	s.toApiInfoDTO(&v, &a)
+	return
+}
+
+func (s bigModelService) UpdateToken(user types.Account, model domain.ModelName, token string) (date string, err error) {
+	a, err := s.apiService.GetApiByUserModel(user, model)
+	if err != nil {
+		return
+	}
+
+	now := utils.Now()
+	date = utils.ToDate(now)
+
+	if err = s.apiService.UpdateToken(user, model, token, date, a.Version); err != nil {
+		return
+	}
+
 	return
 }

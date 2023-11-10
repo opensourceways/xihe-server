@@ -10,4 +10,5 @@ type ApiService interface {
 	GetApiByUserModel(types.Account, domain.ModelName) (domain.UserApiRecord, error)
 	GetApiByUser(types.Account) ([]domain.UserApiRecord, error)
 	AddApiCallCount(types.Account, domain.ModelName, int) error
+	UpdateToken(types.Account, domain.ModelName, string, string, int) error
 }
