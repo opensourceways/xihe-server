@@ -60,18 +60,8 @@ func (s *service) LuoJiaUploadPicture(f io.Reader, user types.Account) error {
 }
 
 func (s *service) LuoJia(question string) (answer string, err error) {
-	s.doIfFree(s.luojiaInfo.endpoints, func(e string) error {
+	err = s.doIfFree(s.luojiaInfo.endpoints, func(e string) error {
 		answer, err = s.sendReqToLuojia(e, question)
-
-		return err
-	})
-
-	return
-}
-
-func (s *service) LuoJiaHF(f io.Reader) (res string, err error) {
-	s.doIfFree(s.luojiaInfo.endpointHF, func(e string) error {
-		res, err = s.sendReqToLuoJiaHF(e, f)
 
 		return err
 	})

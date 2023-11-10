@@ -38,7 +38,6 @@ type BigModel interface {
 	// luojia
 	LuoJiaUploadPicture(f io.Reader, u types.Account) error
 	LuoJia(string) (string, error)
-	LuoJiaHF(io.Reader) (string, error)
 
 	// ai detector
 	AIDetector(domain.AIDetectorInput) (bool, error)
