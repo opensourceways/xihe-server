@@ -29,7 +29,6 @@ type BigModelService interface {
 	LuoJiaUploadPicture(io.Reader, types.Account) error
 	LuoJia(types.Account) (string, error)
 	ListLuoJiaRecord(types.Account) ([]LuoJiaRecordDTO, error)
-	LuoJiaHF(*LuoJiaHFCmd) (string, error)
 
 	// wukong
 	GenWuKongSamples(int) ([]string, error)

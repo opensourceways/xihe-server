@@ -6,6 +6,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/utils"
+	"github.com/sirupsen/logrus"
 )
 
 func (s bigModelService) LuoJiaUploadPicture(f io.Reader, user types.Account) error {
@@ -13,10 +14,13 @@ func (s bigModelService) LuoJiaUploadPicture(f io.Reader, user types.Account) er
 }
 
 func (s bigModelService) LuoJia(user types.Account) (v string, err error) {
-	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
+	sendErr := s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      user,
 		BigModelType: domain.BigmodelLuoJia,
 	})
+	if sendErr != nil {
+		logrus.Warnf("send bigmodel started failed, err: %s", sendErr.Error())
+	}
 
 	if v, err = s.fm.LuoJia(user.Account()); err != nil {
 		return
@@ -25,24 +29,16 @@ func (s bigModelService) LuoJia(user types.Account) (v string, err error) {
 	record := domain.UserLuoJiaRecord{User: user}
 	record.CreatedAt = utils.Now()
 
-	s.luojia.Save(&record)
+	if _, err = s.luojia.Save(&record); err != nil {
+		return
+	}
 
-	_ = s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
+	sendErr2 := s.sender.SendBigModelFinished(&domain.BigModelFinishedEvent{
 		Account:      user,
 		BigModelType: domain.BigmodelLuoJia,
 	})
-
-	return
-}
-
-func (s bigModelService) LuoJiaHF(cmd *LuoJiaHFCmd) (v string, err error) {
-	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
-		Account:      cmd.User,
-		BigModelType: domain.BigmodelLuoJia,
-	})
-
-	if v, err = s.fm.LuoJiaHF(cmd.Picture); err != nil {
-		return
+	if sendErr2 != nil {
+		logrus.Warnf("send bigmodel finished failed, err: %s", sendErr2.Error())
 	}
 
 	return
