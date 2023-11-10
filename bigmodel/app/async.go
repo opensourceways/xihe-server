@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 	"github.com/opensourceways/xihe-server/bigmodel/domain/message"
 	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/sirupsen/logrus"
 )
 
 type AsyncBigModelService interface {
@@ -31,15 +32,20 @@ type asyncBigModelService struct {
 
 func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKongCmd) (err error) {
 	// 1. inference
-	_ = s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
+	sendErr := s.sender.SendBigModelStarted(&domain.BigModelStartedEvent{
 		Account:      user,
 		BigModelType: domain.BigmodelWuKong,
 	})
+	if sendErr != nil {
+		logrus.Warnf("send bigmodel started failed, err: %s", sendErr.Error())
+	}
 
-	s.sender.SendWuKongAsyncTaskStart(&domain.WuKongAsyncTaskStartEvent{
+	if err = s.sender.SendWuKongAsyncTaskStart(&domain.WuKongAsyncTaskStartEvent{
 		Account: user,
 		TaskId:  tid,
-	})
+	}); err != nil {
+		return
+	}
 
 	links, err := s.fm.GenPicturesByWuKong(user, &cmd.WuKongPictureMeta, cmd.EsType)
 	if err != nil {
@@ -47,11 +53,13 @@ func (s *asyncBigModelService) WuKong(tid uint64, user types.Account, cmd *WuKon
 			err = errors.New("internal error")
 		}
 
-		s.sender.SendWuKongInferenceError(&domain.WuKongInferenceErrorEvent{
+		if err = s.sender.SendWuKongInferenceError(&domain.WuKongInferenceErrorEvent{
 			Account: user,
 			TaskId:  tid,
 			ErrMsg:  err.Error(),
-		})
+		}); err != nil {
+			return
+		}
 
 		return
 	}
