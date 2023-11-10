@@ -96,7 +96,9 @@ func (impl *wukongPictureRepoImpl) listFieldNameByUserName(user, fieldName strin
 	r := make([]domain.WuKongPicture, len(t))
 
 	for i := range t {
-		t[i].toWuKongPicture(&r[i])
+		if err := t[i].toWuKongPicture(&r[i]); err != nil {
+			return nil, 0, err
+		}
 	}
 
 	return r, v.Version, nil
@@ -292,7 +294,7 @@ func (impl *wukongPictureRepoImpl) getByUserName(user, pid, field string) (
 		return
 	}
 
-	l[0].toWuKongPicture(&p)
+	err = l[0].toWuKongPicture(&p)
 
 	return
 }
