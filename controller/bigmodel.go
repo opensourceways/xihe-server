@@ -306,13 +306,13 @@ func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 	for i := 0; i < apiConfig.PodTimeout; i++ {
 		dto, err := ctl.s.GetWuKongWaitingTaskRank(pl.DomainAccount())
 		if err != nil {
-			ws.WriteJSON(newResponseError(err))
+			_ = ws.WriteJSON(newResponseError(err))
 
 			log.Errorf("get rank failed: get status, err:%s", err.Error())
 
 			return
 		} else {
-			ws.WriteJSON(newResponseData(dto))
+			_ = ws.WriteJSON(newResponseData(dto))
 		}
 
 		log.Debugf("info dto:%v", dto)
