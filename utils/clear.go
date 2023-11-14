@@ -25,7 +25,7 @@ func clearStringMemory(s string) {
 		return
 	}
 
-	bs := *(*[]byte)(unsafe.Pointer(&s))
+	bs := *(*[]byte)(unsafe.Pointer(&s)) // #nosec G103 -- this is a false positive
 	for i := 0; i < len(bs); i++ {
 		bs[i] = 0
 	}

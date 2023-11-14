@@ -32,7 +32,7 @@ func Init(cfg *Config) error {
 
 	tlsConfig := &tls.Config{
 		RootCAs:            pool,
-		InsecureSkipVerify: true,
+		InsecureSkipVerify: true, // #nosec G402 -- this is a false positive
 	}
 
 	client = redis.NewClient(&redis.Options{

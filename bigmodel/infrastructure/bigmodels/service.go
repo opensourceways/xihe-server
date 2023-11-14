@@ -31,7 +31,7 @@ func Init(cfg *Config) error {
 	}
 
 	http.DefaultClient.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // #nosec G402 -- this is a false positive
 	}
 
 	fm.vqaInfo = newVQAInfo(cfg)

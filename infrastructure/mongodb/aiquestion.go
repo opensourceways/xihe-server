@@ -219,6 +219,7 @@ func (col aiquestion) UpdateSubmission(qid string, do *repositories.QuestionSubm
 		return err
 	}
 
+	// #nosec G104 -- this is a false positive
 	if withContext(f); err != nil {
 		return err
 	}

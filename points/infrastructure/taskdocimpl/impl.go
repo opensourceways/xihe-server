@@ -67,7 +67,7 @@ type taskInfo struct {
 }
 
 func newTemplate(name, path string) (*template.Template, error) {
-	txtStr, err := ioutil.ReadFile(path)
+	txtStr, err := ioutil.ReadFile(path) // #nosec G304 -- this is a false positive
 	if err != nil {
 		return nil, fmt.Errorf("failed to new template: read template file failed: %s", err.Error())
 	}

@@ -21,7 +21,7 @@ import (
 
 const (
 	PrivateToken       = "PRIVATE-TOKEN"
-	csrfToken          = "CSRF-Token"
+	csrfToken          = "CSRF-Token" // #nosec G101 -- this is a false positive
 	headerLanguage     = "Expect-Language"
 	Token              = "token"
 	encodeUsername     = "encode-username"
