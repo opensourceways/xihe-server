@@ -242,7 +242,7 @@ func (ctl *FinetuneController) watchFinetunes(ws *websocket.Conn, user domain.Ac
 
 			done, index := finished(v)
 			if done {
-				ws.WriteJSON(newResponseData(v))
+				_ = ws.WriteJSON(newResponseData(v))
 
 				break
 			}
