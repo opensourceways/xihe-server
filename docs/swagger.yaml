@@ -1392,6 +1392,11 @@ definitions:
       path:
         type: string
     type: object
+  controller.platformInfo:
+    properties:
+      create_at:
+        type: integer
+    type: object
   controller.projectCreateRequest:
     properties:
       cover_id:
@@ -1864,8 +1869,34 @@ definitions:
 info:
   contact: {}
 paths:
-  /{account}/gitlab/refresh:
+  /{account}/gitlab:
     get:
+      consumes:
+      - application/json
+      description: get code platform info of user
+      parameters:
+      - description: account
+        in: path
+        name: account
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.platformInfo'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "401":
+          description: Unauthorized
+          schema:
+            type: not_allowed
+      tags:
+      - User
+  /{account}/gitlab/refresh:
+    post:
       consumes:
       - application/json
       description: refresh platform token of user

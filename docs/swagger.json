@@ -5343,8 +5343,48 @@
                 }
             }
         },
-        "/{account}/gitlab/refresh": {
+        "/{account}/gitlab": {
             "get": {
+                "description": "get code platform info of user",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "account",
+                        "name": "account",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.platformInfo"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "not_allowed"
+                        }
+                    }
+                }
+            }
+        },
+        "/{account}/gitlab/refresh": {
+            "post": {
                 "description": "refresh platform token of user",
                 "consumes": [
                     "application/json"
@@ -7518,6 +7558,14 @@
             "properties": {
                 "path": {
                     "type": "string"
+                }
+            }
+        },
+        "controller.platformInfo": {
+            "type": "object",
+            "properties": {
+                "create_at": {
+                    "type": "integer"
                 }
             }
         },
