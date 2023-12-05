@@ -8,11 +8,11 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/websocket v1.5.0
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.23.9+incompatible
-	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.46
+	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.70
 	github.com/opensourceways/community-robot-lib v0.0.0-20231018034126-a664e14dbb9d
-	github.com/opensourceways/kafka-lib v0.0.0-20231023142428-b41c4ff141c6
+	github.com/opensourceways/kafka-lib v0.0.0-20231114071554-b2af9944cf3a
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
-	github.com/opensourceways/xihe-extra-services v0.0.0-20231107072416-a53383bfd6df
+	github.com/opensourceways/xihe-extra-services v0.0.0-20231127020246-13b18245f56d
 	github.com/opensourceways/xihe-finetune v0.0.0-20231025112302-d48154d5ce22
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
 	github.com/sirupsen/logrus v1.9.3
@@ -86,6 +86,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.18 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
+	github.com/tjfoc/gmsm v1.4.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect

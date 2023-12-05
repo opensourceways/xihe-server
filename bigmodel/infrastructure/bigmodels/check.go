@@ -58,12 +58,13 @@ func (s *service) CheckImages(urls []string) error {
 }
 
 func (s *textCheckService) check(content string) error {
+	var t string = "comment"
 	request := &model.RunTextModerationRequest{
 		Body: &model.TextDetectionReq{
 			Data: &model.TextDetectionDataReq{
 				Text: content,
 			},
-			EventType: "comment",
+			EventType: &t,
 		},
 	}
 
