@@ -3,6 +3,11 @@ RUN dnf update -y && \
     dnf install -y golang && \
     go env -w GOPROXY=https://goproxy.cn,direct
 
+ARG USER
+ARG PASS
+RUN echo "machine github.com login $USER password $PASS" > /root/.netrc
+RUN go env -w GOPRIVATE=github.com/opensourceways/xihe-extra-services,github.com/opensourceways/xihe-server,github.com/opensourceways/xihe-training-center,github.com/opensourceways/xihe-aicc-finetune,github.com/opensourceways/xihe-finetune,github.com/opensourceways/xihe-sync-repo
+
 # build binary
 COPY . /go/src/github.com/opensourceways/xihe-server
 RUN cd /go/src/github.com/opensourceways/xihe-server && GO111MODULE=on CGO_ENABLED=0 go build -buildmode=pie --ldflags "-s -linkmode 'external' -extldflags '-Wl,-z,now'"
