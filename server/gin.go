@@ -57,6 +57,8 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	r.Use(gin.Recovery())
 	r.Use(logRequest())
 
+	r.TrustedPlatform = "X-Real-IP"
+
 	if err := setRouter(r, cfg); err != nil {
 		logrus.Error(err)
 
