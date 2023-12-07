@@ -8,7 +8,7 @@ type Points interface {
 	Save(*Point) error
 	Update(user string, done string) error
 	Find(types.Account) (Point, error)
-	FindRanks() ([]Point, error)
+	FindAll() ([]Point, error)
 }
 
 type Point struct {

@@ -8,6 +8,7 @@ import (
 
 type PointsTaskService interface {
 	Find(types.Account) (domain.UserPoints, error)
+	GetAllUserPoints() ([]domain.UserPoints, error)
 }
 
 func NewPointsTaskService(
@@ -48,6 +49,22 @@ func (s *pointsTaskService) Find(u types.Account) (up domain.UserPoints, err err
 	}
 
 	return s.toUserPoints(p), nil
+}
+
+func (s *pointsTaskService) GetAllUserPoints() (ups []domain.UserPoints, err error) {
+	// get all points
+	ps, err := s.pointsRepo.FindAll()
+	if err != nil {
+		return
+	}
+
+	// generate userpoints
+	ups = make([]domain.UserPoints, len(ps))
+	for i := range ps {
+		ups[i] = s.toUserPoints(ps[i])
+	}
+
+	return
 }
 
 func (s *pointsTaskService) toUserPoints(p repository.Point) domain.UserPoints {

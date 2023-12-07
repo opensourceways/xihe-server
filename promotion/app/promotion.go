@@ -1,9 +1,13 @@
 package app
 
-import "github.com/opensourceways/xihe-server/promotion/domain/repository"
+import (
+	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/promotion/domain/repository"
+)
 
 type PromotionService interface {
 	GetPromotion(*PromotionCmd) (PromotionDTO, error)
+	GetUserRegisterPromotion(*types.Account) ([]PromotionDTO, error)
 }
 
 func NewPromotionService(
@@ -26,6 +30,22 @@ func (s *promotionService) GetPromotion(cmd *PromotionCmd) (dto PromotionDTO, er
 	}
 
 	dto.toDTO(&p, &cmd.User)
+
+	return
+}
+
+func (s *promotionService) GetUserRegisterPromotion(user *types.Account) (dtos []PromotionDTO, err error) {
+	// find all promotions
+	ps, err := s.repo.FindAll()
+
+	// generate promotion dtos
+	for i := range ps {
+		if ps[i].HasRegister(*user) {
+			dto := PromotionDTO{}
+			dto.toDTO(&ps[i], user)
+			dtos = append(dtos, dto)
+		}
+	}
 
 	return
 }

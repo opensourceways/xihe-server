@@ -7,5 +7,6 @@ import (
 
 type Promotion interface {
 	Find(promotionid string) (domain.Promotion, error)
+	FindAll() ([]domain.Promotion, error)
 	UserRegister(promotionid string, user types.Account) error
 }

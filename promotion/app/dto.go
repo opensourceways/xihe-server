@@ -16,6 +16,18 @@ type PointsDTO struct {
 	Total int    `json:"total"`
 }
 
+type PointsRankDTO struct {
+	User  string `json:"user"`
+	Point int    `json:"point"`
+}
+
+func (dto *PointsRankDTO) toDTO(up domain.UserPoints) {
+	dto = &PointsRankDTO{
+		User:  up.User.Account(),
+		Point: up.Total,
+	}
+}
+
 type Item struct {
 	TaskName string `json:"task_name"`
 	Descs    string `json:"descs"`
