@@ -40,3 +40,26 @@ func toPointsDTO(p domain.UserPoints, lang common.Language) PointsDTO {
 		Total: p.Total,
 	}
 }
+
+type PromotionCmd struct {
+	promotionId string
+	User        types.Account
+}
+
+type PromotionDTO struct {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Desc       string `json:"desc"`
+	IsRegister bool   `json:"is_register"`
+	Duration   string `json:"duration"`
+}
+
+func (dto *PromotionDTO) toDTO(p *domain.Promotion, user *types.Account) {
+	dto = &PromotionDTO{
+		Id:         p.Id,
+		Name:       p.Name.PromotionName(),
+		Desc:       p.Desc.PromotionDesc(),
+		IsRegister: p.HasRegister(*user),
+		Duration:   p.Duration.PromotionDuration(),
+	}
+}

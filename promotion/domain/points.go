@@ -2,8 +2,6 @@ package domain
 
 import types "github.com/opensourceways/xihe-server/domain"
 
-
-
 type UserPoints struct {
 	User  types.Account
 	Total int
