@@ -5,8 +5,13 @@ import (
 	"github.com/opensourceways/xihe-server/promotion/domain"
 )
 
+type PromotionRepo struct {
+	domain.Promotion
+	Version int
+}
+
 type Promotion interface {
-	Find(promotionid string) (domain.Promotion, error)
-	FindAll() ([]domain.Promotion, error)
-	UserRegister(promotionid string, user types.Account) error
+	Find(promotionid string) (PromotionRepo, error)
+	FindAll() ([]PromotionRepo, error)
+	UserRegister(promotionid string, user types.Account, version int) error
 }

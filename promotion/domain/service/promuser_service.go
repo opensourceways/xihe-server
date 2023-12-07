@@ -26,8 +26,14 @@ func NewPromotionUserService(
 }
 
 func (s *promotionUserService) Register(pid string, ur *domain.UserRegistration) error {
+	// get promotion version
+	p, err := s.repo.Find(pid)
+	if err != nil {
+		return err
+	}
+
 	// register promotion
-	if err := s.repo.UserRegister(pid, ur.Account); err != nil {
+	if err := s.repo.UserRegister(pid, ur.Account, p.Version); err != nil {
 		return err
 	}
 

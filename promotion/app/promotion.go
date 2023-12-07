@@ -34,7 +34,7 @@ func (s *promotionService) GetPromotion(cmd *PromotionCmd) (dto PromotionDTO, er
 		return
 	}
 
-	dto.toDTO(&p, &cmd.User)
+	dto.toDTO(&p.Promotion, &cmd.User)
 
 	return
 }
@@ -47,7 +47,7 @@ func (s *promotionService) GetUserRegisterPromotion(user *types.Account) (dtos [
 	for i := range ps {
 		if ps[i].HasRegister(*user) {
 			dto := PromotionDTO{}
-			dto.toDTO(&ps[i], user)
+			dto.toDTO(&ps[i].Promotion, user)
 			dtos = append(dtos, dto)
 		}
 	}

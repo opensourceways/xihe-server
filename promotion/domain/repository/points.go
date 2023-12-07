@@ -6,7 +6,7 @@ import (
 
 type Points interface {
 	Save(*Point) error
-	Update(user string, done string) error
+	Update(user string, done string, version int) error
 	Find(types.Account) (Point, error)
 	FindAll() ([]Point, error)
 }
