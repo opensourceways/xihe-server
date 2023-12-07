@@ -75,3 +75,8 @@ func (dto *PromotionDTO) toDTO(p *domain.Promotion, user *types.Account) {
 		Duration:   p.Duration.PromotionDuration(),
 	}
 }
+
+type UserRegistrationCmd struct {
+	PromotionId string
+	domain.UserRegistration
+}

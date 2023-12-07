@@ -3,23 +3,28 @@ package app
 import (
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/promotion/domain/repository"
+	"github.com/opensourceways/xihe-server/promotion/domain/service"
 )
 
 type PromotionService interface {
 	GetPromotion(*PromotionCmd) (PromotionDTO, error)
 	GetUserRegisterPromotion(*types.Account) ([]PromotionDTO, error)
+	UserRegister(*UserRegistrationCmd) error
 }
 
 func NewPromotionService(
+	service service.PromotionUserService,
 	repo repository.Promotion,
 ) PromotionService {
 	return &promotionService{
-		repo: repo,
+		service: service,
+		repo:    repo,
 	}
 }
 
 type promotionService struct {
-	repo repository.Promotion
+	service service.PromotionUserService
+	repo    repository.Promotion
 }
 
 func (s *promotionService) GetPromotion(cmd *PromotionCmd) (dto PromotionDTO, err error) {
@@ -48,4 +53,8 @@ func (s *promotionService) GetUserRegisterPromotion(user *types.Account) (dtos [
 	}
 
 	return
+}
+
+func (s *promotionService) UserRegister(cmd *UserRegistrationCmd) error {
+	return s.service.Register(cmd.PromotionId, &cmd.UserRegistration)
 }
