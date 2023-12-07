@@ -1,0 +1,42 @@
+package app
+
+import (
+	common "github.com/opensourceways/xihe-server/common/domain"
+	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/promotion/domain"
+)
+
+type PointsCmd struct {
+	User types.Account
+	Lang common.Language
+}
+
+type PointsDTO struct {
+	Items []Item `json:"items"`
+	Total int    `json:"total"`
+}
+
+type Item struct {
+	TaskName string `json:"task_name"`
+	Descs    string `json:"descs"`
+	Points   int    `json:"points"`
+	Time     string `json:"time"`
+}
+
+func toPointsDTO(p domain.UserPoints, lang common.Language) PointsDTO {
+	items := make([]Item, len(p.Items))
+
+	for i := range p.Items {
+		items[i] = Item{
+			TaskName: p.Items[i].TaskName.Sentence(lang),
+			Descs:    p.Items[i].Descs.Sentence(lang),
+			Points:   p.Items[i].Points,
+			Time:     p.Items[i].Date,
+		}
+	}
+
+	return PointsDTO{
+		Items: items,
+		Total: p.Total,
+	}
+}
