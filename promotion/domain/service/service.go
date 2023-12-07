@@ -13,46 +13,49 @@ type PointsTaskService interface {
 func NewPointsTaskService(
 	pointsRepo repository.Points,
 	taskRepo repository.Task,
-) PointsTaskService {
+) (PointsTaskService, error) {
+	// get all task
+	alltask, err := taskRepo.FindAll()
+	if err != nil {
+		return nil, err
+	}
+
+	// make a task map
+	taskmap := make(map[string]domain.Task, len(alltask))
+	for i := range alltask {
+		taskmap[alltask[i].Id] = alltask[i]
+	}
+
 	return &pointsTaskService{
+		taskMap:    taskmap,
 		pointsRepo: pointsRepo,
 		taskRepo:   taskRepo,
-	}
+	}, nil
 }
 
 type pointsTaskService struct {
+	taskMap map[string]domain.Task
+
 	pointsRepo repository.Points
 	taskRepo   repository.Task
 }
 
-func (s pointsTaskService) Find(u types.Account) (up domain.UserPoints, err error) {
+func (s *pointsTaskService) Find(u types.Account) (up domain.UserPoints, err error) {
 	// get user's points
 	p, err := s.pointsRepo.Find(u)
 	if err != nil {
 		return
 	}
 
-	// get all task
-	ts, err := s.taskRepo.FindAll()
-	if err != nil {
-		return
-	}
-
-	return toUserPoints(p, ts), nil
+	return s.toUserPoints(p), nil
 }
 
-func toUserPoints(p repository.Point, allTask []domain.Task) domain.UserPoints {
-	// make a task map
-	taskmap := make(map[string]domain.Task, len(allTask))
-	for i := range allTask {
-		taskmap[allTask[i].Id] = allTask[i]
-	}
-
+func (s *pointsTaskService) toUserPoints(p repository.Point) domain.UserPoints {
 	// generate UserPoints
 	var total int
 	items := make([]domain.Item, len(p.Dones))
 	for i := range p.Dones {
-		task := taskmap[p.Dones[i].TaskId]
+		task := s.taskMap[p.Dones[i].TaskId]
 		items[i] = domain.Item{
 			Id:       task.Id,
 			TaskName: task.Names,
