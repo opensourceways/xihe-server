@@ -13,7 +13,8 @@ COPY . /go/src/github.com/opensourceways/xihe-server
 RUN cd /go/src/github.com/opensourceways/xihe-server && GO111MODULE=on CGO_ENABLED=0 go build -buildmode=pie --ldflags "-s -linkmode 'external' -extldflags '-Wl,-z,now'"
 # copy binary config and utils
 FROM openeuler/openeuler:22.03
-RUN dnf -y update && \
+RUN sed -i "s|repo.openeuler.org|mirrors.pku.edu.cn/openeuler|g" /etc/yum.repos.d/openEuler.repo && \ 
+    dnf -y update && \
     dnf in -y shadow && \
     dnf remove -y gdb-gdbserver && \
     groupadd -g 5000 mindspore && \
