@@ -6,14 +6,14 @@ import (
 	"github.com/opensourceways/xihe-server/promotion/domain/service"
 )
 
-type Points interface {
+type PointsService interface {
 	GetPoints(*PointsCmd) (PointsDTO, error)
 	GetPointsRank() ([]PointsRankDTO, error)
 }
 
 func NewPointsService(
 	service service.PointsTaskService,
-) Points {
+) PointsService {
 	return &pointService{
 		service: service,
 	}

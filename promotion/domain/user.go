@@ -1,5 +1,5 @@
 package domain
 
-import coursedomain "github.com/opensourceways/xihe-server/course/domain"
+import userdomain "github.com/opensourceways/xihe-server/user/domain"
 
-type UserRegistration = coursedomain.Student
+type UserRegistration = userdomain.UserRegInfo
