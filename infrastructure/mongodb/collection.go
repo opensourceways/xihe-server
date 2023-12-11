@@ -98,6 +98,17 @@ func (c collection) PushNestedArrayElemAndUpdate(
 	)
 }
 
+func (c collection) PushArrayElemAndInc(
+	ctx context.Context,
+	array string, filterOfDoc, value, updateCmd bson.M,
+	version int,
+) error {
+	return cli.pushArrayElemAndInc(
+		ctx, c.name, array, filterOfDoc,
+		value, updateCmd, version,
+	)
+}
+
 func (c collection) AddToSimpleArray(
 	ctx context.Context, array string,
 	filterOfDoc, value interface{},

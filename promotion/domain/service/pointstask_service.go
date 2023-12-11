@@ -9,7 +9,7 @@ import (
 )
 
 type PointsTaskService interface {
-	Save(user types.Account, taskid string) error
+	Update(user types.Account, taskid string, point int) error
 	Find(types.Account) (domain.UserPoints, error)
 	GetAllUserPoints() ([]domain.UserPoints, error)
 }
@@ -117,13 +117,23 @@ func (s *pointsTaskService) isPointOverMaxAllowed(item ...domain.Item) (bool, er
 	return false, nil
 }
 
-func (s *pointsTaskService) Save(user types.Account, taskid string) error {
+func (s *pointsTaskService) Update(user types.Account, taskid string, point int) error {
 	// find userpoint version
 	up, err := s.pointsRepo.Find(user)
 	if err != nil {
 		return err
 	}
 
+	// find task
+	task, ok := s.taskMap[taskid]
+	if !ok {
+		return errors.New("cannot found this task id")
+	}
+	item, err := task.ToItem(point)
+	if err != nil {
+		return err
+	}
+
 	// update
-	return s.pointsRepo.Update(user, taskid, up.Version)
+	return s.pointsRepo.Update(user, item, up.Version)
 }

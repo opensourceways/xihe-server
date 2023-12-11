@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	fieldEN = "English"
-	fieldZH = "Chinese"
+	FieldEN = "English"
+	FieldZH = "Chinese"
 )
 
 // PronotionName
@@ -90,6 +90,7 @@ func (r promotionDesc) PromotionDesc() string {
 // Sentence
 type Sentence interface {
 	Sentence(common.Language) string
+	SentenceMap() map[string]string
 	ENSentence() string
 	ZHSentence() string
 }
@@ -100,8 +101,8 @@ func NewSentence(en, zh string) (Sentence, error) {
 	}
 
 	s := make(sentence, 2)
-	s[fieldEN] = en
-	s[fieldZH] = zh
+	s[FieldEN] = en
+	s[FieldZH] = zh
 
 	return s, nil
 }
@@ -110,19 +111,26 @@ type sentence map[string]string
 
 func (r sentence) Sentence(lang common.Language) string {
 	switch lang.Language() {
-	case fieldEN:
+	case FieldEN:
 		return r.ENSentence()
-	case fieldZH:
+	case FieldZH:
 		return r.ZHSentence()
 	}
 
 	return r.ZHSentence()
 }
 
+func (r sentence) SentenceMap() map[string]string {
+	m := make(map[string]string, 2)
+	m[FieldEN] = r.ENSentence()
+	m[FieldZH] = r.ZHSentence()
+	return m
+}
+
 func (r sentence) ENSentence() string {
-	return r[fieldEN]
+	return r[FieldEN]
 }
 
 func (r sentence) ZHSentence() string {
-	return r[fieldZH]
+	return r[FieldZH]
 }

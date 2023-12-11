@@ -13,6 +13,6 @@ type Item struct {
 	TaskId   string
 	TaskName Sentence
 	Descs    Sentence
-	Date     string
+	Date     int64
 	Points   int
 }

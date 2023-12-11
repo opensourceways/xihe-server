@@ -6,8 +6,7 @@ import (
 )
 
 type Points interface {
-	Save(*domain.UserPoints) error
-	Update(user types.Account, taskid string, version int) error
+	Update(user types.Account, item domain.Item, version int) error
 	Find(types.Account) (domain.UserPoints, error)
 	FindAll() ([]domain.UserPoints, error)
 }

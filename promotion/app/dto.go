@@ -4,6 +4,7 @@ import (
 	common "github.com/opensourceways/xihe-server/common/domain"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/promotion/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 type PointsCmd struct {
@@ -43,7 +44,7 @@ func toPointsDTO(p domain.UserPoints, lang common.Language) PointsDTO {
 			TaskName: p.Items[i].TaskName.Sentence(lang),
 			Descs:    p.Items[i].Descs.Sentence(lang),
 			Points:   p.Items[i].Points,
-			Time:     p.Items[i].Date,
+			Time:     utils.ToDate(p.Items[i].Date),
 		}
 	}
 
