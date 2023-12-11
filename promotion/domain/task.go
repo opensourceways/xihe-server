@@ -9,5 +9,9 @@ type Task struct {
 type Rule struct {
 	Descs     Sentence
 	CreatedAt string
-	Points    int
+	MaxPoints int
+}
+
+func (r *Rule) IsValidPoint(point int) bool {
+	return point <= r.MaxPoints
 }

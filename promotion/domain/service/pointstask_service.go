@@ -1,12 +1,15 @@
 package service
 
 import (
+	"errors"
+
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/promotion/domain"
 	"github.com/opensourceways/xihe-server/promotion/domain/repository"
 )
 
 type PointsTaskService interface {
+	Save(user types.Account, taskid string) error
 	Find(types.Account) (domain.UserPoints, error)
 	GetAllUserPoints() ([]domain.UserPoints, error)
 }
@@ -48,44 +51,79 @@ func (s *pointsTaskService) Find(u types.Account) (up domain.UserPoints, err err
 		return
 	}
 
-	return s.toUserPoints(p), nil
-}
-
-func (s *pointsTaskService) GetAllUserPoints() (ups []domain.UserPoints, err error) {
-	// get all points
-	ps, err := s.pointsRepo.FindAll()
+	flag, err := s.isUserPointInvalid(p)
 	if err != nil {
 		return
 	}
 
-	// generate userpoints
-	ups = make([]domain.UserPoints, len(ps))
-	for i := range ps {
-		ups[i] = s.toUserPoints(ps[i])
+	if flag {
+		err = errors.New("user point invalid, over max allowed")
+
+		return
 	}
 
 	return
 }
 
-func (s *pointsTaskService) toUserPoints(p repository.Point) domain.UserPoints {
-	// generate UserPoints
-	var total int
-	items := make([]domain.Item, len(p.Dones))
-	for i := range p.Dones {
-		task := s.taskMap[p.Dones[i].TaskId]
-		items[i] = domain.Item{
-			Id:       task.Id,
-			TaskName: task.Names,
-			Descs:    task.Rule.Descs,
-			Date:     p.Dones[i].Date,
-			Points:   task.Rule.Points,
+func (s *pointsTaskService) GetAllUserPoints() (ups []domain.UserPoints, err error) {
+	// get all points
+	ups, err = s.pointsRepo.FindAll()
+	if err != nil {
+		return
+	}
+
+	// is point invalid
+	flag, err := s.isUserPointInvalid(ups...)
+	if err != nil {
+		return
+	}
+
+	if flag {
+		err = errors.New("user point invalid, over max allowed")
+
+		return
+	}
+
+	return
+}
+
+func (s *pointsTaskService) isUserPointInvalid(up ...domain.UserPoints) (bool, error) {
+	for i := range up {
+		flag, err := s.isPointOverMaxAllowed(up[i].Items...)
+		if err != nil {
+			return true, err
 		}
 
-		total += task.Rule.Points
+		if flag {
+			return true, nil
+		}
 	}
 
-	return domain.UserPoints{
-		Total: total,
-		Items: items,
+	return false, nil
+}
+
+func (s *pointsTaskService) isPointOverMaxAllowed(item ...domain.Item) (bool, error) {
+	for i := range item {
+		task, ok := s.taskMap[item[i].TaskId]
+		if !ok {
+			return true, errors.New("invalid task id")
+		}
+
+		if !task.Rule.IsValidPoint(item[i].Points) {
+			return true, nil
+		}
 	}
+
+	return false, nil
+}
+
+func (s *pointsTaskService) Save(user types.Account, taskid string) error {
+	// find userpoint version
+	up, err := s.pointsRepo.Find(user)
+	if err != nil {
+		return err
+	}
+
+	// update
+	return s.pointsRepo.Update(user, taskid, up.Version)
 }
