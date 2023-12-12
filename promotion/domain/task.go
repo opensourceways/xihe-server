@@ -14,7 +14,7 @@ type Task struct {
 
 type Rule struct {
 	Descs     Sentence
-	CreatedAt string
+	CreatedAt int64
 	MaxPoints int
 }
 

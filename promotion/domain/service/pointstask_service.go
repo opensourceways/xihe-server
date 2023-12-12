@@ -46,12 +46,12 @@ type pointsTaskService struct {
 
 func (s *pointsTaskService) Find(u types.Account) (up domain.UserPoints, err error) {
 	// get user's points
-	p, err := s.pointsRepo.Find(u)
+	up, err = s.pointsRepo.Find(u)
 	if err != nil {
 		return
 	}
 
-	flag, err := s.isUserPointInvalid(p)
+	flag, err := s.isUserPointInvalid(up)
 	if err != nil {
 		return
 	}

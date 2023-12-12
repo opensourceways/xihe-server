@@ -9,7 +9,7 @@ const (
 )
 
 type taskDO struct {
-	Id    string            `bson:"user"  json:"user"`
+	Id    string            `bson:"id"  json:"id"`
 	Names map[string]string `bson:"names" json:"names"`
 	Rule  ruleDO            `bson:"rule"  json:"rule"`
 }
@@ -35,7 +35,7 @@ func (do *taskDO) toTask() (task domain.Task, err error) {
 
 type ruleDO struct {
 	Descs     map[string]string `bson:"descs"      json:"descs"`
-	CreatedAt string            `bson:"created_at" json:"created_at"`
+	CreatedAt int64             `bson:"created_at" json:"created_at"`
 	MaxPoints int               `bson:"max_points" json:"max_points"`
 }
 
