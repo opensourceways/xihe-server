@@ -68,7 +68,7 @@ type PromotionDTO struct {
 }
 
 func (dto *PromotionDTO) toDTO(p *domain.Promotion, user *types.Account) {
-	dto = &PromotionDTO{
+	*dto = PromotionDTO{
 		Id:         p.Id,
 		Name:       p.Name.PromotionName(),
 		Desc:       p.Desc.PromotionDesc(),
