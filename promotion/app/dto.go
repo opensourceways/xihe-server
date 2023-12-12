@@ -23,7 +23,7 @@ type PointsRankDTO struct {
 }
 
 func (dto *PointsRankDTO) toDTO(up domain.UserPoints) {
-	dto = &PointsRankDTO{
+	*dto = PointsRankDTO{
 		User:  up.User.Account(),
 		Point: up.Total,
 	}

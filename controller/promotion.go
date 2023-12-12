@@ -22,10 +22,11 @@ func AddRouterForPromotionController(
 
 	// promotion
 	rg.POST("/v1/promotion/:id/apply", ctl.Apply)
-	rg.GET("/v1/promotion/:account", ctl.GetUserRegitration)
+	rg.GET("/v1/promotion/user/:account", ctl.GetUserRegitration)
 
 	// user points
 	rg.GET("/v1/promotion/points/:account", ctl.GetUserPoints)
+	rg.GET("/v1/promotion/:promotion/ranking", ctl.GetUserRanking)
 }
 
 type PromotionController struct {
@@ -80,7 +81,7 @@ func (ctl *PromotionController) Apply(ctx *gin.Context) {
 // @Accept			json
 // @Success		201
 // @Failure		500	system_error	system	error
-// @Router			/v1/promotion/:account [get]
+// @Router			/v1/promotion/user/{account} [get]
 func (ctl *PromotionController) GetUserRegitration(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -108,7 +109,7 @@ func (ctl *PromotionController) GetUserRegitration(ctx *gin.Context) {
 // @Accept			json
 // @Success		201
 // @Failure		500	system_error	system	error
-// @Router			/v1/promotion/points/:account [get]
+// @Router			/v1/promotion/points/{account} [get]
 func (ctl *PromotionController) GetUserPoints(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -134,6 +135,21 @@ func (ctl *PromotionController) GetUserPoints(ctx *gin.Context) {
 			Lang: lang,
 		},
 	); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, dto)
+	}
+}
+
+// @Summary		GetUserRanking
+// @Description	get user points ranking in promotion
+// @Tags			Promotion
+// @Accept			json
+// @Success		201
+// @Failure		500	system_error	system	error
+// @Router			/v1/promotion/{promotion}/ranking [get]
+func (ctl *PromotionController) GetUserRanking(ctx *gin.Context) {
+	if dto, err := ctl.ps.GetPointsRank(ctx.Param("promotion")); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, dto)
