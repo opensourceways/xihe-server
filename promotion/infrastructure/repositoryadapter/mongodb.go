@@ -18,9 +18,9 @@ type mongodbClient interface {
 
 	NewDocIfNotExist(ctx context.Context, filterOfDoc, docInfo bson.M) (string, error)
 
-	PushArrayElem(
+	PushElemArrayWithVersion(
 		ctx context.Context, array string,
-		filterOfDoc, value bson.M,
+		filterOfDoc, value bson.M, version int, otherUpdate bson.M,
 	) error
 
 	GetArrayElem(

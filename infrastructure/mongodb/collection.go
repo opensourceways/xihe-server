@@ -70,6 +70,13 @@ func (c collection) PushArrayElem(
 	return cli.pushArrayElem(ctx, c.name, array, filterOfDoc, value)
 }
 
+func (c collection) PushElemArrayWithVersion(
+	ctx context.Context, array string,
+	filterOfDoc, value bson.M, version int, otherUpdate bson.M,
+) error {
+	return cli.pushElemArrayWithVersion(ctx, c.name, array, filterOfDoc, value, version, otherUpdate)
+}
+
 func (c collection) PushElemToLimitedArray(
 	ctx context.Context, array string,
 	keep int, filterOfDoc, value bson.M,

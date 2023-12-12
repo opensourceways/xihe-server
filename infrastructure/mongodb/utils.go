@@ -365,6 +365,38 @@ func (cli *client) pushElemToLimitedArray(
 	return nil
 }
 
+func (cli *client) pushElemArrayWithVersion(
+	ctx context.Context,
+	collection, array string,
+	filterOfDoc, value bson.M, version int, otherUpdate bson.M,
+) error {
+	filterOfDoc[fieldVersion] = version
+
+	updates := bson.M{
+		mongoCmdPush: bson.M{array: bson.M{
+			"$each": bson.A{value},
+		}},
+		mongoCmdInc: bson.M{fieldVersion: 1},
+	}
+
+	if len(otherUpdate) > 0 {
+		updates[mongoCmdSet] = otherUpdate
+	}
+
+	r, err := cli.collection(collection).UpdateOne(
+		ctx, filterOfDoc, updates,
+	)
+	if err != nil {
+		return dbError{err}
+	}
+
+	if r.MatchedCount == 0 {
+		return errDocNotExists
+	}
+
+	return nil
+}
+
 func (cli *client) pushElemToLimitedArrayWithVersion(
 	ctx context.Context,
 	collection, array string, keep int,

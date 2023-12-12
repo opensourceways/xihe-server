@@ -19,7 +19,7 @@ func AddRouterForPromotionController(
 		ps:   ps,
 	}
 
-	rg.POST("v1/promotion/:id/apply", ctl.Apply)
+	rg.POST("/v1/promotion/:id/apply", ctl.Apply)
 }
 
 type PromotionController struct {
@@ -33,7 +33,7 @@ type PromotionController struct {
 // @Description	apply the Promotion
 // @Tags			Promotion
 // @Param			id		path	string						true	"promotion id"
-// @Param			body	body	cc.CompetitorApplyRequest	true	"body of applying"
+// @Param			body	body	pc.PromotionApplyReq	true	"body of applying"
 // @Accept			json
 // @Success		201
 // @Failure		500	system_error	system	error

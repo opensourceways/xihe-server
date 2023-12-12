@@ -47,6 +47,10 @@ import (
 	pointsservice "github.com/opensourceways/xihe-server/points/domain/service"
 	pointsrepo "github.com/opensourceways/xihe-server/points/infrastructure/repositoryadapter"
 	"github.com/opensourceways/xihe-server/points/infrastructure/taskdocimpl"
+	promotionapp "github.com/opensourceways/xihe-server/promotion/app"
+	prmotionservice "github.com/opensourceways/xihe-server/promotion/domain/service"
+	promotionadapter "github.com/opensourceways/xihe-server/promotion/infrastructure/repositoryadapter"
+	promotionuseradapter "github.com/opensourceways/xihe-server/promotion/infrastructure/useradapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
@@ -148,6 +152,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
+	promotionRepo := promotionadapter.PromotionAdapter(mongodb.NewCollection(collections.Promotion))
+	promotionPointRepo := promotionadapter.PointsAdapter(mongodb.NewCollection(collections.PromotionPoint))
+	promotionTaskRepo := promotionadapter.TaskAdapter(mongodb.NewCollection(collections.PromotionTask))
+
 	bigmodel := bigmodels.NewBigModelService()
 	gitlabUser := gitlab.NewUserSerivce()
 	gitlabRepo := gitlab.NewRepoFile()
@@ -233,6 +241,19 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		pointsAppService, controller.EncryptHelperToken(),
 	)
 
+	promotionAppService := promotionapp.NewPromotionService(
+		prmotionservice.NewPromotionUserService(
+			promotionuseradapter.NewUserAdapter(userRegService), promotionRepo),
+		promotionRepo,
+	)
+
+	promotionPointTaskService, err := prmotionservice.NewPointsTaskService(promotionPointRepo, promotionTaskRepo)
+	if err != nil {
+		return err
+	}
+
+	promotionpointsAppService := promotionapp.NewPointsService(promotionPointTaskService)
+
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
@@ -295,6 +316,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForCompetitionController(
 			v1, competitionAppService, userRegService, proj,
+		)
+
+		controller.AddRouterForPromotionController(
+			v1, promotionAppService, promotionpointsAppService,
 		)
 
 		controller.AddRouterForChallengeController(

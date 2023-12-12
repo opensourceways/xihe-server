@@ -77,10 +77,10 @@ func (impl *promotionAdapter) UserRegister(promotionid string, user types.Accoun
 	}
 
 	f := func(ctx context.Context) error {
-		return impl.cli.PushArrayElem(
+		return impl.cli.PushElemArrayWithVersion(
 			ctx, fieldRegUsers,
 			docIdFilter(promotionid),
-			doc,
+			doc, version, nil,
 		)
 	}
 
