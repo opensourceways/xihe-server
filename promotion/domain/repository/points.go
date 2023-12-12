@@ -8,5 +8,5 @@ import (
 type Points interface {
 	Update(user types.Account, item domain.Item, version int) error
 	Find(types.Account) (domain.UserPoints, error)
-	FindAll() ([]domain.UserPoints, error)
+	FindAll(promotionid string) ([]domain.UserPoints, error)
 }

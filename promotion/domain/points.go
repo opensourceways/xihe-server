@@ -3,10 +3,11 @@ package domain
 import types "github.com/opensourceways/xihe-server/domain"
 
 type UserPoints struct {
-	User    types.Account
-	Total   int
-	Items   []Item
-	Version int
+	User        types.Account
+	PromotionId string
+	Total       int
+	Items       []Item
+	Version     int
 }
 
 type Item struct {

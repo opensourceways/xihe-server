@@ -7,16 +7,18 @@ import (
 )
 
 const (
-	fieldUser  = "user"
-	fieldItems = "items"
-	fieldTotal = "total"
+	fieldUser        = "user"
+	fieldItems       = "items"
+	fieldTotal       = "total"
+	fieldPromotionId = "promotion_id"
 )
 
 type pointsDO struct {
-	User    string   `bson:"user"       json:"user"`
-	Total   int      `bson:"total"      json:"total"`
-	Items   []itemDO `bson:"items"      json:"items"`
-	Version int      `bson:"version"    json:"version"`
+	User        string   `bson:"user"           json:"user"`
+	PromotionId string   `bson:"promotion_id"   json:"promotion_id"`
+	Total       int      `bson:"total"          json:"total"`
+	Items       []itemDO `bson:"items"          json:"items"`
+	Version     int      `bson:"version"        json:"version"`
 }
 
 func (do *pointsDO) doc() (bson.M, error) {
@@ -35,6 +37,7 @@ func (do *pointsDO) toUserPoints() (ups domain.UserPoints, err error) {
 		}
 	}
 
+	ups.PromotionId = do.PromotionId
 	ups.Total = do.Total
 	ups.Version = do.Version
 
@@ -43,9 +46,10 @@ func (do *pointsDO) toUserPoints() (ups domain.UserPoints, err error) {
 
 func toPointsDO(ups *domain.UserPoints) pointsDO {
 	do := pointsDO{
-		User:    ups.User.Account(),
-		Total:   ups.Total,
-		Version: ups.Version,
+		User:        ups.User.Account(),
+		PromotionId: ups.PromotionId,
+		Total:       ups.Total,
+		Version:     ups.Version,
 	}
 
 	items := make([]itemDO, len(ups.Items))

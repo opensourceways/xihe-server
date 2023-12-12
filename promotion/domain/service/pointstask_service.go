@@ -11,7 +11,7 @@ import (
 type PointsTaskService interface {
 	Update(user types.Account, taskid string, point int) error
 	Find(types.Account) (domain.UserPoints, error)
-	GetAllUserPoints() ([]domain.UserPoints, error)
+	GetAllUserPoints(promotionid string) ([]domain.UserPoints, error)
 }
 
 func NewPointsTaskService(
@@ -65,9 +65,9 @@ func (s *pointsTaskService) Find(u types.Account) (up domain.UserPoints, err err
 	return
 }
 
-func (s *pointsTaskService) GetAllUserPoints() (ups []domain.UserPoints, err error) {
+func (s *pointsTaskService) GetAllUserPoints(promotionid string) (ups []domain.UserPoints, err error) {
 	// get all points
-	ups, err = s.pointsRepo.FindAll()
+	ups, err = s.pointsRepo.FindAll(promotionid)
 	if err != nil {
 		return
 	}

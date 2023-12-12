@@ -8,7 +8,7 @@ import (
 
 type PointsService interface {
 	GetPoints(*PointsCmd) (PointsDTO, error)
-	GetPointsRank() ([]PointsRankDTO, error)
+	GetPointsRank(promotionid string) ([]PointsRankDTO, error)
 }
 
 func NewPointsService(
@@ -32,9 +32,9 @@ func (s *pointService) GetPoints(cmd *PointsCmd) (dto PointsDTO, err error) {
 	return toPointsDTO(p, cmd.Lang), nil
 }
 
-func (s *pointService) GetPointsRank() (dtos []PointsRankDTO, err error) {
+func (s *pointService) GetPointsRank(promotionid string) (dtos []PointsRankDTO, err error) {
 	// get all userpoints (not ordered)
-	ups, err := s.service.GetAllUserPoints()
+	ups, err := s.service.GetAllUserPoints(promotionid)
 
 	// order uerpoints (desc)
 	sort.Slice(ups, func(i, j int) bool {
