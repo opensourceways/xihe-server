@@ -80,12 +80,12 @@ func (r promotionDuration) PromotionStatus() (string, error) {
 func (r promotionDuration) durationTime() (int64, int64, error) {
 	t := strings.Split(string(r), "-")
 
-	start, err := utils.ToUnixTime(t[0])
+	start, err := utils.ToUnixTimeLayout2(t[0])
 	if err != nil {
 		return 0, 0, err
 	}
 
-	end, err := utils.ToUnixTime(t[1])
+	end, err := utils.ToUnixTimeLayout2(t[1])
 	if err != nil {
 		return 0, 0, err
 	}
