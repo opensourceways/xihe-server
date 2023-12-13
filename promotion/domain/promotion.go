@@ -1,11 +1,15 @@
 package domain
 
-import types "github.com/opensourceways/xihe-server/domain"
+import (
+	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/sirupsen/logrus"
+)
 
 type Promotion struct {
 	Id       string
 	Name     PromotionName
 	Desc     PromotionDesc
+	Poster   string
 	RegUsers []RegUser
 	Duration PromotionDuration
 }
@@ -23,4 +27,14 @@ func (r *Promotion) HasRegister(u types.Account) bool {
 	}
 
 	return false
+}
+
+func (r *Promotion) Status() string {
+	status, err := r.Duration.PromotionStatus()
+	if err != nil {
+		logrus.Warnf("get promotion status error: %s", err.Error())
+		status = promotionStatusPreparing
+	}
+
+	return status
 }

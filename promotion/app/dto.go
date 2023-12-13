@@ -64,6 +64,8 @@ type PromotionDTO struct {
 	Id         string `json:"id"`
 	Name       string `json:"name"`
 	Desc       string `json:"desc"`
+	Poster     string `json:"poster"`
+	Status     string `json:"status"`
 	IsRegister bool   `json:"is_register"`
 	Duration   string `json:"duration"`
 }
@@ -73,6 +75,8 @@ func (dto *PromotionDTO) toDTO(p *domain.Promotion, user *types.Account) {
 		Id:         p.Id,
 		Name:       p.Name.PromotionName(),
 		Desc:       p.Desc.PromotionDesc(),
+		Poster:     p.Poster,
+		Status:     p.Status(),
 		IsRegister: p.HasRegister(*user),
 		Duration:   p.Duration.PromotionDuration(),
 	}

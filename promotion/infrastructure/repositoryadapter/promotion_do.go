@@ -15,6 +15,7 @@ type promotionDO struct {
 	Id       string      `bson:"id"        json:"id"`
 	Name     string      `bson:"name"      json:"name"`
 	Desc     string      `bson:"desc"      json:"desc"`
+	Poster   string      `bson:"poster"    json:"poster"`
 	RegUsers []RegUserDO `bson:"reg_users" json:"reg_users"`
 	Duration string      `bson:"duration"  json:"duration"`
 	Version  int         `bson:"version"   json:"version"`
@@ -43,6 +44,7 @@ func (do *promotionDO) toPromotionRepo() (p repository.PromotionRepo, err error)
 	}
 
 	p.Id = do.Id
+	p.Poster = do.Poster
 	p.Version = do.Version
 
 	return

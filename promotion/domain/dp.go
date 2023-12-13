@@ -2,13 +2,20 @@ package domain
 
 import (
 	"errors"
+	"strings"
+	"time"
 
 	common "github.com/opensourceways/xihe-server/common/domain"
+	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
 	FieldEN = "English"
 	FieldZH = "Chinese"
+
+	promotionStatusOver       = "over"
+	promotionStatusPreparing  = "preparing"
+	promotionStatusInProgress = "in-progress"
 )
 
 // PronotionName
@@ -33,6 +40,7 @@ func (r promotionName) PromotionName() string {
 // PromotionDuration
 type PromotionDuration interface {
 	PromotionDuration() string
+	PromotionStatus() (string, error)
 }
 
 func NewPromotionDuration(v string) (PromotionDuration, error) {
@@ -47,6 +55,42 @@ type promotionDuration string
 
 func (r promotionDuration) PromotionDuration() string {
 	return string(r)
+}
+
+func (r promotionDuration) PromotionStatus() (string, error) {
+	start, end, err := r.durationTime()
+	if err != nil {
+		return "", errors.New("parse duration error")
+	}
+
+	now := time.Now().Unix()
+	if now < start {
+		return promotionStatusPreparing, nil
+	}
+	if now >= start && now <= end {
+		return promotionStatusInProgress, nil
+	}
+	if now > end {
+		return promotionStatusOver, nil
+	}
+
+	return "", errors.New("promotion status internal error")
+}
+
+func (r promotionDuration) durationTime() (int64, int64, error) {
+	t := strings.Split(string(r), "-")
+
+	start, err := utils.ToUnixTime(t[0])
+	if err != nil {
+		return 0, 0, err
+	}
+
+	end, err := utils.ToUnixTime(t[1])
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return start.Unix(), end.Unix(), nil
 }
 
 // PromotionDesc
