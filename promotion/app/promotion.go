@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-
 	types "github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/promotion/domain/repository"
@@ -62,8 +60,6 @@ func (s *promotionService) GetUserRegisterPromotion(user *types.Account) (dtos [
 			if err != nil {
 				return nil, err
 			}
-
-			fmt.Printf("up: %v\n", up)
 
 			// gen promotion dtos
 			dto := PromotionDTO{}

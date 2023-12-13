@@ -1,14 +1,15 @@
 package controller
 
 import (
-	"errors"
-
 	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/user/domain"
-	"github.com/opensourceways/xihe-server/utils"
 )
 
-type UserRegistrationCmd domain.UserRegInfo
+type UserInfoUpdateRequest struct {
+	UserBasicInfoUpdateRequest
+	ApplyRequest
+}
 
 type ApplyRequest struct {
 	Name     string            `json:"name"`
@@ -20,7 +21,7 @@ type ApplyRequest struct {
 	Detail   map[string]string `json:"detail"`
 }
 
-func (req *ApplyRequest) ToCmd(user types.Account) (cmd UserRegistrationCmd, err error) {
+func (req *ApplyRequest) ToCmd(user types.Account) (cmd app.UserRegisterInfoCmd, err error) {
 	if cmd.Name, err = domain.NewName(req.Name); err != nil {
 		return
 	}
@@ -53,21 +54,24 @@ func (req *ApplyRequest) ToCmd(user types.Account) (cmd UserRegistrationCmd, err
 	return
 }
 
-func (cmd *UserRegistrationCmd) Validate() error {
-	b := cmd.Account != nil &&
-		cmd.Name != nil &&
-		cmd.Email != nil &&
-		cmd.Identity != nil
+type UserBasicInfoUpdateRequest struct {
+	AvatarId *string `json:"avatar_id"`
+	Bio      *string `json:"bio"`
+}
 
-	if !b {
-		return errors.New("invalid cmd")
-	}
-
-	for i := range cmd.Detail {
-		if utils.StrLen(cmd.Detail[i]) > 20 {
-			return errors.New("invalid detail")
+func (req *UserBasicInfoUpdateRequest) ToCmd() (
+	cmd app.UpdateUserBasicInfoCmd,
+	err error,
+) {
+	if req.Bio != nil {
+		if cmd.Bio, err = domain.NewBio(*req.Bio); err != nil {
+			return
 		}
 	}
 
-	return nil
+	if req.AvatarId != nil {
+		cmd.AvatarId, err = domain.NewAvatarId(*req.AvatarId)
+	}
+
+	return
 }
