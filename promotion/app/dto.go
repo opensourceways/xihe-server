@@ -67,10 +67,11 @@ type PromotionDTO struct {
 	Poster     string `json:"poster"`
 	Status     string `json:"status"`
 	IsRegister bool   `json:"is_register"`
+	Total      int    `json:"total"`
 	Duration   string `json:"duration"`
 }
 
-func (dto *PromotionDTO) toDTO(p *domain.Promotion, user *types.Account) {
+func (dto *PromotionDTO) toDTO(p *domain.Promotion, user *types.Account, totoal int) {
 	*dto = PromotionDTO{
 		Id:         p.Id,
 		Name:       p.Name.PromotionName(),

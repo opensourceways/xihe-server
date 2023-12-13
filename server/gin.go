@@ -184,6 +184,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		login, messages.NewSignInMessageAdapter(&cfg.SignIn, publisher),
 	)
 
+	promotionPointTaskService, err := prmotionservice.NewPointsTaskService(promotionPointRepo, promotionTaskRepo)
+	if err != nil {
+		return err
+	}
+
 	asyncAppService := asyncapp.NewTaskService(asyncrepoimpl.NewAsyncTaskRepo(&cfg.Postgresql.Async))
 
 	competitionAppService := competitionapp.NewCompetitionService(
@@ -244,13 +249,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	promotionAppService := promotionapp.NewPromotionService(
 		prmotionservice.NewPromotionUserService(
 			promotionuseradapter.NewUserAdapter(userRegService), promotionRepo),
+		promotionPointTaskService,
 		promotionRepo,
 	)
-
-	promotionPointTaskService, err := prmotionservice.NewPointsTaskService(promotionPointRepo, promotionTaskRepo)
-	if err != nil {
-		return err
-	}
 
 	promotionpointsAppService := promotionapp.NewPointsService(promotionPointTaskService)
 

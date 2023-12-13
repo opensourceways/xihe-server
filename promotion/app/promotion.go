@@ -15,17 +15,20 @@ type PromotionService interface {
 
 func NewPromotionService(
 	service service.PromotionUserService,
+	ptservice service.PointsTaskService,
 	repo repository.Promotion,
 ) PromotionService {
 	return &promotionService{
-		service: service,
-		repo:    repo,
+		service:   service,
+		ptservice: ptservice,
+		repo:      repo,
 	}
 }
 
 type promotionService struct {
-	service service.PromotionUserService
-	repo    repository.Promotion
+	service   service.PromotionUserService
+	ptservice service.PointsTaskService
+	repo      repository.Promotion
 }
 
 func (s *promotionService) GetPromotion(cmd *PromotionCmd) (dto PromotionDTO, err error) {
@@ -35,7 +38,13 @@ func (s *promotionService) GetPromotion(cmd *PromotionCmd) (dto PromotionDTO, er
 		return
 	}
 
-	dto.toDTO(&p.Promotion, &cmd.User)
+	// find user point
+	up, err := s.ptservice.Find(cmd.User, cmd.promotionId)
+	if err != nil {
+		return
+	}
+
+	dto.toDTO(&p.Promotion, &cmd.User, up.Total)
 
 	return
 }
@@ -44,11 +53,17 @@ func (s *promotionService) GetUserRegisterPromotion(user *types.Account) (dtos [
 	// find all promotions
 	ps, err := s.repo.FindAll()
 
-	// generate promotion dtos
 	for i := range ps {
 		if ps[i].HasRegister(*user) {
+			// get user points
+			up, err := s.ptservice.Find(*user, ps[i].Id)
+			if err != nil {
+				return nil, err
+			}
+
+			// gen promotion dtos
 			dto := PromotionDTO{}
-			dto.toDTO(&ps[i].Promotion, user)
+			dto.toDTO(&ps[i].Promotion, user, up.Total)
 			dtos = append(dtos, dto)
 		}
 	}
