@@ -25,7 +25,7 @@ func AddRouterForPromotionController(
 	rg.GET("/v1/promotion/user/:account", ctl.GetUserRegitration)
 
 	// user points
-	rg.GET("/v1/promotion/points/:account", ctl.GetUserPoints)
+	rg.GET("/v1/promotion/:promotion/points/:account", ctl.GetUserPoints)
 	rg.GET("/v1/promotion/:promotion/ranking", ctl.GetUserRanking)
 }
 
@@ -109,7 +109,7 @@ func (ctl *PromotionController) GetUserRegitration(ctx *gin.Context) {
 // @Accept			json
 // @Success		201
 // @Failure		500	system_error	system	error
-// @Router			/v1/promotion/points/{account} [get]
+// @Router			/v1/promotion/{promotion}/points/{account} [get]
 func (ctl *PromotionController) GetUserPoints(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -131,8 +131,9 @@ func (ctl *PromotionController) GetUserPoints(ctx *gin.Context) {
 
 	if dto, err := ctl.ps.GetPoints(
 		&app.PointsCmd{
-			User: pl.DomainAccount(),
-			Lang: lang,
+			Promotionid: ctx.Param("promotion"),
+			User:        pl.DomainAccount(),
+			Lang:        lang,
 		},
 	); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

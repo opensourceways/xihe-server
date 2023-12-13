@@ -23,6 +23,15 @@ func (impl *pointsAdapter) docFilter(username string) bson.M {
 	return bson.M{fieldUser: username}
 }
 
+func (impl *pointsAdapter) docFilterOfUserNamePromotionId(
+	username string, promotionid string,
+) bson.M {
+	return bson.M{
+		fieldUser:        username,
+		fieldPromotionId: promotionid,
+	}
+}
+
 func (impl *pointsAdapter) docOfTotal(points int) bson.M {
 	return bson.M{fieldTotal: points}
 }
@@ -31,11 +40,14 @@ func (impl *pointsAdapter) docOfPromotionId(promotionid string) bson.M {
 	return bson.M{fieldPromotionId: promotionid}
 }
 
-func (impl *pointsAdapter) Find(user types.Account) (domain.UserPoints, error) {
+func (impl *pointsAdapter) Find(user types.Account, promotionid string) (domain.UserPoints, error) {
 	var do pointsDO
 
 	f := func(ctx context.Context) error {
-		return impl.cli.GetDoc(ctx, impl.docFilter(user.Account()), nil, &do)
+		return impl.cli.GetDoc(
+			ctx, impl.docFilterOfUserNamePromotionId(user.Account(), promotionid),
+			nil, &do,
+		)
 	}
 
 	if err := withContext(f); err != nil {

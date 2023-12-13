@@ -9,8 +9,8 @@ import (
 )
 
 type PointsTaskService interface {
-	Update(user types.Account, taskid string, point int) error
-	Find(types.Account) (domain.UserPoints, error)
+	Update(user types.Account, promotionid string, taskid string, point int) error
+	Find(user types.Account, promotionid string) (domain.UserPoints, error)
 	GetAllUserPoints(promotionid string) ([]domain.UserPoints, error)
 }
 
@@ -44,9 +44,9 @@ type pointsTaskService struct {
 	taskRepo   repository.Task
 }
 
-func (s *pointsTaskService) Find(u types.Account) (up domain.UserPoints, err error) {
+func (s *pointsTaskService) Find(u types.Account, promotionid string) (up domain.UserPoints, err error) {
 	// get user's points
-	up, err = s.pointsRepo.Find(u)
+	up, err = s.pointsRepo.Find(u, promotionid)
 	if err != nil {
 		return
 	}
@@ -117,9 +117,11 @@ func (s *pointsTaskService) isPointOverMaxAllowed(item ...domain.Item) (bool, er
 	return false, nil
 }
 
-func (s *pointsTaskService) Update(user types.Account, taskid string, point int) error {
+func (s *pointsTaskService) Update(
+	user types.Account, promotionid string, taskid string, point int,
+) error {
 	// find userpoint version
-	up, err := s.pointsRepo.Find(user)
+	up, err := s.pointsRepo.Find(user, promotionid)
 	if err != nil {
 		return err
 	}

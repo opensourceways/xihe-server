@@ -24,7 +24,7 @@ type pointService struct {
 }
 
 func (s *pointService) GetPoints(cmd *PointsCmd) (dto PointsDTO, err error) {
-	p, err := s.service.Find(cmd.User)
+	p, err := s.service.Find(cmd.User, cmd.Promotionid)
 	if err != nil {
 		return
 	}

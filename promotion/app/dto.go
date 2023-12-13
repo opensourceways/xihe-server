@@ -8,8 +8,9 @@ import (
 )
 
 type PointsCmd struct {
-	User types.Account
-	Lang common.Language
+	Promotionid string
+	User        types.Account
+	Lang        common.Language
 }
 
 type PointsDTO struct {
