@@ -722,6 +722,43 @@ func (cli *client) getArraysElem(
 	)
 }
 
+func (cli *client) getArrayElemSlice(
+	ctx context.Context, collection string,
+	filterOfDoc bson.M, array string,
+	sliceCmd interface{}, result interface{},
+) error {
+	var (
+		projection bson.M
+	)
+	col := cli.collection(collection)
+
+	if v, ok := sliceCmd.(int); ok {
+		projection = bson.M{
+			array: bson.M{"$slice": v},
+		}
+	} else if v, ok := sliceCmd.([2]int); ok {
+		projection = bson.M{
+			array: bson.M{"$slice": v},
+		}
+	} else {
+		return errors.New("internal error: sliceCmd assert error")
+	}
+
+	sr := col.FindOne(ctx, filterOfDoc, &options.FindOneOptions{
+		Projection: projection,
+	})
+
+	if err := sr.Decode(result); err != nil {
+		if isErrNoDocuments(err) {
+			return errDocNotExists
+		}
+
+		return err
+	}
+
+	return nil
+}
+
 func (cli *client) getArraysElemsByCustomizedCond(
 	ctx context.Context, collection string,
 	filterOfDoc bson.M, filterOfArrays map[string]func() bson.M,

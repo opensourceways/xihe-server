@@ -44,6 +44,7 @@ func AddRouterForTrainingController(
 		ctl.GetResultDownloadURL,
 	)
 	rg.GET("/v1/train/project/:pid/training/:id", ctl.Get)
+	rg.GET("/v1/train/project/:pid/config", ctl.GetLastTrainingConfig)
 	rg.DELETE("v1/train/project/:pid/training/:id", ctl.Delete)
 }
 
@@ -462,6 +463,33 @@ func (ctl *TrainingController) watchTrainings(ws *websocket.Conn, user domain.Ac
 		}
 
 		sleep()
+	}
+}
+
+// @Summary		GetLastTrainingConfig
+// @Description	get user last preset training config
+// @Tags			Training
+// @Param			pid	path	string	true	"project id"
+// @Accept			json
+// @Success		200	{object}		app.TrainingConfigDTO
+// @Failure		500	system_error	system	error
+// @Router			/v1/train/project/{pid}/config [get]
+func (ctl *TrainingController) GetLastTrainingConfig(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	dto, code, err := ctl.ts.GetLastTrainingConfig(
+		&app.ResourceIndexCmd{
+			Owner: pl.DomainAccount(),
+			Id:    ctx.Param("pid"),
+		},
+	)
+	if err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+	} else {
+		ctx.JSON(http.StatusOK, newResponseData(dto))
 	}
 }
 

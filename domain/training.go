@@ -54,6 +54,7 @@ type ResourceRef struct {
 	Type   ResourceType
 	RepoId string
 	File   InputeFilePath
+	Name   ResourceName
 }
 
 type JobInfo struct {

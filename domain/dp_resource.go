@@ -80,6 +80,20 @@ func (r resourceName) FirstLetterOfName() byte {
 	return string(r)[0]
 }
 
+func NewEmptyResourceName() ResourceName {
+	return emptyResourceName("")
+}
+
+type emptyResourceName string
+
+func (e emptyResourceName) ResourceName() string {
+	return ""
+}
+
+func (e emptyResourceName) FirstLetterOfName() byte {
+	return byte(0)
+}
+
 // ResourceTitle
 type ResourceTitle interface {
 	ResourceTitle() string
