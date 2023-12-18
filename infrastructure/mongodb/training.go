@@ -8,6 +8,10 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 )
 
+const (
+	lastArrayElemIndex int = -1
+)
+
 func NewTrainingMapper(name string) repositories.TrainingMapper {
 	return training{name}
 }
@@ -198,6 +202,33 @@ func (col training) GetTrainingConfig(info *repositories.TrainingIndexDO) (
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
 		col.toTrainingConfigDO(&v[0], &do)
+	}
+
+	return
+}
+
+func (col training) GetLastTrainingConfig(res *repositories.ResourceIndexDO) (
+	do repositories.TrainingConfigDO, err error,
+) {
+	var v *dTraining
+
+	f := func(ctx context.Context) error {
+		return cli.getArrayElemSlice(
+			ctx, col.collectionName,
+			trainingDocFilter(res.Owner, res.Id),
+			fieldItems, lastArrayElemIndex,
+			v,
+		)
+	}
+
+	if err = withContext(f); err != nil {
+		return
+	}
+
+	if v == nil || len(v.Items) == 0 {
+		err = repositories.NewErrorDataNotExists(errDocNotExists)
+	} else {
+		col.toTrainingConfigDO(v, &do)
 	}
 
 	return

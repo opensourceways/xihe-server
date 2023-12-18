@@ -12,6 +12,7 @@ type TrainingMapper interface {
 	Delete(*TrainingIndexDO) error
 	Get(*TrainingIndexDO) (TrainingDetailDO, error)
 	GetTrainingConfig(*TrainingIndexDO) (TrainingConfigDO, error)
+	GetLastTrainingConfig(*ResourceIndexDO) (TrainingConfigDO, error)
 	List(user, projectId string) ([]TrainingSummaryDO, int, error)
 	UpdateJobInfo(*TrainingIndexDO, *TrainingJobInfoDO) error
 	GetJobInfo(*TrainingIndexDO) (TrainingJobInfoDO, error)
@@ -69,6 +70,20 @@ func (impl training) GetTrainingConfig(info *domain.TrainingIndex) (domain.Train
 	do := impl.toTrainingIndexDO(info)
 
 	v, err := impl.mapper.GetTrainingConfig(&do)
+	if err != nil {
+		return domain.TrainingConfig{}, convertError(err)
+	}
+
+	return v.toTrainingConfig()
+}
+
+func (impl training) GetLastTrainingConfig(res *domain.ResourceIndex) (domain.TrainingConfig, error) {
+	do := new(ResourceIndexDO)
+	if err := do.toResourceIndex(res); err != nil {
+		return domain.TrainingConfig{}, err
+	}
+
+	v, err := impl.mapper.GetLastTrainingConfig(do)
 	if err != nil {
 		return domain.TrainingConfig{}, convertError(err)
 	}
