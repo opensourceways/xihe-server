@@ -3,6 +3,7 @@ package app
 import (
 	"sort"
 
+	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/promotion/domain/service"
 )
 
@@ -26,6 +27,10 @@ type pointService struct {
 func (s *pointService) GetPoints(cmd *PointsCmd) (dto PointsDTO, err error) {
 	p, err := s.service.Find(cmd.User, cmd.Promotionid)
 	if err != nil {
+		if repoerr.IsErrorResourceNotExists(err) {
+			return PointsDTO{}, nil
+		}
+
 		return
 	}
 
@@ -35,6 +40,13 @@ func (s *pointService) GetPoints(cmd *PointsCmd) (dto PointsDTO, err error) {
 func (s *pointService) GetPointsRank(promotionid string) (dtos []PointsRankDTO, err error) {
 	// get all userpoints (not ordered)
 	ups, err := s.service.GetAllUserPoints(promotionid)
+	if err != nil {
+		if repoerr.IsErrorResourceNotExists(err) {
+			return dtos, nil
+		}
+
+		return
+	}
 
 	// order uerpoints (desc)
 	sort.Slice(ups, func(i, j int) bool {

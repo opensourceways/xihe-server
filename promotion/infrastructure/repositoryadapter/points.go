@@ -69,6 +69,10 @@ func (impl *pointsAdapter) FindAll(promotionid string) (ups []domain.UserPoints,
 	}
 
 	if err := withContext(f); err != nil || len(dos) == 0 {
+		if impl.cli.IsDocNotExists(err) {
+			err = repoerr.NewErrorResourceNotExists(err)
+		}
+
 		return nil, err
 	}
 
