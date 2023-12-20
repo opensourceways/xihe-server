@@ -95,8 +95,8 @@ func (ctl *PromotionController) GetUserRegitration(ctx *gin.Context) {
 	}
 
 	u := pl.DomainAccount()
-	if dto, err := ctl.pros.GetUserRegisterPromotion(&u); err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	if dto, code, err := ctl.pros.GetUserRegisterPromotion(&u); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfGet(ctx, dto)
 	}

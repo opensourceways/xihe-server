@@ -9,7 +9,7 @@ import (
 
 type PromotionService interface {
 	GetPromotion(*PromotionCmd) (PromotionDTO, error)
-	GetUserRegisterPromotion(*types.Account) ([]PromotionDTO, error)
+	GetUserRegisterPromotion(*types.Account) ([]PromotionDTO, string, error)
 	UserRegister(*UserRegistrationCmd) (code string, err error)
 }
 
@@ -49,21 +49,35 @@ func (s *promotionService) GetPromotion(cmd *PromotionCmd) (dto PromotionDTO, er
 	return
 }
 
-func (s *promotionService) GetUserRegisterPromotion(user *types.Account) (dtos []PromotionDTO, err error) {
+func (s *promotionService) GetUserRegisterPromotion(user *types.Account) (
+	dtos []PromotionDTO, code string, err error,
+) {
 	// find all promotions
 	ps, err := s.repo.FindAll()
+	if err != nil {
+		if repoerr.IsErrorResourceNotExists(err) {
+			code = errorUserRegistrationExists
+		}
+
+		return
+	}
 
 	for i := range ps {
 		if ps[i].HasRegister(*user) {
-			// get user points
+			// get total of user points
+			var total int
 			up, err := s.ptservice.Find(*user, ps[i].Id)
 			if err != nil {
-				return nil, err
+				if !repoerr.IsErrorResourceNotExists(err) {
+					return nil, "", err
+				}
+			} else {
+				total = up.Total
 			}
 
 			// gen promotion dtos
 			dto := PromotionDTO{}
-			dto.toDTO(&ps[i].Promotion, user, up.Total)
+			dto.toDTO(&ps[i].Promotion, user, total)
 			dtos = append(dtos, dto)
 		}
 	}
