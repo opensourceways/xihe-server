@@ -112,25 +112,6 @@ func (r promotionDesc) PromotionDesc() string {
 	return string(r)
 }
 
-// // Dones
-// type Dones interface {
-// 	Dones() []string
-// }
-
-// func NewDones(d []string) (Dones, error) {
-// 	if len(d) <= 0 {
-// 		return nil, errors.New("invalid dones input")
-// 	}
-
-// 	return dones(d), nil
-// }
-
-// func (r dones) Dones() []string {
-// 	return r
-// }
-
-// type dones []string
-
 // Sentence
 type Sentence interface {
 	Sentence(common.Language) string
