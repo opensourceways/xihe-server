@@ -460,7 +460,7 @@ func (ctl baseController) checkCSRFTokenForWebSocket(
 }
 
 func (ctl baseController) getRemoteAddr(ctx *gin.Context) (string, error) {
-	ips := ctx.Request.Header.Get("x-forwarded-for")
+	ips := ctx.ClientIP()
 
 	for _, item := range strings.Split(ips, ", ") {
 		if net.ParseIP(item) != nil {

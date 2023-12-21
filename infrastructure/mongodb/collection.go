@@ -70,6 +70,13 @@ func (c collection) PushArrayElem(
 	return cli.pushArrayElem(ctx, c.name, array, filterOfDoc, value)
 }
 
+func (c collection) PushElemArrayWithVersion(
+	ctx context.Context, array string,
+	filterOfDoc, value bson.M, version int, otherUpdate bson.M,
+) error {
+	return cli.pushElemArrayWithVersion(ctx, c.name, array, filterOfDoc, value, version, otherUpdate)
+}
+
 func (c collection) PushElemToLimitedArray(
 	ctx context.Context, array string,
 	keep int, filterOfDoc, value bson.M,
@@ -95,6 +102,17 @@ func (c collection) PushNestedArrayElemAndUpdate(
 	return cli.pushNestedArrayElemAndUpdate(
 		ctx, c.name, array, filterOfDoc, filterOfArray, data,
 		version, otherUpdate,
+	)
+}
+
+func (c collection) PushArrayElemAndInc(
+	ctx context.Context,
+	array string, filterOfDoc, value, updateCmd bson.M,
+	version int,
+) error {
+	return cli.pushArrayElemAndInc(
+		ctx, c.name, array, filterOfDoc,
+		value, updateCmd, version,
 	)
 }
 

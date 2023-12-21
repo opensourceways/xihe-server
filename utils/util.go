@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	layout     = "2006-01-02"
-	timeLayout = "2006-01-02 15:04:05"
+	layout        = "2006-01-02"
+	layoutSimple2 = "2006.01.02"
+	timeLayout    = "2006-01-02 15:04:05"
 )
 
 func LoadFromYaml(path string, cfg interface{}) error {
@@ -52,7 +53,15 @@ func DateAndTime(n int64) (string, string) {
 }
 
 func ToUnixTime(v string) (time.Time, error) {
-	t, err := time.Parse(layout, v)
+	return toUnixTime(v, layout)
+}
+
+func ToUnixTimeLayout2(v string) (time.Time, error) {
+	return toUnixTime(v, layoutSimple2)
+}
+
+func toUnixTime(v, layouts string) (time.Time, error) {
+	t, err := time.Parse(layouts, v)
 	if err != nil {
 		return time.Time{}, err
 	}

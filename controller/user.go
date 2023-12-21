@@ -11,6 +11,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	userctl "github.com/opensourceways/xihe-server/user/controller"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
@@ -35,7 +36,6 @@ func AddRouterForUserController(
 		register: register,
 	}
 
-	rg.PUT("/v1/user", ctl.Update)
 	rg.PUT("/v1/user/agreement", ctl.UpdateAgreement)
 	rg.GET("/v1/user", ctl.Get)
 
@@ -53,7 +53,9 @@ func AddRouterForUserController(
 	rg.POST("/v1/user/email/sendbind", ctl.SendBindEmail)
 	rg.POST("/v1/user/email/bind", ctl.BindEmail)
 
+	// userinfo
 	rg.GET("/v1/user/info/:account", ctl.GetInfo)
+	rg.PUT("/v1/user/info", ctl.UpdateUserRegistrationInfo)
 }
 
 type UserController struct {
@@ -64,50 +66,6 @@ type UserController struct {
 	s        userapp.UserService
 	email    userapp.EmailService
 	register userapp.RegService
-}
-
-// @Summary		Update
-// @Description	update user basic info
-// @Tags			User
-// @Param			body	body	userBasicInfoUpdateRequest	true	"body of updating user"
-// @Accept			json
-// @Produce		json
-// @Router			/v1/user [put]
-func (ctl *UserController) Update(ctx *gin.Context) {
-	m := userBasicInfoUpdateRequest{}
-
-	if err := ctx.ShouldBindJSON(&m); err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorBadRequestBody,
-			"can't fetch request body",
-		))
-
-		return
-	}
-
-	cmd, err := m.toCmd()
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
-			errorBadRequestParam, err,
-		))
-
-		return
-	}
-
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
-	if !ok {
-		return
-	}
-
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user basic info")
-
-	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd); err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseError(err))
-
-		return
-	}
-
-	ctx.JSON(http.StatusAccepted, newResponseData(m))
 }
 
 // @Summary		Update Agreement
@@ -514,4 +472,59 @@ func (ctl *UserController) GetInfo(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, newResponseData(v))
+}
+
+// @Summary		UpdateUserRegistrationInfo
+// @Description	update user info
+// @Tags			User
+// @Param			body	body	userctl.UserInfoUpdateRequest	true	"body of update user infomation"
+// @Accept			json
+// @Success		201	{object}			UserBasicInfoUpdateRequest
+// @Failure		400	bad_request_body	can't	parse		request	body
+// @Failure		400	bad_request_param	some	parameter	of		body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/user/info [put]
+func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
+	req := userctl.UserInfoUpdateRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, respBadRequestBody)
+
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	// update registration info
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user registration info")
+
+	cmd, err := req.ApplyRequest.ToCmd(pl.DomainAccount())
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
+
+		return
+	}
+
+	if err := ctl.register.UpsertUserRegInfo(&cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseData(err))
+	}
+
+	// update base info
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user basic info")
+
+	cmd2, err := req.UserBasicInfoUpdateRequest.ToCmd()
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseData(err))
+
+		return
+	}
+	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd2); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseError(err))
+
+		return
+	}
+
+	ctx.JSON(http.StatusAccepted, newResponseData(req))
 }

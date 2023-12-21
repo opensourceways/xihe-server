@@ -344,7 +344,7 @@ func (ctl *RepoFileController) DownloadRepo(ctx *gin.Context) {
 // @Failure		500	system_error		system	error
 // @Router			/v1/repo/{type}/{user}/{name}/file/{path}/preview [get]
 func (ctl *RepoFileController) Preview(ctx *gin.Context) {
-	_, u, repoInfo, ok := ctl.checkForView(ctx)
+	_, u, repoInfo, ok := ctl.checkForPreview(ctx)
 	if !ok {
 		return
 	}
@@ -388,7 +388,7 @@ func (ctl *RepoFileController) Preview(ctx *gin.Context) {
 // @Failure		500	system_error		system	error
 // @Router			/v1/repo/{type}/{user}/{name}/readme [get]
 func (ctl *RepoFileController) ContainReadme(ctx *gin.Context) {
-	_, u, repoInfo, ok := ctl.checkForView(ctx)
+	_, u, repoInfo, ok := ctl.checkForPreview(ctx)
 	if !ok {
 		return
 	}
@@ -437,7 +437,7 @@ func (ctl *RepoFileController) ContainReadme(ctx *gin.Context) {
 // @Failure		500	system_error		system	error
 // @Router			/v1/repo/{type}/{user}/{name}/app [get]
 func (ctl *RepoFileController) ContainApp(ctx *gin.Context) {
-	_, u, repoInfo, ok := ctl.checkForView(ctx)
+	_, u, repoInfo, ok := ctl.checkForPreview(ctx)
 	if !ok {
 		return
 	}
@@ -517,6 +517,54 @@ func (ctl *RepoFileController) List(ctx *gin.Context) {
 }
 
 func (ctl *RepoFileController) checkForView(ctx *gin.Context) (
+	pl *oldUserTokenPayload,
+	u platform.UserInfo,
+	repoInfo resourceSummary, ok bool,
+) {
+	user, err := domain.NewAccount(ctx.Param("user"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	pl, visitor, b := ctl.checkUserApiToken(ctx, true)
+	if !b {
+		return
+	}
+
+	repoInfo, err = ctl.getRepoInfo(ctx, user)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+
+	viewOther := visitor || pl.isNotMe(user)
+
+	if viewOther && !repoInfo.IsPublic() {
+		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
+			errorResourceNotExists,
+			"can't access other people's private/online project",
+		))
+
+		return
+	}
+
+	if viewOther {
+		u.User = user
+	} else {
+		u = pl.PlatformUserInfo()
+	}
+
+	ok = true
+
+	return
+}
+
+func (ctl *RepoFileController) checkForPreview(ctx *gin.Context) (
 	pl *oldUserTokenPayload,
 	u platform.UserInfo,
 	repoInfo resourceSummary, ok bool,
