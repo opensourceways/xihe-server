@@ -176,6 +176,9 @@ type MongodbCollections struct {
 	ApiInfo           string `json:"api_info"               required:"true"`
 	PointsTask        string `json:"points_task"            required:"true"`
 	UserPoints        string `json:"user_points"            required:"true"`
+	Promotion         string `json:"promotion"              required:"true"`
+	PromotionPoint    string `json:"promotion_point"        required:"true"`
+	PromotionTask     string `json:"promotion_task"         required:"true"`
 }
 
 func (cfg *Config) InitDomainConfig() {

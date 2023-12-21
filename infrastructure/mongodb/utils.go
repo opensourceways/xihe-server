@@ -301,6 +301,47 @@ func (cli *client) pushArrayElem(
 	return nil
 }
 
+func (cli *client) pushArrayElemAndInc(
+	ctx context.Context,
+	collection, array string,
+	filterofDoc, value bson.M,
+	updateCmd bson.M, version int,
+) error {
+	return cli.pushArrayElemAndModify(
+		ctx, collection, array,
+		filterofDoc, value,
+		mongoCmdInc, updateCmd,
+		version,
+	)
+}
+
+func (cli *client) pushArrayElemAndModify(
+	ctx context.Context,
+	collection, array string,
+	filterOfDoc, value bson.M,
+	op string, updateCmd bson.M,
+	version int,
+) error {
+	filterOfDoc[fieldVersion] = version
+
+	r, err := cli.collection(collection).UpdateOne(
+		ctx, filterOfDoc,
+		bson.M{
+			mongoCmdPush: bson.M{array: value},
+			op:           updateCmd,
+		},
+	)
+	if err != nil {
+		return dbError{err}
+	}
+
+	if r.MatchedCount == 0 {
+		return errDocExists
+	}
+
+	return nil
+}
+
 func (cli *client) pushElemToLimitedArray(
 	ctx context.Context,
 	collection, array string, keep int,
@@ -312,6 +353,38 @@ func (cli *client) pushElemToLimitedArray(
 			"$each":  bson.A{value},
 			"$slice": keep,
 		}}},
+	)
+	if err != nil {
+		return dbError{err}
+	}
+
+	if r.MatchedCount == 0 {
+		return errDocNotExists
+	}
+
+	return nil
+}
+
+func (cli *client) pushElemArrayWithVersion(
+	ctx context.Context,
+	collection, array string,
+	filterOfDoc, value bson.M, version int, otherUpdate bson.M,
+) error {
+	filterOfDoc[fieldVersion] = version
+
+	updates := bson.M{
+		mongoCmdPush: bson.M{array: bson.M{
+			"$each": bson.A{value},
+		}},
+		mongoCmdInc: bson.M{fieldVersion: 1},
+	}
+
+	if len(otherUpdate) > 0 {
+		updates[mongoCmdSet] = otherUpdate
+	}
+
+	r, err := cli.collection(collection).UpdateOne(
+		ctx, filterOfDoc, updates,
 	)
 	if err != nil {
 		return dbError{err}
