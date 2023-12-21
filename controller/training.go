@@ -44,7 +44,7 @@ func AddRouterForTrainingController(
 		ctl.GetResultDownloadURL,
 	)
 	rg.GET("/v1/train/project/:pid/training/:id", ctl.Get)
-	// rg.GET("/v1/train/project/:pid/training")
+	rg.GET("/v1/train/project/:pid/last_training_config", ctl.GetLastTrainingConfig)
 	rg.DELETE("v1/train/project/:pid/training/:id", ctl.Delete)
 }
 

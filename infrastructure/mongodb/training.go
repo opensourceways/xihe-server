@@ -210,7 +210,7 @@ func (col training) GetTrainingConfig(info *repositories.TrainingIndexDO) (
 func (col training) GetLastTrainingConfig(res *repositories.ResourceIndexDO) (
 	do repositories.TrainingConfigDO, err error,
 ) {
-	var v *dTraining
+	v := new(dTraining)
 
 	f := func(ctx context.Context) error {
 		return cli.getArrayElemSlice(
@@ -221,11 +221,9 @@ func (col training) GetLastTrainingConfig(res *repositories.ResourceIndexDO) (
 		)
 	}
 
-	if err = withContext(f); err != nil {
-		return
-	}
+	withContext(f)
 
-	if v == nil || len(v.Items) == 0 {
+	if len(v.Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
 		col.toTrainingConfigDO(v, &do)
