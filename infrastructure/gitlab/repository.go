@@ -139,7 +139,8 @@ func (r *repository) Update(repoId string, repo *platform.RepoOption) error {
 		switch repo.RepoType.RepoType() {
 		case domain.RepoTypePrivate:
 			v = sdk.PrivateVisibility
-
+		case domain.RepoTypeOnline:
+			v = sdk.PrivateVisibility
 		default:
 			v = sdk.PublicVisibility
 		}
