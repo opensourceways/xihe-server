@@ -12,6 +12,7 @@ require (
 	github.com/opensourceways/community-robot-lib v0.0.0-20231106030104-fefc5fa67771
 	github.com/opensourceways/kafka-lib v0.0.0-20231114071554-b2af9944cf3a
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
+	github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231024113108-b0494248de50
 	github.com/opensourceways/xihe-extra-services v0.0.0-20231215030123-df06ee77c3d1
 	github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37

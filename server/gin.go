@@ -13,6 +13,10 @@ import (
 
 	asyncapp "github.com/opensourceways/xihe-extra-services/async-server/app"
 	asyncrepoimpl "github.com/opensourceways/xihe-extra-services/async-server/infrastructure/repositoryimpl"
+	aiccapp "github.com/opensourceways/xihe-server/aiccfinetune/app"
+	aiccimpl "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/aiccfinetuneimpl"
+	aiccmsg "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/messageadapter"
+	aiccrepo "github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/app"
 	bigmodelapp "github.com/opensourceways/xihe-server/bigmodel/app"
 	bigmodelasynccli "github.com/opensourceways/xihe-server/bigmodel/infrastructure/asynccli"
@@ -168,8 +172,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	repoAdapter := messages.NewDownloadMessageAdapter(cfg.MQTopics.Download, &cfg.Download, publisher, operater)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
+	aiccUploader := aiccimpl.NewAICCUploadService()
 	challengeHelper := challengeimpl.NewChallenge(&cfg.Challenge)
 	likeAdapter := messages.NewLikeMessageAdapter(cfg.MQTopics.Like, &cfg.Like, publisher)
+
+	aiccFinetune := aiccimpl.NewAICCFinetune(&cfg.AICCFinetune.Config)
 
 	// sender
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
@@ -255,6 +262,14 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		promotionRepo,
 	)
 
+	aiccAppService := aiccapp.NewAICCFinetuneService(
+		aiccFinetune,
+		aiccmsg.NewMessageAdapter(&cfg.AICCFinetune.Message, publisher),
+		aiccUploader,
+		aiccrepo.NewAICCFinetuneRepo(mongodb.NewCollection(collections.AICCFinetune)),
+		5,
+	)
+
 	promotionpointsAppService := promotionapp.NewPointsService(promotionPointTaskService)
 
 	{
@@ -288,6 +303,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForActivityController(
 			v1, activity, user, proj, model, dataset,
+		)
+
+		controller.AddRouterForAICCFinetuneController(
+			v1, aiccAppService, promotionAppService,
 		)
 
 		controller.AddRouterForTagsController(

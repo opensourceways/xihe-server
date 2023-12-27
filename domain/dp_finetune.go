@@ -22,7 +22,7 @@ func NewFinetuneName(v string) (FinetuneName, error) {
 		return nil, fmt.Errorf("name's length should be between %d to %d", min, max)
 	}
 
-	if !reName.MatchString(v) {
+	if !ReName.MatchString(v) {
 		return nil, errors.New("invalid name")
 	}
 

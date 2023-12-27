@@ -5,6 +5,7 @@ import (
 
 	asyncrepoimpl "github.com/opensourceways/xihe-extra-services/async-server/infrastructure/repositoryimpl"
 	agreement "github.com/opensourceways/xihe-server/agreement/app"
+	aiccconfig "github.com/opensourceways/xihe-server/aiccfinetune/config"
 	"github.com/opensourceways/xihe-server/app"
 	bigmodel "github.com/opensourceways/xihe-server/bigmodel/config"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
@@ -40,29 +41,30 @@ type Config struct {
 	ActivityKeepNum   int `json:"activity_keep_num"`
 	ReadHeaderTimeout int `json:"read_header_timeout"`
 
-	Competition competition.Config              `json:"competition"  required:"true"`
-	Challenge   challengeimpl.Config            `json:"challenge"    required:"true"`
-	Training    trainingConfig                  `json:"training"     required:"true"`
-	Finetune    finetuneimpl.Config             `json:"finetune"     required:"true"`
-	BigModel    bigmodel.Config                 `json:"bigmodel"     required:"true"`
-	Authing     authingimpl.Config              `json:"authing"      required:"true"`
-	Mongodb     Mongodb                         `json:"mongodb"      required:"true"`
-	Postgresql  PostgresqlConfig                `json:"postgresql"   required:"true"`
-	Redis       Redis                           `json:"redis"        required:"true"`
-	Gitlab      gitlab.Config                   `json:"gitlab"       required:"true"`
-	Domain      domain.Config                   `json:"domain"       required:"true"`
-	App         app.Config                      `json:"app"          required:"true"`
-	API         controller.APIConfig            `json:"api"          required:"true"`
-	MQ          kafka.Config                    `json:"mq"           required:"true"`
-	MQTopics    messages.Topics                 `json:"mq_topics"    required:"true"`
-	SignIn      messages.SignInConfig           `json:"sign_in"      required:"true"`
-	Points      pointsConfig                    `json:"points"`
-	Course      course.Config                   `json:"course"       required:"true"`
-	Resource    messages.ResourceConfig         `json:"resource"     required:"true"`
-	Download    messages.DownloadProducerConfig `json:"download"     required:"true"`
-	User        userConfig                      `json:"user"`
-	Like        messages.LikeConfig             `json:"like"`
-	Agreement   agreement.Config                `json:"agreement"`
+	Competition  competition.Config              `json:"competition"  required:"true"`
+	Challenge    challengeimpl.Config            `json:"challenge"    required:"true"`
+	Training     trainingConfig                  `json:"training"     required:"true"`
+	Finetune     finetuneimpl.Config             `json:"finetune"     required:"true"`
+	BigModel     bigmodel.Config                 `json:"bigmodel"     required:"true"`
+	Authing      authingimpl.Config              `json:"authing"      required:"true"`
+	Mongodb      Mongodb                         `json:"mongodb"      required:"true"`
+	Postgresql   PostgresqlConfig                `json:"postgresql"   required:"true"`
+	Redis        Redis                           `json:"redis"        required:"true"`
+	Gitlab       gitlab.Config                   `json:"gitlab"       required:"true"`
+	Domain       domain.Config                   `json:"domain"       required:"true"`
+	App          app.Config                      `json:"app"          required:"true"`
+	API          controller.APIConfig            `json:"api"          required:"true"`
+	MQ           kafka.Config                    `json:"mq"           required:"true"`
+	MQTopics     messages.Topics                 `json:"mq_topics"    required:"true"`
+	SignIn       messages.SignInConfig           `json:"sign_in"      required:"true"`
+	Points       pointsConfig                    `json:"points"`
+	Course       course.Config                   `json:"course"       required:"true"`
+	Resource     messages.ResourceConfig         `json:"resource"     required:"true"`
+	Download     messages.DownloadProducerConfig `json:"download"     required:"true"`
+	User         userConfig                      `json:"user"`
+	Like         messages.LikeConfig             `json:"like"`
+	Agreement    agreement.Config                `json:"agreement"`
+	AICCFinetune aiccconfig.Config               `json:"aicc_finetune"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -100,6 +102,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.Resource,
 		&cfg.User,
 		&cfg.Like,
+		&cfg.AICCFinetune,
 		&cfg.Agreement,
 	}
 }
@@ -179,6 +182,7 @@ type MongodbCollections struct {
 	Promotion         string `json:"promotion"              required:"true"`
 	PromotionPoint    string `json:"promotion_point"        required:"true"`
 	PromotionTask     string `json:"promotion_task"         required:"true"`
+	AICCFinetune      string `json:"aicc_finetune"          required:"true"`
 }
 
 func (cfg *Config) InitDomainConfig() {

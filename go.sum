@@ -1054,6 +1054,8 @@ github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0 h1:x5UpMj
 github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0/go.mod h1:KeuoqWTYtmtDy4tHYkHt2xDSPtOi1WXR1uL8EwTTG6g=
 github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c h1:atmkPztYx7LFXhwnjrQ6IvgZXmzqFREYzpYA4qfsG9I=
 github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c/go.mod h1:1iVJ+C3L9e0GJMUhGfbegH4CecnALntzfTW29GzBGUk=
+github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231024113108-b0494248de50 h1:E2LFs3dtY1xp9wMXTTRI3RQUqc/glzrY/J2E0UGSdR4=
+github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231024113108-b0494248de50/go.mod h1:VNb794wb2GLiESTlteb13VINMIhTl8NGMI5a0E5+IDg=
 github.com/opensourceways/xihe-extra-services v0.0.0-20231215030123-df06ee77c3d1 h1:Cq1xUhUdrT+2oSEO/XT72aaBRmxBoW/jRofFzE5WU4M=
 github.com/opensourceways/xihe-extra-services v0.0.0-20231215030123-df06ee77c3d1/go.mod h1:kyKZx4SVK5m8kIw/hx3hwxigQziU+p7CxFxZZLl3Id4=
 github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43 h1:9u9AcfJeR2zvnjiJXrShL83LtEBhqD3GK7o45eVZ0o0=
