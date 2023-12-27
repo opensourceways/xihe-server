@@ -71,4 +71,7 @@ const (
 	ErrorFinetuneExccedMaxNum     = "finetune_excced_max_num"
 	ErrorFinetuneNoPermission     = "finetune_no_permission"
 	ErrorFinetuneRunningJobExists = "finetune_running_job_exists"
+
+	ErrorAICCFinetuneNoLog    = "aicc_finetune_no_log"
+	ErrorAICCFinetuneNotFound = "aicc_finetune_not_found"
 )

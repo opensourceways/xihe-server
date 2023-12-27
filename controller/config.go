@@ -73,6 +73,7 @@ type APIConfig struct {
 	MinSurvivalTimeOfInference     int    `json:"min_survival_time_of_inference"`
 	MaxTagsNumToSearchResource     int    `json:"max_tags_num_to_search_resource"`
 	MaxTagKindsNumToSearchResource int    `json:"max_tag_kinds_num_to_search_resource"`
+	MaxFinetuneSubmmitFileSzie     int64  `json:"max_finetune_submmit_file_size"`
 }
 
 func (cfg *APIConfig) SetDefault() {
@@ -106,6 +107,10 @@ func (cfg *APIConfig) SetDefault() {
 
 	if cfg.MaxCompetitionSubmmitFileSzie <= 0 {
 		cfg.MaxCompetitionSubmmitFileSzie = 10 * 1024 * 1024
+	}
+
+	if cfg.MaxFinetuneSubmmitFileSzie <= 0 {
+		cfg.MaxFinetuneSubmmitFileSzie = 50 * 1024 * 1024
 	}
 }
 
