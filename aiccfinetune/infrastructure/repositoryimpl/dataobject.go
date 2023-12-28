@@ -79,24 +79,7 @@ func (doc dAICCFinetune) toAICCFinetuneDO(f *domain.AICCFinetune) (err error) {
 
 	f.CreatedAt = doc.Items[0].CreatedAt
 
-	return
-}
-
-func (doc aiccFinetuneItem) toAICCFinetuneConfig() (s domain.AICCFinetuneConfig, err error) {
-
-	if s.Name, err = domain.NewFinetuneName(doc.Name); err != nil {
-		return
-	}
-
-	if s.Desc, err = domain.NewFinetuneDesc(doc.Desc); err != nil {
-		return
-	}
-
-	if s.Hyperparameters, err = toKeyValues(doc.Hyperparameters); err != nil {
-		return
-	}
-
-	if s.Env, err = toKeyValues(doc.Env); err != nil {
+	if f.Hyperparameters, err = toKeyValues(doc.Items[0].Hyperparameters); err != nil {
 		return
 	}
 
