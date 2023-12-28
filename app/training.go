@@ -27,6 +27,7 @@ type TrainingService interface {
 	UpdateJobDetail(*TrainingIndex, *JobDetail) error
 	List(user domain.Account, projectId string) ([]TrainingSummaryDTO, error)
 	Get(*TrainingIndex) (TrainingDTO, string, error)
+	GetLastTrainingConfig(*ResourceIndexCmd) (dto TrainingConfigDTO, code string, err error)
 	Delete(*TrainingIndex) error
 	Terminate(*TrainingIndex) error
 	GetLogDownloadURL(*TrainingIndex) (string, string, error)
@@ -170,6 +171,22 @@ func (s trainingService) Get(info *TrainingIndex) (dto TrainingDTO, code string,
 	}
 
 	s.toTrainingDTO(&dto, &data, link)
+
+	return
+}
+
+func (s trainingService) GetLastTrainingConfig(cmd *ResourceIndexCmd) (dto TrainingConfigDTO, code string, err error) {
+	resourceIndex := domain.ResourceIndex(*cmd)
+	data, err := s.repo.GetLastTrainingConfig(&resourceIndex)
+	if err != nil {
+		if repository.IsErrorResourceNotExists(err) {
+			code = ErrorTrainNotFound
+		}
+
+		return
+	}
+
+	dto.toDTO(&data)
 
 	return
 }

@@ -11,6 +11,7 @@ type Training interface {
 	List(user domain.Account, projectId string) ([]domain.TrainingSummary, int, error)
 
 	GetTrainingConfig(*domain.TrainingIndex) (domain.TrainingConfig, error)
+	GetLastTrainingConfig(*domain.ResourceIndex) (domain.TrainingConfig, error)
 
 	SaveJob(*domain.TrainingIndex, *domain.JobInfo) error
 	GetJob(*domain.TrainingIndex) (domain.JobInfo, error)
