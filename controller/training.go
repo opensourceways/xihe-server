@@ -471,9 +471,9 @@ func (ctl *TrainingController) watchTrainings(ws *websocket.Conn, user domain.Ac
 // @Tags			Training
 // @Param			pid	path	string	true	"project id"
 // @Accept			json
-// @Success		200	{object}		trainingDetail
+// @Success		200	{object}		app.TrainingConfigDTO
 // @Failure		500	system_error	system	error
-// @Router			/v1/train/project/{pid}/training [get]
+// @Router			/v1/train/project/{pid}/config [get]
 func (ctl *TrainingController) GetLastTrainingConfig(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {

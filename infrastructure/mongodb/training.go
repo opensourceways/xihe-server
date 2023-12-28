@@ -221,13 +221,15 @@ func (col training) GetLastTrainingConfig(res *repositories.ResourceIndexDO) (
 		)
 	}
 
-	withContext(f)
+	_ = withContext(f)
 
 	if len(v.Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
-	} else {
-		col.toTrainingConfigDO(v, &do)
+
+		return
 	}
+
+	col.toTrainingConfigDO(v, &do)
 
 	return
 }
