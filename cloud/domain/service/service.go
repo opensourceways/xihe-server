@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/opensourceways/xihe-server/cloud/domain"
+	"github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
@@ -9,13 +10,16 @@ import (
 
 type CloudService struct {
 	podRepo repository.Pod
+	sender  message.CloudMessageProducer
 }
 
 func NewCloudService(
 	pod repository.Pod,
+	sender message.CloudMessageProducer,
 ) CloudService {
 	return CloudService{
 		pod,
+		sender,
 	}
 }
 
@@ -48,6 +52,46 @@ func (r *CloudService) ToCloud(c *domain.Cloud) (err error) {
 	}
 
 	return r.caculateRemain(c, &plist)
+}
+
+func (r *CloudService) SubscribeCloud(
+	c *domain.CloudConf, u types.Account,
+) (err error) {
+	// save into repo
+	p := new(domain.PodInfo)
+	if err := p.SetStartingPodInfo(c.Id, u); err != nil {
+		return err
+	}
+
+	var pid string
+	if pid, err = r.podRepo.AddStartingPod(p); err != nil {
+		return
+	}
+
+	// send msg to call pod instance api
+	msg := new(message.MsgCloudConf)
+	msg.ToMsgCloudConf(c, u, pid)
+
+	return r.sender.SubscribeCloud(msg)
+}
+
+func (r *CloudService) CheckUserCanSubsribe(user types.Account, cid string) (
+	p domain.PodInfo, ok bool, err error,
+) {
+	p, err = r.podRepo.GetUserCloudIdLastPod(user, cid)
+	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			return p, true, nil
+		}
+
+		return
+	}
+
+	if p.IsExpiried() || p.IsFailedOrTerminated() {
+		return p, true, err
+	}
+
+	return p, false, err
 }
 
 func (r *CloudService) HasHolding(user types.Account, c *domain.CloudConf) (bool, error) {

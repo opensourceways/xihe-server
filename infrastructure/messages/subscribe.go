@@ -7,6 +7,8 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	cloudtypes "github.com/opensourceways/xihe-server/cloud/domain"
+	cloudmsg "github.com/opensourceways/xihe-server/cloud/domain/message"
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -65,6 +67,10 @@ func Subscribe(
 		return
 	}
 
+	// cloud
+	if err = r.registerHandlerForCloud(handler); err != nil {
+		return
+	}
 	// register end
 	<-ctx.Done()
 
@@ -273,4 +279,36 @@ func (r *register) subscribe(
 	return r.subscriber.SubscribeWithStrategyOfRetry(
 		handlerName, handler, []string{topicName}, retryNum,
 	)
+}
+
+func (r *register) registerHandlerForCloud(handler interface{}) error {
+	h, ok := handler.(cloudmsg.CloudMessageHandler)
+	if !ok {
+		return nil
+	}
+
+	f := func(b []byte, m map[string]string) (err error) {
+		body := msgPodCreate{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
+
+		user, err := domain.NewAccount(body.User)
+		if err != nil {
+			return
+		}
+
+		v := cloudtypes.PodInfo{
+			Pod: cloudtypes.Pod{
+				Id:      body.PodId,
+				CloudId: body.CloudId,
+				Owner:   user,
+			},
+		}
+		v.SetDefaultExpiry()
+
+		return h.HandleEventPodSubscribe(&v)
+	}
+
+	return r.subscribe(r.topics.Cloud, handlerNameCreateCloud, f)
 }

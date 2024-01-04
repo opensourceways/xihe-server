@@ -8,6 +8,7 @@ import (
 	aiccconfig "github.com/opensourceways/xihe-server/aiccfinetune/config"
 	"github.com/opensourceways/xihe-server/app"
 	bigmodel "github.com/opensourceways/xihe-server/bigmodel/config"
+	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepoimpl "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	common "github.com/opensourceways/xihe-server/common/config"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
@@ -21,6 +22,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
+	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
 	"github.com/opensourceways/xihe-server/utils"
@@ -61,6 +63,8 @@ type Config struct {
 	Course       course.Config                   `json:"course"       required:"true"`
 	Resource     messages.ResourceConfig         `json:"resource"     required:"true"`
 	Download     messages.DownloadProducerConfig `json:"download"     required:"true"`
+	Inference    inferenceimpl.Config            `json:"inference"    required:"true"`
+	Cloud        cloudmsg.Config                 `json:"cloud"        required:"true"`
 	User         userConfig                      `json:"user"`
 	Like         messages.LikeConfig             `json:"like"`
 	Agreement    agreement.Config                `json:"agreement"`
@@ -89,6 +93,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.Domain,
 		&cfg.Mongodb,
 		&cfg.Postgresql.DB,
+		&cfg.Postgresql.Cloud,
 		&cfg.Redis.DB,
 		&cfg.Gitlab,
 		&cfg.App,
@@ -97,6 +102,7 @@ func (cfg *Config) ConfigItems() []interface{} {
 		&cfg.MQTopics,
 		&cfg.SignIn,
 		&cfg.Points,
+		&cfg.Cloud,
 		&cfg.Download,
 		&cfg.Course,
 		&cfg.Resource,

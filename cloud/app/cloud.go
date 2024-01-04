@@ -1,7 +1,10 @@
 package app
 
 import (
+	"errors"
+
 	"github.com/opensourceways/xihe-server/cloud/domain"
+	"github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
 	"github.com/opensourceways/xihe-server/cloud/domain/service"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
@@ -11,6 +14,10 @@ import (
 type CloudService interface {
 	// cloud
 	ListCloud(*GetCloudConfCmd) ([]CloudDTO, error)
+	SubscribeCloud(*SubscribeCloudCmd) (code string, err error)
+
+	// pod
+	Get(*PodInfoCmd) (PodInfoDTO, error)
 }
 
 var _ CloudService = (*cloudService)(nil)
@@ -18,17 +25,20 @@ var _ CloudService = (*cloudService)(nil)
 func NewCloudService(
 	cloudRepo repository.Cloud,
 	podRepo repository.Pod,
+	producer message.CloudMessageProducer,
 ) *cloudService {
 	return &cloudService{
 		cloudRepo:    cloudRepo,
 		podRepo:      podRepo,
-		cloudService: service.NewCloudService(podRepo),
+		producer:     producer,
+		cloudService: service.NewCloudService(podRepo, producer),
 	}
 }
 
 type cloudService struct {
 	cloudRepo    repository.Cloud
 	podRepo      repository.Pod
+	producer     message.CloudMessageProducer
 	cloudService service.CloudService
 }
 
@@ -72,6 +82,45 @@ func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err erro
 
 		dto[i].toCloudDTO(&c[i], c[i].HasIdle(), b)
 	}
+
+	return
+}
+
+func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err error) {
+	// check
+	_, ok, err := s.cloudService.CheckUserCanSubsribe(cmd.User, cmd.CloudId)
+	if err != nil {
+		return
+	}
+
+	if !ok {
+		code = errorNotAllowed
+		err = errors.New("starting or running pod exist")
+
+		return
+	}
+
+	// get cloud conf
+	c := new(domain.Cloud)
+	c.CloudConf, err = s.cloudRepo.GetCloudConf(cmd.CloudId)
+	if err != nil {
+		return
+	}
+
+	// check
+	if err = s.cloudService.ToCloud(c); err != nil {
+		return
+	}
+
+	if !c.HasIdle() {
+		code = errorResourceBusy
+		err = errors.New("no idle resource remain")
+
+		return
+	}
+
+	// subscribe
+	err = s.cloudService.SubscribeCloud(&c.CloudConf, cmd.User)
 
 	return
 }
