@@ -24,6 +24,7 @@ import (
 	bigmodelmsg "github.com/opensourceways/xihe-server/bigmodel/infrastructure/messageadapter"
 	bigmodelrepo "github.com/opensourceways/xihe-server/bigmodel/infrastructure/repositoryimpl"
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
+	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
@@ -144,6 +145,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
+	inference := repositories.NewInferenceRepository(
+		mongodb.NewInferenceMapper(
+			collections.Inference,
+		),
+	)
+
 	tags := repositories.NewTagsRepository(
 		mongodb.NewTagsMapper(collections.Tag),
 	)
@@ -220,6 +227,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		user,
 	)
 
+	cloudAppService := cloudapp.NewCloudService(
+		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
+		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
+		cloudmsg.NewPublisher(&cfg.Cloud, publisher),
+	)
+
 	bigmodelAppService := bigmodelapp.NewBigModelService(
 		bigmodel, user,
 		bigmodelrepo.NewLuoJiaRepo(mongodb.NewCollection(collections.LuoJia)),
@@ -230,11 +243,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		bigmodelrepo.NewApiService(mongodb.NewCollection(collections.ApiApply)),
 		bigmodelrepo.NewApiInfo(mongodb.NewCollection(collections.ApiInfo)),
 		userRegService,
-	)
-
-	cloudAppService := cloudapp.NewCloudService(
-		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
-		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
 	)
 
 	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, resProducer)
@@ -330,6 +338,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForRepoFileController(
 			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,
+		)
+
+		controller.AddRouterForInferenceController(
+			v1, gitlabRepo, inference, proj, sender,
 		)
 
 		controller.AddRouterForSearchController(

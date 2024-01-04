@@ -3,8 +3,11 @@ package repositoryimpl
 import (
 	"context"
 
+	"go.mongodb.org/mongo-driver/bson"
+
 	"github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
+	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 )
 
 func NewCloudRepo(m mongodbClient) repository.Cloud {
@@ -28,10 +31,36 @@ func (impl *cloudRepoImpl) ListCloudConf() (conf []domain.CloudConf, err error) 
 
 	conf = make([]domain.CloudConf, len(v))
 	for i := range v {
-		if err = v[i].toCloudConf(&conf[i]); err != nil {
-			return
-		}
+		v[i].toCloudConf(&conf[i])
 	}
 
 	return
+}
+
+func (impl *cloudRepoImpl) GetCloudConf(cid string) (conf domain.CloudConf, err error) {
+	var v DCloudConf
+
+	f := func(ctx context.Context) error {
+		filter := impl.docIdFilter(cid)
+
+		return impl.cli.GetDoc(ctx, filter, nil, &v)
+	}
+
+	if err = withContext(f); err != nil {
+		if impl.cli.IsDocNotExists(err) {
+			err = repoerr.NewErrorResourceNotExists(err)
+		}
+
+		return
+	}
+
+	v.toCloudConf(&conf)
+
+	return
+}
+
+func (impl *cloudRepoImpl) docIdFilter(id string) bson.M {
+	return bson.M{
+		fieldId: id,
+	}
 }
