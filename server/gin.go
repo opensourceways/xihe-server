@@ -280,6 +280,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	promotionpointsAppService := promotionapp.NewPointsService(promotionPointTaskService)
 
+	userWhiteListService := userapp.NewWhiteListService(
+		userrepoimpl.NewWhiteListRepo(
+			mongodb.NewCollection(collections.UserWhiteList),
+		),
+	)
+
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
@@ -298,7 +304,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForUserController(
 			v1, userAppService, user,
-			authingUser, loginService, userRegService,
+			authingUser, loginService, userRegService, userWhiteListService,
 		)
 
 		controller.AddRouterForLoginController(
@@ -341,7 +347,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, inference, proj, sender,
+			v1, gitlabRepo, inference, proj, sender, userWhiteListService,
 		)
 
 		controller.AddRouterForSearchController(
@@ -369,7 +375,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForCloudController(
-			v1, cloudAppService,
+			v1, cloudAppService, userWhiteListService,
 		)
 	}
 

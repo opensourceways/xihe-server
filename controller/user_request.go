@@ -89,3 +89,17 @@ func (req *EmailSend) toCmd(user domain.Account) (cmd app.SendBindEmailCmd, err 
 
 	return
 }
+
+func toCheckWhiteListCmd(user domain.Account, t string) (cmd app.UserWhiteListCmd, err error) {
+	cmd.Account = user
+	v, err := domain.NewWhiteListType(t)
+	if err != nil {
+		return
+	}
+	cmd.Type = v
+	return
+}
+
+type whitelistResp struct {
+	Allowed bool `json:"allowed"`
+}

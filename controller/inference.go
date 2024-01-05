@@ -13,6 +13,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -22,12 +23,14 @@ func AddRouterForInferenceController(
 	repo repository.Inference,
 	project repository.Project,
 	sender message.Sender,
+	whitelist userapp.WhiteListService,
 ) {
 	ctl := InferenceController{
 		s: app.NewInferenceService(
 			p, repo, sender, apiConfig.MinSurvivalTimeOfInference,
 		),
-		project: project,
+		project:   project,
+		whitelist: whitelist,
 	}
 
 	ctl.inferenceDir, _ = domain.NewDirectory(apiConfig.InferenceDir)
@@ -45,6 +48,7 @@ type InferenceController struct {
 
 	inferenceDir      domain.Directory
 	inferenceBootFile domain.FilePath
+	whitelist         userapp.WhiteListService
 }
 
 // @Summary		Create
@@ -59,16 +63,28 @@ type InferenceController struct {
 // @Failure		500	system_error		system	error
 // @Router			/v1/inference/project/{owner}/{pid} [get]
 func (ctl *InferenceController) Create(ctx *gin.Context) {
-	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, true)
+	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
 		return
 	}
 
-	visitor := true
-	projectId := ctx.Param("pid")
+	whitecmd, err := toWhiteListCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
 
-	if csrftoken != "visitor-"+projectId {
-		visitor = false
+	allow, err := ctl.whitelist.CheckWhiteList(&whitecmd)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+	if !allow {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorNotAllowed, "not allowed for this module",
+		))
+
+		return
 	}
 
 	// setup websocket
@@ -103,6 +119,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		return
 	}
 
+	projectId := ctx.Param("pid")
 	v, err := ctl.project.GetSummary(owner, projectId)
 	if err != nil {
 		ws.WriteJSON(newResponseError(err))
@@ -112,7 +129,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		return
 	}
 
-	viewOther := visitor || pl.isNotMe(owner)
+	viewOther := pl.isNotMe(owner)
 
 	if v.IsPrivate() {
 		ws.WriteJSON(
@@ -151,7 +168,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		InferenceDir:  ctl.inferenceDir,
 		BootFile:      ctl.inferenceBootFile,
 	}
-	
+
 	dto, lastCommit, err := ctl.s.Create(pl.Account, &u, &cmd)
 	if err != nil {
 		ws.WriteJSON(newResponseError(err))

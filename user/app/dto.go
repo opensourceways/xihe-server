@@ -190,3 +190,9 @@ func (cmd *UserRegisterInfoCmd) Validate() error {
 
 	return nil
 }
+
+type UserWhiteListCmd domain.WhiteListInfo
+
+func (cmd *UserWhiteListCmd) toUserWhiteListInfo(r *domain.WhiteListInfo) {
+	*r = *(*domain.WhiteListInfo)(cmd)
+}
