@@ -24,6 +24,7 @@ func AddRouterForUserController(
 	auth authing.User,
 	login app.LoginService,
 	register userapp.RegService,
+	whitelist userapp.WhiteListService,
 ) {
 	ctl := UserController{
 		auth: auth,
@@ -33,7 +34,8 @@ func AddRouterForUserController(
 			auth, userlogincli.NewLoginCli(login),
 			us,
 		),
-		register: register,
+		register:  register,
+		whitelist: whitelist,
 	}
 
 	rg.PUT("/v1/user/agreement", ctl.UpdateAgreement)
@@ -56,16 +58,20 @@ func AddRouterForUserController(
 	// userinfo
 	rg.GET("/v1/user/info/:account", ctl.GetInfo)
 	rg.PUT("/v1/user/info", ctl.UpdateUserRegistrationInfo)
+
+	// whitelist
+	rg.GET("/v1/user/whitelist/:type", ctl.CheckWhiteList)
 }
 
 type UserController struct {
 	baseController
 
-	repo     userrepo.User
-	auth     authing.User
-	s        userapp.UserService
-	email    userapp.EmailService
-	register userapp.RegService
+	repo      userrepo.User
+	auth      authing.User
+	s         userapp.UserService
+	email     userapp.EmailService
+	register  userapp.RegService
+	whitelist userapp.WhiteListService
 }
 
 // @Summary		Update Agreement
@@ -527,4 +533,39 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusAccepted, newResponseData(req))
+}
+
+// @Summary		CheckWhiteList
+// @Description	check user whitelist info
+// @Tags			User
+// @Param			type	path	string	true	"type"
+// @Accept			json
+// @Success		200	{object}			whitelistResp
+// @Failure		400	bad_request_body	can't	parse	request	body
+// @Router			/v1/user/whitelist/{type} [Get]
+func (ctl *UserController) CheckWhiteList(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "check user white list")
+
+	cmd, err := toCheckWhiteListCmd(pl.DomainAccount(), ctx.Param("type"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, respBadRequestBody)
+		return
+	}
+
+	v, err := ctl.whitelist.CheckWhiteList(&cmd)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+
+	resp := whitelistResp{
+		Allowed: v,
+	}
+
+	ctx.JSON(http.StatusOK, newResponseData(resp))
 }

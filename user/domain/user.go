@@ -66,3 +66,10 @@ type UserRegInfo struct {
 	Detail   map[string]string
 	Version  int
 }
+
+// whitelist
+type WhiteListInfo struct {
+	Account types.Account
+	Type    WhiteListType
+	Enabled bool
+}

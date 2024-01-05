@@ -140,3 +140,17 @@ func toFollowerUserInfo(doc DUser, info *domain.FollowerUserInfo) (err error) {
 
 	return
 }
+
+func (doc *DWhiteListInfo) toWhiteListInfo(u *domain.WhiteListInfo) (err error) {
+	if u.Account, err = types.NewAccount(doc.Account); err != nil {
+		return
+	}
+
+	if u.Type, err = domain.NewWhiteListType(doc.Type); err != nil {
+		return
+	}
+
+	u.Enabled = doc.Enabled
+
+	return
+}

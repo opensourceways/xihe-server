@@ -13,6 +13,7 @@ const (
 	fieldFollowerCount  = "follower_count"
 	fieldFollowingCount = "following_count"
 	fieldIsFollower     = "is_follower"
+	fieldWhiteListType  = "type"
 )
 
 type DUser struct {
@@ -49,4 +50,10 @@ type DUserRegInfo struct {
 	Province string            `bson:"province"       json:"province"`
 	Detail   map[string]string `bson:"detail"         json:"detail"`
 	Version  int               `bson:"version"        json:"-"`
+}
+
+type DWhiteListInfo struct {
+	Account string `bson:"account"        json:"account"`
+	Type    string `bson:"type"           json:"type"`
+	Enabled bool   `bson:"enabled"        json:"enabled"`
 }

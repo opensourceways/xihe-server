@@ -14,6 +14,9 @@ const (
 	identityStudent   = "student"
 	identityTeacher   = "teacher"
 	identityDeveloper = "developer"
+
+	typeCloud     = "cloud"
+	typeInference = "inference"
 )
 
 // DomainValue
@@ -266,4 +269,25 @@ type province string
 
 func (r province) Province() string {
 	return string(r)
+}
+
+// WhiteList Type
+type WhiteListType interface {
+	WhiteListType() string
+}
+
+func NewWhiteListType(w string) (WhiteListType, error) {
+	b := w == typeCloud || w == typeInference
+
+	if !b {
+		return nil, errors.New("invalid type")
+	}
+
+	return whiteListType(w), nil
+}
+
+type whiteListType string
+
+func (w whiteListType) WhiteListType() string {
+	return string(w)
 }

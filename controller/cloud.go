@@ -8,15 +8,18 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/opensourceways/xihe-server/cloud/app"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForCloudController(
 	rg *gin.RouterGroup,
 	s app.CloudService,
+	us userapp.WhiteListService,
 ) {
 	ctl := CloudController{
-		s: s,
+		s:  s,
+		us: us,
 	}
 
 	rg.GET("/v1/cloud", ctl.List)
@@ -28,7 +31,8 @@ func AddRouterForCloudController(
 type CloudController struct {
 	baseController
 
-	s app.CloudService
+	s  app.CloudService
+	us userapp.WhiteListService
 }
 
 // @Summary		List
@@ -77,6 +81,25 @@ func (ctl *CloudController) Subscribe(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		return
+	}
+
+	whitecmd, err := toWhiteListCmd(pl.DomainAccount())
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+
+	v, err := ctl.us.CheckWhiteList(&whitecmd)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+	if !v {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorNotAllowed, "not allowed for this module",
+		))
+
 		return
 	}
 

@@ -189,6 +189,7 @@ type MongodbCollections struct {
 	PromotionPoint    string `json:"promotion_point"        required:"true"`
 	PromotionTask     string `json:"promotion_task"         required:"true"`
 	AICCFinetune      string `json:"aicc_finetune"          required:"true"`
+	UserWhiteList     string `json:"user_whitelist"         required:"true"`
 }
 
 func (cfg *Config) InitDomainConfig() {
