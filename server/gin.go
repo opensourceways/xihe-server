@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/community-robot-lib/interrupts"
 	"github.com/sirupsen/logrus"
+	"github.com/DeanThompson/ginpprof"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -74,6 +75,7 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 	}
 
 	r.Use(controller.ClearSenstiveInfoMiddleware())
+	ginpprof.Wrap(r)
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", port),
