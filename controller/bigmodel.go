@@ -844,6 +844,11 @@ func (ctl *BigModelController) GLM2(ctx *gin.Context) {
 		return
 	}
 
+	ctx.Writer.Header().Set("Content-Type", "text/event-stream; charset=utf-8")
+	ctx.Writer.Header().Set("Cache-Control", "no-cache")
+	ctx.Writer.Header().Set("Connection", "keep-alive")
+	ctx.Writer.Header().Set("Transfer-Encoding", "chunked")
+
 	code, err := ctl.s.GLM2(&cmd)
 	if err != nil {
 		ctx.Stream(func(w io.Writer) bool {
@@ -860,10 +865,6 @@ func (ctl *BigModelController) GLM2(ctx *gin.Context) {
 
 		return
 	}
-
-	ctx.Header("Content-Type", "text/event-stream; charset=utf-8")
-	ctx.Header("Cache-Control", "no-cache")
-	ctx.Header("Connection", "keep-alive")
 
 	ctx.Stream(func(w io.Writer) bool {
 		if msg, ok := <-ch; ok {
