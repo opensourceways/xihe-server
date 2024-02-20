@@ -8,8 +8,16 @@ import (
 	"strings"
 
 	libutils "github.com/opensourceways/community-robot-lib/utils"
-	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/sirupsen/logrus"
+
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
+)
+
+const (
+	skipStepGLM = 5
+
+	doneStatusGLM      = "DONE"
+	replaceResponseGLM = "data: "
 )
 
 type glm2Request struct {
@@ -49,6 +57,7 @@ func newGLM2Info(cfg *Config) (info glm2Info, err error) {
 func (s *service) GLM2(ch chan string, input *domain.GLM2Input) (err error) {
 	// input audit
 	if err = s.check.check(input.Text.GLM2Text()); err != nil {
+		logrus.Debugf("content audit not pass: %s", err.Error())
 		return
 	}
 
@@ -106,30 +115,28 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 	go func() {
 		defer func() { ec <- endpoint }()
 		defer resp.Body.Close()
+		defer close(ch)
 
 		for {
 			line, err := reader.ReadString('\n')
-			if err != nil {
+			if count != 1 && err != nil {
 				ch <- "done"
-
 				return
 			}
 
-			data := strings.Replace(string(line), "data: ", "", 1)
+			data := strings.Replace(string(line), replaceResponseGLM, "", 1)
 			data = strings.TrimRight(data, "\x00")
 
 			if err = json.Unmarshal([]byte(data), &r); err != nil {
 				continue
 			}
 
-			if r.StreamStatus == "DONE" {
+			if r.StreamStatus == doneStatusGLM {
 				ch <- "done"
-
 				return
 			}
 
-			// response audit, skip 6 response
-			if r.Reply != "" && count > 6 {
+			if r.Reply != "" && count > skipStepGLM {
 				count = 0
 
 				if err = s.check.check(r.Reply); err != nil {

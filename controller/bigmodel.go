@@ -19,6 +19,10 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
+const (
+	chBufferSize = 10000
+)
+
 func AddRouterForBigModelController(
 	rg *gin.RouterGroup,
 	s app.BigModelService,
@@ -836,7 +840,7 @@ func (ctl *BigModelController) GLM2(ctx *gin.Context) {
 		return
 	}
 
-	ch := make(chan string)
+	ch := make(chan string, chBufferSize)
 	cmd, err := req.toCmd(ch, pl.DomainAccount())
 	if err != nil {
 		ctl.sendBadRequestParam(ctx, err)
@@ -869,7 +873,6 @@ func (ctl *BigModelController) GLM2(ctx *gin.Context) {
 		if msg, ok := <-ch; ok {
 			if msg == "done" {
 				ctx.SSEvent("status", "done")
-				close(ch)
 			} else {
 				ctx.SSEvent("message", msg)
 			}
@@ -905,7 +908,7 @@ func (ctl *BigModelController) LLAMA2(ctx *gin.Context) {
 		return
 	}
 
-	ch := make(chan string)
+	ch := make(chan string, chBufferSize)
 	cmd, err := req.toCmd(ch, pl.DomainAccount())
 	if err != nil {
 		ctl.sendBadRequestParam(ctx, err)
@@ -938,12 +941,13 @@ func (ctl *BigModelController) LLAMA2(ctx *gin.Context) {
 		if msg, ok := <-ch; ok {
 			if msg == "done" {
 				ctx.SSEvent("status", "done")
-				close(ch)
 			} else {
 				ctx.SSEvent("message", msg)
 			}
+
 			return true
 		}
+
 		return false
 	})
 }
