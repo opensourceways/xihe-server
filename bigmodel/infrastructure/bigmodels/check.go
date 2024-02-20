@@ -5,12 +5,11 @@ import (
 
 	"github.com/huaweicloud/huaweicloud-sdk-go-v3/core/auth/basic"
 	"github.com/huaweicloud/huaweicloud-sdk-go-v3/core/region"
-	moderation "github.com/huaweicloud/huaweicloud-sdk-go-v3/services/moderation/v3"
-	"github.com/huaweicloud/huaweicloud-sdk-go-v3/services/moderation/v3/model"
-
 	moderationv2 "github.com/huaweicloud/huaweicloud-sdk-go-v3/services/moderation/v2"
 	modelv2 "github.com/huaweicloud/huaweicloud-sdk-go-v3/services/moderation/v2/model"
 	regionv2 "github.com/huaweicloud/huaweicloud-sdk-go-v3/services/moderation/v2/region"
+	moderation "github.com/huaweicloud/huaweicloud-sdk-go-v3/services/moderation/v3"
+	"github.com/huaweicloud/huaweicloud-sdk-go-v3/services/moderation/v3/model"
 
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 )

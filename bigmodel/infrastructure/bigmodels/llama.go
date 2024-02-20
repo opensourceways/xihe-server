@@ -8,8 +8,16 @@ import (
 	"strings"
 
 	libutils "github.com/opensourceways/community-robot-lib/utils"
-	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/sirupsen/logrus"
+
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
+)
+
+const (
+	skipStepLlama = 10
+
+	doneStatusLlama      = "DONE"
+	replaceResponseLlama = "data: "
 )
 
 type llama2Request struct {
@@ -49,6 +57,7 @@ func newLLAMA2Info(cfg *Config) (info llama2Info, err error) {
 func (s *service) LLAMA2(ch chan string, input *domain.LLAMA2Input) (err error) {
 	// input audit
 	if err = s.check.check(input.Text.LLAMA2Text()); err != nil {
+		logrus.Debugf("content audit not pass: %s", err.Error())
 		return
 	}
 
@@ -106,6 +115,7 @@ func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.L
 	go func() {
 		defer func() { ec <- endpoint }()
 		defer resp.Body.Close()
+		defer close(ch)
 
 		for {
 			line, err := reader.ReadString('\n')
@@ -117,21 +127,20 @@ func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.L
 				return
 			}
 
-			data := strings.Replace(string(line), "data: ", "", 1)
+			data := strings.Replace(string(line), replaceResponseLlama, "", 1)
 			data = strings.TrimRight(data, "\x00")
 
 			if err = json.Unmarshal([]byte(data), &r); err != nil {
 				continue
 			}
 
-			if r.StreamStatus == "DONE" {
+			if r.StreamStatus == doneStatusLlama {
 				ch <- "done"
 
 				return
 			}
 
-			// response audit, skip 6 response
-			if r.Reply != "" && count > 6 {
+			if r.Reply != "" && count > skipStepLlama {
 				count = 0
 
 				if err = s.check.check(r.Reply); err != nil {
@@ -146,6 +155,7 @@ func (s *service) genllama2(ec, ch chan string, endpoint string, input *domain.L
 			ch <- r.Reply
 			count += 1
 		}
+
 	}()
 
 	return

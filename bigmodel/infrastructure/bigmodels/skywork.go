@@ -8,8 +8,9 @@ import (
 	"strings"
 
 	libutils "github.com/opensourceways/community-robot-lib/utils"
-	"github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/sirupsen/logrus"
+
+	"github.com/opensourceways/xihe-server/bigmodel/domain"
 )
 
 type skyWorkRequest struct {

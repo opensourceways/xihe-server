@@ -13,6 +13,10 @@ import (
 	"github.com/opensourceways/xihe-server/bigmodel/domain/bigmodel"
 )
 
+const (
+	waitTime = 2 * 60 * time.Second
+)
+
 var fm *service
 
 func Init(cfg *Config) error {
@@ -156,11 +160,8 @@ func (s *service) doWaitAndEndpointNotReturned(
 	select {
 	case e := <-ec:
 		err := f(ec, e)
-		if err != nil {
-			ec <- e // return endpoint to channel while function returns error
-		}
 		return err
-	case <-time.After(2 * 60 * time.Second):
+	case <-time.After(waitTime):
 		return bigmodel.NewErrorBusySource(errors.New("access overload, please try again later"))
 	}
 }
