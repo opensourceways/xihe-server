@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+	"unicode/utf8"
 
 	libutils "github.com/opensourceways/community-robot-lib/utils"
 	"github.com/sirupsen/logrus"
@@ -14,36 +15,46 @@ import (
 )
 
 const (
-	skipStepGLM = 5
+	skipStepFly = 5
 
-	doneStatusGLM      = "DONE"
-	replaceResponseGLM = "data: "
+	doneStatusFly = "DONE"
+	lenThreshold  = 500
 )
 
-type glm2Request struct {
-	Inputs            string      `json:"inputs"`
-	History           [][2]string `json:"history"`
-	Sampling          bool        `json:"sampling"`
-	TopK              int         `json:"top_k"`
-	TopP              float64     `json:"top_p"`
-	Temperature       float64     `json:"temperature"`
-	RepetitionPenalty float64     `json:"repetition_penalty"`
+type iflyteksparkRequest struct {
+	Inputs            string  `json:"question"`
+	Sampling          bool    `json:"do_sample"`
+	TopK              int     `json:"top_k"`
+	Temperature       float64 `json:"temperature"`
+	RepetitionPenalty float64 `json:"repetition_penalty"`
 }
 
-type glm2Response struct {
+type iflyteksparkResponse struct {
 	Reply        string `json:"reply"`
 	Code         int    `json:"code"`
 	Msg          string `json:"msg"`
 	StreamStatus string `json:"stream_status"`
 }
 
-type glm2Info struct {
-	endpoints chan string
+type iflyteksparkInfo struct {
+	auth CloudConfig
+
+	endpoints     chan string
+	endpointsLong chan string
 }
 
-func newGLM2Info(cfg *Config) (info glm2Info, err error) {
+func newiflyteksparkInfo(cfg *Config) (info iflyteksparkInfo, err error) {
 	ce := &cfg.Endpoints
-	es, _ := ce.parse(ce.GLM2)
+	es, err := ce.parse(ce.IFlytekspark)
+	if err != nil {
+		return
+	}
+	esLong, err := ce.parse(ce.IFlyteksparkLong)
+	if err != nil {
+		return
+	}
+
+	info.auth = cfg.CloudGY
 
 	// init endpoints
 	info.endpoints = make(chan string, len(es))
@@ -51,39 +62,45 @@ func newGLM2Info(cfg *Config) (info glm2Info, err error) {
 		info.endpoints <- e
 	}
 
+	info.endpointsLong = make(chan string, len(esLong))
+	for _, e := range esLong {
+		info.endpointsLong <- e
+	}
+
 	return
 }
 
-func (s *service) GLM2(ch chan string, input *domain.GLM2Input) (err error) {
+func (s *service) IFlytekSpark(ch chan string, input *domain.IFlytekSparkInput) (err error) {
 	// input audit
-	if err = s.check.check(input.Text.GLM2Text()); err != nil {
-		logrus.Debugf("content audit not pass: %s", err.Error())
+	if err = s.check.check(input.Text.IFlytekSparkText()); err != nil {
 		return
 	}
 
-	// call bigmodel glm2
+	// call bigmodel iflytekspark
 	f := func(ec chan string, e string) (err error) {
-		err = s.genGLM2(ec, ch, e, input)
+		err = s.geniflytekspark(ec, ch, e, input)
 
 		return
 	}
 
-	if err = s.doWaitAndEndpointNotReturned(s.glm2Info.endpoints, f); err != nil {
+	if utf8.RuneCountInString(input.Text.IFlytekSparkText()) > lenThreshold {
+		s.doWaitAndEndpointNotReturned(s.iflyteksparkInfo.endpointsLong, f)
 		return
 	}
 
+	s.doWaitAndEndpointNotReturned(s.iflyteksparkInfo.endpoints, f)
 	return
 }
 
-func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM2Input) (
+func (s *service) geniflytekspark(ec, ch chan string, endpoint string, input *domain.IFlytekSparkInput) (
 	err error,
 ) {
-	t, err := genToken(&s.wukongInfo.cfg.CloudConfig)
+	t, err := genToken(&s.iflyteksparkInfo.auth)
 	if err != nil {
 		return
 	}
 
-	opt := toGLM2Req(input)
+	opt := toiflyteksparkReq(input)
 	body, err := libutils.JsonMarshal(&opt)
 	if err != nil {
 		return
@@ -109,9 +126,10 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 	reader := bufio.NewReader(resp.Body)
 
 	var (
-		r     glm2Response
+		r     iflyteksparkResponse
 		count int
 	)
+
 	go func() {
 		defer close(ch)
 		defer func() { ec <- endpoint }()
@@ -119,24 +137,27 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 
 		for {
 			line, err := reader.ReadString('\n')
+
 			if count != 1 && err != nil {
 				ch <- "done"
+
 				return
 			}
 
-			data := strings.Replace(string(line), replaceResponseGLM, "", 1)
-			data = strings.TrimRight(data, "\x00")
+			data := strings.Replace(string(line), "data: ", "", 1)
+			data = strings.TrimRight(data, "\n")
 
 			if err = json.Unmarshal([]byte(data), &r); err != nil {
 				continue
 			}
 
-			if r.StreamStatus == doneStatusGLM {
+			if r.StreamStatus == doneStatusFly {
 				ch <- "done"
+
 				return
 			}
 
-			if r.Reply != "" && count > skipStepGLM {
+			if r.Reply != "" && count > skipStepFly {
 				count = 0
 
 				if err = s.check.check(r.Reply); err != nil {
@@ -155,19 +176,17 @@ func (s *service) genGLM2(ec, ch chan string, endpoint string, input *domain.GLM
 	return
 }
 
-func toGLM2Req(input *domain.GLM2Input) glm2Request {
+func toiflyteksparkReq(input *domain.IFlytekSparkInput) iflyteksparkRequest {
 	history := make([][2]string, len(input.History))
 
 	for i := range input.History {
 		history[i] = input.History[i].History()
 	}
 
-	return glm2Request{
-		Inputs:            input.Text.GLM2Text(),
-		History:           history,
+	return iflyteksparkRequest{
+		Inputs:            input.Text.IFlytekSparkText(),
 		Sampling:          input.Sampling,
 		TopK:              input.TopK.TopK(),
-		TopP:              input.TopP.TopP(),
 		Temperature:       input.Temperature.Temperature(),
 		RepetitionPenalty: input.RepetitionPenalty.RepetitionPenalty(),
 	}

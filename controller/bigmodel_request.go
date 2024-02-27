@@ -440,3 +440,40 @@ func (req *skyWorkRequest) toCmd(ch chan string, user types.Account) (cmd app.Sk
 
 	return
 }
+
+// iflytekspark
+type iflyteksparkRequest struct {
+	Text              string  `json:"text"`
+	Sampling          bool    `json:"sampling"`
+	TopK              int     `json:"top_k"`
+	Temperature       float64 `json:"temperature"`
+	RepetitionPenalty float64 `json:"repetition_penalty"`
+}
+
+func (req *iflyteksparkRequest) toCmd(ch chan string, user types.Account) (cmd app.IFlytekSparkCmd, err error) {
+	if cmd.Text, err = domain.NewIFlytekSparkText(req.Text); err != nil {
+		return
+	}
+
+	if req.Sampling {
+		if cmd.TopK, err = domain.NewTopK(req.TopK); err != nil {
+			return
+		}
+
+		if cmd.Temperature, err = domain.NewTemperature(req.Temperature); err != nil {
+			return
+		}
+
+		if cmd.RepetitionPenalty, err = domain.NewRepetitionPenalty(req.RepetitionPenalty); err != nil {
+			return
+		}
+	} else {
+		cmd.SetDefault()
+	}
+
+	cmd.CH = ch
+	cmd.Sampling = req.Sampling
+	cmd.User = user
+
+	return
+}

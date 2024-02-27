@@ -12,6 +12,7 @@ type Config struct {
 	WuKong     WuKong      `json:"wukong"          required:"true"`
 	Endpoints  Endpoints   `json:"endpoints"       required:"true"`
 	Moderation Moderation  `json:"moderation"      required:"true"`
+	CloudGY    CloudConfig `json:"auth_gy"         required:"true"`
 
 	MaxPictureSizeToDescribe int64 `json:"max_picture_size_to_describe"`
 	MaxPictureSizeToVQA      int64 `json:"max_picture_size_to_vqa"`
@@ -78,6 +79,8 @@ type Endpoints struct {
 	GLM2             string `json:"glm"                required:"true"`
 	LLAMA2           string `json:"llama"              required:"true"`
 	SkyWork          string `json:"skywork"            required:"true"`
+	IFlytekspark     string `json:"iflytekspark"       required:"true"`
+	IFlyteksparkLong string `json:"iflytekspark_long"  required:"true"`
 }
 
 func (e *Endpoints) validate() (err error) {
@@ -210,7 +213,4 @@ func (cfg *WuKong) validate() error {
 
 type ApiService struct {
 	TokenExpire string
-}
-
-type BaiChuan struct {
 }

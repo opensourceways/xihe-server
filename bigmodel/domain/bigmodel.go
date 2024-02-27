@@ -114,3 +114,14 @@ type SkyWorkInput struct {
 	Temperature       Temperature
 	RepetitionPenalty RepetitionPenalty
 }
+
+// iflytekspark
+type IFlytekSparkInput struct {
+	Text              IFlytekSparkText
+	Sampling          bool
+	History           []History
+	TopK              TopK
+	TopP              TopP
+	Temperature       Temperature
+	RepetitionPenalty RepetitionPenalty
+}
