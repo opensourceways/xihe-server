@@ -422,3 +422,25 @@ type SkyWorkDTO struct {
 	Reply        string `json:"reply"`
 	StreamStatus string `json:"stream_status"`
 }
+
+// iflytekspark
+type IFlytekSparkCmd struct {
+	CH                chan string
+	User              types.Account
+	Sampling          bool
+	Text              domain.IFlytekSparkText
+	TopK              domain.TopK
+	Temperature       domain.Temperature
+	RepetitionPenalty domain.RepetitionPenalty
+}
+
+func (cmd *IFlytekSparkCmd) SetDefault() {
+	cmd.TopK, _ = domain.NewTopK(1)
+	cmd.Temperature, _ = domain.NewTemperature(1)
+	cmd.RepetitionPenalty, _ = domain.NewRepetitionPenalty(1)
+}
+
+type IFlytekSparkDTO struct {
+	Reply        string `json:"reply"`
+	StreamStatus string `json:"stream_status"`
+}

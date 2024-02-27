@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	chBufferSize = 10000
+	chBufferSize = 1000
 )
 
 func AddRouterForBigModelController(
@@ -61,6 +61,7 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/glm2_6b", ctl.GLM2)
 	rg.POST("/v1/bigmodel/llama2_7b", ctl.LLAMA2)
 	rg.POST("/v1/bigmodel/skywork_13b", ctl.SkyWork)
+	rg.POST("/v1/bigmodel/iflytekspark", ctl.IFlytekSpark)
 
 	// api apply
 	rg.POST("/v1/bigmodel/api/apply/:model", ctl.ApplyApi)
@@ -1015,6 +1016,74 @@ func (ctl *BigModelController) SkyWork(ctx *gin.Context) {
 			}
 			return true
 		}
+		return false
+	})
+}
+
+// @Title			IFlytekSpark
+// @Description	conversational AI
+// @Tags			BigModel
+// @Param			body	body	iflyteksparkRequest	true	"body of iflytekspark"
+// @Accept			json
+// @Success		202	{object}		string
+// @Failure		500	system_error	system	error
+// @Router			/v1/bigmodel/iflytekspark [post]
+func (ctl *BigModelController) IFlytekSpark(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	desc := "launch iflytekspark bigmodel"
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, desc)
+
+	req := iflyteksparkRequest{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequest(ctx, respBadRequestBody)
+
+		return
+	}
+
+	ch := make(chan string, chBufferSize)
+	cmd, err := req.toCmd(ch, pl.DomainAccount())
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	code, err := ctl.s.IFlytekSpark(&cmd)
+	if err != nil {
+		ctx.Stream(func(w io.Writer) bool {
+			if code == app.ErrorBigModelRecourseBusy {
+				ctx.SSEvent("message", "access overload, please try again later")
+			} else if code == app.ErrorBigModelSensitiveInfo {
+				ctx.SSEvent("message", "I cannot answer such questions")
+			}
+
+			close(ch)
+
+			return false
+		})
+
+		return
+	}
+
+	ctx.Header("Content-Type", "text/event-stream; charset=utf-8")
+	ctx.Header("Cache-Control", "no-cache")
+	ctx.Header("Connection", "keep-alive")
+
+	ctx.Stream(func(w io.Writer) bool {
+		if msg, ok := <-ch; ok {
+			if msg == "done" {
+				ctx.SSEvent("status", "done")
+			} else {
+				ctx.SSEvent("message", msg)
+			}
+
+			return true
+		}
+
 		return false
 	})
 }

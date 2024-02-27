@@ -61,6 +61,10 @@ func Init(cfg *Config) error {
 		return err
 	}
 
+	if fm.iflyteksparkInfo, err = newiflyteksparkInfo(cfg); err != nil {
+		return err
+	}
+
 	return err
 }
 
@@ -75,14 +79,15 @@ type service struct {
 
 	hc utils.HttpClient
 
-	vqaInfo        vqaInfo
-	wukongInfo     wukongInfo
-	luojiaInfo     luojiaInfo
-	aiDetectorInfo aiDetectorInfo
-	baichuanInfo   baichuanInfo
-	glm2Info       glm2Info
-	llama2Info     llama2Info
-	skyWorkInfo    skyWorkInfo
+	vqaInfo          vqaInfo
+	wukongInfo       wukongInfo
+	luojiaInfo       luojiaInfo
+	aiDetectorInfo   aiDetectorInfo
+	baichuanInfo     baichuanInfo
+	glm2Info         glm2Info
+	llama2Info       llama2Info
+	skyWorkInfo      skyWorkInfo
+	iflyteksparkInfo iflyteksparkInfo
 }
 
 func (s *service) token() (string, error) {

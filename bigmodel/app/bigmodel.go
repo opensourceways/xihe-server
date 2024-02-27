@@ -73,6 +73,9 @@ type BigModelService interface {
 	// llama2
 	LLAMA2(*LLAMA2Cmd) (string, error)
 
+	// iflytekspark
+	IFlytekSpark(*IFlytekSparkCmd) (string, error)
+
 	// skywork 13b
 	SkyWork(*SkyWorkCmd) (string, error)
 }

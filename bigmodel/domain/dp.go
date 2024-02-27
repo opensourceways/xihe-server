@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -25,6 +26,7 @@ const (
 	bigmodelGLM2          = "glm2"
 	bigmodelLLAMA2        = "llama2"
 	bigmodelSkyWork       = "skywork"
+	bigmodelIFlytekSpark  = "iflytekspark"
 
 	langZH = "zh"
 	langEN = "en"
@@ -49,6 +51,7 @@ var (
 	BigmodelGLM2          = BigmodelType(bigmodelGLM2)
 	BigmodelLLAMA2        = BigmodelType(bigmodelLLAMA2)
 	BigmodelSkyWork       = BigmodelType(bigmodelSkyWork)
+	BigmodelIFlytekSpark  = BigmodelType(bigmodelIFlytekSpark)
 
 	wukongPictureLevelMap = map[string]int{
 		"official": 2,
@@ -460,5 +463,28 @@ func NewSkyWorkText(v string) (SkyWorkText, error) {
 }
 
 func (t skyWorkText) SkyWorkText() string {
+	return string(t)
+}
+
+// iflytekspark text
+type IFlytekSparkText interface {
+	IFlytekSparkText() string
+}
+
+type iflyteksparkText string
+
+func NewIFlytekSparkText(v string) (IFlytekSparkText, error) {
+	if v == "" {
+		return nil, errors.New("no iflytekspark text")
+	}
+
+	if max := 20000; utf8.RuneCountInString(v) > max { // TODO: to config
+		return nil, errors.New("invalid iflytekspark text")
+	}
+
+	return iflyteksparkText(v), nil
+}
+
+func (t iflyteksparkText) IFlytekSparkText() string {
 	return string(t)
 }

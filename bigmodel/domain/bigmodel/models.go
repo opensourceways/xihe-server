@@ -53,4 +53,7 @@ type BigModel interface {
 
 	// skywork
 	SkyWork(chan string, *domain.SkyWorkInput) error
+
+	// iflytekspark
+	IFlytekSpark(chan string, *domain.IFlytekSparkInput) error
 }
