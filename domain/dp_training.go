@@ -22,7 +22,7 @@ const (
 	computeVersionCannMS17   = "mindspore_1.7.0-cann_5.1.0-py_3.7-euler_2.8.3-aarch64"
 	computeVersionCannMS19_1 = "mindspore_1.9.0-cann_6.0.RC1-py_3.7-ubuntu_18.04-amd64"
 	computeVersionCannMS19_2 = "mindspore_1.9.0-cann_6.0.RC1-py_3.9-ubuntu_18.04-amd64"
-	computeVersionCannMS20   = "mindspore_2.0.0-cann_6.3.RC1-py_3.9-ubuntu_18.04-amd64"
+	computeVersionCannMS22   = "mindspore_2.2.10-cann_7.0.RC1-py_3.9-euler_2.8.3"
 )
 
 var (
@@ -195,7 +195,7 @@ func NewComputeVersion(v string) (ComputeVersion, error) {
 		v == computeVersionCannMS17 ||
 		v == computeVersionCannMS19_1 ||
 		v == computeVersionCannMS19_2 ||
-		v == computeVersionCannMS20
+		v == computeVersionCannMS22
 
 	if !b {
 		return nil, errors.New("invalid compute type")
@@ -226,7 +226,7 @@ func NewComputeFlavorVersion(flaver string, t string, version string) (ComputeFl
 		b1 = version == computeVersionCannMS17 ||
 			version == computeVersionCannMS19_1 ||
 			version == computeVersionCannMS19_2 ||
-			version == computeVersionCannMS20
+			version == computeVersionCannMS22
 	}
 
 	if b2 {
