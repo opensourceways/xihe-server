@@ -161,11 +161,13 @@ func (ctl baseController) checkApiToken(
 ) bool {
 	ac, tokenbyte, ok := ctl.checkToken(ctx, token, pl)
 	if !ok {
+		logrus.Warnf("check token error")
 		return ok
 	}
 	defer utils.ClearByteArrayMemory(tokenbyte)
 
 	if ok = ctl.checkCSRFToken(ctx, tokenbyte, csrftoken); !ok {
+		logrus.Warnf("check csrf token error")
 		return ok
 	}
 
@@ -182,7 +184,7 @@ func (ctl baseController) checkApiToken(
 		return ok
 	}
 
-	if err := ctl.setRespToken(ctx, token, csrftoken, payload.Account); err != nil {
+	if err := ctl.setRespToken(ctx, token, csrftoken, payload.Account, apiConfig.SessionDomain); err != nil {
 		logrus.Debugf("set resp token error: %s", err.Error())
 	}
 
@@ -266,7 +268,7 @@ func (ctl baseController) checkUserApiTokenBase(
 	return
 }
 
-func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username string) error {
+func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username, domain string) error {
 	// encrpt username
 	u, err := ctl.encryptData(username)
 	if err != nil {
@@ -292,16 +294,16 @@ func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username s
 	}
 
 	// set cookie
-	setCookie(ctx, PrivateToken, u, true, utils.ExpiryReduceSecond(apiConfig.TokenExpiry))
+	setCookie(ctx, PrivateToken, u, domain, true, utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteLaxMode)
 
 	return nil
 }
 
-func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token string) {
-	setCookie(ctx, csrfToken, token, false, utils.ExpiryReduceSecond(apiConfig.TokenExpiry))
+func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token, domain string) {
+	setCookie(ctx, csrfToken, token, domain, false, utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteStrictMode)
 }
 
-func setCookie(ctx *gin.Context, key, val string, httpOnly bool, expireTime time.Time) {
+func setCookie(ctx *gin.Context, key, val, domain string, httpOnly bool, expireTime time.Time, sameSite http.SameSite) {
 	cookie := &http.Cookie{
 		Name:     key,
 		Value:    val,
@@ -309,16 +311,17 @@ func setCookie(ctx *gin.Context, key, val string, httpOnly bool, expireTime time
 		Expires:  expireTime,
 		HttpOnly: httpOnly,
 		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: sameSite,
+		Domain:   domain,
 	}
 
 	http.SetCookie(ctx.Writer, cookie)
 }
 
-func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, username string) error {
-	ctl.setRespCSRFToken(ctx, csrftoken)
+func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, username, domain string) error {
+	ctl.setRespCSRFToken(ctx, csrftoken, domain)
 
-	if err := ctl.setRespCookieToken(ctx, token, username); err != nil {
+	if err := ctl.setRespCookieToken(ctx, token, username, domain); err != nil {
 		return err
 	}
 
@@ -525,8 +528,9 @@ func (ctl baseController) decryptDataForToken(s string) ([]byte, error) {
 	return encryptHelperToken.Decrypt(dst)
 }
 
-func (ctl baseController) cleanCookie(ctx *gin.Context) {
-	setCookie(ctx, PrivateToken, "", true, time.Now().AddDate(0, 0, -1))
+func (ctl baseController) cleanCookie(ctx *gin.Context, domain string) {
+	setCookie(ctx, PrivateToken, "", domain, true, time.Now().AddDate(0, 0, -1), http.SameSiteLaxMode)
+	setCookie(ctx, PrivateToken, "", "", true, time.Now().AddDate(0, 0, -1), http.SameSiteLaxMode)
 	t, ok := ctx.Get(encodeUsername)
 	if !ok {
 		logrus.Warnf("context get encode username failed")
@@ -539,7 +543,8 @@ func (ctl baseController) cleanCookie(ctx *gin.Context) {
 
 	_ = ctl.newRepo().Expire(u, 0)
 
-	setCookie(ctx, csrfToken, "", false, time.Now().AddDate(0, 0, -1))
+	setCookie(ctx, csrfToken, "", domain, false, time.Now().AddDate(0, 0, -1), http.SameSiteStrictMode)
+	setCookie(ctx, csrfToken, "", "", false, time.Now().AddDate(0, 0, -1), http.SameSiteStrictMode)
 }
 
 func (ctl baseController) getQueryParameter(ctx *gin.Context, key string) string {

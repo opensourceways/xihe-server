@@ -58,6 +58,7 @@ type APIConfig struct {
 	Tags                           Tags   `json:"tags"                        required:"true"`
 	TokenKey                       string `json:"token_key"                   required:"true"`
 	TokenExpiry                    int64  `json:"token_expiry"                required:"true"`
+	SessionDomain                  string `json:"session_domain"              required:"true"`
 	EncryptionKey                  string `json:"encryption_key"              required:"true"`
 	EncryptionKeyForCSRF           string `json:"encryption_key_csrf"         required:"true"`
 	EncryptionKeyForGitlabToken    string `json:"encryption_key_gitlab_token" required:"true"`
