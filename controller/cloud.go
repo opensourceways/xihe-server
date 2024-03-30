@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/opensourceways/xihe-server/cloud/app"
+	"github.com/opensourceways/xihe-server/domain"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -26,6 +28,7 @@ func AddRouterForCloudController(
 	rg.POST("/v1/cloud/subscribe", checkUserEmailMiddleware(&ctl.baseController), ctl.Subscribe)
 	rg.GET("/v1/cloud/:cid", ctl.Get)
 	rg.GET("/v1/cloud/pod/:cid", ctl.GetHttp)
+	rg.GET("/v1/cloud/read/:owner", ctl.CanRead)
 }
 
 type CloudController struct {
@@ -228,4 +231,54 @@ func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 	} else {
 		ctl.sendRespOfGet(ctx, dto)
 	}
+}
+
+// @Summary		CanRead
+// @Description	get cloud pod
+// @Tags			Cloud
+// @Param			owner	path	string	true	""
+// @Accept			json
+// @Success		201	{object}			app.InferenceDTO
+// @Failure		400	bad_request	not allowed
+// @Failure		500	system_error		system	error
+// @Router			/v1/cloud/read/{owner} [get]
+func (ctl *CloudController) CanRead(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		return
+	}
+	
+	if pl.Account == "" {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, errors.New("not identified"),
+		))
+
+		return
+	}
+
+	owner, err := domain.NewAccount(ctx.Param("owner"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	if pl.isNotMe(owner) {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorNotAllowed, "not allowed",
+		))
+
+		return
+	}
+	type Res struct {
+		Status string `json:"status"`
+	}
+
+	res := Res{
+		Status: "success",
+	}
+
+	ctl.sendRespOfGet(ctx, res)
 }

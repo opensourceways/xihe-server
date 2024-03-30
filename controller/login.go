@@ -139,7 +139,7 @@ func (ctl *LoginController) Login(ctx *gin.Context) {
 		return
 	}
 
-	if err = ctl.setRespToken(ctx, token, csrftoken, user.Account); err != nil {
+	if err = ctl.setRespToken(ctx, token, csrftoken, user.Account, apiConfig.SessionDomain); err != nil {
 		ctl.sendRespWithInternalError(
 			ctx, newResponseCodeError(errorSystemError, err),
 		)
@@ -277,7 +277,7 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 
 	utils.DoLog(info.UserId, "", "logout", "", "success")
 
-	ctl.cleanCookie(ctx)
+	ctl.cleanCookie(ctx, apiConfig.SessionDomain)
 
 	info.Info = string(v)
 	ctx.JSON(http.StatusOK, newResponseData(info))

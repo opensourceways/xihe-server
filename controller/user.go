@@ -154,7 +154,7 @@ func (ctl *UserController) Get(ctx *gin.Context) {
 	if visitor {
 		if target == nil {
 			// clear cookie if we got an invalid user info
-			ctl.cleanCookie(ctx)
+			ctl.cleanCookie(ctx, apiConfig.SessionDomain)
 
 			ctx.JSON(http.StatusOK, newResponseData(nil))
 			return
@@ -274,7 +274,7 @@ func (ctl *UserController) RefreshGitlabToken(ctx *gin.Context) {
 	token, csrftoken := f()
 
 	if token != "" {
-		if err = ctl.setRespToken(ctx, token, csrftoken, usernew.Account); err != nil {
+		if err = ctl.setRespToken(ctx, token, csrftoken, usernew.Account, apiConfig.SessionDomain); err != nil {
 			return
 		}
 	}
@@ -449,7 +449,7 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 	} else {
 		token, csrftoken := f()
 		if token != "" {
-			if err := ctl.setRespToken(ctx, token, csrftoken, pl.Account); err != nil {
+			if err := ctl.setRespToken(ctx, token, csrftoken, pl.Account, apiConfig.SessionDomain); err != nil {
 				return
 			}
 		}
