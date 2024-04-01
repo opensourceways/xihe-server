@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	chBufferSize = 1000
+	chBufferSize = 20000
 )
 
 func AddRouterForBigModelController(
