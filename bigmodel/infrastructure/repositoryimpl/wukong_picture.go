@@ -300,7 +300,6 @@ func (impl *wukongPictureRepoImpl) getByUserName(user, pid, field string) (
 }
 
 func (impl *wukongPictureRepoImpl) GetPublicsGlobal() (r []domain.WuKongPicture, err error) {
-
 	var v []dWuKongPicture
 
 	f := func(ctx context.Context) error {

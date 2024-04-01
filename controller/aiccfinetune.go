@@ -198,6 +198,8 @@ func (ctl *AICCFinetuneController) Get(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
 		))
+
+		return
 	}
 
 	index := domain.AICCFinetuneIndex{
@@ -309,6 +311,7 @@ func (ctl *AICCFinetuneController) List(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
 		))
+		return
 	}
 
 	v, err := ctl.as.List(pl.DomainAccount(), model)
@@ -340,6 +343,8 @@ func (ctl *AICCFinetuneController) ListByWS(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
 		))
+
+		return
 	}
 
 	// setup websocket
@@ -534,6 +539,8 @@ func (ctl *AICCFinetuneController) UploadData(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
 		))
+
+		return
 	}
 
 	task, err := domain.NewFinetuneTask(ctx.Param("task"))
@@ -541,6 +548,8 @@ func (ctl *AICCFinetuneController) UploadData(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
 		))
+
+		return
 	}
 
 	f, err := ctx.FormFile("file")
@@ -576,6 +585,8 @@ func (ctl *AICCFinetuneController) UploadData(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
 		))
+
+		return
 	}
 
 	cmd := &app.UploadDataCmd{
@@ -587,7 +598,11 @@ func (ctl *AICCFinetuneController) UploadData(ctx *gin.Context) {
 	}
 
 	if v, err := ctl.as.UploadData(cmd); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
 
+		return
 	} else {
 		ctl.sendRespOfPost(ctx, v)
 	}

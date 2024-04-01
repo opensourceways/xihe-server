@@ -597,9 +597,7 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 
 	var b, e int
 	if b = cmd.CountPerPage * (cmd.PageNum - 1); b >= len(v) {
-		err = errors.New("paginator error")
-
-		return
+		return r, nil
 	}
 	if e = b + cmd.CountPerPage; e > len(v) {
 		e = len(v)
