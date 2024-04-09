@@ -678,6 +678,10 @@ func (ctl *BigModelController) GetPublicsGlobal(ctx *gin.Context) {
 			cmd.Level = domain.NewWuKongPictureLevel(v)
 		}
 
+		if v := ctl.getQueryParameter(ctx, "sort_by"); v != "" {
+			cmd.SortBy = v
+		}
+
 		cmd.User = pl.DomainAccount()
 
 		return
