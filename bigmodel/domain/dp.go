@@ -54,6 +54,7 @@ var (
 	BigmodelIFlytekSpark  = BigmodelType(bigmodelIFlytekSpark)
 
 	wukongPictureLevelMap = map[string]int{
+		"hot":      3,
 		"official": 2,
 		"good":     1,
 		"normal":   0,
