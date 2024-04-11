@@ -643,6 +643,9 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 }
 
 func (s bigModelService) sortWuKongPicture(pic []domain.WuKongPicture, picLevel domain.WuKongPictureLevel) {
+	if picLevel == nil {
+		return
+	}
 	if picLevel.IsHot() {
 		sort.Slice(pic, func(i, j int) bool {
 			return pic[i].DiggCount > pic[j].DiggCount
