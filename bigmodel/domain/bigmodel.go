@@ -45,6 +45,10 @@ func (r *WuKongPicture) IsOfficial() bool {
 	return r.Level.IsOfficial()
 }
 
+func (r WuKongPicture) IsHot() bool {
+	return r.Level.IsHot()
+}
+
 func (r *WuKongPicture) SetDefaultDiggs() {
 	r.Diggs = []string{}
 }

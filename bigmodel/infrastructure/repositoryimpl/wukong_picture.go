@@ -336,6 +336,9 @@ func (impl *wukongPictureRepoImpl) GetPublicsGlobal() (r []domain.WuKongPicture,
 			c++
 		}
 	}
+
+	sortWuKongPictureByTime(r)
+
 	return
 }
 

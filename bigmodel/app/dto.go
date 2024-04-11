@@ -80,9 +80,8 @@ type WuKongPictureListOption struct {
 }
 
 type WuKongListPublicGlobalCmd struct {
-	User   types.Account
-	Level  domain.WuKongPictureLevel
-	SortBy string
+	User  types.Account
+	Level domain.WuKongPictureLevel
 	WuKongPictureListOption
 }
 
@@ -94,13 +93,6 @@ func (cmd *WuKongListPublicGlobalCmd) Validate() error {
 	if cmd.WuKongPictureListOption.CountPerPage < 1 {
 		return errors.New("count_per_page less than 1")
 	}
-
-	if cmd.SortBy != "" {
-		if cmd.SortBy != "digg_count" && cmd.SortBy != "created_at" {
-			return errors.New("invalid cmd")
-		}
-	}
-
 	return nil
 }
 
