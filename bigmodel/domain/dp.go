@@ -54,6 +54,7 @@ var (
 	BigmodelIFlytekSpark  = BigmodelType(bigmodelIFlytekSpark)
 
 	wukongPictureLevelMap = map[string]int{
+		"hot":      3,
 		"official": 2,
 		"good":     1,
 		"normal":   0,
@@ -115,6 +116,7 @@ type WuKongPictureLevel interface {
 	WuKongPictureLevel() string
 	Int() int
 	IsOfficial() bool
+	IsHot() bool
 }
 
 func NewWuKongPictureLevel(v string) WuKongPictureLevel {
@@ -159,6 +161,10 @@ func (r wukongPictureLevel) Int() int {
 
 func (r wukongPictureLevel) IsOfficial() bool {
 	return r.WuKongPictureLevel() == "official"
+}
+
+func (r wukongPictureLevel) IsHot() bool {
+	return r.WuKongPictureLevel() == "hot"
 }
 
 // obspath
