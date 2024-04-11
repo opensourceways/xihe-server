@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"net/url"
+	"sort"
 	"strings"
 	"time"
 
@@ -594,6 +595,7 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 	if err != nil {
 		return
 	}
+	s.sortWuKongPicture(v, cmd.Level)
 
 	var b, e int
 	if b = cmd.CountPerPage * (cmd.PageNum - 1); b >= len(v) {
@@ -638,6 +640,22 @@ func (s bigModelService) GetPublicsGlobal(cmd *WuKongListPublicGlobalCmd) (r WuK
 	}
 
 	return
+}
+
+func (s bigModelService) sortWuKongPicture(pic []domain.WuKongPicture, picLevel domain.WuKongPictureLevel) {
+	if picLevel == nil {
+		return
+	}
+	if picLevel.IsHot() {
+		sort.Slice(pic, func(i, j int) bool {
+			if pic[i].DiggCount == pic[j].DiggCount {
+				ti, _ := utils.ToUnixTime(pic[i].CreatedAt)
+				tj, _ := utils.ToUnixTime(pic[j].CreatedAt)
+				return ti.After(tj)
+			}
+			return pic[i].DiggCount > pic[j].DiggCount
+		})
+	}
 }
 
 func (s bigModelService) ListPublics(user types.Account) (
