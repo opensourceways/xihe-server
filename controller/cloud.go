@@ -87,25 +87,6 @@ func (ctl *CloudController) Subscribe(ctx *gin.Context) {
 		return
 	}
 
-	whitecmd, err := toWhiteListCmd(pl.DomainAccount())
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	}
-
-	v, err := ctl.us.CheckWhiteList(&whitecmd)
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	}
-	if !v {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorNotAllowed, "not allowed for this module",
-		))
-
-		return
-	}
-
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "subscribe cloud")
 
 	cmd := req.toCmd(pl.DomainAccount())
@@ -247,7 +228,7 @@ func (ctl *CloudController) CanRead(ctx *gin.Context) {
 	if !ok {
 		return
 	}
-	
+
 	if pl.Account == "" {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, errors.New("not identified"),
