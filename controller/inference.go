@@ -68,25 +68,6 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		return
 	}
 
-	whitecmd, err := toWhiteListCmd(pl.DomainAccount())
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	}
-
-	allow, err := ctl.whitelist.CheckWhiteList(&whitecmd)
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	}
-	if !allow {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorNotAllowed, "not allowed for this module",
-		))
-
-		return
-	}
-
 	// setup websocket
 	upgrader := websocket.Upgrader{
 		Subprotocols: []string{csrftoken},
