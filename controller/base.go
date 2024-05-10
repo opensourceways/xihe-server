@@ -324,6 +324,11 @@ func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, usern
 	if err := ctl.setRespCookieToken(ctx, token, username, domain); err != nil {
 		return err
 	}
+	if apiConfig.LocalDomainCookie {
+		if err := ctl.setRespCookieToken(ctx, token, username, ""); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

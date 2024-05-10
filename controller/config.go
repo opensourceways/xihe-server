@@ -75,6 +75,7 @@ type APIConfig struct {
 	MaxTagsNumToSearchResource     int    `json:"max_tags_num_to_search_resource"`
 	MaxTagKindsNumToSearchResource int    `json:"max_tag_kinds_num_to_search_resource"`
 	MaxFinetuneSubmmitFileSzie     int64  `json:"max_finetune_submmit_file_size"`
+	LocalDomainCookie              bool   `json:"local_domain_cookie"`
 }
 
 func (cfg *APIConfig) SetDefault() {
