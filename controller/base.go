@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"strconv"
@@ -321,8 +322,18 @@ func setCookie(ctx *gin.Context, key, val, domain string, httpOnly bool, expireT
 func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, username, domain string) error {
 	ctl.setRespCSRFToken(ctx, csrftoken, domain)
 
+	if apiConfig.LocalDomainCookie {
+		ctl.setRespCSRFToken(ctx, csrftoken, "")
+	}
+
 	if err := ctl.setRespCookieToken(ctx, token, username, domain); err != nil {
 		return err
+	}
+	if apiConfig.LocalDomainCookie {
+		fmt.Println("====================local set domain cookie========================")
+		if err := ctl.setRespCookieToken(ctx, token, username, ""); err != nil {
+			return err
+		}
 	}
 
 	return nil
