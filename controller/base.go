@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"strconv"
@@ -323,6 +322,8 @@ func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, usern
 	ctl.setRespCSRFToken(ctx, csrftoken, domain)
 
 	if apiConfig.LocalDomainCookie {
+		logrus.Info("local set cookie domain empty")
+
 		ctl.setRespCSRFToken(ctx, csrftoken, "")
 	}
 
@@ -330,7 +331,8 @@ func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, usern
 		return err
 	}
 	if apiConfig.LocalDomainCookie {
-		fmt.Println("====================local set domain cookie========================")
+		logrus.Info("local set cookie domain empty")
+		
 		if err := ctl.setRespCookieToken(ctx, token, username, ""); err != nil {
 			return err
 		}
