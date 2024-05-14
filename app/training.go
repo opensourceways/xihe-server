@@ -179,6 +179,9 @@ func (s trainingService) GetLastTrainingConfig(cmd *ResourceIndexCmd) (dto Train
 	resourceIndex := domain.ResourceIndex(*cmd)
 	data, err := s.repo.GetLastTrainingConfig(&resourceIndex)
 	if err != nil {
+		s.log.WithFields(logrus.Fields{"owner": cmd.Owner.Account(), "pid": cmd.Id}).
+			Errorf("fail to get the latest configuration of training: %s", err.Error())
+
 		if repository.IsErrorResourceNotExists(err) {
 			code = ErrorTrainNotFound
 		}
