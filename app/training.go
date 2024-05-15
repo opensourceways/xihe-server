@@ -103,6 +103,12 @@ func (s trainingService) create(
 				errors.New("a training is running"),
 			}
 		}
+
+		if v[i].Name.TrainingName() == config.Name.TrainingName() {
+			return "", ErrorDuplicateTrainingName{
+				errors.New("duplicate training name"),
+			}
+		}
 	}
 
 	t := domain.UserTraining{

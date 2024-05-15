@@ -38,6 +38,10 @@ func IsErrorUnavailableTraining(err error) bool {
 	return ok
 }
 
+type ErrorDuplicateTrainingName struct {
+	error
+}
+
 const (
 	ErrorCodeSytem = "system"
 
