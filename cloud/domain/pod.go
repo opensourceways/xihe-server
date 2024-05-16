@@ -6,6 +6,13 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
+const (
+	cloudIdCPU   = "cpu_001"
+	cloudIdNPU   = "ascend_001"
+	cloudTypeCPU = "cpu"
+	cloudTypeNPU = "npu"
+)
+
 type Pod struct {
 	Id      string
 	CloudId string
@@ -92,4 +99,12 @@ func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account) (err erro
 	}
 
 	return
+}
+
+func (p *PodInfo) GetCloudType() string {
+	if p.CloudId == cloudIdCPU {
+		return cloudTypeCPU
+	}
+
+	return cloudTypeNPU
 }
