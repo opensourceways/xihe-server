@@ -151,6 +151,8 @@ func (doc *DWhiteListInfo) toWhiteListInfo(u *domain.WhiteListInfo) (err error) 
 	}
 
 	u.Enabled = doc.Enabled
+	u.StartTime = doc.StartTime
+	u.EndTime = doc.EndTime
 
 	return
 }

@@ -99,7 +99,3 @@ func toCheckWhiteListCmd(user domain.Account, t string) (cmd app.UserWhiteListCm
 	cmd.Type = v
 	return
 }
-
-type whitelistResp struct {
-	Allowed bool `json:"allowed"`
-}

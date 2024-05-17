@@ -557,15 +557,11 @@ func (ctl *UserController) CheckWhiteList(ctx *gin.Context) {
 		return
 	}
 
-	v, err := ctl.whitelist.CheckWhiteList(&cmd)
+	whitelistDTO, err := ctl.whitelist.CheckWhiteList(&cmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
 	}
 
-	resp := whitelistResp{
-		Allowed: v,
-	}
-
-	ctx.JSON(http.StatusOK, newResponseData(resp))
+	ctl.sendRespOfGet(ctx, whitelistDTO)
 }

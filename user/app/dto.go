@@ -196,3 +196,11 @@ type UserWhiteListCmd domain.WhiteListInfo
 func (cmd *UserWhiteListCmd) toUserWhiteListInfo(r *domain.WhiteListInfo) {
 	*r = *(*domain.WhiteListInfo)(cmd)
 }
+
+type WhitelistDTO struct {
+	Allowed bool `json:"allowed"`
+}
+
+func (w *WhitelistDTO) toWhitelistDTO(whitelist *domain.WhiteListInfo) {
+	w.Allowed = whitelist.Enable()
+}
