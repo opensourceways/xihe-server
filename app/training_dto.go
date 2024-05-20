@@ -161,3 +161,92 @@ func (s trainingService) toTrainingDTO(dto *TrainingDTO, ut *domain.UserTraining
 		dto.Desc = t.Desc.TrainingDesc()
 	}
 }
+
+type ResourceIndexCmd = domain.ResourceIndex
+
+type TrainingConfigDTO struct {
+	Name string `json:"name"`
+	Desc string `json:"desc"`
+
+	CodeDir  string `json:"code_dir"`
+	BootFile string `json:"boot_file"`
+
+	Hyperparameters []KeyValueDTO    `json:"hyperparameter"`
+	Env             []KeyValueDTO    `json:"env"`
+	Inputs          []TrainingRefDTO `json:"inputs"`
+	EnableAim       bool             `json:"enable_aim"`
+	EnableOutput    bool             `json:"enable_output"`
+
+	Compute ComputeDTO `json:"compute"`
+}
+
+func (dto *TrainingConfigDTO) toDTO(config *domain.TrainingConfig) {
+	hypers := make([]KeyValueDTO, len(config.Hyperparameters))
+	for i := range config.Hyperparameters {
+		hypers[i].toDTO(&config.Hyperparameters[i])
+	}
+
+	env := make([]KeyValueDTO, len(config.Env))
+	for i := range config.Env {
+		env[i].toDTO(&config.Env[i])
+	}
+
+	inputs := make([]TrainingRefDTO, len(config.Inputs))
+	for i := range config.Inputs {
+		inputs[i].toDTO(&config.Inputs[i])
+	}
+
+	compute := new(ComputeDTO)
+	compute.toDTO(&config.Compute)
+
+	*dto = TrainingConfigDTO{
+		Name:            config.Name.TrainingName(),
+		Desc:            config.Desc.TrainingDesc(),
+		CodeDir:         config.CodeDir.Directory(),
+		BootFile:        config.BootFile.FilePath(),
+		Hyperparameters: hypers,
+		Env:             env,
+		Inputs:          inputs,
+		EnableAim:       config.EnableAim,
+		EnableOutput:    config.EnableOutput,
+		Compute:         *compute,
+	}
+}
+
+type KeyValueDTO struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+func (dto *KeyValueDTO) toDTO(kv *domain.KeyValue) {
+	*dto = KeyValueDTO{
+		Key:   kv.Key.CustomizedKey(),
+		Value: kv.Value.CustomizedValue(),
+	}
+}
+
+type TrainingRefDTO struct {
+	Key   string `json:"key"`
+	Owner string `json:"owner"`
+	File  string `json:"File"`
+	Name  string `json:"name,omitempty"`
+	Type  string `json:"type"`
+}
+
+func (dto *TrainingRefDTO) toDTO(input *domain.Input) {
+	*dto = TrainingRefDTO{
+		Key:   input.Key.CustomizedKey(),
+		Owner: input.User.Account(),
+		File:  input.File.InputeFilePath(),
+		Name:  input.Name.ResourceName(),
+		Type:  input.Type.ResourceType(),
+	}
+}
+
+func (dto *ComputeDTO) toDTO(c *domain.Compute) {
+	*dto = ComputeDTO{
+		Type:    c.Type.ComputeType(),
+		Flavor:  c.Flavor.ComputeFlavor(),
+		Version: c.Version.ComputeVersion(),
+	}
+}

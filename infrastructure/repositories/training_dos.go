@@ -148,6 +148,7 @@ type InputDO struct {
 	Type   string
 	RepoId string
 	File   string
+	Name   string
 }
 
 func (do *InputDO) toInput() (r domain.Input, err error) {
@@ -166,6 +167,14 @@ func (do *InputDO) toInput() (r domain.Input, err error) {
 	r.RepoId = do.RepoId
 	if r.File, err = domain.NewInputeFilePath(do.File); err != nil {
 		return
+	}
+
+	// compatible with empty field
+	r.Name = domain.NewEmptyResourceName()
+	if do.Name != "" {
+		if r.Name, err = domain.NewResourceName(do.Name); err != nil {
+			return
+		}
 	}
 
 	return
@@ -246,6 +255,7 @@ func (impl training) toInputDOs(v []domain.Input) []InputDO {
 			Type:   item.Type.ResourceType(),
 			File:   item.File.InputeFilePath(),
 			RepoId: item.RepoId,
+			Name:   item.Name.ResourceName(),
 		}
 	}
 

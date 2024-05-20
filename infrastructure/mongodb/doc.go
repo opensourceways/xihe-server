@@ -332,6 +332,7 @@ type dInput struct {
 	User   string `bson:"user"           json:"user"`
 	File   string `bson:"file"           json:"file"`
 	RepoId string `bson:"rid"            json:"rid"`
+	Name   string `bson:"name"           json:"name,omitempty"`
 }
 
 type dJobInfo struct {

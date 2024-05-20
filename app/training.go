@@ -27,6 +27,7 @@ type TrainingService interface {
 	UpdateJobDetail(*TrainingIndex, *JobDetail) error
 	List(user domain.Account, projectId string) ([]TrainingSummaryDTO, error)
 	Get(*TrainingIndex) (TrainingDTO, string, error)
+	GetLastTrainingConfig(*ResourceIndexCmd) (dto TrainingConfigDTO, code string, err error)
 	Delete(*TrainingIndex) error
 	Terminate(*TrainingIndex) error
 	GetLogDownloadURL(*TrainingIndex) (string, string, error)
@@ -102,6 +103,12 @@ func (s trainingService) create(
 				errors.New("a training is running"),
 			}
 		}
+
+		if v[i].Name.TrainingName() == config.Name.TrainingName() {
+			return "", ErrorDuplicateTrainingName{
+				errors.New("duplicate training name"),
+			}
+		}
 	}
 
 	t := domain.UserTraining{
@@ -170,6 +177,25 @@ func (s trainingService) Get(info *TrainingIndex) (dto TrainingDTO, code string,
 	}
 
 	s.toTrainingDTO(&dto, &data, link)
+
+	return
+}
+
+func (s trainingService) GetLastTrainingConfig(cmd *ResourceIndexCmd) (dto TrainingConfigDTO, code string, err error) {
+	resourceIndex := domain.ResourceIndex(*cmd)
+	data, err := s.repo.GetLastTrainingConfig(&resourceIndex)
+	if err != nil {
+		s.log.WithFields(logrus.Fields{"owner": cmd.Owner.Account(), "pid": cmd.Id}).
+			Errorf("fail to get the latest configuration of training: %s", err.Error())
+
+		if repository.IsErrorResourceNotExists(err) {
+			code = ErrorTrainNotFound
+		}
+
+		return
+	}
+
+	dto.toDTO(&data)
 
 	return
 }

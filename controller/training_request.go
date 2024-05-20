@@ -174,9 +174,10 @@ func (t *TrainingRef) toInput(r *domain.Input) (name domain.ResourceName, err er
 		return
 	}
 
-	if name, err = domain.NewResourceName(t.Name); err != nil {
+	if r.Name, err = domain.NewResourceName(t.Name); err != nil {
 		return
 	}
+	name = r.Name
 
 	if r.File, err = domain.NewInputeFilePath(t.File); err != nil {
 		return
@@ -231,11 +232,8 @@ func (ctl *TrainingController) setModelsInput(
 
 		ti, name, err := v.toModelInput()
 		if err != nil {
-			if err != nil {
-				ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
-
-				return
-			}
+			ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
+			return
 		}
 		tinputs[i] = ti
 
@@ -320,11 +318,8 @@ func (ctl *TrainingController) setDatasetsInput(
 
 		ti, name, err := v.toDatasetInput()
 		if err != nil {
-			if err != nil {
-				ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
-
-				return
-			}
+			ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
+			return
 		}
 		tinputs[i] = ti
 

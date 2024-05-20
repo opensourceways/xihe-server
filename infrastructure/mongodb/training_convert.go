@@ -64,6 +64,7 @@ func (col training) toInputDoc(v []repositories.InputDO) []dInput {
 			Type:   item.Type,
 			File:   item.File,
 			RepoId: item.RepoId,
+			Name:   item.Name,
 		}
 	}
 
@@ -136,6 +137,7 @@ func (col training) toInputs(v []dInput) []repositories.InputDO {
 			Type:   item.Type,
 			File:   item.File,
 			RepoId: item.RepoId,
+			Name:   item.Name,
 		}
 	}
 
