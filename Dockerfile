@@ -12,8 +12,11 @@ RUN go env -w GOPRIVATE=github.com/opensourceways/xihe-extra-services,github.com
 COPY . /go/src/github.com/opensourceways/xihe-server
 RUN cd /go/src/github.com/opensourceways/xihe-server && GO111MODULE=on CGO_ENABLED=0 go build -buildmode=pie --ldflags "-s -linkmode 'external' -extldflags '-Wl,-z,now'"
 # copy binary config and utils
-FROM openeuler/openeuler:22.03
-RUN dnf -y update && \
+FROM openeuler/openeuler:22.03-lts-sp1
+RUN sed -i "s|repo.openeuler.org|mirrors.nju.edu.cn/openeuler|g" /etc/yum.repos.d/openEuler.repo && \
+    sed -i '/metalink/d' /etc/yum.repos.d/openEuler.repo && \
+    sed -i '/metadata_expire/d' /etc/yum.repos.d/openEuler.repo && \
+    dnf -y update && \
     dnf in -y shadow && \
     dnf remove -y gdb-gdbserver && \
     groupadd -g 5000 mindspore && \
