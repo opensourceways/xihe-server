@@ -9,6 +9,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain/service"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
+	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
 type CloudService interface {
@@ -26,20 +27,23 @@ func NewCloudService(
 	cloudRepo repository.Cloud,
 	podRepo repository.Pod,
 	producer message.CloudMessageProducer,
+	whitelistRepo userrepo.WhiteList,
 ) *cloudService {
 	return &cloudService{
-		cloudRepo:    cloudRepo,
-		podRepo:      podRepo,
-		producer:     producer,
-		cloudService: service.NewCloudService(podRepo, producer),
+		cloudRepo:     cloudRepo,
+		podRepo:       podRepo,
+		producer:      producer,
+		cloudService:  service.NewCloudService(podRepo, producer),
+		whitelistRepo: whitelistRepo,
 	}
 }
 
 type cloudService struct {
-	cloudRepo    repository.Cloud
-	podRepo      repository.Pod
-	producer     message.CloudMessageProducer
-	cloudService service.CloudService
+	cloudRepo     repository.Cloud
+	podRepo       repository.Pod
+	producer      message.CloudMessageProducer
+	cloudService  service.CloudService
+	whitelistRepo userrepo.WhiteList
 }
 
 func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err error) {
@@ -87,6 +91,29 @@ func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err erro
 }
 
 func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err error) {
+	// get cloud conf
+	cloudConf, err := s.cloudRepo.GetCloudConf(cmd.CloudId)
+	if err != nil {
+		return
+	}
+
+	// whitelist
+	if cloudConf.IsAscend() {
+		whitelist, e := s.whitelistRepo.GetWhiteListInfo(cmd.User, "cloud")
+		if e != nil {
+			err = e
+
+			return
+		}
+
+		if !whitelist.Enable() {
+			code = errorWhitelistNotAllowed
+			err = errors.New("not allowed for this module")
+
+			return
+		}
+	}
+
 	// check
 	_, ok, err := s.cloudService.CheckUserCanSubsribe(cmd.User, cmd.CloudId)
 	if err != nil {
@@ -100,12 +127,8 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 		return
 	}
 
-	// get cloud conf
 	c := new(domain.Cloud)
-	c.CloudConf, err = s.cloudRepo.GetCloudConf(cmd.CloudId)
-	if err != nil {
-		return
-	}
+	c.CloudConf = cloudConf
 
 	// check
 	if err = s.cloudService.ToCloud(c); err != nil {

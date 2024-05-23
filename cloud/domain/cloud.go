@@ -11,6 +11,10 @@ type CloudConf struct {
 	Credit    Credit
 }
 
+func (c *CloudConf) IsAscend() bool {
+	return c.Id == "ascend_001"
+}
+
 type Cloud struct {
 	CloudConf
 

@@ -165,6 +165,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
+	whitelist := userrepoimpl.NewWhiteListRepo(
+		mongodb.NewCollection(collections.UserWhiteList),
+	)
+
 	promotionRepo := promotionadapter.PromotionAdapter(mongodb.NewCollection(collections.Promotion))
 	promotionPointRepo := promotionadapter.PointsAdapter(mongodb.NewCollection(collections.PromotionPoint))
 	promotionTaskRepo := promotionadapter.TaskAdapter(mongodb.NewCollection(collections.PromotionTask))
@@ -231,6 +235,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		cloudrepo.NewCloudRepo(mongodb.NewCollection(collections.CloudConf)),
 		cloudrepo.NewPodRepo(&cfg.Postgresql.Cloud),
 		cloudmsg.NewPublisher(&cfg.Cloud, publisher),
+		whitelist,
 	)
 
 	bigmodelAppService := bigmodelapp.NewBigModelService(
@@ -281,9 +286,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	promotionpointsAppService := promotionapp.NewPointsService(promotionPointTaskService)
 
 	userWhiteListService := userapp.NewWhiteListService(
-		userrepoimpl.NewWhiteListRepo(
-			mongodb.NewCollection(collections.UserWhiteList),
-		),
+		whitelist,
 	)
 
 	{
