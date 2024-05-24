@@ -98,19 +98,15 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 	}
 
 	// whitelist
-	if cloudConf.IsAscend() {
-		whitelist, e := s.whitelistRepo.GetWhiteListInfo(cmd.User, "cloud")
-		if e != nil {
-			err = e
-
-			return
+	if cloudConf.IsNPU() {
+		const whitelistTypeCloud = "cloud"
+		whitelist, err := s.whitelistRepo.GetWhiteListInfo(cmd.User, whitelistTypeCloud)
+		if err != nil {
+			return "", err
 		}
 
 		if !whitelist.Enable() {
-			code = errorWhitelistNotAllowed
-			err = errors.New("not allowed for this module")
-
-			return
+			return errorWhitelistNotAllowed, errors.New("not allowed for this module")
 		}
 	}
 

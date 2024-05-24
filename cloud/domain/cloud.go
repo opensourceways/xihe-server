@@ -1,5 +1,12 @@
 package domain
 
+const (
+	cloudIdCPU   = "cpu_001"
+	cloudIdNPU   = "ascend_001"
+	cloudTypeCPU = "cpu"
+	cloudTypeNPU = "npu"
+)
+
 type CloudConf struct {
 	Id        string
 	Name      CloudName
@@ -11,8 +18,8 @@ type CloudConf struct {
 	Credit    Credit
 }
 
-func (c *CloudConf) IsAscend() bool {
-	return c.Id == "ascend_001"
+func (c *CloudConf) IsNPU() bool {
+	return c.Id == cloudIdNPU
 }
 
 type Cloud struct {

@@ -6,13 +6,6 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-const (
-	cloudIdCPU   = "cpu_001"
-	cloudIdNPU   = "ascend_001"
-	cloudTypeCPU = "cpu"
-	cloudTypeNPU = "npu"
-)
-
 type Pod struct {
 	Id      string
 	CloudId string
