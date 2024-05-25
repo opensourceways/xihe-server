@@ -24,6 +24,7 @@ type RepoFile struct {
 
 type Sender interface {
 	AddOperateLogForAccessBigModel(domain.Account, bmdomain.BigmodelType) error
+	AddOperateLogForCloudCreated(domain.Account, string) error
 
 	CreateFinetune(*domain.FinetuneIndex) error
 

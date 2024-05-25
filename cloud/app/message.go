@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/cloud/domain/cloud"
+	"github.com/opensourceways/xihe-server/cloud/domain/message"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 	"github.com/sirupsen/logrus"
@@ -17,20 +18,23 @@ func NewCloudMessageService(
 	manager cloud.CloudPod,
 	survivalTimeForPodCPU int64,
 	survivalTimeForPodAscend int64,
+	cloudRecordEventPublisher message.CloudRecordEventPublisher,
 ) CloudMessageService {
 	return &cloudMessageService{
-		repo:                     repo,
-		manager:                  manager,
-		survivalTimeForPodCPU:    survivalTimeForPodCPU,
-		survivalTimeForPodAscend: survivalTimeForPodAscend,
+		repo:                      repo,
+		manager:                   manager,
+		survivalTimeForPodCPU:     survivalTimeForPodCPU,
+		survivalTimeForPodAscend:  survivalTimeForPodAscend,
+		cloudRecordEventPublisher: cloudRecordEventPublisher,
 	}
 }
 
 type cloudMessageService struct {
-	repo                     repository.Pod
-	manager                  cloud.CloudPod
-	survivalTimeForPodCPU    int64
-	survivalTimeForPodAscend int64
+	repo                      repository.Pod
+	manager                   cloud.CloudPod
+	survivalTimeForPodCPU     int64
+	survivalTimeForPodAscend  int64
+	cloudRecordEventPublisher message.CloudRecordEventPublisher
 }
 
 func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
@@ -65,5 +69,12 @@ func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
 	p.StatusSetCreating()
 	p.Expiry = expire
 
-	return c.repo.UpdatePod(p)
+	if err = c.repo.UpdatePod(p); err != nil {
+		return err
+	}
+
+	return c.cloudRecordEventPublisher.Publish(&message.CloudRecordEvent{
+		Owner:  p.Owner,
+		ClouId: p.CloudId,
+	})
 }

@@ -42,3 +42,12 @@ func (r *MsgPod) ToMsgPod(p *domain.Pod) {
 type CloudMessageHandler interface {
 	HandleEventPodSubscribe(info *domain.PodInfo) error
 }
+
+type CloudRecordEvent struct {
+	Owner  types.Account
+	ClouId string
+}
+
+type CloudRecordEventPublisher interface {
+	Publish(*CloudRecordEvent) error
+}
