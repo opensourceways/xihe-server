@@ -101,3 +101,19 @@ func (p *PodInfo) GetCloudType() string {
 
 	return cloudTypeNPU
 }
+
+func (p *PodInfo) IsCpu() bool {
+	if p.CloudId == cloudIdCPU {
+		return true
+	}
+
+	return false
+}
+
+func (p *PodInfo) IsAscend() bool {
+	if p.CloudId == cloudIdNPU {
+		return true
+	}
+
+	return false
+}
