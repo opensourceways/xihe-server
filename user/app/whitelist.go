@@ -6,7 +6,7 @@ import (
 
 type WhiteListService interface {
 	// register
-	CheckWhiteList(*UserWhiteListCmd) (bool, error)
+	CheckWhiteList(*UserWhiteListCmd) (*WhitelistDTO, error)
 }
 
 var _ RegService = (*regService)(nil)
@@ -23,15 +23,14 @@ type whiteListService struct {
 	whiteRepo repository.WhiteList
 }
 
-func (s *whiteListService) CheckWhiteList(cmd *UserWhiteListCmd) (v bool, err error) {
+func (s *whiteListService) CheckWhiteList(cmd *UserWhiteListCmd) (*WhitelistDTO, error) {
 	u, err := s.whiteRepo.GetWhiteListInfo(cmd.Account, cmd.Type.WhiteListType())
 	if err != nil {
-		return
+		return nil, err
 	}
-	if !u.Enabled {
-		v = false
-		return
-	}
-	v = true
-	return
+
+	w := &WhitelistDTO{}
+	w.toWhitelistDTO(&u)
+
+	return w, nil
 }

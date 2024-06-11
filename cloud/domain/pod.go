@@ -93,3 +93,11 @@ func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account) (err erro
 
 	return
 }
+
+func (p *PodInfo) GetCloudType() string {
+	if p.CloudId == cloudIdCPU {
+		return cloudTypeCPU
+	}
+
+	return cloudTypeNPU
+}
