@@ -5,6 +5,7 @@ import (
 
 	types "github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/promotion/domain"
 	"github.com/opensourceways/xihe-server/promotion/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -66,10 +67,12 @@ func (impl *promotionAdapter) FindAll() (prs []repository.PromotionRepo, err err
 	return
 }
 
-func (impl *promotionAdapter) UserRegister(promotionid string, user types.Account, version int) error {
+func (impl *promotionAdapter) UserRegister(promotionid string, user types.Account, origin domain.Origin,
+	version int) error {
 	regUserDO := RegUserDO{
 		User:      user.Account(),
 		CreatedAt: utils.Now(),
+		Origin:    origin.Oringn(),
 	}
 	doc, err := regUserDO.doc()
 	if err != nil {

@@ -86,7 +86,7 @@ func (s *promotionService) GetUserRegisterPromotion(user *types.Account) (
 }
 
 func (s *promotionService) UserRegister(cmd *UserRegistrationCmd) (code string, err error) {
-	if err = s.service.Register(cmd.PromotionId, &cmd.UserRegistration); err != nil {
+	if err = s.service.Register(cmd.PromotionId, cmd.Origin, &cmd.UserRegistration); err != nil {
 		if repoerr.IsErrorDuplicateCreating(err) {
 			code = errorUserRegistrationExists
 		}

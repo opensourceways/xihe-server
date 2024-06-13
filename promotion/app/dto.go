@@ -87,4 +87,5 @@ func (dto *PromotionDTO) toDTO(p *domain.Promotion, user *types.Account, total i
 type UserRegistrationCmd struct {
 	PromotionId string
 	domain.UserRegistration
+	Origin domain.Origin
 }
