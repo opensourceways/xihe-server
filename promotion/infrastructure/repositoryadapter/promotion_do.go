@@ -59,7 +59,7 @@ func (do *promotionDO) toPromotionRepo() (p repository.PromotionRepo, err error)
 type RegUserDO struct {
 	User      string `bson:"user"       json:"user"`
 	CreatedAt int64  `bson:"created_at" json:"created_at"`
-	Origin    string `bson:"origin" json:"origin"`
+	Origin    string `bson:"origin"     json:"origin"`
 }
 
 func (do *RegUserDO) doc() (bson.M, error) {
