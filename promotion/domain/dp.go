@@ -16,6 +16,10 @@ const (
 	promotionStatusOver       = "over"
 	promotionStatusPreparing  = "preparing"
 	promotionStatusInProgress = "in-progress"
+
+	originMindSpore = "MindSpore"
+	originCSDN      = "CSDN"
+	originOther     = "other"
 )
 
 // PronotionName
@@ -158,4 +162,23 @@ func (r sentence) ENSentence() string {
 
 func (r sentence) ZHSentence() string {
 	return r[FieldZH]
+}
+
+type Origin interface {
+	Oringn() string
+}
+
+func NewOrigin(v string) (Origin, error) {
+	switch v {
+	case originMindSpore, originCSDN, originOther:
+		return origin(v), nil
+	}
+
+	return nil, errors.New("invalid origin")
+}
+
+type origin string
+
+func (o origin) Oringn() string {
+	return string(o)
 }
