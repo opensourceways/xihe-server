@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain"
 	"github.com/opensourceways/xihe-server/cloud/domain/cloud"
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
+	"github.com/opensourceways/xihe-server/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -42,7 +43,7 @@ func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
 		survivalTime = c.survivalTimeForPodAscend
 	}
 
-	expire, err := domain.NewPodExpiry(survivalTime)
+	expire, err := domain.NewPodExpiry(utils.Now()+survivalTime)
 	if err != nil {
 		return err
 	}
