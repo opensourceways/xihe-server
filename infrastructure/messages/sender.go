@@ -86,6 +86,13 @@ func (s *sender) AddOperateLogForAccessBigModel(u domain.Account, t bigmodeldoma
 	})
 }
 
+func (s *sender) AddOperateLogForCloudCreated(u domain.Account, cloudId string) error {
+	const operateType = "cloud"
+	return s.sendOperateLog(u, operateType, map[string]string{
+		"cloud_id": cloudId,
+	})
+}
+
 func (s *sender) sendOperateLog(u domain.Account, t string, info map[string]string) error {
 	return s.send(s.topics.OperateLog, operateLog(u, t, info))
 }
