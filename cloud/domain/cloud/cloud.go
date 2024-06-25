@@ -9,4 +9,5 @@ type CloudPodCreateInfo struct {
 
 type CloudPod interface {
 	Create(*CloudPodCreateInfo) error
+	Release(podId, cloudType string) error
 }

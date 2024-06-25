@@ -20,6 +20,7 @@ type MsgPod struct {
 
 type CloudMessageProducer interface {
 	SubscribeCloud(*MsgCloudConf) error
+	ReleaseCloud(*ReleaseCloudEvent) error
 }
 
 func (r *MsgCloudConf) ToMsgCloudConf(c *domain.CloudConf, u types.Account, pid string) {
@@ -41,6 +42,7 @@ func (r *MsgPod) ToMsgPod(p *domain.Pod) {
 
 type CloudMessageHandler interface {
 	HandleEventPodSubscribe(info *domain.PodInfo) error
+	HandleEventPodRelease(podId, cloudType string) error
 }
 
 type CloudRecordEvent struct {
@@ -50,4 +52,9 @@ type CloudRecordEvent struct {
 
 type CloudRecordEventPublisher interface {
 	Publish(*CloudRecordEvent) error
+}
+
+type ReleaseCloudEvent struct {
+	PodId     string `json:"pod_id"`
+	CloudType string `json:"cloud_type"`
 }

@@ -12,6 +12,7 @@ type Topics struct {
 	OperateLog      string `json:"operate_log"      required:"true"`
 	RelatedResource string `json:"related_resource" required:"true"`
 	Cloud           string `json:"cloud"            required:"true"`
+	ReleaseCloud    string `json:"release_cloud"    required:"true"`
 	Async           string `json:"async"            required:"true"`
 	AICCFinetune    string `json:"aiccfinetune"     required:"true"`
 }
