@@ -27,7 +27,7 @@ func (r *Pod) IsOnwer(owner otypes.Account) bool {
 }
 
 func (p *PodInfo) CanRelease() bool {
-	return p.Status.IsRunning()
+	return p.Status.IsRunning() && !p.IsExpiried()
 }
 
 func (p *PodInfo) IsExpiried() bool {
@@ -44,6 +44,10 @@ func (p *PodInfo) IsHoldingAndNotExpiried() bool {
 	}
 
 	return p.Status.IsCreating() || p.Status.IsStarting() || p.Status.IsRunning()
+}
+
+func (p *PodInfo) IsTerminating() bool {
+	return p.Status.IsTerminating()
 }
 
 func (p *PodInfo) CheckGoodAndSet() bool {
@@ -65,6 +69,10 @@ func (p *PodInfo) StatusSetRunning() {
 
 func (p *PodInfo) StatusSetFailed() {
 	p.Status, _ = NewPodStatus(cloudPodStatusFailed)
+}
+
+func (p *PodInfo) StatusSetTerminating() {
+	p.Status, _ = NewPodStatus(cloudPodStatusTerminating)
 }
 
 func (p *PodInfo) SetStatus() {

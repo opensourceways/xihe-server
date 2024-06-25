@@ -29,6 +29,7 @@ func AddRouterForCloudController(
 	rg.GET("/v1/cloud/:cid", ctl.Get)
 	rg.GET("/v1/cloud/pod/:cid", ctl.GetHttp)
 	rg.GET("/v1/cloud/read/:owner", ctl.CanRead)
+	rg.DELETE("/v1/cloud/pod/:id", ctl.Release)
 }
 
 type CloudController struct {
@@ -262,4 +263,43 @@ func (ctl *CloudController) CanRead(ctx *gin.Context) {
 	}
 
 	ctl.sendRespOfGet(ctx, res)
+}
+
+// @Summary		Release
+// @Description	release cloud resource
+// @Tags			Cloud
+// @Param			id	path	string	true	""
+// @Param			cloud_id	query	string	true	""
+// @Accept			json
+// @Success		204
+// @Failure		404	bad_request	not allowed
+// @Failure		500	system_error		system	error
+// @Router			/v1/cloud/pod/{id} [delete]
+func (ctl *CloudController) Release(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "release cloud")
+
+	cmd := &app.ReleaseCloudCmd{
+		Account: pl.DomainAccount(),
+		PodId:   ctx.Param("id"),
+		CloudId: ctx.Query("cloud_id"),
+	}
+
+	if err := cmd.Validate(); err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if code, err := ctl.s.ReleaseCloud(cmd); err != nil {
+		ctl.sendCodeMessage(ctx, code, err)
+
+		return
+	}
+
+	ctl.sendRespOfDelete(ctx)
 }

@@ -87,7 +87,7 @@ func (r *CloudService) CheckUserCanSubsribe(user types.Account, cid string) (
 		return
 	}
 
-	if p.IsExpiried() || p.IsFailedOrTerminated() {
+	if !p.IsTerminating() && p.IsExpiried() || p.IsFailedOrTerminated() {
 		return p, true, err
 	}
 

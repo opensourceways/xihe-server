@@ -19,6 +19,7 @@ type CloudService interface {
 
 	// pod
 	Get(*PodInfoCmd) (PodInfoDTO, error)
+	ReleaseCloud(*ReleaseCloudCmd) (string, error)
 }
 
 var _ CloudService = (*cloudService)(nil)
@@ -142,4 +143,23 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 	err = s.cloudService.SubscribeCloud(&c.CloudConf, cmd.User)
 
 	return
+}
+
+func (s *cloudService) ReleaseCloud(cmd *ReleaseCloudCmd) (string, error) {
+	pod, err := s.podRepo.GetPodInfo(cmd.PodId)
+	if err != nil {
+		return "", err
+	}
+	if !pod.CanRelease() {
+		return errorReleased, errors.New("cloud was released")
+	}
+
+	pod.StatusSetTerminating()
+	if err := s.podRepo.UpdatePod(&pod); err != nil {
+		return "", err
+	}
+
+	// TODO:send release msg
+
+	return "success", nil
 }

@@ -142,3 +142,17 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 		r.CreatedAt = p.CreatedAt.Time()
 	}
 }
+
+type ReleaseCloudCmd struct {
+	Account types.Account
+	PodId   string
+	CloudId string
+}
+
+func (c *ReleaseCloudCmd) Validate() error {
+	if c.CloudId == "" || c.PodId == "" {
+		return errors.New("cloud id and pod id are needed")
+	}
+
+	return nil
+}
