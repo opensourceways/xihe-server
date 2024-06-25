@@ -196,7 +196,7 @@ func (ctl baseController) checkUserApiToken(
 ) (
 	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
-	pl, visitor, ok = ctl.checkUserApiTokenBase(ctx, allowVistor, true)
+	pl, visitor, ok = ctl.checkUserApiTokenBase(ctx, allowVistor, false)
 	if !ok {
 		if pl == nil || pl.Account == "" {
 			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check api token")
@@ -332,7 +332,7 @@ func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, usern
 	}
 	if apiConfig.LocalDomainCookie {
 		logrus.Info("local set cookie domain empty")
-		
+
 		if err := ctl.setRespCookieToken(ctx, token, username, ""); err != nil {
 			return err
 		}
