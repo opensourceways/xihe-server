@@ -15,7 +15,7 @@ require (
 	github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1
 	github.com/opensourceways/xihe-extra-services v0.0.0-20231215030123-df06ee77c3d1
 	github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43
-	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240520091334-5f9eb831c1a4
+	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240627012429-272cf3cf0854
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/files v1.0.1
