@@ -47,5 +47,10 @@ func (s publisher) SubscribeCloud(m *message.MsgCloudConf) error {
 
 // Config
 type Config struct {
-	JupyterCreated common.TopicConfig `json:"jupyter_created" required:"true"`
+	JupyterCreated  common.TopicConfig `json:"jupyter_created" required:"true"`
+	JupyterReleased common.TopicConfig `json:"jupyter_released" required:"true"`
+}
+
+func (s publisher) ReleaseCloud(event *message.ReleaseCloudEvent) error {
+	return s.publisher.Publish(s.cfg.JupyterReleased.Topic, event, nil)
 }

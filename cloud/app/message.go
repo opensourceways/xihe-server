@@ -11,6 +11,7 @@ import (
 
 type CloudMessageService interface {
 	CreatePodInstance(*domain.PodInfo) error
+	ReleasePodInstance(Id, cloudType string) error
 }
 
 func NewCloudMessageService(
@@ -47,7 +48,7 @@ func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
 		survivalTime = c.survivalTimeForPodAscend
 	}
 
-	expire, err := domain.NewPodExpiry(utils.Now()+survivalTime)
+	expire, err := domain.NewPodExpiry(utils.Now() + survivalTime)
 	if err != nil {
 		return err
 	}
@@ -77,4 +78,10 @@ func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
 		Owner:  p.Owner,
 		ClouId: p.CloudId,
 	})
+}
+
+func (c *cloudMessageService) ReleasePodInstance(Id, cloudType string) error {
+	logrus.Infof("release pod id: %s, type: %s", Id, cloudType)
+
+	return c.manager.Release(Id, cloudType)
 }

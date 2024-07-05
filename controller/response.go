@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"errors"
+
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/repository"
 )
@@ -26,6 +28,8 @@ var (
 	respBadRequestBody = newResponseCodeMsg(
 		errorBadRequestBody, "can't fetch request body",
 	)
+
+	ErrSystemFault = errors.New("system error")
 )
 
 // responseData is the response data to client

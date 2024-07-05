@@ -170,3 +170,8 @@ type msgPodCreate struct {
 	CloudId   string `json:"cloud_id"`
 	CloudName string `json:"cloud_name"`
 }
+
+type ReleasePodMsg struct {
+	PodId     string `json:"pod_id"`
+	CloudType string `json:"cloud_type"`
+}

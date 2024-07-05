@@ -81,7 +81,6 @@ func (table *TPod) toPodInfo(p *domain.PodInfo) (err error) {
 func (table *TPod) toTPod(p *domain.PodInfo) {
 	*table = TPod{
 		CloudId: p.CloudId,
-		Status:  p.Status.PodStatus(),
 	}
 
 	if p.Id != "" {
@@ -106,5 +105,9 @@ func (table *TPod) toTPod(p *domain.PodInfo) {
 
 	if p.CreatedAt != nil {
 		table.CreatedAt = p.CreatedAt.Time()
+	}
+
+	if p.Status != nil {
+		table.Status = p.Status.PodStatus()
 	}
 }
