@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 )
@@ -259,11 +260,12 @@ func (col wukongPicture) GetPublicsGlobal() (do []repositories.WuKongPictureDO, 
 	var v []dWuKongPicture
 
 	f := func(ctx context.Context) error {
+		opts := options.FindOptions{}
 		return cli.getDocs(
 			ctx, col.collectionName, nil,
-			bson.M{
+			opts.SetProjection(bson.M{
 				fieldPublics: 1,
-			}, &v,
+			}), &v,
 		)
 	}
 

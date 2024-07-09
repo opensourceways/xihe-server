@@ -215,19 +215,13 @@ func (cli *client) getDoc(
 
 func (cli *client) getDocs(
 	ctx context.Context, collection string,
-	filterOfDoc, project bson.M, result interface{},
+	filterOfDoc bson.M, opts *options.FindOptions, result interface{},
 ) error {
 	col := cli.collection(collection)
 
 	var cursor *mongo.Cursor
 	var err error
-	if len(project) > 0 {
-		cursor, err = col.Find(ctx, filterOfDoc, &options.FindOptions{
-			Projection: project,
-		})
-	} else {
-		cursor, err = col.Find(ctx, filterOfDoc)
-	}
+	cursor, err = col.Find(ctx, filterOfDoc, opts)
 
 	if err != nil {
 		return dbError{err}
@@ -815,6 +809,12 @@ func (cli *client) getArraysElemsHelper(
 	}
 
 	return cursor.All(ctx, result)
+}
+
+func (cli *client) count(ctx context.Context, collection string, filterOfDoc bson.M, opts *options.CountOptions,
+) (int64, error) {
+	col := cli.collection(collection)
+	return col.CountDocuments(ctx, filterOfDoc, opts)
 }
 
 func condFieldOfArrayElem(key string) string {

@@ -73,7 +73,7 @@ func (ctl *AICCFinetuneController) Create(ctx *gin.Context) {
 
 	// check mindcon apply
 	u := pl.DomainAccount()
-	if dto, code, err := ctl.pros.GetUserRegisterPromotion(&u); err != nil {
+	if dto, code, err := ctl.pros.GetUserRegisterPromotion(u); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 		return
 	} else {

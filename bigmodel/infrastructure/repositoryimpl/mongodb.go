@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -33,7 +34,7 @@ type mongodbClient interface {
 
 	GetDoc(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
 
-	GetDocs(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
+	GetDocs(ctx context.Context, filterOfDoc bson.M, opts *options.FindOptions, result interface{}) error
 
 	GetArrayElem(ctx context.Context, array string, filterOfDoc,
 		filterOfArray bson.M, project bson.M, result interface{}) error

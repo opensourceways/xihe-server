@@ -22,14 +22,13 @@ const (
 	errorPreviewLFSFile        = "preview_lfs_file"
 	errorUnavailableRepoFile   = "unavailable_repo_file"
 	errorDuplicateTrainingName = "duplicate_training_name"
+	errorExccedMaxiumPageNum   = "excend_maxium_page_num"
 )
 
 var (
 	respBadRequestBody = newResponseCodeMsg(
 		errorBadRequestBody, "can't fetch request body",
 	)
-
-	ErrSystemFault = errors.New("system error")
 )
 
 // responseData is the response data to client
@@ -62,6 +61,8 @@ func newResponseError(err error) responseData {
 		code = errorPreviewLFSFile
 	} else if errors.As(err, &app.ErrorDuplicateTrainingName{}) {
 		code = errorDuplicateTrainingName
+	} else if errors.As(err, &repository.ExcendMaxiumPageNumError{}) {
+		code = errorExccedMaxiumPageNum
 	}
 
 	return responseData{

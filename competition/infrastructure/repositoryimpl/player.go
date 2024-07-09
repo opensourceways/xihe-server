@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/opensourceways/xihe-server/competition/domain"
 	"github.com/opensourceways/xihe-server/competition/domain/repository"
@@ -186,7 +187,8 @@ func (impl playerRepoImpl) FindCompetitionsUserApplied(a types.Account) (
 		filter := impl.docFilterByUser("", a)
 		delete(filter, fieldCid)
 
-		return impl.cli.GetDocs(ctx, filter, bson.M{fieldCid: 1}, &v)
+		opts := options.FindOptions{}
+		return impl.cli.GetDocs(ctx, filter, opts.SetProjection(bson.M{fieldCid: 1}), &v)
 	}
 
 	if err = withContext(f); err != nil || len(v) == 0 {

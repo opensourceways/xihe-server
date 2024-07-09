@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/points/domain"
@@ -46,7 +47,8 @@ func (impl *taskAdapter) FindAllTasks() ([]domain.Task, error) {
 	var dos []taskDO
 
 	f := func(ctx context.Context) error {
-		return impl.cli.GetDocs(ctx, nil, bson.M{fieldOlds: 0}, &dos)
+		opts := options.FindOptions{}
+		return impl.cli.GetDocs(ctx, nil, opts.SetProjection(bson.M{fieldOlds: 0}), &dos)
 	}
 
 	if err := withContext(f); err != nil || len(dos) == 0 {

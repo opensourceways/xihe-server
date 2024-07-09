@@ -9,6 +9,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	typesrepo "github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
@@ -185,12 +186,12 @@ func (impl *userRepoImpl) FindUsersInfo(accounts []domain.Account) (r []domain.U
 			},
 		}
 
+		opts := options.FindOptions{}
 		return impl.cli.GetDocs(
-			ctx, filter,
-			bson.M{
+			ctx, filter, opts.SetProjection(bson.M{
 				fieldName:     1,
 				fieldAvatarId: 1,
-			}, &v,
+			}), &v,
 		)
 	}
 
@@ -499,13 +500,13 @@ func (impl *userRepoImpl) listFollowsDirectly(accounts []string, isFollower bool
 			},
 		}
 
+		opts := options.FindOptions{}
 		return impl.cli.GetDocs(
-			ctx, filter,
-			bson.M{
+			ctx, filter, opts.SetProjection(bson.M{
 				fieldBio:      1,
 				fieldName:     1,
 				fieldAvatarId: 1,
-			}, &v,
+			}), &v,
 		)
 	}
 
