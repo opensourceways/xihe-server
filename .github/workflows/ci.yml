@@ -10,9 +10,7 @@ env:
   GOPRIVATE: "github.com/opensourceways"
 
 jobs:
-
   build:
-
     runs-on: self-ubuntu-latest
 
     steps:
