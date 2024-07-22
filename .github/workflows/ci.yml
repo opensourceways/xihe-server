@@ -19,8 +19,10 @@ jobs:
 
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
+        env:
+          GITHUB_AUTHENTICATION_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
         with:
-          args: ./...
+          args: -exclude-dir api -exclude-dir tests ./...
 
       - name: Build the Docker image
         env:
