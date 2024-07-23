@@ -7,7 +7,7 @@ import (
 )
 
 type PromotionUserService interface {
-	Register(promotionid string, ur *domain.UserRegistration) error
+	Register(promotionid string, origin domain.Origin, ur *domain.UserRegistration) error
 }
 
 type promotionUserService struct {
@@ -25,7 +25,7 @@ func NewPromotionUserService(
 	}
 }
 
-func (s *promotionUserService) Register(pid string, ur *domain.UserRegistration) error {
+func (s *promotionUserService) Register(pid string, origin domain.Origin, ur *domain.UserRegistration) error {
 	// get promotion version
 	p, err := s.repo.Find(pid)
 	if err != nil {
@@ -33,7 +33,7 @@ func (s *promotionUserService) Register(pid string, ur *domain.UserRegistration)
 	}
 
 	// register promotion
-	if err := s.repo.UserRegister(pid, ur.Account, p.Version); err != nil {
+	if err := s.repo.UserRegister(pid, ur.Account, origin, p.Version); err != nil {
 		return err
 	}
 

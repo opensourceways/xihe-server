@@ -27,7 +27,7 @@ func (r *Pod) IsOnwer(owner otypes.Account) bool {
 }
 
 func (p *PodInfo) CanRelease() bool {
-	return p.Status.IsRunning()
+	return p.Status.IsRunning() && !p.IsExpiried()
 }
 
 func (p *PodInfo) IsExpiried() bool {
@@ -35,7 +35,7 @@ func (p *PodInfo) IsExpiried() bool {
 }
 
 func (p *PodInfo) IsFailedOrTerminated() bool {
-	return p.Status.IsFailed() || p.Status.IsTerminated()
+	return p.Status.IsFailed() || p.IsTerminated()
 }
 
 func (p *PodInfo) IsHoldingAndNotExpiried() bool {
@@ -43,7 +43,7 @@ func (p *PodInfo) IsHoldingAndNotExpiried() bool {
 		return false
 	}
 
-	return p.Status.IsCreating() || p.Status.IsStarting() || p.Status.IsRunning()
+	return p.Status.IsCreating() || p.Status.IsStarting() || p.Status.IsRunning() || p.IsTerminating()
 }
 
 func (p *PodInfo) CheckGoodAndSet() bool {
@@ -65,6 +65,14 @@ func (p *PodInfo) StatusSetRunning() {
 
 func (p *PodInfo) StatusSetFailed() {
 	p.Status, _ = NewPodStatus(cloudPodStatusFailed)
+}
+
+func (p *PodInfo) StatusSetTerminating() {
+	p.Status, _ = NewPodStatus(cloudPodStatusTerminating)
+}
+
+func (p *PodInfo) StatusSetTerminated() {
+	p.Status, _ = NewPodStatus(cloudPodStatusTerminated)
 }
 
 func (p *PodInfo) SetStatus() {
@@ -92,4 +100,36 @@ func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account) (err erro
 	}
 
 	return
+}
+
+func (p *PodInfo) GetCloudType() string {
+	if p.CloudId == cloudIdCPU {
+		return cloudTypeCPU
+	}
+
+	return cloudTypeNPU
+}
+
+func (p *PodInfo) IsCpu() bool {
+	if p.CloudId == cloudIdCPU {
+		return true
+	}
+
+	return false
+}
+
+func (p *PodInfo) IsAscend() bool {
+	if p.CloudId == cloudIdNPU {
+		return true
+	}
+
+	return false
+}
+
+func (p *PodInfo) IsTerminated() bool {
+	return p.IsExpiried()
+}
+
+func (p *PodInfo) IsTerminating() bool {
+	return !p.IsExpiried() && (p.Status.IsTerminated() || p.Status.IsTerminating())
 }

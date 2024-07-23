@@ -53,7 +53,9 @@ type DUserRegInfo struct {
 }
 
 type DWhiteListInfo struct {
-	Account string `bson:"account"        json:"account"`
-	Type    string `bson:"type"           json:"type"`
-	Enabled bool   `bson:"enabled"        json:"enabled"`
+	Account   string `bson:"account"        json:"account"`
+	Type      string `bson:"type"           json:"type"`
+	Enabled   bool   `bson:"enabled"        json:"enabled"`
+	StartTime int64  `bson:"start_time"     json:"start_time"`
+	EndTime   int64  `bson:"end_time"       json:"end_time"`
 }

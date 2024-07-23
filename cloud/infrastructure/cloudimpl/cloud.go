@@ -22,7 +22,12 @@ func (impl *cloudpodImpl) Create(info *cloud.CloudPodCreateInfo) error {
 		PodId:        info.PodId,
 		User:         info.User,
 		SurvivalTime: info.SurvivalTime,
+		CloudType:    info.CloudType,
 	}
 
 	return impl.cli.CreateCloudPod(opt)
+}
+
+func (impl *cloudpodImpl) Release(podId, cloudType string) error {
+	return impl.cli.ReleaseCloudPod(podId, cloudType)
 }

@@ -23,6 +23,7 @@ const (
 	handlerNameAddFollowing       = "add_following"
 	handlerNameAddRelatedResource = "add_related_resource"
 	handlerNameCreateCloud        = "create_cloud"
+	handlerNameReleaseCloud       = "release_cloud"
 	handlerNameCreateTraining     = "create_training"
 	handlerNameCreateFinetune     = "create_finetune"
 	handlerNameCreateInference    = "create_inference"
@@ -71,6 +72,10 @@ func Subscribe(
 	if err = r.registerHandlerForCloud(handler); err != nil {
 		return
 	}
+	if err = r.registerHandlerForReleasingCloud(handler); err != nil {
+		return
+	}
+
 	// register end
 	<-ctx.Done()
 
@@ -313,4 +318,22 @@ func (r *register) registerHandlerForCloud(handler interface{}) error {
 	}
 
 	return r.subscribe(r.topics.Cloud, handlerNameCreateCloud, f)
+}
+
+func (r *register) registerHandlerForReleasingCloud(handler interface{}) error {
+	h, ok := handler.(cloudmsg.CloudMessageHandler)
+	if !ok {
+		return nil
+	}
+
+	f := func(b []byte, m map[string]string) (err error) {
+		body := ReleasePodMsg{}
+		if err = json.Unmarshal(b, &body); err != nil {
+			return
+		}
+
+		return h.HandleEventPodRelease(body.PodId, body.CloudType)
+	}
+
+	return r.subscribe(r.topics.ReleaseCloud, handlerNameReleaseCloud, f)
 }

@@ -30,6 +30,10 @@ type UpdatePodInternalCmd struct {
 	AccessURL domain.AccessURL
 }
 
+type ReleaseInternalCmd struct {
+	PodId string
+}
+
 type CloudConfDTO struct {
 	Id        string `json:"id"`
 	Spec      string `json:"spec"`
@@ -123,6 +127,11 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	}
 
 	if p.Status != nil {
+		if p.IsTerminated() {
+			p.StatusSetTerminated()
+		} else if p.IsTerminating() {
+			p.StatusSetTerminating()
+		}
 		r.Status = p.Status.PodStatus()
 	}
 
@@ -141,4 +150,21 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	if p.CreatedAt != nil {
 		r.CreatedAt = p.CreatedAt.Time()
 	}
+}
+
+type ReleaseCloudCmd struct {
+	PodId string
+	User  types.Account
+}
+
+func (c *ReleaseCloudCmd) Validate() error {
+	if c.PodId == "" {
+		return errors.New("need pod id")
+	}
+
+	return nil
+}
+
+type GetReleasedPodCmd struct {
+	PodId string
 }

@@ -17,6 +17,7 @@ type Promotion struct {
 type RegUser struct {
 	User      types.Account
 	CreatedAt int64
+	Origin    Origin
 }
 
 func (r *Promotion) HasRegister(u types.Account) bool {

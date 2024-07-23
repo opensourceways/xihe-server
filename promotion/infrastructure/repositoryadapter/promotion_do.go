@@ -40,6 +40,12 @@ func (do *promotionDO) toPromotionRepo() (p repository.PromotionRepo, err error)
 			return
 		}
 
+		if do.RegUsers[i].Origin != "" {
+			if p.RegUsers[i].Origin, err = domain.NewOrigin(do.RegUsers[i].Origin); err != nil {
+				return
+			}
+		}
+
 		p.RegUsers[i].CreatedAt = do.RegUsers[i].CreatedAt
 	}
 
@@ -53,6 +59,7 @@ func (do *promotionDO) toPromotionRepo() (p repository.PromotionRepo, err error)
 type RegUserDO struct {
 	User      string `bson:"user"       json:"user"`
 	CreatedAt int64  `bson:"created_at" json:"created_at"`
+	Origin    string `bson:"origin"     json:"origin"`
 }
 
 func (do *RegUserDO) doc() (bson.M, error) {

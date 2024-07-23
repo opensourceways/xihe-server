@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/cloud/app"
 	"github.com/opensourceways/xihe-server/domain"
@@ -29,6 +30,8 @@ func AddRouterForCloudController(
 	rg.GET("/v1/cloud/:cid", ctl.Get)
 	rg.GET("/v1/cloud/pod/:cid", ctl.GetHttp)
 	rg.GET("/v1/cloud/read/:owner", ctl.CanRead)
+	rg.DELETE("/v1/cloud/pod/:id", ctl.ReleasePod)
+	rg.GET("/v1/ws/cloud/pod/:id", ctl.WsSendReleasedPod)
 }
 
 type CloudController struct {
@@ -268,4 +271,111 @@ func (ctl *CloudController) CanRead(ctx *gin.Context) {
 	}
 
 	ctl.sendRespOfGet(ctx, res)
+}
+
+// @Summary		Release
+// @Description	release cloud resource
+// @Tags			Cloud
+// @Param			id	path	string	true	""
+// @Param			cloud_id	query	string	true	""
+// @Accept			json
+// @Success		204
+// @Failure		404	{string} string "not found"
+// @Failure		500	{object} responseData "system error"
+// @Router			/v1/cloud/pod/{id} [delete]
+func (ctl *CloudController) ReleasePod(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "release cloud")
+
+	cmd := &app.ReleaseCloudCmd{
+		PodId: ctx.Param("id"),
+		User:  pl.DomainAccount(),
+	}
+
+	if err := cmd.Validate(); err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if err := ctl.s.ReleaseCloud(cmd); err != nil {
+		if errors.Is(err, app.ErrCloudReleased) {
+			ctx.JSON(http.StatusNotFound, newResponseError(err))
+		} else if errors.Is(err, app.ErrCloudNotAllowed) {
+			ctx.JSON(http.StatusForbidden, newResponseError(err))
+		} else {
+			logrus.Errorf("fail to release cloud, pod id: %s, err: %s", cmd.PodId, err.Error())
+
+			ctl.sendRespWithInternalError(ctx, newResponseError(ErrSystemFault))
+		}
+
+		return
+	}
+
+	ctl.sendRespOfDelete(ctx)
+}
+
+// @Summary		WsSendReleasedPod
+// @Description	WsSendReleasedPod is a websocket api which sends a released pod data to client.
+// @Tags			Cloud
+// @Param			id	    path	string	true	"pod id"
+// @Accept			json
+// @Success		200 {object} app.PodInfoDTO
+// @Failure		404	{string} string "not found"
+// @Failure		500	{object} responseData "system error"
+// @Router			/v1/cloud/pod/{id} [get]
+func (ctl *CloudController) WsSendReleasedPod(ctx *gin.Context) {
+	_, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
+	if !ok {
+		return
+	}
+
+	// setup websocket
+	upgrader := websocket.Upgrader{
+		Subprotocols: []string{csrftoken},
+		CheckOrigin: func(r *http.Request) bool {
+			return r.Header.Get(headerSecWebsocket) == csrftoken
+		},
+	}
+
+	ws, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
+	if err != nil {
+		//TODO delete
+		log.Errorf("update ws failed, err:%s", err.Error())
+
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+	defer ws.Close()
+
+	cmd := app.GetReleasedPodCmd{
+		PodId: ctx.Param("id"),
+	}
+
+	for i := 0; i < apiConfig.PodTimeout; i++ {
+		dto, err := ctl.s.GetReleasedPod(&cmd)
+		if errors.Is(err, app.ErrPodNotFound) {
+			time.Sleep(time.Second)
+			continue
+		} else if err != nil {
+			log.Errorf("[RELEASE] fail to get pod %s, err:%s", cmd.PodId, err.Error())
+
+			ws.WriteJSON(newResponseError(err))
+
+			return
+		}
+
+		ws.WriteJSON(newResponseData(dto))
+
+		return
+	}
+
+	log.Errorf("release pod %s timeout", cmd.PodId)
+
+	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
 }

@@ -13,5 +13,5 @@ type PromotionRepo struct {
 type Promotion interface {
 	Find(promotionid string) (PromotionRepo, error)
 	FindAll() ([]PromotionRepo, error)
-	UserRegister(promotionid string, user types.Account, version int) error
+	UserRegister(promotionid string, user types.Account, origin domain.Origin, version int) error
 }

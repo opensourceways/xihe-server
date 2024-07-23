@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"time"
+
 	types "github.com/opensourceways/xihe-server/domain"
 )
 
@@ -69,7 +71,15 @@ type UserRegInfo struct {
 
 // whitelist
 type WhiteListInfo struct {
-	Account types.Account
-	Type    WhiteListType
-	Enabled bool
+	Account   types.Account
+	Type      WhiteListType
+	Enabled   bool
+	StartTime int64
+	EndTime   int64
+}
+
+func (w WhiteListInfo) Enable() bool {
+	t := time.Now()
+
+	return w.Enabled && t.After(time.Unix(w.StartTime, 0)) && t.Before(time.Unix(w.EndTime, 0))
 }
