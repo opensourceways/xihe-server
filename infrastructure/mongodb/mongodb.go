@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -16,7 +15,7 @@ import (
 var cli *client
 
 func Initialize(conn, dbName, dbCert string) error {
-	ca, err := ioutil.ReadFile(dbCert) // #nosec G304 -- this is a false positive
+	ca, err := os.ReadFile(dbCert) // #nosec G304 -- this is a false positive
 	if err != nil {
 		return err
 	}

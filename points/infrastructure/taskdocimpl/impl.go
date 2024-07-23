@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"text/template"
 
 	common "github.com/opensourceways/xihe-server/common/domain"
@@ -67,7 +67,7 @@ type taskInfo struct {
 }
 
 func newTemplate(name, path string) (*template.Template, error) {
-	txtStr, err := ioutil.ReadFile(path) // #nosec G304 -- this is a false positive
+	txtStr, err := os.ReadFile(path) // #nosec G304 -- this is a false positive
 	if err != nil {
 		return nil, fmt.Errorf("failed to new template: read template file failed: %s", err.Error())
 	}

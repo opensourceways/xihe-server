@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/go-redis/redis/v8"
@@ -16,7 +15,7 @@ var (
 )
 
 func Init(cfg *Config) error {
-	ca, err := ioutil.ReadFile(cfg.DBCert)
+	ca, err := os.ReadFile(cfg.DBCert)
 	if err != nil {
 		return err
 	}
