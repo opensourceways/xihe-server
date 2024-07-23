@@ -25,7 +25,7 @@ jobs:
         env:
           GITHUB_AUTHENTICATION_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
         with:
-          args: -exclude-dir api
+          args: ./...
 
       - name: Build the Docker image
         env:
