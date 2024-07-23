@@ -28,8 +28,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
           GH_USER: ${{ secrets.ZYK_USER_NAME }}
-        run: echo "machine github.com login $GH_USER password $GH_TOKEN" > ~/.netrc |
-        docker build . --file Dockerfile --tag server:$(date +%s)
-      
+        run: echo "machine github.com login $GH_USER password $GH_TOKEN" > ~/.netrc 
+        
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag server:$(date +%s)
+
       - name: cleanup
         run: rm -f ~/.netrc
