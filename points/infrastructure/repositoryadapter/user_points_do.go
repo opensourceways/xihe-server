@@ -108,11 +108,11 @@ func toPointsItemsOfDayDO(item *domain.PointsItem) pointsDetailsOfDayDO {
 
 // pointsDetailDO
 type pointsDetailDO struct {
-	Id     string `json:"id"       json:"id"`
-	Desc   string `json:"desc"     json:"desc"`
+	Id     string `bson:"id"       json:"id"`
+	Desc   string `bson:"desc"     json:"desc"`
 	Time   string `bson:"time"     json:"time"`
 	TaskId string `bson:"task_id"  json:"task_id"`
-	Points int    `json:"points"   json:"points"`
+	Points int    `bson:"points"   json:"points"`
 }
 
 func (do *pointsDetailDO) toPointsDetail() domain.PointsDetail {
