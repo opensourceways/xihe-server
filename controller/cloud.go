@@ -184,7 +184,7 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 	log.Error("create pod timeout")
 
 	if wsErr := ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); wsErr != nil {
-		log.Error("create pod timeout | web socket write error:", wsErr)
+		log.Error("create pod timeout | web socket write error:%s", wsErr.Error())
 	}
 }
 
