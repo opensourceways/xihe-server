@@ -122,8 +122,9 @@ func (impl aiccFinetuneRepoImpl) Get(info *domain.AICCFinetuneIndex) (obj domain
 	if len(v) == 0 || len(v[0].Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
-		v[0].toAICCFinetuneDO(&obj)
+		err = v[0].toAICCFinetuneDO(&obj)
 	}
+
 	return
 }
 
