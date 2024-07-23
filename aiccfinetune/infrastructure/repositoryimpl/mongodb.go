@@ -17,7 +17,6 @@ const (
 
 var (
 	errDocNotExists = errors.New("doc doesn't exist")
-	errDocNoUpdate  = errors.New("no update")
 )
 
 type mongodbClient interface {
