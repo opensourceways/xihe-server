@@ -218,8 +218,8 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	log.Error("inference timeout")
 
-	if err = ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); err != nil {
-		logrus.Errorf("inference | web socket write error: %s", err.Error())
+	if wsErr := ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); wsErr != nil {
+		logrus.Errorf("inference | web socket write error: %s", wsErr.Error())
 	}
 
 	return
