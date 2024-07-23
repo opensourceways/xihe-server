@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout Source
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
@@ -29,5 +29,6 @@ jobs:
           GH_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
           GH_USER: ${{ secrets.ZYK_USER_NAME }}
         run: machine github.com login $GH_USER password $GH_TOKEN && docker build . --file Dockerfile --tag server:$(date +%s)
+     
       - name: cleanup
         run: rm -f ~/.netrc
