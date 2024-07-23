@@ -221,8 +221,6 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	if wsErr := ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); wsErr != nil {
 		logrus.Errorf("inference | web socket write error: %s", wsErr.Error())
 	}
-
-	return
 }
 
 func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid string) (level string, err error) {
