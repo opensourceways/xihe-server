@@ -365,17 +365,23 @@ func (ctl *CloudController) WsSendReleasedPod(ctx *gin.Context) {
 		} else if err != nil {
 			log.Errorf("[RELEASE] fail to get pod %s, err:%s", cmd.PodId, err.Error())
 
-			ws.WriteJSON(newResponseError(err))
+			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+				log.Errorf("[RELEASE] fail to get pod | web socket write error:%s", wsErr.Error())
+			}
 
 			return
 		}
 
-		ws.WriteJSON(newResponseData(dto))
+		if wsErr := ws.WriteJSON(newResponseData(dto)); wsErr != nil {
+			log.Errorf("[RELEASE] fail to get pod | web socket write error:%s", wsErr.Error())
+		}
 
 		return
 	}
 
 	log.Errorf("release pod %s timeout", cmd.PodId)
 
-	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
+	if wsErr := ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); wsErr != nil {
+		log.Errorf("[RELEASE] fail to get pod | web socket write error:%s", wsErr.Error())
+	}
 }
