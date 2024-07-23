@@ -103,7 +103,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	projectId := ctx.Param("pid")
 	v, err := ctl.project.GetSummary(owner, projectId)
 	if err != nil {
-		ws.WriteJSON(newResponseError(err))
+		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
+		}
 
 		log.Errorf("inference failed: get summary, err:%s", err.Error())
 
@@ -127,7 +129,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	var level string
 	if level, err = ctl.getResourceLevel(owner, projectId); err != nil {
-		ws.WriteJSON(newResponseError(err))
+		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
+		}
 
 		log.Errorf("inference failed: get reource, err:%s", err.Error())
 
@@ -152,7 +156,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	dto, lastCommit, err := ctl.s.Create(pl.Account, &u, &cmd)
 	if err != nil {
-		ws.WriteJSON(newResponseError(err))
+		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
+		}
 
 		log.Errorf("inference failed: create, err:%s", err.Error())
 
@@ -180,7 +186,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	for i := 0; i < apiConfig.InferenceTimeout; i++ {
 		dto, err = ctl.s.Get(&info)
 		if err != nil {
-			ws.WriteJSON(newResponseError(err))
+			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+				log.Errorf("inference create | web socket write err:%s", wsErr.Error())
+			}
 
 			log.Errorf("inference failed: get status, err:%s", err.Error())
 

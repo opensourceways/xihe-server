@@ -31,7 +31,9 @@ func (impl *cloudRepoImpl) ListCloudConf() (conf []domain.CloudConf, err error) 
 
 	conf = make([]domain.CloudConf, len(v))
 	for i := range v {
-		v[i].toCloudConf(&conf[i])
+		if err = v[i].toCloudConf(&conf[i]); err != nil {
+			return
+		}
 	}
 
 	return
@@ -54,7 +56,7 @@ func (impl *cloudRepoImpl) GetCloudConf(cid string) (conf domain.CloudConf, err 
 		return
 	}
 
-	v.toCloudConf(&conf)
+	err = v.toCloudConf(&conf)
 
 	return
 }

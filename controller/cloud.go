@@ -157,7 +157,9 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 	for i := 0; i < apiConfig.PodTimeout; i++ {
 		dto, err := ctl.s.Get(&cmd)
 		if err != nil {
-			ws.WriteJSON(newResponseError(err))
+			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+				log.Errorf("create pod failed: web socket write err:%s", wsErr.Error())
+			}
 
 			log.Errorf("create pod failed: get status, err:%s", err.Error())
 
@@ -167,7 +169,9 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 		log.Debugf("info dto:%v", dto)
 
 		if dto.Error != "" || dto.AccessURL != "" {
-			ws.WriteJSON(newResponseData(dto))
+			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+				log.Errorf("create pod failed: web socket write err:%s", wsErr.Error())
+			}
 
 			log.Debug("create pod done")
 
@@ -179,7 +183,9 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 
 	log.Error("create pod timeout")
 
-	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
+	if err = ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); err != nil {
+		log.Error("create pod timeout | web socket write error:", err)
+	}
 }
 
 // @Summary		GetHttp

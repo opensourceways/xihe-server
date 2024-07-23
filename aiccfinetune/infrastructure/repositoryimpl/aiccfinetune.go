@@ -225,7 +225,7 @@ func (impl aiccFinetuneRepoImpl) GetJob(info *domain.AICCFinetuneIndex) (job dom
 	if len(v) == 0 || len(v[0].Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
-		v[0].Items[0].Job.toAICCFinetuneJobInfo(&job)
+		err = v[0].Items[0].Job.toAICCFinetuneJobInfo(&job)
 	}
 
 	return
@@ -257,7 +257,7 @@ func (impl aiccFinetuneRepoImpl) GetJobDetail(info *domain.AICCFinetuneIndex) (
 	if len(v) == 0 || len(v[0].Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
-		v[0].Items[0].JobDetail.toAICCFinetuneJobDetail(&job)
+		err = v[0].Items[0].JobDetail.toAICCFinetuneJobDetail(&job)
 		endpoint = v[0].Items[0].Job.Endpoint
 	}
 
