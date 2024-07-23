@@ -145,9 +145,9 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 		CloudId: ctx.Param("cid"),
 	}
 	if err := cmd.Validate(); err != nil {
-		ws.WriteJSON(
-			newResponseCodeError(errorBadRequestParam, err),
-		)
+		if wsErr := ws.WriteJSON(newResponseCodeError(errorBadRequestParam, err)); wsErr != nil {
+			log.Errorf("create pod failed | web socket err:%s", wsErr.Error())
+		}
 
 		log.Errorf("create pod failed: new cmd, err:%s", err.Error())
 
@@ -169,7 +169,7 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 		log.Debugf("info dto:%v", dto)
 
 		if dto.Error != "" || dto.AccessURL != "" {
-			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+			if wsErr := ws.WriteJSON(newResponseData(dto)); wsErr != nil {
 				log.Errorf("create pod failed: web socket write err:%s", wsErr.Error())
 			}
 
