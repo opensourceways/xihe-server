@@ -164,7 +164,9 @@ func (impl aiccFinetuneRepoImpl) List(user types.Account, Model domain.ModelName
 	r = make([]domain.AICCFinetuneSummary, len(t))
 
 	for i := range t {
-		t[i].toAICCFinetuneSummary(&r[i])
+		if err = t[i].toAICCFinetuneSummary(&r[i]); err != nil {
+			return r, v.Version, err
+		}
 	}
 
 	return r, v.Version, nil
