@@ -197,18 +197,9 @@ func (ctl *TrainingController) setProjectInfo(
 		return
 	}
 
-	name, ok := v.Name.(domain.ResourceName)
-	if !ok {
-		ctl.sendRespWithInternalError(ctx, newResponseError(
-			errors.New("it is not a project name"),
-		))
-
-		return
-	}
-
 	cmd.User = user
 	cmd.ProjectId = projectId
-	cmd.ProjectName = name
+	cmd.ProjectName = v.Name
 	cmd.ProjectRepoId = v.RepoId
 	ok = true
 

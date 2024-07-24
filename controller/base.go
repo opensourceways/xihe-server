@@ -281,7 +281,8 @@ func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username, 
 	}
 
 	// set expire time for old token
-	var ok, oldusername = false, ""
+	var oldusername = ""
+	var ok bool
 	o, exist := ctx.Get(encodeUsername)
 	if exist {
 		if oldusername, ok = o.(string); !ok {
@@ -332,7 +333,7 @@ func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, usern
 	}
 	if apiConfig.LocalDomainCookie {
 		logrus.Info("local set cookie domain empty")
-		
+
 		if err := ctl.setRespCookieToken(ctx, token, username, ""); err != nil {
 			return err
 		}

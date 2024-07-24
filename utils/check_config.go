@@ -3,8 +3,10 @@ package utils
 import (
 	"fmt"
 	"reflect"
-	"strings"
 	"time"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // baseError is an error type that all other error types embed.
@@ -67,7 +69,9 @@ func CheckConfig(opts interface{}, parent string) error {
 		v := optsValue.Field(i)
 		f := optsType.Field(i)
 
-		if f.Tag.Get("json") == "-" || f.Name != strings.Title(f.Name) {
+		titleCaser := cases.Title(language.English)
+		titleStr := titleCaser.String(f.Name)
+		if f.Tag.Get("json") == "-" || f.Name != titleStr {
 			continue
 		}
 
