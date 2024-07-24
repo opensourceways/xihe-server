@@ -65,7 +65,9 @@ func (impl *wukongPictureRepoImpl) ListPublicsByUserName(user types.Account) (
 	return v, version, nil
 }
 
-func (impl *wukongPictureRepoImpl) listFieldNameByUserName(user, fieldName string) ([]domain.WuKongPicture, int, error) {
+func (impl *wukongPictureRepoImpl) listFieldNameByUserName(user, fieldName string) (
+	[]domain.WuKongPicture, int, error,
+) {
 	var v dWuKongPicture
 
 	f := func(ctx context.Context) error {

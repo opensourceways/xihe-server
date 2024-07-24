@@ -37,13 +37,9 @@ func IsErrorResourceNotExists(err error) bool {
 }
 
 func IsErrorDuplicateCreating(err error) bool {
-	_, ok := err.(ErrorDuplicateCreating)
-
-	return ok
+	return errors.As(err, &ErrorDuplicateCreating{})
 }
 
 func IsErrorConcurrentUpdating(err error) bool {
-	_, ok := err.(ErrorConcurrentUpdating)
-
-	return ok
+	return errors.As(err, &ErrorConcurrentUpdating{})
 }
