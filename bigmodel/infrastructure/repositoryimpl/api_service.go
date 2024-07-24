@@ -122,7 +122,8 @@ func (a *dApiApply) toUserApiRecord(d *domain.UserApiRecord) (err error) {
 	return
 }
 
-func (impl *apiServiceRepoImpl) UpdateToken(user types.Account, model domain.ModelName, token string, date string, version int) (err error) {
+func (impl *apiServiceRepoImpl) UpdateToken(user types.Account,
+	model domain.ModelName, token string, date string, version int) (err error) {
 	filter := bson.M{fiedUser: user.Account(), fieldModelName: model.ModelName()}
 
 	f := func(ctx context.Context) error {

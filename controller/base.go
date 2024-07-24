@@ -295,16 +295,19 @@ func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username, 
 	}
 
 	// set cookie
-	setCookie(ctx, PrivateToken, u, domain, true, utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteLaxMode)
+	setCookie(ctx, PrivateToken, u, domain, true,
+		utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteLaxMode)
 
 	return nil
 }
 
 func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token, domain string) {
-	setCookie(ctx, csrfToken, token, domain, false, utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteStrictMode)
+	setCookie(ctx, csrfToken, token, domain, false,
+		utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteStrictMode)
 }
 
-func setCookie(ctx *gin.Context, key, val, domain string, httpOnly bool, expireTime time.Time, sameSite http.SameSite) {
+func setCookie(ctx *gin.Context, key, val, domain string, httpOnly bool,
+	expireTime time.Time, sameSite http.SameSite) {
 	cookie := &http.Cookie{
 		Name:     key,
 		Value:    val,

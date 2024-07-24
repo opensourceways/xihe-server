@@ -1,6 +1,10 @@
 package repositories
 
-import "github.com/opensourceways/xihe-server/domain/repository"
+import (
+	"errors"
+
+	"github.com/opensourceways/xihe-server/domain/repository"
+)
 
 // errorDuplicateCreating
 type errorDuplicateCreating struct {
@@ -40,20 +44,16 @@ func ConvertError(err error) (out error) {
 	return convertError(err)
 }
 
-func convertError(err error) (out error) {
-	switch err.(type) {
-	case errorDuplicateCreating:
-		out = repository.NewErrorDuplicateCreating(err)
-
-	case errorDataNotExists:
-		out = repository.NewErrorResourceNotExists(err)
-
-	case errorConcurrentUpdating:
-		out = repository.NewErrorConcurrentUpdating(err)
-
-	default:
-		out = err
+func convertError(err error) error {
+	if errors.As(err, &errorDuplicateCreating{}) {
+		return repository.NewErrorDuplicateCreating(err)
+	}
+	if errors.As(err, &errorDataNotExists{}) {
+		return repository.NewErrorResourceNotExists(err)
+	}
+	if errors.As(err, &errorConcurrentUpdating{}) {
+		return repository.NewErrorConcurrentUpdating(err)
 	}
 
-	return
+	return err
 }

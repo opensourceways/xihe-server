@@ -1,5 +1,7 @@
 package repository
 
+import "errors"
+
 // ErrorDuplicateCreating
 type ErrorDuplicateCreating struct {
 	error
@@ -30,9 +32,8 @@ func NewErrorConcurrentUpdating(err error) ErrorConcurrentUpdating {
 // helper
 
 func IsErrorResourceNotExists(err error) bool {
-	_, ok := err.(ErrorResourceNotExists)
+	return errors.As(err, &ErrorResourceNotExists{})
 
-	return ok
 }
 
 func IsErrorDuplicateCreating(err error) bool {

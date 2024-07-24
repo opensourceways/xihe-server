@@ -16,7 +16,8 @@ type asyncImpl struct {
 	srv asyncapp.TaskService
 }
 
-func (impl *asyncImpl) GetWaitingTaskRank(user types.Account, time commondomain.Time, taskType []string) (rank int, err error) {
+func (impl *asyncImpl) GetWaitingTaskRank(user types.Account, time commondomain.Time, taskType []string,
+) (rank int, err error) {
 	return impl.srv.GetWaitingTaskRank(user, time, taskType)
 }
 

@@ -847,7 +847,8 @@ func (s bigModelService) GetApiInfo(model domain.ModelName) (a ApiInfoDTO, err e
 	return
 }
 
-func (s bigModelService) UpdateToken(user types.Account, model domain.ModelName, token string) (date string, err error) {
+func (s bigModelService) UpdateToken(user types.Account,
+	model domain.ModelName, token string) (date string, err error) {
 	a, err := s.apiService.GetApiByUserModel(user, model)
 	if err != nil {
 		return
