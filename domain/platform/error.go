@@ -1,5 +1,7 @@
 package platform
 
+import "errors"
+
 // errorTooManyFilesToDelete
 type errorTooManyFilesToDelete struct {
 	error
@@ -11,7 +13,5 @@ func NewErrorTooManyFilesToDelete(err error) errorTooManyFilesToDelete {
 
 // helper
 func IsErrorTooManyFilesToDelete(err error) bool {
-	_, ok := err.(errorTooManyFilesToDelete)
-
-	return ok
+	return errors.As(err, &errorTooManyFilesToDelete{})
 }

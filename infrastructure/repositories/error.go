@@ -25,9 +25,7 @@ func NewErrorDataNotExists(err error) errorDataNotExists {
 }
 
 func isErrorDataNotExists(err error) bool {
-	_, ok := err.(errorDataNotExists)
-
-	return ok
+	return errors.As(err, &errorDataNotExists{})
 }
 
 // errorConcurrentUpdating

@@ -1,5 +1,7 @@
 package bigmodels
 
+import "errors"
+
 const (
 	CodeInputTextAuditError     = "code_input_text_audit_error"
 	CodeOutputTextAuditError    = "code_output_text_audit_error"
@@ -15,7 +17,6 @@ func NewErrorConcurrentRequest(err error) errorConcurrentRequest {
 }
 
 func IsErrorConcurrentRequest(err error) bool {
-	_, ok := err.(errorConcurrentRequest)
+	return errors.As(err, &errorConcurrentRequest{})
 
-	return ok
 }

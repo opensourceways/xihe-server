@@ -40,9 +40,7 @@ type responseData struct {
 }
 
 func isErrorOfAccessingPrivateRepo(err error) bool {
-	_, ok := err.(app.ErrorPrivateRepo)
-
-	return ok
+	return errors.As(err, &app.ErrorPrivateRepo{})
 }
 
 func newResponseError(err error) responseData {

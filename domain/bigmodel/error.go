@@ -27,7 +27,5 @@ func NewErrorBusySource(err error) errorBusySource {
 }
 
 func IsErrorBusySource(err error) bool {
-	_, ok := err.(errorBusySource)
-
-	return ok
+	return errors.As(err, &errorBusySource{})
 }
