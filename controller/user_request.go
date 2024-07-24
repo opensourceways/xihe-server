@@ -10,13 +10,6 @@ type UserAgreement struct {
 	Type agreement.AgreementType `json:"type"`
 }
 
-type userCreateRequest struct {
-	Account  string `json:"account"`
-	Email    string `json:"email"`
-	Bio      string `json:"bio"`
-	AvatarId string `json:"avatar_id"`
-}
-
 type followingCreateRequest struct {
 	Account string `json:"account" required:"true"`
 }
