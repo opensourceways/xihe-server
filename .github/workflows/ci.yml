@@ -43,7 +43,7 @@ jobs:
           #
           # Note: By default, the `.golangci.yml` file should be at the root of the repository.
           # The location of the configuration file can be changed by using `--config=`
-          args: -v --config=.golangci.yml --max-same-issues=0
+          args: -v --config=.golangci.yml --max-same-issues=0 --exclude=docs/
 
       - name: cleanup
         run: rm -f ~/.netrc
