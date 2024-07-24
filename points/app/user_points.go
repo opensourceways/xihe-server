@@ -45,7 +45,9 @@ func (s *userPointsAppService) Points(account types.Account) (int, error) {
 	return up.Total, nil
 }
 
-func (s *userPointsAppService) PointsDetails(account types.Account, lang common.Language) (dto UserPointsDetailsDTO, err error) {
+func (s *userPointsAppService) PointsDetails(account types.Account, lang common.Language) (
+	dto UserPointsDetailsDTO, err error,
+) {
 	tasks, err := s.tr.FindAllTasks()
 	if err != nil {
 		return
@@ -88,7 +90,9 @@ func (s *userPointsAppService) PointsDetails(account types.Account, lang common.
 	return
 }
 
-func (s *userPointsAppService) TasksOfDay(account types.Account, lang common.Language) ([]TasksCompletionInfoDTO, error) {
+func (s *userPointsAppService) TasksOfDay(account types.Account, lang common.Language) (
+	[]TasksCompletionInfoDTO, error,
+) {
 	tasks, err := s.tr.FindAllTasks()
 	if err != nil {
 		return nil, err

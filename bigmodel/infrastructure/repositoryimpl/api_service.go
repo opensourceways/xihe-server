@@ -39,7 +39,9 @@ func (impl *apiServiceRepoImpl) ApplyApi(d *domain.UserApiRecord) error {
 	return nil
 }
 
-func (impl *apiServiceRepoImpl) GetApiByUserModel(user types.Account, model domain.ModelName) (u domain.UserApiRecord, err error) {
+func (impl *apiServiceRepoImpl) GetApiByUserModel(user types.Account, model domain.ModelName) (
+	u domain.UserApiRecord, err error,
+) {
 	v := new(dApiApply)
 
 	f := func(ctx context.Context) error {
