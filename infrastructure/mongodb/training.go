@@ -292,7 +292,8 @@ func (col training) UpdateJobInfo(info *repositories.TrainingIndexDO, job *repos
 	return withContext(f)
 }
 
-func (col training) UpdateJobDetail(info *repositories.TrainingIndexDO, detail *repositories.TrainingJobDetailDO) error {
+func (col training) UpdateJobDetail(info *repositories.TrainingIndexDO,
+	detail *repositories.TrainingJobDetailDO) error {
 	v := dJobDetail{
 		Duration:   detail.Duration,
 		Error:      detail.Error,

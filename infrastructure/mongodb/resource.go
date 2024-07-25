@@ -227,7 +227,7 @@ func updateResourceProperty(
 	}
 
 	// #nosec G104 -- this is a false positive
-	if withContext(f); err != nil {
+	if err = withContext(f); err != nil {
 		return err
 	}
 
@@ -460,7 +460,7 @@ func updateRelatedResource(
 	}
 
 	// #nosec G104 -- this is a false positive
-	if withContext(f); err != nil {
+	if err = withContext(f); err != nil {
 		return err
 	}
 

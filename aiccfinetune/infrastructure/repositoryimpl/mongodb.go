@@ -17,7 +17,6 @@ const (
 
 var (
 	errDocNotExists = errors.New("doc doesn't exist")
-	errDocNoUpdate  = errors.New("no update")
 )
 
 type mongodbClient interface {
@@ -36,11 +35,13 @@ type mongodbClient interface {
 
 	NewDocIfNotExist(ctx context.Context, filterOfDoc, docInfo bson.M) (string, error)
 
-	GetArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray bson.M, project bson.M, result interface{}) error
+	GetArrayElem(ctx context.Context, array string, filterOfDoc,
+		filterOfArray bson.M, project bson.M, result interface{}) error
 
 	UpdateDoc(ctx context.Context, filterOfDoc, update bson.M, op string, version int) error
 
-	ModifyArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray, updateCmd bson.M, op string) (bool, error)
+	ModifyArrayElem(ctx context.Context, array string,
+		filterOfDoc, filterOfArray, updateCmd bson.M, op string) (bool, error)
 
 	PullArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray bson.M) error
 	// modifyArrayElemWithoutVersion

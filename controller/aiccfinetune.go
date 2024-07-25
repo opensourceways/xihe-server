@@ -412,7 +412,9 @@ func (ctl *AICCFinetuneController) watchFinetunes(ws *websocket.Conn, user types
 
 			done, index := finished(v)
 			if done {
-				ws.WriteJSON(newResponseData(v))
+				if err = ws.WriteJSON(newResponseData(v)); err != nil {
+					log.Error("create pod timeout | web socket write error:", err)
+				}
 
 				break
 			}

@@ -13,12 +13,12 @@ import (
 
 func NewTraining(cfg *Config) training.Training {
 	return &trainingImpl{
-		doneStatus: sets.NewString(cfg.JobDoneStatus...),
+		doneStatus: sets.New[string](cfg.JobDoneStatus...),
 	}
 }
 
 type trainingImpl struct {
-	doneStatus sets.String
+	doneStatus sets.Set[string]
 }
 
 func (impl *trainingImpl) IsJobDone(status string) bool {

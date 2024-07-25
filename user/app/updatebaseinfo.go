@@ -16,14 +16,14 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 		return err
 	}
 
-	if cmd.avatarChanged == true {
+	if cmd.avatarChanged {
 		_ = s.sender.SendUserAvatarSetEvent(&domain.UserAvatarSetEvent{
 			Account:  account,
 			AvatarId: cmd.AvatarId,
 		})
 	}
 
-	if cmd.bioChanged == true {
+	if cmd.bioChanged {
 		_ = s.sender.SendUserBioSetEvent(&domain.UserBioSetEvent{
 			Account: account,
 			Bio:     cmd.Bio,

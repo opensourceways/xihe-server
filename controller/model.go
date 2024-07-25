@@ -45,8 +45,10 @@ func AddRouterForModelController(
 	rg.GET("/v1/model/:owner", ctl.List)
 	rg.GET("/v1/model", ctl.ListGlobal)
 
-	rg.PUT("/v1/model/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedDataset)
-	rg.DELETE("/v1/model/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.RemoveRelatedDataset)
+	rg.PUT("/v1/model/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController),
+		ctl.AddRelatedDataset)
+	rg.DELETE("/v1/model/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController),
+		ctl.RemoveRelatedDataset)
 
 	rg.PUT("/v1/model/:owner/:id/tags", checkUserEmailMiddleware(&ctl.baseController), ctl.SetTags)
 }

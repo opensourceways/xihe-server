@@ -1,5 +1,7 @@
 package bigmodel
 
+import "errors"
+
 // errorSensitiveInfo
 type errorSensitiveInfo struct {
 	error
@@ -11,9 +13,8 @@ func NewErrorSensitiveInfo(err error) errorSensitiveInfo {
 
 // helper
 func IsErrorSensitiveInfo(err error) bool {
-	_, ok := err.(errorSensitiveInfo)
+	return errors.As(err, &errorSensitiveInfo{})
 
-	return ok
 }
 
 // errorBusySource
@@ -26,7 +27,5 @@ func NewErrorBusySource(err error) errorBusySource {
 }
 
 func IsErrorBusySource(err error) bool {
-	_, ok := err.(errorBusySource)
-
-	return ok
+	return errors.As(err, &errorBusySource{})
 }

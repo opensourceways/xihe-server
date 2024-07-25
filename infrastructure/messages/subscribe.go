@@ -310,7 +310,9 @@ func (r *register) registerHandlerForCloud(handler interface{}) error {
 				Owner:   user,
 			},
 		}
-		v.SetDefaultExpiry()
+		if err = v.SetDefaultExpiry(); err != nil {
+			return
+		}
 
 		return h.HandleEventPodSubscribe(&v)
 	}

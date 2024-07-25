@@ -51,11 +51,15 @@ func AddRouterForProjectController(
 
 	rg.POST("/v1/project/:owner/:id", checkUserEmailMiddleware(&ctl.baseController), ctl.Fork)
 
-	rg.PUT("/v1/project/relation/:owner/:id/model", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedModel)
-	rg.DELETE("/v1/project/relation/:owner/:id/model", checkUserEmailMiddleware(&ctl.baseController), ctl.RemoveRelatedModel)
+	rg.PUT("/v1/project/relation/:owner/:id/model",
+		checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedModel)
+	rg.DELETE("/v1/project/relation/:owner/:id/model",
+		checkUserEmailMiddleware(&ctl.baseController), ctl.RemoveRelatedModel)
 
-	rg.PUT("/v1/project/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedDataset)
-	rg.DELETE("/v1/project/relation/:owner/:id/dataset", checkUserEmailMiddleware(&ctl.baseController), ctl.RemoveRelatedDataset)
+	rg.PUT("/v1/project/relation/:owner/:id/dataset",
+		checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedDataset)
+	rg.DELETE("/v1/project/relation/:owner/:id/dataset",
+		checkUserEmailMiddleware(&ctl.baseController), ctl.RemoveRelatedDataset)
 
 	rg.PUT("/v1/project/:owner/:id/tags", checkUserEmailMiddleware(&ctl.baseController), ctl.SetTags)
 }

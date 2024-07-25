@@ -10,39 +10,6 @@ type UserAgreement struct {
 	Type agreement.AgreementType `json:"type"`
 }
 
-type userCreateRequest struct {
-	Account  string `json:"account"`
-	Email    string `json:"email"`
-	Bio      string `json:"bio"`
-	AvatarId string `json:"avatar_id"`
-}
-
-func (req *userCreateRequest) toCmd() (cmd app.UserCreateCmd, err error) {
-	if cmd.Account, err = domain.NewAccount(req.Account); err != nil {
-		return
-	}
-
-	if cmd.Email, err = domain.NewEmail(req.Email); err != nil {
-		return
-	}
-
-	if cmd.Bio, err = domain.NewBio(req.Bio); err != nil {
-		return
-	}
-
-	if cmd.AvatarId, err = domain.NewAvatarId(req.AvatarId); err != nil {
-		return
-	}
-
-	if cmd.Password, err = domain.NewPassword(apiConfig.DefaultPassword); err != nil {
-		return
-	}
-
-	err = cmd.Validate()
-
-	return
-}
-
 type followingCreateRequest struct {
 	Account string `json:"account" required:"true"`
 }

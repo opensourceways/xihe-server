@@ -7,7 +7,8 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-func NewResourceMessageAdapter(cfg *ResourceConfig, p commsg.Publisher, o commsg.OperateLogPublisher) *resourceMessageAdapter {
+func NewResourceMessageAdapter(cfg *ResourceConfig,
+	p commsg.Publisher, o commsg.OperateLogPublisher) *resourceMessageAdapter {
 	return &resourceMessageAdapter{cfg: *cfg, publisher: p, operateLog: o}
 }
 

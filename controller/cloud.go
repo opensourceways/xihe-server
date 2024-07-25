@@ -148,9 +148,9 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 		CloudId: ctx.Param("cid"),
 	}
 	if err := cmd.Validate(); err != nil {
-		ws.WriteJSON(
-			newResponseCodeError(errorBadRequestParam, err),
-		)
+		if wsErr := ws.WriteJSON(newResponseCodeError(errorBadRequestParam, err)); wsErr != nil {
+			log.Errorf("create pod failed | web socket err:%s", wsErr.Error())
+		}
 
 		log.Errorf("create pod failed: new cmd, err:%s", err.Error())
 
@@ -160,7 +160,9 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 	for i := 0; i < apiConfig.PodTimeout; i++ {
 		dto, err := ctl.s.Get(&cmd)
 		if err != nil {
-			ws.WriteJSON(newResponseError(err))
+			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+				log.Errorf("create pod failed: web socket write err:%s", wsErr.Error())
+			}
 
 			log.Errorf("create pod failed: get status, err:%s", err.Error())
 
@@ -170,7 +172,9 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 		log.Debugf("info dto:%v", dto)
 
 		if dto.Error != "" || dto.AccessURL != "" {
-			ws.WriteJSON(newResponseData(dto))
+			if wsErr := ws.WriteJSON(newResponseData(dto)); wsErr != nil {
+				log.Errorf("create pod failed: web socket write err:%s", wsErr.Error())
+			}
 
 			log.Debug("create pod done")
 
@@ -182,7 +186,9 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 
 	log.Error("create pod timeout")
 
-	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
+	if wsErr := ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); wsErr != nil {
+		log.Errorf("create pod timeout | web socket write error:%s", wsErr.Error())
+	}
 }
 
 // @Summary		GetHttp
@@ -359,17 +365,23 @@ func (ctl *CloudController) WsSendReleasedPod(ctx *gin.Context) {
 		} else if err != nil {
 			log.Errorf("[RELEASE] fail to get pod %s, err:%s", cmd.PodId, err.Error())
 
-			ws.WriteJSON(newResponseError(err))
+			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+				log.Errorf("[RELEASE] fail to get pod | web socket write error:%s", wsErr.Error())
+			}
 
 			return
 		}
 
-		ws.WriteJSON(newResponseData(dto))
+		if wsErr := ws.WriteJSON(newResponseData(dto)); wsErr != nil {
+			log.Errorf("[RELEASE] fail to get pod | web socket write error:%s", wsErr.Error())
+		}
 
 		return
 	}
 
 	log.Errorf("release pod %s timeout", cmd.PodId)
 
-	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
+	if wsErr := ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); wsErr != nil {
+		log.Errorf("[RELEASE] fail to get pod | web socket write error:%s", wsErr.Error())
+	}
 }

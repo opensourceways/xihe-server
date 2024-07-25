@@ -281,7 +281,8 @@ func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username, 
 	}
 
 	// set expire time for old token
-	var ok, oldusername = false, ""
+	var oldusername = ""
+	var ok bool
 	o, exist := ctx.Get(encodeUsername)
 	if exist {
 		if oldusername, ok = o.(string); !ok {
@@ -294,16 +295,19 @@ func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username, 
 	}
 
 	// set cookie
-	setCookie(ctx, PrivateToken, u, domain, true, utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteLaxMode)
+	setCookie(ctx, PrivateToken, u, domain, true,
+		utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteLaxMode)
 
 	return nil
 }
 
 func (ctl baseController) setRespCSRFToken(ctx *gin.Context, token, domain string) {
-	setCookie(ctx, csrfToken, token, domain, false, utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteStrictMode)
+	setCookie(ctx, csrfToken, token, domain, false,
+		utils.ExpiryReduceSecond(apiConfig.TokenExpiry), http.SameSiteStrictMode)
 }
 
-func setCookie(ctx *gin.Context, key, val, domain string, httpOnly bool, expireTime time.Time, sameSite http.SameSite) {
+func setCookie(ctx *gin.Context, key, val, domain string, httpOnly bool,
+	expireTime time.Time, sameSite http.SameSite) {
 	cookie := &http.Cookie{
 		Name:     key,
 		Value:    val,
@@ -332,7 +336,7 @@ func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, usern
 	}
 	if apiConfig.LocalDomainCookie {
 		logrus.Info("local set cookie domain empty")
-		
+
 		if err := ctl.setRespCookieToken(ctx, token, username, ""); err != nil {
 			return err
 		}

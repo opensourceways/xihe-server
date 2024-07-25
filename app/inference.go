@@ -106,6 +106,8 @@ func (s inferenceService) Create(user string, owner *UserInfo, cmd *InferenceCre
 		err = ErrorUnavailableRepoFile{
 			errors.New("no boot file"),
 		}
+
+		return
 	}
 
 	instance := new(domain.Inference)
