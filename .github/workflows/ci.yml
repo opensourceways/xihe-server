@@ -32,7 +32,7 @@ jobs:
 
       - name: Build the Docker image
         run: docker build . --file Dockerfile  --build-arg USER=${{ secrets.ZYK_USER_NAME }} \
-         --build-arg PASS=${{ secrets.ZYK_PERSONAL_TOKEN }}--tag server:$(date +%s)
+         --build-arg PASS=${{ secrets.ZYK_PERSONAL_TOKEN }} --tag server:$(date +%s)
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@master
