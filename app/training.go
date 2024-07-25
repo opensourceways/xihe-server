@@ -215,11 +215,11 @@ func (s trainingService) Delete(info *TrainingIndex) error {
 
 	if job.JobId != "" {
 		err = s.train.DeleteJob(job.Endpoint, job.JobId)
+
 		if err != nil {
 			// ignore 404
-			logrus.Errorf("user:%s delete training job id:%s failed", info.Project.Owner.Account(), job.JobId)
+			logrus.Errorf("user:%s delete training job id:%s failed: %s", info.Project.Owner.Account(), job.JobId, err.Error())
 
-			return nil
 		}
 	}
 
