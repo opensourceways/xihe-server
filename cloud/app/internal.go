@@ -29,11 +29,14 @@ type cloudInternalService struct {
 
 func (s *cloudInternalService) UpdateInfo(cmd *UpdatePodInternalCmd) error {
 	p := new(domain.PodInfo)
-	cmd.toPodInfo(p)
+	if err := cmd.toPodInfo(p); err != nil {
+		return err
+	}
 
 	p.SetStatus()
 
 	err := s.repo.UpdatePod(p)
+
 	return err
 }
 

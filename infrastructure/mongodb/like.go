@@ -117,7 +117,7 @@ func (col like) HasLike(owner string, do *repositories.ResourceObjectDO) (b bool
 	}
 
 	// #nosec G104 -- this is a false positive
-	if withContext(f); err != nil {
+	if err = withContext(f); err != nil {
 		return
 	}
 

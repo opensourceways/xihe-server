@@ -1,5 +1,7 @@
 package app
 
+import "errors"
+
 type ErrorExceedMaxRelatedResourceNum struct {
 	error
 }
@@ -33,9 +35,7 @@ type errorUnavailableTraining struct {
 }
 
 func IsErrorUnavailableTraining(err error) bool {
-	_, ok := err.(errorUnavailableTraining)
-
-	return ok
+	return errors.As(err, &errorUnavailableTraining{})
 }
 
 type ErrorDuplicateTrainingName struct {

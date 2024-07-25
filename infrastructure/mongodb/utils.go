@@ -37,9 +37,7 @@ type dbError struct {
 }
 
 func isDBError(err error) bool {
-	_, b := err.(dbError)
-
-	return b
+	return errors.As(err, &dbError{})
 }
 
 func isDocNotExists(err error) bool {

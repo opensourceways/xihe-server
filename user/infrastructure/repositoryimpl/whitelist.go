@@ -17,7 +17,8 @@ type userWhiteListImpl struct {
 	cli mongodbClient
 }
 
-func (impl *userWhiteListImpl) GetWhiteListInfo(accout types.Account, wtype string) (u domain.WhiteListInfo, err error) {
+func (impl *userWhiteListImpl) GetWhiteListInfo(accout types.Account,
+	wtype string) (u domain.WhiteListInfo, err error) {
 	var v DWhiteListInfo
 
 	f := func(ctx context.Context) error {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
@@ -91,9 +92,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	// start
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {
-		ws.WriteJSON(
-			newResponseCodeError(errorBadRequestParam, err),
-		)
+		if wsErr := ws.WriteJSON(newResponseCodeError(errorBadRequestParam, err)); wsErr != nil {
+			log.Errorf("inference failed: web socket write err:%s", wsErr.Error())
+		}
 
 		log.Errorf("inference failed: new account, err:%s", err.Error())
 
@@ -103,7 +104,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	projectId := ctx.Param("pid")
 	v, err := ctl.project.GetSummary(owner, projectId)
 	if err != nil {
-		ws.WriteJSON(newResponseError(err))
+		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
+		}
 
 		log.Errorf("inference failed: get summary, err:%s", err.Error())
 
@@ -113,12 +116,15 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	viewOther := pl.isNotMe(owner)
 
 	if v.IsPrivate() {
-		ws.WriteJSON(
+		wsErr := ws.WriteJSON(
 			newResponseCodeMsg(
 				errorNotAllowed,
 				"project is not found",
 			),
 		)
+		if wsErr != nil {
+			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
+		}
 
 		log.Debug("inference failed: project is private")
 
@@ -127,7 +133,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	var level string
 	if level, err = ctl.getResourceLevel(owner, projectId); err != nil {
-		ws.WriteJSON(newResponseError(err))
+		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
+		}
 
 		log.Errorf("inference failed: get reource, err:%s", err.Error())
 
@@ -152,7 +160,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	dto, lastCommit, err := ctl.s.Create(pl.Account, &u, &cmd)
 	if err != nil {
-		ws.WriteJSON(newResponseError(err))
+		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
+		}
 
 		log.Errorf("inference failed: create, err:%s", err.Error())
 
@@ -163,7 +173,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		fmt.Sprintf("projectid: %s", v.Id), "success")
 
 	if dto.Error != "" || dto.AccessURL != "" {
-		ws.WriteJSON(newResponseData(dto))
+		if wsErr := ws.WriteJSON(newResponseData(dto)); wsErr != nil {
+			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
+		}
 
 		return
 	}
@@ -180,7 +192,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 	for i := 0; i < apiConfig.InferenceTimeout; i++ {
 		dto, err = ctl.s.Get(&info)
 		if err != nil {
-			ws.WriteJSON(newResponseError(err))
+			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
+				log.Errorf("inference create | web socket write err:%s", wsErr.Error())
+			}
 
 			log.Errorf("inference failed: get status, err:%s", err.Error())
 
@@ -190,7 +204,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		log.Debugf("info dto:%v", dto)
 
 		if dto.Error != "" || dto.AccessURL != "" {
-			ws.WriteJSON(newResponseData(dto))
+			if wsErr := ws.WriteJSON(newResponseData(dto)); wsErr != nil {
+				log.Errorf("inference create | web socket write err:%s", wsErr.Error())
+			}
 
 			log.Debug("inference done")
 
@@ -202,7 +218,9 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	log.Error("inference timeout")
 
-	ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout"))
+	if wsErr := ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); wsErr != nil {
+		logrus.Errorf("inference | web socket write error: %s", wsErr.Error())
+	}
 }
 
 func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid string) (level string, err error) {

@@ -43,7 +43,7 @@ func (cmd *CompetitorApplyCmd) Validate() error {
 
 func (cmd *CompetitorApplyCmd) toPlayer(cid string) (p domain.Player) {
 	p.CompetitionId = cid
-	p.Leader = *&domain.Competitor{
+	p.Leader = domain.Competitor{
 		Account:  cmd.Account,
 		Name:     cmd.Name,
 		City:     cmd.City,

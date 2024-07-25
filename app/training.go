@@ -282,6 +282,9 @@ func (s trainingService) CreateTrainingJob(
 			Status: trainingStatusScheduleFailed,
 			Error:  err.Error(),
 		})
+		if err != nil {
+			return
+		}
 	}
 
 	return

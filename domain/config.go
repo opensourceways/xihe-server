@@ -13,11 +13,11 @@ func Init(cfg *Config) {
 }
 
 type Config struct {
-	covers           sets.String
-	protocols        sets.String
-	projectType      sets.String
-	trainingPlatform sets.String
-	avatarURL        sets.String
+	covers           sets.Set[string]
+	protocols        sets.Set[string]
+	projectType      sets.Set[string]
+	trainingPlatform sets.Set[string]
+	avatarURL        sets.Set[string]
 
 	MaxBioLength          int `json:"max_bio_length"`
 	MaxNameLength         int `json:"max_name_length"`
@@ -110,11 +110,11 @@ func (r *Config) Validate() error {
 		return errors.New("invalid name length")
 	}
 
-	r.covers = sets.NewString(r.Covers...)
-	r.protocols = sets.NewString(r.Protocols...)
-	r.projectType = sets.NewString(r.ProjectType...)
-	r.trainingPlatform = sets.NewString(r.TrainingPlatform...)
-	r.avatarURL = sets.NewString(r.AvatarURL...)
+	r.covers = sets.New[string](r.Covers...)
+	r.protocols = sets.New[string](r.Protocols...)
+	r.projectType = sets.New[string](r.ProjectType...)
+	r.trainingPlatform = sets.New[string](r.TrainingPlatform...)
+	r.avatarURL = sets.New[string](r.AvatarURL...)
 
 	return nil
 }

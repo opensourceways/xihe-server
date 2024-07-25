@@ -11,15 +11,15 @@ import (
 func NewFinetune(cfg *Config) finetune.Finetune {
 	return &finetuneImpl{
 		cli:                sdk.New(cfg.Endpoint),
-		doneStatus:         sets.NewString(cfg.JobDoneStatus...),
-		canTerminateStatus: sets.NewString(cfg.CanTerminateStatus...),
+		doneStatus:         sets.New[string](cfg.JobDoneStatus...),
+		canTerminateStatus: sets.New[string](cfg.CanTerminateStatus...),
 	}
 }
 
 type finetuneImpl struct {
 	cli                sdk.Finetune
-	doneStatus         sets.String
-	canTerminateStatus sets.String
+	doneStatus         sets.Set[string]
+	canTerminateStatus sets.Set[string]
 }
 
 func (impl *finetuneImpl) IsJobDone(status string) bool {

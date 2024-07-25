@@ -84,11 +84,12 @@ func (s *service) IFlytekSpark(ch chan string, input *domain.IFlytekSparkInput) 
 	}
 
 	if utf8.RuneCountInString(input.Text.IFlytekSparkText()) > lenThreshold {
-		s.doWaitAndEndpointNotReturned(s.iflyteksparkInfo.endpointsLong, f)
+		err = s.doWaitAndEndpointNotReturned(s.iflyteksparkInfo.endpointsLong, f)
 		return
 	}
 
-	s.doWaitAndEndpointNotReturned(s.iflyteksparkInfo.endpoints, f)
+	err = s.doWaitAndEndpointNotReturned(s.iflyteksparkInfo.endpoints, f)
+
 	return
 }
 

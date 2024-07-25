@@ -229,10 +229,13 @@ func (s aiccFinetuneService) CreateAICCFinetuneJob(
 	}
 
 	if lastChance {
-		s.repo.UpdateJobDetail(info, &JobDetail{
+		err = s.repo.UpdateJobDetail(info, &JobDetail{
 			Status: trainingStatusScheduleFailed,
 			Error:  err.Error(),
 		})
+		if err != nil {
+			return
+		}
 	}
 
 	return

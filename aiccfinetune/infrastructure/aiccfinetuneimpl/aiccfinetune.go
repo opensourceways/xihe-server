@@ -13,13 +13,13 @@ import (
 
 func NewAICCFinetune(cfg *Config) aiccfinetune.AICCFinetuneServer {
 	return &aiccFinetuneImpl{
-		doneStatus: sets.NewString(cfg.JobDoneStatus...),
+		doneStatus: sets.New[string](cfg.JobDoneStatus...),
 		endpoint:   cfg.Endpoint,
 	}
 }
 
 type aiccFinetuneImpl struct {
-	doneStatus sets.String
+	doneStatus sets.Set[string]
 	endpoint   string
 }
 

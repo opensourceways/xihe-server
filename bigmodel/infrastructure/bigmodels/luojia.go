@@ -5,21 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
 
 	types "github.com/opensourceways/xihe-server/domain"
 )
-
-type luojiaHFResp struct {
-	Status int    `json:"status"`
-	Msg    string `json:"msg"`
-	Result string `json:"result"`
-}
-
-func (r *luojiaHFResp) result() string {
-	return r.Result
-}
 
 type luojiaInfo struct {
 	bucket     string
@@ -103,42 +92,4 @@ func (s *service) sendReqToLuojia(endpoint, userName string) (answer string, err
 	}
 
 	return
-}
-
-func (s *service) sendReqToLuoJiaHF(endpoint string, f io.Reader) (res string, err error) {
-	buf := new(bytes.Buffer)
-	writer := multipart.NewWriter(buf)
-	file, err := writer.CreateFormFile("file", "filename")
-	if err != nil {
-		return "", err
-	}
-
-	_, err = io.Copy(file, f)
-	if err != nil {
-		return "", err
-	}
-
-	if err = writer.Close(); err != nil {
-		return "", err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
-	if err != nil {
-		return "", err
-	}
-
-	t, err := s.token()
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Set("X-Auth-Token", t)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-
-	resp := new(luojiaHFResp)
-	if _, err = s.hc.ForwardTo(req, resp); err != nil {
-		return "", err
-	}
-
-	return resp.result(), nil
 }

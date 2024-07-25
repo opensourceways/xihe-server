@@ -39,7 +39,9 @@ func (impl *apiServiceRepoImpl) ApplyApi(d *domain.UserApiRecord) error {
 	return nil
 }
 
-func (impl *apiServiceRepoImpl) GetApiByUserModel(user types.Account, model domain.ModelName) (u domain.UserApiRecord, err error) {
+func (impl *apiServiceRepoImpl) GetApiByUserModel(user types.Account, model domain.ModelName) (
+	u domain.UserApiRecord, err error,
+) {
 	v := new(dApiApply)
 
 	f := func(ctx context.Context) error {
@@ -122,7 +124,8 @@ func (a *dApiApply) toUserApiRecord(d *domain.UserApiRecord) (err error) {
 	return
 }
 
-func (impl *apiServiceRepoImpl) UpdateToken(user types.Account, model domain.ModelName, token string, date string, version int) (err error) {
+func (impl *apiServiceRepoImpl) UpdateToken(user types.Account,
+	model domain.ModelName, token string, date string, version int) (err error) {
 	filter := bson.M{fiedUser: user.Account(), fieldModelName: model.ModelName()}
 
 	f := func(ctx context.Context) error {

@@ -111,19 +111,11 @@ func (p *PodInfo) GetCloudType() string {
 }
 
 func (p *PodInfo) IsCpu() bool {
-	if p.CloudId == cloudIdCPU {
-		return true
-	}
-
-	return false
+	return p.CloudId == cloudIdCPU
 }
 
 func (p *PodInfo) IsAscend() bool {
-	if p.CloudId == cloudIdNPU {
-		return true
-	}
-
-	return false
+	return p.CloudId == cloudIdNPU
 }
 
 func (p *PodInfo) IsTerminated() bool {

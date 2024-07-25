@@ -40,41 +40,28 @@ type responseData struct {
 }
 
 func isErrorOfAccessingPrivateRepo(err error) bool {
-	_, ok := err.(app.ErrorPrivateRepo)
-
-	return ok
+	return errors.As(err, &app.ErrorPrivateRepo{})
 }
 
 func newResponseError(err error) responseData {
 	code := errorSystemError
 
-	switch err.(type) {
-	case repository.ErrorDuplicateCreating:
+	if errors.As(err, &repository.ErrorDuplicateCreating{}) {
 		code = errorDuplicateCreating
-
-	case repository.ErrorResourceNotExists:
+	} else if errors.As(err, &repository.ErrorResourceNotExists{}) {
 		code = errorResourceNotExists
-
-	case repository.ErrorConcurrentUpdating:
+	} else if errors.As(err, &repository.ErrorConcurrentUpdating{}) {
 		code = errorConcurrentUpdating
-
-	case app.ErrorExceedMaxRelatedResourceNum:
+	} else if errors.As(err, &app.ErrorExceedMaxRelatedResourceNum{}) {
 		code = errorExccedMaxNum
-
-	case app.ErrorUpdateLFSFile:
+	} else if errors.As(err, &app.ErrorUpdateLFSFile{}) {
 		code = errorUpdateLFSFile
-
-	case app.ErrorUnavailableRepoFile:
+	} else if errors.As(err, &app.ErrorUnavailableRepoFile{}) {
 		code = errorUnavailableRepoFile
-
-	case app.ErrorPreviewLFSFile:
+	} else if errors.As(err, &app.ErrorPreviewLFSFile{}) {
 		code = errorPreviewLFSFile
-
-	case app.ErrorDuplicateTrainingName:
+	} else if errors.As(err, &app.ErrorDuplicateTrainingName{}) {
 		code = errorDuplicateTrainingName
-
-	default:
-
 	}
 
 	return responseData{

@@ -122,8 +122,9 @@ func (impl aiccFinetuneRepoImpl) Get(info *domain.AICCFinetuneIndex) (obj domain
 	if len(v) == 0 || len(v[0].Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
-		v[0].toAICCFinetuneDO(&obj)
+		err = v[0].toAICCFinetuneDO(&obj)
 	}
+
 	return
 }
 
@@ -163,7 +164,9 @@ func (impl aiccFinetuneRepoImpl) List(user types.Account, Model domain.ModelName
 	r = make([]domain.AICCFinetuneSummary, len(t))
 
 	for i := range t {
-		t[i].toAICCFinetuneSummary(&r[i])
+		if err = t[i].toAICCFinetuneSummary(&r[i]); err != nil {
+			return r, v.Version, err
+		}
 	}
 
 	return r, v.Version, nil
@@ -222,7 +225,7 @@ func (impl aiccFinetuneRepoImpl) GetJob(info *domain.AICCFinetuneIndex) (job dom
 	if len(v) == 0 || len(v[0].Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
-		v[0].Items[0].Job.toAICCFinetuneJobInfo(&job)
+		err = v[0].Items[0].Job.toAICCFinetuneJobInfo(&job)
 	}
 
 	return
@@ -254,7 +257,7 @@ func (impl aiccFinetuneRepoImpl) GetJobDetail(info *domain.AICCFinetuneIndex) (
 	if len(v) == 0 || len(v[0].Items) == 0 {
 		err = repositories.NewErrorDataNotExists(errDocNotExists)
 	} else {
-		v[0].Items[0].JobDetail.toAICCFinetuneJobDetail(&job)
+		err = v[0].Items[0].JobDetail.toAICCFinetuneJobDetail(&job)
 		endpoint = v[0].Items[0].Job.Endpoint
 	}
 

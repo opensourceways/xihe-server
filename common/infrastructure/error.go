@@ -1,6 +1,8 @@
 package infrastructure
 
 import (
+	"errors"
+
 	"github.com/opensourceways/xihe-server/common/domain/repository"
 )
 
@@ -23,9 +25,7 @@ func NewErrorDataNotExists(err error) errorDataNotExists {
 }
 
 func IsErrorDataNotExists(err error) bool {
-	_, ok := err.(errorDataNotExists)
-
-	return ok
+	return errors.As(err, &errorDataNotExists{})
 }
 
 // errorConcurrentUpdating
@@ -37,21 +37,17 @@ func NewErrorConcurrentUpdating(err error) errorConcurrentUpdating {
 	return errorConcurrentUpdating{err}
 }
 
-// convertError
-func ConvertError(err error) (out error) {
-	switch err.(type) {
-	case errorDuplicateCreating:
-		out = repository.NewErrorDuplicateCreating(err)
-
-	case errorDataNotExists:
-		out = repository.NewErrorResourceNotExists(err)
-
-	case errorConcurrentUpdating:
-		out = repository.NewErrorConcurrentUpdating(err)
-
-	default:
-		out = err
+// ConvertError
+func ConvertError(err error) error {
+	if errors.As(err, &errorDuplicateCreating{}) {
+		return repository.NewErrorDuplicateCreating(err)
+	}
+	if errors.As(err, &errorDataNotExists{}) {
+		return repository.NewErrorResourceNotExists(err)
+	}
+	if errors.As(err, &errorConcurrentUpdating{}) {
+		return repository.NewErrorConcurrentUpdating(err)
 	}
 
-	return
+	return err
 }

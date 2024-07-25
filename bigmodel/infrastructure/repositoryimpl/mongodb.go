@@ -35,19 +35,23 @@ type mongodbClient interface {
 
 	GetDocs(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
 
-	GetArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray bson.M, project bson.M, result interface{}) error
+	GetArrayElem(ctx context.Context, array string, filterOfDoc,
+		filterOfArray bson.M, project bson.M, result interface{}) error
 
 	NewDocIfNotExist(ctx context.Context, filterOfDoc, docInfo bson.M) (string, error)
 
-	PushElemToLimitedArray(ctx context.Context, array string, keep int, filterOfDoc, value bson.M) error
+	PushElemToLimitedArray(ctx context.Context, array string, keep int,
+		filterOfDoc, value bson.M) error
 
 	PullArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray bson.M) error
 
 	UpdateDoc(ctx context.Context, filterOfDoc, update bson.M, op string, version int) error
 
-	UpdateArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray, updateCmd bson.M, version int, t int64) (bool, error)
+	UpdateArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray,
+		updateCmd bson.M, version int, t int64) (bool, error)
 
-	ModifyArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray, updateCmd bson.M, op string) (bool, error)
+	ModifyArrayElem(ctx context.Context, array string, filterOfDoc, filterOfArray,
+		updateCmd bson.M, op string) (bool, error)
 
 	InCondForArrayElem(key string, value interface{}) bson.M
 
