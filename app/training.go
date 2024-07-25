@@ -218,6 +218,7 @@ func (s trainingService) Delete(info *TrainingIndex) error {
 		if err != nil {
 			// ignore 404
 			logrus.Errorf("user:%s delete training job id:%s failed", info.Project.Owner.Account(), job.JobId)
+
 			return nil
 		}
 	}
