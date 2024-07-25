@@ -16,19 +16,6 @@ jobs:
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
-  
-      - name: Run Gosec Security Scanner
-        uses: securego/gosec@master
-        env:
-          GITHUB_AUTHENTICATION_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
-        with:
-          args: ./...
-
-      - name: Add Env for Build the Docker image
-        env:
-          USER: ${{ secrets.ZYK_USER_NAME }}
-          PASS: ${{ secrets.ZYK_PERSONAL_TOKEN }}
-        run: echo "machine github.com login $USER password $PASS" > ~/.netrc 
 
       - name: Build the Docker image
         run: |
@@ -36,6 +23,13 @@ jobs:
             --build-arg USER=${{ secrets.ZYK_USER_NAME }} \
             --build-arg PASS=${{ secrets.ZYK_PERSONAL_TOKEN }} \
             --tag server:$(date +%s) .
+
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        env:
+          GITHUB_AUTHENTICATION_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
+        with:
+          args: ./...
 
       - name: golangci-lint
         uses: golangci/golangci-lint-action@master
