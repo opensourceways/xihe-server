@@ -4,10 +4,14 @@ on:
   push:
     branches: [ "main", "dev", "sec"]
   pull_request:
-    branches: [ "main", "dev", "sec"]
+    branches: [ '*' ]
 
 env:
   GOPRIVATE: "github.com/opensourceways"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
