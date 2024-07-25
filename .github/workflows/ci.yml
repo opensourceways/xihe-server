@@ -26,12 +26,13 @@ jobs:
 
       - name: Build the Docker image
         env:
-          GH_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
-          GH_USER: ${{ secrets.ZYK_USER_NAME }}
-        run: echo "machine github.com login $GH_USER password $GH_TOKEN" > ~/.netrc 
+          USER: ${{ secrets.ZYK_PERSONAL_TOKEN }}
+          PASS: ${{ secrets.ZYK_USER_NAME }}
+        run: echo "machine github.com login $USER password $PASS" > ~/.netrc 
 
-      # - name: Build the Docker image
-      #   run: docker build . --file Dockerfile --tag server:$(date +%s)
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag server:$(date +%s)
+
       - name: golangci-lint
         uses: golangci/golangci-lint-action@master
         with:
