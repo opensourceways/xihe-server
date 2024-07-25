@@ -36,7 +36,6 @@ type errorUnavailableTraining struct {
 
 func IsErrorUnavailableTraining(err error) bool {
 	return errors.As(err, &errorUnavailableTraining{})
-
 }
 
 type ErrorDuplicateTrainingName struct {
