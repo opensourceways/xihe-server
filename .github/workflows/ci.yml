@@ -24,13 +24,16 @@ jobs:
         with:
           args: ./...
 
-      - name: Build the Docker image
+      - name: Add Env for Build the Docker image
         env:
           USER: ${{ secrets.ZYK_PERSONAL_TOKEN }}
           PASS: ${{ secrets.ZYK_USER_NAME }}
         run: echo "machine github.com login $USER password $PASS" > ~/.netrc 
 
       - name: Build the Docker image
+        env:
+          USER: ${{ secrets.ZYK_PERSONAL_TOKEN }}
+          PASS: ${{ secrets.ZYK_USER_NAME }}
         run: docker build . --file Dockerfile --tag server:$(date +%s)
 
       - name: golangci-lint
