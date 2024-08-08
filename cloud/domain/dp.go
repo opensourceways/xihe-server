@@ -54,25 +54,6 @@ func (r cloudSpec) CloudSpec() string {
 	return string(r)
 }
 
-// CloudImage
-type CloudImage interface {
-	CloudImage() string
-}
-
-func NewCloudImage(v string) (CloudImage, error) {
-	if v == "" {
-		return nil, errors.New("empty value")
-	}
-
-	return cloudImage(v), nil
-}
-
-type cloudImage string
-
-func (r cloudImage) CloudImage() string {
-	return string(r)
-}
-
 // CloudFeature
 type CloudFeature interface {
 	CloudFeature() string
@@ -274,4 +255,40 @@ type accessURL string
 
 func (r accessURL) AccessURL() string {
 	return string(r)
+}
+
+type CloudImageAlias interface {
+	CloudImageAlias() string
+}
+
+func NewCloudImageAlias(v string) (CloudImageAlias, error) {
+	if v == "" {
+		return nil, errors.New("empty value")
+	}
+
+	return cloudImageAlias(v), nil
+}
+
+type cloudImageAlias string
+
+func (a cloudImageAlias) CloudImageAlias() string {
+	return string(a)
+}
+
+type ICloudImage interface {
+	Image() string
+}
+
+func NewICloudImage(v string) (ICloudImage, error) {
+	if v == "" {
+		return nil, errors.New("empty value")
+	}
+
+	return cloudImage(v), nil
+}
+
+type cloudImage string
+
+func (i cloudImage) Image() string {
+	return string(i)
 }

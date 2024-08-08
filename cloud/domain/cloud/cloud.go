@@ -5,6 +5,7 @@ type CloudPodCreateInfo struct {
 	SurvivalTime int64
 	User         string
 	CloudType    string
+	CloudImage   string
 }
 
 type CloudPod interface {

@@ -23,6 +23,7 @@ func (impl *cloudpodImpl) Create(info *cloud.CloudPodCreateInfo) error {
 		User:         info.User,
 		SurvivalTime: info.SurvivalTime,
 		CloudType:    info.CloudType,
+		CloudImage:   info.CloudImage,
 	}
 
 	return impl.cli.CreateCloudPod(opt)

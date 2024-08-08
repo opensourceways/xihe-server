@@ -24,8 +24,21 @@ func (doc *DCloudConf) toCloudConf(c *domain.CloudConf) (err error) {
 		return
 	}
 
-	if c.Image, err = domain.NewCloudImage(doc.Image); err != nil {
-		return
+	c.Images = make([]domain.CloudImage, 0, len(doc.Images))
+	for i := range doc.Images {
+		cloudImage := domain.CloudImage{}
+
+		if cloudImage.Alias, err = domain.NewCloudImageAlias(doc.Images[i].Alias); err != nil {
+			return
+		}
+
+		if cloudImage.Image, err = domain.NewICloudImage(doc.Images[i].Image); err != nil {
+			return
+		}
+
+		cloudImage.Default = doc.Images[i].Default
+
+		c.Images = append(c.Images, cloudImage)
 	}
 
 	if c.Feature, err = domain.NewCloudFeature(doc.Feature); err != nil {

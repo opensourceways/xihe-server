@@ -141,7 +141,7 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 	}
 
 	// subscribe
-	err = s.cloudService.SubscribeCloud(&c.CloudConf, cmd.User)
+	err = s.cloudService.SubscribeCloud(&c.CloudConf, cmd.User, cmd.ImageAlias.CloudImageAlias())
 
 	return
 }

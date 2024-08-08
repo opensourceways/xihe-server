@@ -59,6 +59,7 @@ func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
 			SurvivalTime: survivalTime,
 			User:         p.Owner.Account(),
 			CloudType:    p.GetCloudType(),
+			CloudImage:   p.Image,
 		},
 	)
 
