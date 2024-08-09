@@ -11,6 +11,7 @@ import (
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/utils"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func NewWuKongPictureRepo(m mongodbClient) repository.WuKongPicture {
@@ -305,12 +306,9 @@ func (impl *wukongPictureRepoImpl) GetPublicsGlobal() (r []domain.WuKongPicture,
 	var v []dWuKongPicture
 
 	f := func(ctx context.Context) error {
-		project := bson.M{
-			fieldPublics: 1,
-		}
-
+		opts := options.FindOptions{}
 		return impl.cli.GetDocs(
-			ctx, nil, project, &v,
+			ctx, nil, opts.SetProjection(bson.M{fieldPublics: 1}), &v,
 		)
 	}
 

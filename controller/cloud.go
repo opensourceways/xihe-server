@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/cloud/app"
 	"github.com/opensourceways/xihe-server/domain"
@@ -308,9 +307,7 @@ func (ctl *CloudController) ReleasePod(ctx *gin.Context) {
 		} else if errors.Is(err, app.ErrCloudNotAllowed) {
 			ctx.JSON(http.StatusForbidden, newResponseError(err))
 		} else {
-			logrus.Errorf("fail to release cloud, pod id: %s, err: %s", cmd.PodId, err.Error())
-
-			ctl.sendRespWithInternalError(ctx, newResponseError(ErrSystemFault))
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		}
 
 		return

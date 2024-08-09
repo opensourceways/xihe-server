@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type mongodbClient interface {
@@ -14,7 +16,7 @@ type mongodbClient interface {
 
 	GetDoc(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
 
-	GetDocs(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
+	GetDocs(ctx context.Context, filterOfDoc bson.M, opts *options.FindOptions, result interface{}) error
 
 	NewDocIfNotExist(ctx context.Context, filterOfDoc, docInfo bson.M) (string, error)
 
@@ -34,6 +36,10 @@ type mongodbClient interface {
 		array string, filterOfDoc, value, updateCmd bson.M,
 		version int,
 	) error
+
+	Count(ctx context.Context, filterOfDoc bson.M, opts *options.CountOptions) (int64, error)
+
+	Aggregate(ctx context.Context, pipeline mongo.Pipeline, opts *options.AggregateOptions, result interface{}) error
 }
 
 func withContext(f func(context.Context) error) error {

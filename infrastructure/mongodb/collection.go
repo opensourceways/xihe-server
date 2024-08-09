@@ -5,6 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func NewCollection(name string) collection {
@@ -43,10 +44,10 @@ func (c collection) GetDoc(
 }
 
 func (c collection) GetDocs(
-	ctx context.Context, filterOfDoc, project bson.M,
+	ctx context.Context, filterOfDoc bson.M, opts *options.FindOptions,
 	result interface{},
 ) error {
-	return cli.getDocs(ctx, c.name, filterOfDoc, project, result)
+	return cli.getDocs(ctx, c.name, filterOfDoc, opts, result)
 }
 
 func (c collection) GetArrayElem(
@@ -171,4 +172,19 @@ func (c collection) ModifyArrayElem(
 
 func (c collection) InCondForArrayElem(key string, value interface{}) bson.M {
 	return bson.M{"$in": bson.A{condFieldOfArrayElem(key), value}}
+}
+
+func (c collection) Count(ctx context.Context, filterOfDoc bson.M, opts *options.CountOptions) (int64, error) {
+	return cli.count(ctx, c.name, filterOfDoc, opts)
+}
+
+func (c collection) Aggregate(ctx context.Context, pipeline mongo.Pipeline, opts *options.AggregateOptions,
+	result interface{},
+) error {
+	cursor, err := c.Collection().Aggregate(ctx, pipeline, opts)
+	if err != nil {
+		return err
+	}
+
+	return cursor.All(ctx, result)
 }

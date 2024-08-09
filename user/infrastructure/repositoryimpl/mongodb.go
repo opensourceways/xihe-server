@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 const (
@@ -23,7 +24,7 @@ type mongodbClient interface {
 	NewDocIfNotExist(ctx context.Context, filterOfDoc, docInfo bson.M) (string, error)
 	UpdateDoc(ctx context.Context, filterOfDoc, update bson.M, op string, version int) error
 	GetDoc(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
-	GetDocs(ctx context.Context, filterOfDoc, project bson.M, result interface{}) error
+	GetDocs(ctx context.Context, filterOfDoc bson.M, opts *options.FindOptions, result interface{}) error
 	AddToSimpleArray(ctx context.Context, array string, filterOfDoc, value interface{}) error
 	RemoveFromSimpleArray(ctx context.Context, array string, filterOfDoc, value interface{}) error
 }

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/opensourceways/xihe-server/promotion/domain"
 	"github.com/opensourceways/xihe-server/promotion/domain/repository"
 	"github.com/opensourceways/xihe-server/promotion/domain/user"
@@ -27,19 +29,19 @@ func NewPromotionUserService(
 
 func (s *promotionUserService) Register(pid string, origin domain.Origin, ur *domain.UserRegistration) error {
 	// get promotion version
-	p, err := s.repo.Find(pid)
+	p, err := s.repo.FindById(pid)
 	if err != nil {
-		return err
+		return fmt.Errorf("find promotion error: %w", err)
 	}
 
 	// register promotion
 	if err := s.repo.UserRegister(pid, ur.Account, origin, p.Version); err != nil {
-		return err
+		return fmt.Errorf("register promotion error: %w", err)
 	}
 
 	// update registration
 	if err := s.user.UpdateRegister(ur); err != nil {
-		return err
+		return fmt.Errorf("update registration error: %w", err)
 	}
 
 	return nil

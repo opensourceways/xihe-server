@@ -2,24 +2,32 @@ package domain
 
 import (
 	"errors"
-	"strings"
-	"time"
 
 	common "github.com/opensourceways/xihe-server/common/domain"
-	"github.com/opensourceways/xihe-server/utils"
 )
 
 const (
 	FieldEN = "English"
 	FieldZH = "Chinese"
 
-	promotionStatusOver       = "over"
-	promotionStatusPreparing  = "preparing"
-	promotionStatusInProgress = "in-progress"
+	PromotionStatusOver       = "over"
+	PromotionStatusPreparing  = "preparing"
+	PromotionStatusInProgress = "in-progress"
 
 	originMindSpore = "MindSpore"
 	originCSDN      = "CSDN"
 	originOther     = "other"
+
+	promotionWayOnline  = "online"
+	promotionWayOffline = "offline"
+
+	promotionTypeClockin      = "clockin"
+	promotionTypeTrainingCamp = "trainingCamp"
+	promotionTypeForum        = "forum"
+	promotionTypeHackathon    = "hackathon"
+	promotionTypeMsg          = "MSG"
+	promotionTypeMindcon      = "MindCon"
+	promotionTypeOther        = "other"
 )
 
 // PronotionName
@@ -41,60 +49,25 @@ func (r promotionName) PromotionName() string {
 	return string(r)
 }
 
-// PromotionDuration
-type PromotionDuration interface {
-	PromotionDuration() string
-	PromotionStatus() (string, error)
+type PromotionStatus interface {
+	PromotionStatus() string
 }
 
-func NewPromotionDuration(v string) (PromotionDuration, error) {
-	if v == "" {
-		return nil, errors.New("empty value")
+type promotionStatus string
+
+func NewPromotionStatus(v string) (PromotionStatus, error) {
+	switch v {
+	case PromotionStatusPreparing, PromotionStatusInProgress, PromotionStatusOver:
+		return promotionStatus(v), nil
+	case "":
+		return nil, nil
 	}
 
-	return promotionDuration(v), nil
+	return nil, errors.New("unsupported promotion status")
 }
 
-type promotionDuration string
-
-func (r promotionDuration) PromotionDuration() string {
-	return string(r)
-}
-
-func (r promotionDuration) PromotionStatus() (string, error) {
-	start, end, err := r.durationTime()
-	if err != nil {
-		return "", errors.New("parse duration error")
-	}
-
-	now := time.Now().Unix()
-	if now < start {
-		return promotionStatusPreparing, nil
-	}
-	if now >= start && now <= end {
-		return promotionStatusInProgress, nil
-	}
-	if now > end {
-		return promotionStatusOver, nil
-	}
-
-	return "", errors.New("promotion status internal error")
-}
-
-func (r promotionDuration) durationTime() (int64, int64, error) {
-	t := strings.Split(string(r), "-")
-
-	start, err := utils.ToUnixTimeLayout2(t[0])
-	if err != nil {
-		return 0, 0, err
-	}
-
-	end, err := utils.ToUnixTimeLayout2(t[1])
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return start.Unix(), end.Unix(), nil
+func (s promotionStatus) PromotionStatus() string {
+	return string(s)
 }
 
 // PromotionDesc
@@ -181,4 +154,47 @@ type origin string
 
 func (o origin) Oringn() string {
 	return string(o)
+}
+
+type PromotionWay interface {
+	PromotionWay() string
+}
+
+func NewPromotionWay(v string) (PromotionWay, error) {
+	switch v {
+	case promotionWayOnline, promotionWayOffline:
+		return promotionWay(v), nil
+	case "":
+		return nil, nil
+	}
+
+	return nil, errors.New("unsupported promotion way")
+}
+
+type promotionWay string
+
+func (w promotionWay) PromotionWay() string {
+	return string(w)
+}
+
+type PromotionType interface {
+	PromotionType() string
+}
+
+func NewPromotionType(v string) (PromotionType, error) {
+	switch v {
+	case promotionTypeClockin, promotionTypeTrainingCamp, promotionTypeForum, promotionTypeHackathon, promotionTypeMsg,
+		promotionTypeMindcon, promotionTypeOther:
+		return promotionType(v), nil
+	case "":
+		return nil, nil
+	}
+
+	return nil, errors.New("unsupported promotion type")
+}
+
+type promotionType string
+
+func (t promotionType) PromotionType() string {
+	return string(t)
 }
