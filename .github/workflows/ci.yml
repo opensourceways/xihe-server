@@ -32,13 +32,15 @@ jobs:
           GITHUB_AUTHENTICATION_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
         with:
           args: ./...
-
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@master
+          
+      - name: Set Login Credentials
         env:
           TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
           USER: ${{ secrets.ZYK_USER_NAME }}
         run: echo "machine github.com login $USER password $TOKEN" > ~/.netrc
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@master
         with:
           # Require: The version of golangci-lint to use.
           # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
