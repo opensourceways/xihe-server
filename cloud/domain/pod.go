@@ -10,6 +10,7 @@ type Pod struct {
 	Id      string
 	CloudId string
 	Owner   otypes.Account
+	Image   string
 }
 
 type PodInfo struct {

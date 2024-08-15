@@ -55,8 +55,13 @@ func (r *CloudService) ToCloud(c *domain.Cloud) (err error) {
 }
 
 func (r *CloudService) SubscribeCloud(
-	c *domain.CloudConf, u types.Account,
+	c *domain.CloudConf, u types.Account, imageAlias string,
 ) (err error) {
+	var image domain.ICloudImage
+	if image, err = c.GetImage(imageAlias); err != nil {
+		return
+	}
+
 	// save into repo
 	p := new(domain.PodInfo)
 	if err := p.SetStartingPodInfo(c.Id, u); err != nil {
@@ -70,7 +75,7 @@ func (r *CloudService) SubscribeCloud(
 
 	// send msg to call pod instance api
 	msg := new(message.MsgCloudConf)
-	msg.ToMsgCloudConf(c, u, pid)
+	msg.ToMsgCloudConf(c, u, pid, image)
 
 	return r.sender.SubscribeCloud(msg)
 }

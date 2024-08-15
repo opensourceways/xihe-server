@@ -1,5 +1,10 @@
 package domain
 
+import (
+	"fmt"
+	"sort"
+)
+
 const (
 	cloudIdCPU   = "cpu_001"
 	cloudIdNPU   = "ascend_001"
@@ -11,11 +16,17 @@ type CloudConf struct {
 	Id        string
 	Name      CloudName
 	Spec      CloudSpec
-	Image     CloudImage
+	Images    []CloudImage
 	Feature   CloudFeature
 	Processor CloudProcessor
 	Limited   CloudLimited
 	Credit    Credit
+}
+
+type CloudImage struct {
+	Alias   CloudImageAlias
+	Image   ICloudImage
+	Default bool
 }
 
 func (c *CloudConf) IsNPU() bool {
@@ -30,4 +41,20 @@ type Cloud struct {
 
 func (c *Cloud) HasIdle() bool {
 	return c.Remain.CloudRemain() > 0
+}
+
+func (c *CloudConf) GetImage(alias string) (ICloudImage, error) {
+	for i := range c.Images {
+		if alias == c.Images[i].Alias.CloudImageAlias() {
+			return c.Images[i].Image, nil
+		}
+	}
+
+	return nil, fmt.Errorf("%s doesn't exist", alias)
+}
+
+func (c *CloudConf) MoveDefaultImageToHead() {
+	sort.Slice(c.Images, func(i, j int) bool {
+		return c.Images[i].Default
+	})
 }

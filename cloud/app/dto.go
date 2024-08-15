@@ -8,8 +8,9 @@ import (
 )
 
 type SubscribeCloudCmd struct {
-	User    types.Account
-	CloudId string
+	User       types.Account
+	ImageAlias domain.CloudImageAlias
+	CloudId    string
 }
 
 type PodInfoCmd SubscribeCloudCmd
@@ -35,13 +36,13 @@ type ReleaseInternalCmd struct {
 }
 
 type CloudConfDTO struct {
-	Id        string `json:"id"`
-	Spec      string `json:"spec"`
-	Name      string `json:"name"`
-	Image     string `json:"image"`
-	Feature   string `json:"feature"`
-	Processor string `json:"processor"`
-	Credit    int64  `json:"credit"`
+	Id        string   `json:"id"`
+	Spec      string   `json:"spec"`
+	Name      string   `json:"name"`
+	Images    []string `json:"images"`
+	Feature   string   `json:"feature"`
+	Processor string   `json:"processor"`
+	Credit    int64    `json:"credit"`
 }
 
 type CloudDTO struct {
@@ -64,7 +65,7 @@ type PodInfoDTO struct {
 
 func (cmd *SubscribeCloudCmd) Validate() error {
 	b := cmd.User.Account() != "" &&
-		cmd.CloudId != ""
+		cmd.CloudId != "" && cmd.ImageAlias != nil
 
 	if !b {
 		return errors.New("invalid cmd")
@@ -104,10 +105,15 @@ func (r *CloudConfDTO) toCloudConfDTO(c *domain.CloudConf) {
 		Id:        c.Id,
 		Spec:      c.Spec.CloudSpec(),
 		Name:      c.Name.CloudName(),
-		Image:     c.Image.CloudImage(),
 		Feature:   c.Feature.CloudFeature(),
 		Processor: c.Processor.CloudProcessor(),
 		Credit:    c.Credit.Credit(),
+	}
+
+	c.MoveDefaultImageToHead()
+	r.Images = make([]string, 0, len(c.Images))
+	for i := range c.Images {
+		r.Images = append(r.Images, c.Images[i].Alias.CloudImageAlias())
 	}
 }
 

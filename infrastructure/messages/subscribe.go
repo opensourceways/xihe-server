@@ -308,6 +308,7 @@ func (r *register) registerHandlerForCloud(handler interface{}) error {
 				Id:      body.PodId,
 				CloudId: body.CloudId,
 				Owner:   user,
+				Image:   body.CloudImage,
 			},
 		}
 		if err = v.SetDefaultExpiry(); err != nil {

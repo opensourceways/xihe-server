@@ -130,7 +130,7 @@ func (impl *courseRepoImpl) FindAssignment(cid string, aid string) (
 		return
 	}
 
-	if v.Assignments == nil || len(v.Assignments) == 0 {
+	if len(v.Assignments) == 0 {
 		err = repoerr.NewErrorResourceNotExists(err)
 		return
 	}

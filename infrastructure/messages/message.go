@@ -165,10 +165,11 @@ type msgSubmission struct {
 }
 
 type msgPodCreate struct {
-	User      string `json:"user"`
-	PodId     string `json:"pod_id"`
-	CloudId   string `json:"cloud_id"`
-	CloudName string `json:"cloud_name"`
+	User       string `json:"user"`
+	PodId      string `json:"pod_id"`
+	CloudId    string `json:"cloud_id"`
+	CloudName  string `json:"cloud_name"`
+	CloudImage string `json:"cloud_image"`
 }
 
 type ReleasePodMsg struct {
