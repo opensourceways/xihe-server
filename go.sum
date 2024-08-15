@@ -1065,6 +1065,8 @@ github.com/opensourceways/code-server-operator v0.0.0-20240725021149-4723c3cd4b2
 github.com/opensourceways/code-server-operator v0.0.0-20240725021149-4723c3cd4b26/go.mod h1:ceTvNHG58tyN3wGsE0Sg8mtR3Txp4H9OATl/Nvrur44=
 github.com/opensourceways/code-server-operator v0.0.0-20240814021242-2bcce2a9c69f h1:lLxBLVFrQePoPteT6gPzDBpYWBqI0AB1WXztftsFi/Y=
 github.com/opensourceways/code-server-operator v0.0.0-20240814021242-2bcce2a9c69f/go.mod h1:JmfcVq/ADe1AYqZA9RlOA41b/T1hRj5TaloyHdYKEgw=
+github.com/opensourceways/code-server-operator v0.0.0-20240814093336-e176fec86ddc h1:v/JnG89hMDsiXBYvBL7P1DdLCD/wiqCBpIudPWr6zVc=
+github.com/opensourceways/code-server-operator v0.0.0-20240814093336-e176fec86ddc/go.mod h1:JmfcVq/ADe1AYqZA9RlOA41b/T1hRj5TaloyHdYKEgw=
 github.com/opensourceways/community-robot-lib v0.0.0-20231106030104-fefc5fa67771 h1:LefDtTbbfEIA8pV/q7w+m2lbau3SoxbzWoV664CiBkg=
 github.com/opensourceways/community-robot-lib v0.0.0-20231106030104-fefc5fa67771/go.mod h1:/d3aSeUZkqMS/B+EWPShLWBiSDKrzaeQI23fsD+g29E=
 github.com/opensourceways/go-gitee v0.0.0-20231106021446-9fc2a41b1faa/go.mod h1:OExGhjyeAI6nM597rup/xn+x1YN+90AwEZBazHzGdSY=
@@ -1090,6 +1092,8 @@ github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240814022255-780358d1
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240814022255-780358d147eb/go.mod h1:paBV+Y5ONsQ3FK9rn5lfTXlmUN10eWQsNnkhlj0tYfw=
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240815014615-79c62ce3328c h1:bGHejvAP/njTzz72qCNfFxgFvQKNfbTnVuhYP6opHDs=
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240815014615-79c62ce3328c/go.mod h1:kakRVaNTYt5V1z7mnsm2g/A6FGT7NAyRDaZu7JzUrMA=
+github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240815033023-3b946fdd6875 h1:jLCVH4j/sVgIUk5MHLREJ9O2xluQDHpolerwkM/zB70=
+github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240815033023-3b946fdd6875/go.mod h1:NgaidYIn75D0QhptFnXtXdb6ezvH/2NrTz1Ulc3dkNE=
 github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37 h1:BtuQhXKv/EdH36nm26fUrCQnfzKw7UqbPNPZmBS+b70=
 github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37/go.mod h1:INt/SP760CQIuTT/tJfU+bFKig2ISyY6a1DRVN6407o=
 github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=

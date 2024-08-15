@@ -15,7 +15,7 @@ require (
 	github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1
 	github.com/opensourceways/xihe-extra-services v0.0.0-20231215030123-df06ee77c3d1
 	github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43
-	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240815014615-79c62ce3328c
+	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240815033023-3b946fdd6875
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/files v1.0.1
@@ -92,7 +92,7 @@ require (
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/onsi/gomega v1.30.0 // indirect
-	github.com/opensourceways/code-server-operator v0.0.0-20240814021242-2bcce2a9c69f // indirect
+	github.com/opensourceways/code-server-operator v0.0.0-20240814093336-e176fec86ddc // indirect
 	github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c // indirect
 	github.com/opensourceways/xihe-grpc-protocol v0.0.0-20240704031314-261f5e8542e2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
