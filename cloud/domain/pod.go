@@ -49,7 +49,7 @@ func (p *PodInfo) IsHoldingAndNotExpiried() bool {
 
 func (p *PodInfo) CheckGoodAndSet() bool {
 	if !p.Error.IsGood() {
-		p.Status, _ = NewPodStatus(cloudPodStatusFailed)
+		p.Status, _ = NewPodStatus(CloudPodStatusFailed)
 		return false
 	}
 
@@ -57,23 +57,23 @@ func (p *PodInfo) CheckGoodAndSet() bool {
 }
 
 func (p *PodInfo) StatusSetCreating() {
-	p.Status, _ = NewPodStatus(cloudPodStatusCreating)
+	p.Status, _ = NewPodStatus(CloudPodStatusCreating)
 }
 
 func (p *PodInfo) StatusSetRunning() {
-	p.Status, _ = NewPodStatus(cloudPodStatusRunning)
+	p.Status, _ = NewPodStatus(CloudPodStatusRunning)
 }
 
 func (p *PodInfo) StatusSetFailed() {
-	p.Status, _ = NewPodStatus(cloudPodStatusFailed)
+	p.Status, _ = NewPodStatus(CloudPodStatusFailed)
 }
 
 func (p *PodInfo) StatusSetTerminating() {
-	p.Status, _ = NewPodStatus(cloudPodStatusTerminating)
+	p.Status, _ = NewPodStatus(CloudPodStatusTerminating)
 }
 
 func (p *PodInfo) StatusSetTerminated() {
-	p.Status, _ = NewPodStatus(cloudPodStatusTerminated)
+	p.Status, _ = NewPodStatus(CloudPodStatusTerminated)
 }
 
 func (p *PodInfo) SetStatus() {
@@ -96,7 +96,7 @@ func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account) (err erro
 	p.CloudId = cid
 	p.Owner = owner
 
-	if p.Status, err = NewPodStatus(cloudPodStatusStarting); err != nil {
+	if p.Status, err = NewPodStatus(CloudPodStatusStarting); err != nil {
 		return
 	}
 

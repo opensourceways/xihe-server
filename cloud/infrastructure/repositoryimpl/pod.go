@@ -24,7 +24,9 @@ func (impl *podRepoImpl) GetRunningPod(cid string) (
 ) {
 	filter := map[string]interface{}{
 		fieldCloudId: cid,
-		fieldStatus:  []string{"running", "terminated", "terminating"},
+		fieldStatus: []string{domain.CloudPodStatusCreating, domain.CloudPodStatusStarting,
+			domain.CloudPodStatusRunning, domain.CloudPodStatusTerminating, domain.CloudPodStatusTerminated,
+		},
 	}
 
 	return impl.getFilterPods(filter)
