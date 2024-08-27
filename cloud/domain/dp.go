@@ -8,12 +8,12 @@ import (
 )
 
 const (
-	cloudPodStatusStarting    = "starting"
-	cloudPodStatusCreating    = "creating"
-	cloudPodStatusFailed      = "failed"
-	cloudPodStatusRunning     = "running"
-	cloudPodStatusTerminated  = "terminated"
-	cloudPodStatusTerminating = "terminating"
+	CloudPodStatusStarting    = "starting"
+	CloudPodStatusCreating    = "creating"
+	CloudPodStatusFailed      = "failed"
+	CloudPodStatusRunning     = "running"
+	CloudPodStatusTerminated  = "terminated"
+	CloudPodStatusTerminating = "terminating"
 )
 
 // CloudName
@@ -175,27 +175,27 @@ func (r podStatus) PodStatus() string {
 }
 
 func (r podStatus) IsStarting() bool {
-	return r.PodStatus() == cloudPodStatusStarting
+	return r.PodStatus() == CloudPodStatusStarting
 }
 
 func (r podStatus) IsCreating() bool {
-	return r.PodStatus() == cloudPodStatusCreating
+	return r.PodStatus() == CloudPodStatusCreating
 }
 
 func (r podStatus) IsFailed() bool {
-	return r.PodStatus() == cloudPodStatusFailed
+	return r.PodStatus() == CloudPodStatusFailed
 }
 
 func (r podStatus) IsRunning() bool {
-	return r.PodStatus() == cloudPodStatusRunning
+	return r.PodStatus() == CloudPodStatusRunning
 }
 
 func (r podStatus) IsTerminated() bool {
-	return r.PodStatus() == cloudPodStatusTerminated
+	return r.PodStatus() == CloudPodStatusTerminated
 }
 
 func (r podStatus) IsTerminating() bool {
-	return r.PodStatus() == cloudPodStatusTerminating
+	return r.PodStatus() == CloudPodStatusTerminating
 }
 
 // PodExpiry
