@@ -17,13 +17,13 @@ type userWhiteListImpl struct {
 	cli mongodbClient
 }
 
-func (impl *userWhiteListImpl) GetWhiteListInfo(accout types.Account,
+func (impl *userWhiteListImpl) GetWhiteListInfo(account types.Account,
 	wtype string) (u domain.WhiteListInfo, err error) {
 	var v DWhiteListInfo
 
 	f := func(ctx context.Context) error {
 		filter := bson.M{
-			fieldAccount:       accout.Account(),
+			fieldAccount:       account.Account(),
 			fieldWhiteListType: wtype,
 		}
 

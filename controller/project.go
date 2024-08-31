@@ -851,7 +851,7 @@ func (ctl *ProjectController) RemoveRelatedDataset(ctx *gin.Context) {
 		return
 	}
 
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "remove related dateset to project")
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "remove related dataset to project")
 
 	index := domain.ResourceIndex{
 		Owner: cmd.Owner,

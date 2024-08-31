@@ -23,10 +23,10 @@ func NewCloudService(
 	}
 }
 
-func (r *CloudService) caculateRemain(
+func (r *CloudService) calculateRemain(
 	c *domain.Cloud, p *repository.PodInfoList,
 ) (err error) {
-	// caculate running and not expiry pod
+	// calculate running and not expiry pod
 	var count int
 	for i := range p.PodInfos {
 		if !p.PodInfos[i].IsExpired() {
@@ -51,7 +51,7 @@ func (r *CloudService) ToCloud(c *domain.Cloud) (err error) {
 		return
 	}
 
-	return r.caculateRemain(c, &plist)
+	return r.calculateRemain(c, &plist)
 }
 
 func (r *CloudService) SubscribeCloud(
