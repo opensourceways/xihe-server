@@ -53,7 +53,7 @@ type ProtocolName interface {
 
 func NewProtocolName(v string) (ProtocolName, error) {
 	if !DomainConfig.hasProtocol(v) {
-		return nil, errors.New("unsupported protocol")
+		return nil, errors.New("unsupporteded protocol")
 	}
 
 	return protocolName(v), nil
@@ -72,7 +72,7 @@ type ProjType interface {
 
 func NewProjType(v string) (ProjType, error) {
 	if !DomainConfig.hasProjectType(v) {
-		return nil, errors.New("unsupported project type")
+		return nil, errors.New("unsupporteded project type")
 	}
 
 	return projType(v), nil
@@ -91,7 +91,7 @@ type TrainingPlatform interface {
 
 func NewTrainingPlatform(v string) (TrainingPlatform, error) {
 	if !DomainConfig.hasPlatform(v) {
-		return nil, errors.New("unsupport training platform")
+		return nil, errors.New("unsupported training platform")
 	}
 
 	return trainingPlatform(v), nil

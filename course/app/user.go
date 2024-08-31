@@ -72,7 +72,7 @@ func (s *courseService) Apply(cmd *PlayerApplyCmd) (code string, err error) {
 	return
 }
 
-func (s *courseService) AddReleatedProject(cmd *CourseAddReleatedProjectCmd) (
+func (s *courseService) AddRelatedProject(cmd *CourseAddRelatedProjectCmd) (
 	code string, err error,
 ) {
 	// check phase

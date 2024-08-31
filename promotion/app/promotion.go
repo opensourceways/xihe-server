@@ -132,7 +132,7 @@ func (s *promotionService) List(cmd *ListPromotionsCmd) (PromotionsDTO, error) {
 	}
 
 	if query.Offset >= total {
-		return promotionsDTO, repoerr.NewExcendMaxiumPageNumError(errors.New("excend the maxium page number"))
+		return promotionsDTO, repoerr.NewExcendMaximumPageNumError(errors.New("excend the maximum page number"))
 	}
 
 	promotions, err := s.repo.FindByCustom(query)

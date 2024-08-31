@@ -33,7 +33,7 @@ func checkUserEmailMiddleware(ctl *baseController) gin.HandlerFunc {
 	}
 }
 
-func ClearSenstiveInfoMiddleware() gin.HandlerFunc {
+func ClearSensitiveInfoMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		pl, exist := ctx.Get(PayLoad)
 		if !exist {

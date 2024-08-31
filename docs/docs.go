@@ -1219,7 +1219,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.CompetitonRankingDTO"
+                            "$ref": "#/definitions/app.CompetitionRankingDTO"
                         }
                     },
                     "500": {
@@ -1231,7 +1231,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/competition/{id}/realted_project": {
+        "/v1/competition/{id}/related_project": {
             "put": {
                 "description": "add related project",
                 "consumes": [
@@ -1948,7 +1948,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/course/{id}/realted_project": {
+        "/v1/course/{id}/related_project": {
             "put": {
                 "description": "add related project",
                 "consumes": [
@@ -5676,7 +5676,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app.CompetitonRankingDTO": {
+        "app.CompetitionRankingDTO": {
             "type": "object",
             "properties": {
                 "final": {

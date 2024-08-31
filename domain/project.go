@@ -20,7 +20,7 @@ type Project struct {
 
 	Version int
 
-	// following fileds is not under the controlling of version
+	// following fields is not under the controlling of version
 	LikeCount     int
 	ForkCount     int
 	DownloadCount int

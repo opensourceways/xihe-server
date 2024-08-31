@@ -15,7 +15,7 @@ type CompetitionSubmitCMD struct {
 	Competitor domain.Account
 }
 
-type CompetitionAddReleatedProjectCMD struct {
+type CompetitionAddRelatedProjectCMD struct {
 	Index      CompetitionIndex
 	Competitor domain.Account
 	Project    domain.ResourceSummary

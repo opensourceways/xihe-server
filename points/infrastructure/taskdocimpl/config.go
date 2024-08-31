@@ -14,7 +14,7 @@ type Config struct {
 func (cfg *Config) Validate() error {
 	for i := range cfg.Templates {
 		if lang := common.NewLanguage(cfg.Templates[i].Language); lang == nil {
-			return errors.New("unsupported language")
+			return errors.New("unsupporteded language")
 		}
 	}
 

@@ -19,7 +19,7 @@ type CourseService interface {
 	// course
 	List(*CourseListCmd) ([]CourseSummaryDTO, error)
 	Get(*CourseGetCmd) (CourseDTO, error)
-	AddReleatedProject(*CourseAddReleatedProjectCmd) (string, error)
+	AddRelatedProject(*CourseAddRelatedProjectCmd) (string, error)
 	ListAssignments(*AsgListCmd) ([]AsgWorkDTO, error)
 	GetSubmissions(*GetSubmissionCmd) (RelateProjectDTO, error)
 	GetCertification(*CourseGetCmd) (CertInfoDTO, error)

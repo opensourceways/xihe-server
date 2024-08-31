@@ -156,7 +156,7 @@ definitions:
       spec:
         type: string
     type: object
-  app.CompetitonRankingDTO:
+  app.CompetitionRankingDTO:
     properties:
       final:
         items:
@@ -2681,7 +2681,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.CompetitonRankingDTO'
+            $ref: '#/definitions/app.CompetitionRankingDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -2689,7 +2689,7 @@ paths:
       summary: GetRankingList
       tags:
       - Competition
-  /v1/competition/{id}/realted_project:
+  /v1/competition/{id}/related_project:
     put:
       consumes:
       - application/json
@@ -3162,7 +3162,7 @@ paths:
       summary: Apply
       tags:
       - Course
-  /v1/course/{id}/realted_project:
+  /v1/course/{id}/related_project:
     put:
       consumes:
       - application/json

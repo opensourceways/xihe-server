@@ -63,7 +63,7 @@ func NewPromotionStatus(v string) (PromotionStatus, error) {
 		return nil, nil
 	}
 
-	return nil, errors.New("unsupported promotion status")
+	return nil, errors.New("unsupporteded promotion status")
 }
 
 func (s promotionStatus) PromotionStatus() string {
@@ -168,7 +168,7 @@ func NewPromotionWay(v string) (PromotionWay, error) {
 		return nil, nil
 	}
 
-	return nil, errors.New("unsupported promotion way")
+	return nil, errors.New("unsupporteded promotion way")
 }
 
 type promotionWay string
@@ -190,7 +190,7 @@ func NewPromotionType(v string) (PromotionType, error) {
 		return nil, nil
 	}
 
-	return nil, errors.New("unsupported promotion type")
+	return nil, errors.New("unsupporteded promotion type")
 }
 
 type promotionType string

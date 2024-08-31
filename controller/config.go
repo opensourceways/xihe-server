@@ -70,11 +70,11 @@ type APIConfig struct {
 	PodTimeout                     int    `json:"pod_timeout"`
 	MaxPictureSizeToDescribe       int64  `json:"-"`
 	MaxPictureSizeToVQA            int64  `json:"-"`
-	MaxCompetitionSubmmitFileSzie  int64  `json:"max_competition_submmit_file_size"`
+	MaxCompetitionSubmmitFileSize  int64  `json:"max_competition_submmit_file_size"`
 	MinSurvivalTimeOfInference     int    `json:"min_survival_time_of_inference"`
 	MaxTagsNumToSearchResource     int    `json:"max_tags_num_to_search_resource"`
 	MaxTagKindsNumToSearchResource int    `json:"max_tag_kinds_num_to_search_resource"`
-	MaxFinetuneSubmmitFileSzie     int64  `json:"max_finetune_submmit_file_size"`
+	MaxFinetuneSubmmitFileSize     int64  `json:"max_finetune_submmit_file_size"`
 	LocalDomainCookie              bool   `json:"local_domain_cookie"`
 }
 
@@ -107,12 +107,12 @@ func (cfg *APIConfig) SetDefault() {
 		cfg.MaxTagKindsNumToSearchResource = 5
 	}
 
-	if cfg.MaxCompetitionSubmmitFileSzie <= 0 {
-		cfg.MaxCompetitionSubmmitFileSzie = 10 * 1024 * 1024
+	if cfg.MaxCompetitionSubmmitFileSize <= 0 {
+		cfg.MaxCompetitionSubmmitFileSize = 10 * 1024 * 1024
 	}
 
-	if cfg.MaxFinetuneSubmmitFileSzie <= 0 {
-		cfg.MaxFinetuneSubmmitFileSzie = 50 * 1024 * 1024
+	if cfg.MaxFinetuneSubmmitFileSize <= 0 {
+		cfg.MaxFinetuneSubmmitFileSize = 50 * 1024 * 1024
 	}
 }
 

@@ -9,7 +9,7 @@ import (
 	"github.com/opensourceways/xihe-server/utils"
 )
 
-const minValueOfInvlidTime = 24 * 3600 // second
+const minValueOfInvalidTime = 24 * 3600 // second
 
 type UserPointsAppService interface {
 	Points(account types.Account) (int, error)

@@ -178,7 +178,7 @@ func (ctl *CourseController) Get(ctx *gin.Context) {
 // @Accept			json
 // @Success		202
 // @Failure		500	system_error	system	error
-// @Router			/v1/course/{id}/realted_project [put]
+// @Router			/v1/course/{id}/realted_project  [put]
 func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -215,13 +215,13 @@ func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 		return
 	}
 
-	cmd := app.CourseAddReleatedProjectCmd{
+	cmd := app.CourseAddRelatedProjectCmd{
 		Cid:     ctx.Param("id"),
 		User:    pl.DomainAccount(),
 		Project: p,
 	}
 
-	if code, err := ctl.s.AddReleatedProject(&cmd); err != nil {
+	if code, err := ctl.s.AddRelatedProject(&cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPut(ctx, "success")

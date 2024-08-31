@@ -11,7 +11,7 @@ import (
 )
 
 func (s *competitionService) GetRankingList(cid string) (
-	dto CompetitonRankingDTO, err error,
+	dto CompetitionRankingDTO, err error,
 ) {
 	order, err := s.repo.FindScoreOrder(cid)
 	if err != nil {
@@ -110,7 +110,7 @@ func (s *competitionService) GetSubmissions(cmd *CompetitionGetCmd) (
 	return
 }
 
-func (s *competitionService) AddRelatedProject(cmd *CompetitionAddReleatedProjectCMD) (
+func (s *competitionService) AddRelatedProject(cmd *CompetitionAddRelatedProjectCMD) (
 	code string, err error,
 ) {
 	competition, err := s.repo.FindCompetition(&repository.CompetitionGetOption{
@@ -225,7 +225,7 @@ func (s *competitionService) Submit(cmd *CompetitionSubmitCMD) (
 	}
 
 	// submit
-	ps, err := s.submissionServie.Submit(
+	ps, err := s.submissionService.Submit(
 		&w, phase, cmd.FileName, cmd.Data,
 	)
 	if err != nil {

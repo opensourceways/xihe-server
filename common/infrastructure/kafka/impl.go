@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	queueName     = "xihe-kafka-queue"
-	deaultVersion = "2.1.0"
+	queueName      = "xihe-kafka-queue"
+	defaultVersion = "2.1.0"
 )
 
 type Config struct {
@@ -22,7 +22,7 @@ type Config struct {
 
 func (cfg *Config) SetDefault() {
 	if cfg.Version == "" {
-		cfg.Version = deaultVersion
+		cfg.Version = defaultVersion
 	}
 }
 
