@@ -8,7 +8,7 @@ type UserFinetunes struct {
 	domain.FinetuneUserInfo
 
 	Version int
-	Datas   []domain.FinetuneSummary
+	Data    []domain.FinetuneSummary
 }
 
 type Finetune interface {

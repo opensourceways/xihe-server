@@ -3,7 +3,7 @@ package repositoryimpl
 const (
 	fieldId        = "id"
 	fieldOwner     = "owner"
-	fiedUser       = "user"
+	fieddUser      = "user"
 	fieldItems     = "items"
 	fieldSamples   = "samples"
 	fieldNum       = "num"

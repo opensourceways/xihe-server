@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/v1/bigmodel/ai_detector": {
             "post": {
-                "description": "detecte if text generate by ai",
+                "description": "detect if text generate by ai",
                 "consumes": [
                     "application/json"
                 ],

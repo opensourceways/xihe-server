@@ -249,14 +249,14 @@ func (s bigModelService) GetWuKongLastTaskResp(user types.Account) (dtos []wukon
 		if bigmodel.IsErrorSensitiveInfo(err) {
 			code = ErrorBigModelSensitiveInfo
 		} else {
-			code = ErrorCodeSytem
+			code = ErrorCodeSystem
 		}
 
 		return
 	}
 
 	if p.Status.IsRunning() {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 		err = errors.New("task is running, please try it later")
 
 		return
@@ -370,7 +370,7 @@ func (s bigModelService) AddLikeFromPublicPicture(
 
 	// copy picture from public dir to like dir on obs
 	if err = s.fm.MoveWuKongPictureToDir(likePath, p.OBSPath.OBSPath()); err != nil {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 		return
 	}
 
@@ -482,7 +482,7 @@ func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCm
 
 	// copy picture from public dir to like dir on obs
 	if err = s.fm.MoveWuKongPictureToDir(publicPath, cmd.OBSPath.OBSPath()); err != nil {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 
 		return
 	}
@@ -540,7 +540,7 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 
 	// copy picture from public dir to like dir on obs
 	if err = s.fm.MoveWuKongPictureToDir(publicPath, p.OBSPath.OBSPath()); err != nil {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 
 		return
 	}
@@ -555,7 +555,7 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 		WuKongPictureMeta: p.WuKongPictureMeta,
 	}
 	if pid, err = s.wukongPicture.SavePublic(ps, version); err != nil {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 
 		return
 	}

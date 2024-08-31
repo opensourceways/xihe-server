@@ -42,7 +42,7 @@ func AddRouterForBigModelController(
 	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
 	rg.POST("/v1/bigmodel/wukong_async", ctl.WuKongAsync)
 	rg.GET("/v1/bigmodel/wukong/rank", ctl.WuKongRank)
-	rg.GET("/v1/bigmodel/wukong/task", ctl.WuKongLastFinisedTask)
+	rg.GET("/v1/bigmodel/wukong/task", ctl.WuKongLastFinishedTask)
 	rg.POST("/v1/bigmodel/wukong/like", ctl.AddLike)
 	rg.POST("/v1/bigmodel/wukong/public", ctl.AddPublic)
 	rg.GET("/v1/bigmodel/wukong/public", ctl.ListPublic)
@@ -340,7 +340,7 @@ func (ctl *BigModelController) WuKongRank(ctx *gin.Context) {
 // @Success		200	{object}		app.WuKongRankDTO
 // @Failure		500	system_error	system	error
 // @Router			/v1/bigmodel/wukong/task [get]
-func (ctl *BigModelController) WuKongLastFinisedTask(ctx *gin.Context) {
+func (ctl *BigModelController) WuKongLastFinishedTask(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
@@ -740,7 +740,7 @@ func (ctl *BigModelController) GenDownloadURL(ctx *gin.Context) {
 }
 
 // @Title			AI Detector
-// @Description	detecte if text generate by ai
+// @Description	detect if text generate by ai
 // @Tags			BigModel
 // @Param			body	body	aiDetectorReq	true	"body of ai detector"
 // @Accept			json

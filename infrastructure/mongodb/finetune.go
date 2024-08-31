@@ -125,7 +125,7 @@ func (col finetuneCol) List(user string) (do repositories.UserFinetunesDO, versi
 	for i := range t {
 		col.toFinetuneSummaryDO(&t[i], &r[i])
 	}
-	do.Datas = r
+	do.Data = r
 
 	return
 }

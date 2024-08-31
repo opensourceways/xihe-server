@@ -43,7 +43,7 @@ type ErrorDuplicateTrainingName struct {
 }
 
 const (
-	ErrorCodeSytem = "system"
+	ErrorCodeSystem = "system"
 
 	// It exceed the max times for a day.
 	ErrorCodeAIQuestionExceedMaxTimes           = "aiquestion_exceed_max_times"
