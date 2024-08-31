@@ -26,7 +26,7 @@ func Initialize(conn, dbName, dbCert string) error {
 
 	pool := x509.NewCertPool()
 	if !pool.AppendCertsFromPEM(ca) {
-		return fmt.Errorf("faild to append certs from PEM")
+		return fmt.Errorf("failed to append certs from PEM")
 	}
 
 	tlsConfig := &tls.Config{

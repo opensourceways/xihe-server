@@ -232,7 +232,7 @@ func (do *ProjectDO) toProject(r *domain.Project) (err error) {
 		return
 	}
 
-	if r.CoverId, err = domain.NewConverId(do.CoverId); err != nil {
+	if r.CoverId, err = domain.NewCoverId(do.CoverId); err != nil {
 		return
 	}
 

@@ -32,7 +32,7 @@ type CoverId interface {
 	CoverId() string
 }
 
-func NewConverId(v string) (CoverId, error) {
+func NewCoverId(v string) (CoverId, error) {
 	if !DomainConfig.hasCover(v) {
 		return nil, errors.New("invalid cover id")
 	}

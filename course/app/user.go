@@ -95,7 +95,7 @@ func (s *courseService) AddReleatedProject(cmd *CourseAddReleatedProjectCmd) (
 	// check permission
 	player, err := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
 
-	if !course.IsApplyed(&player.Player) {
+	if !course.IsApplied(&player.Player) {
 		code = errorNoPermission
 		return
 	}
@@ -122,7 +122,7 @@ func (s *courseService) GetCertification(cmd *CourseGetCmd) (dto CertInfoDTO, er
 	if err != nil {
 		return
 	}
-	if !c.IsApplyed(&p.Player) {
+	if !c.IsApplied(&p.Player) {
 		return
 	}
 

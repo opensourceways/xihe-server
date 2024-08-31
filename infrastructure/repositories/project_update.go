@@ -268,7 +268,7 @@ func (do *ProjectSummaryDO) toProjectSummary(r *domain.ProjectSummary) (err erro
 		return
 	}
 
-	if r.CoverId, err = domain.NewConverId(do.CoverId); err != nil {
+	if r.CoverId, err = domain.NewCoverId(do.CoverId); err != nil {
 		return
 	}
 

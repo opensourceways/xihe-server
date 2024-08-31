@@ -3043,7 +3043,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get course infomation
+      description: get course information
       parameters:
       - description: course id
         in: path

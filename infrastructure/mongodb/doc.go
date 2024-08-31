@@ -79,7 +79,7 @@ type projectItem struct {
 
 	ProjectPropertyItem `bson:",inline"`
 
-	// These two items are not allowd to be set,
+	// These two items are not allowed to be set,
 	// So, don't marshal it to avoid setting it occasionally.
 	RelatedModels   []ResourceIndex `bson:"models"   json:"-"`
 	RelatedDatasets []ResourceIndex `bson:"datasets" json:"-"`
@@ -107,7 +107,7 @@ type ProjectPropertyItem struct {
 }
 
 func (doc *ProjectPropertyItem) setDefault() {
-	// The serach by the tag want the tags exist.
+	// The search by the tag want the tags exist.
 	if doc.Tags == nil {
 		doc.Tags = []string{}
 	}
@@ -131,7 +131,7 @@ type modelItem struct {
 
 	ModelPropertyItem `bson:",inline"`
 
-	// RelatedDatasets is not allowd to be set,
+	// RelatedDatasets is not allowed to be set,
 	// So, don't marshal it to avoid setting it occasionally.
 	RelatedDatasets []ResourceIndex `bson:"datasets" json:"-"`
 	RelatedProjects []ResourceIndex `bson:"projects" json:"-"`
@@ -155,7 +155,7 @@ type ModelPropertyItem struct {
 }
 
 func (doc *ModelPropertyItem) setDefault() {
-	// The serach by the tag want the tags exist.
+	// The search by the tag want the tags exist.
 	if doc.Tags == nil {
 		doc.Tags = []string{}
 	}
@@ -201,7 +201,7 @@ type DatasetPropertyItem struct {
 }
 
 func (doc *DatasetPropertyItem) setDefault() {
-	// The serach by the tag want the tags exist.
+	// The search by the tag want the tags exist.
 	if doc.Tags == nil {
 		doc.Tags = []string{}
 	}

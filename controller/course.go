@@ -148,7 +148,7 @@ func (ctl *CourseController) List(ctx *gin.Context) {
 }
 
 // @Summary		Get
-// @Description	get course infomation
+// @Description	get course information
 // @Tags			Course
 // @Param			id	path	string	true	"course id"
 // @Accept			json

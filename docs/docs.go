@@ -1763,7 +1763,7 @@ const docTemplate = `{
         },
         "/v1/course/{id}": {
             "get": {
-                "description": "get course infomation",
+                "description": "get course information",
                 "consumes": [
                     "application/json"
                 ],

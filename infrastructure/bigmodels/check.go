@@ -19,7 +19,7 @@ func initTextCheck(cfg *Moderation) textCheckService {
 	auth := basic.NewCredentialsBuilder().
 		WithAk(cfg.AccessKey).
 		WithSk(cfg.SecretKey).
-		WithIamEndpointOverride(cfg.IAMEndpint).
+		WithIamEndpointOverride(cfg.IAMEndpoint).
 		Build()
 
 	cli := moderation.NewModerationClient(

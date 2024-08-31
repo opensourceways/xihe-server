@@ -10,15 +10,15 @@ type firstLetterSortData struct {
 }
 
 func firstLetterSortAndPaginate(
-	datas []firstLetterSortData, countPerPage, pageNum int,
+	data []firstLetterSortData, countPerPage, pageNum int,
 ) []firstLetterSortData {
-	i, j, ok := paginate(countPerPage, pageNum, len(datas))
+	i, j, ok := paginate(countPerPage, pageNum, len(data))
 	if !ok {
 		return nil
 	}
 
-	sort.Slice(datas, func(i, j int) bool {
-		a, b := &datas[i], &datas[j]
+	sort.Slice(data, func(i, j int) bool {
+		a, b := &data[i], &data[j]
 
 		if a.level != b.level {
 			return a.level > b.level
@@ -31,7 +31,7 @@ func firstLetterSortAndPaginate(
 		return a.updateAt >= b.updateAt
 	})
 
-	return datas[i:j]
+	return data[i:j]
 }
 
 type updateAtSortData struct {
@@ -42,15 +42,15 @@ type updateAtSortData struct {
 }
 
 func updateAtSortAndPaginate(
-	datas []updateAtSortData, countPerPage, pageNum int,
+	data []updateAtSortData, countPerPage, pageNum int,
 ) []updateAtSortData {
-	i, j, ok := paginate(countPerPage, pageNum, len(datas))
+	i, j, ok := paginate(countPerPage, pageNum, len(data))
 	if !ok {
 		return nil
 	}
 
-	sort.Slice(datas, func(i, j int) bool {
-		a, b := &datas[i], &datas[j]
+	sort.Slice(data, func(i, j int) bool {
+		a, b := data[i], &data[j]
 
 		if a.level != b.level {
 			return a.level > b.level
@@ -63,7 +63,7 @@ func updateAtSortAndPaginate(
 		return a.id < b.id
 	})
 
-	return datas[i:j]
+	return data[i:j]
 }
 
 type downloadSortData struct {
@@ -74,15 +74,15 @@ type downloadSortData struct {
 }
 
 func downloadSortAndPaginate(
-	datas []downloadSortData, countPerPage, pageNum int,
+	data []downloadSortData, countPerPage, pageNum int,
 ) []downloadSortData {
-	i, j, ok := paginate(countPerPage, pageNum, len(datas))
+	i, j, ok := paginate(countPerPage, pageNum, len(data))
 	if !ok {
 		return nil
 	}
 
-	sort.Slice(datas, func(i, j int) bool {
-		a, b := &datas[i], &datas[j]
+	sort.Slice(data, func(i, j int) bool {
+		a, b := &data[i], &data[j]
 
 		if a.level != b.level {
 			return a.level > b.level
@@ -95,7 +95,7 @@ func downloadSortAndPaginate(
 		return a.updateAt >= b.updateAt
 	})
 
-	return datas[i:j]
+	return data[i:j]
 }
 
 func paginate(countPerPage, pageNum, total int) (i, j int, ok bool) {

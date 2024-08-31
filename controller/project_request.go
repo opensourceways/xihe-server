@@ -38,7 +38,7 @@ func (p *projectCreateRequest) toCmd(
 		return
 	}
 
-	if cmd.CoverId, err = domain.NewConverId(p.CoverId); err != nil {
+	if cmd.CoverId, err = domain.NewCoverId(p.CoverId); err != nil {
 		return
 	}
 
@@ -114,7 +114,7 @@ func (p *projectUpdateRequest) toCmd() (cmd app.ProjectUpdateCmd, err error) {
 	}
 
 	if p.CoverId != nil {
-		if cmd.CoverId, err = domain.NewConverId(*p.CoverId); err != nil {
+		if cmd.CoverId, err = domain.NewCoverId(*p.CoverId); err != nil {
 			return
 		}
 	}

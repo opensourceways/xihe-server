@@ -17,7 +17,7 @@ type BigModelService interface {
 	IsPublic(*domain.WuKongPicture) (bool, string, error)
 	IsDigg(types.Account, []string) bool
 	LinkLikePublic(string, types.Account) (LinkLikePublicOpt, error)
-	IsPathCotain(string, []domain.WuKongPicture) bool
+	IsPathContain(string, []domain.WuKongPicture) bool
 
 	// luojia
 	LatestLuojiaList([]domain.LuoJiaRecord) domain.LuoJiaRecord
@@ -130,7 +130,7 @@ func (s *bigModelService) LinkLikePublic(link string, user types.Account) (
 	return
 }
 
-func (s *bigModelService) IsPathCotain(path string, v []domain.WuKongPicture) bool {
+func (s *bigModelService) IsPathContain(path string, v []domain.WuKongPicture) bool {
 	for i := range v {
 		if v[i].OBSPath.OBSPath() == path {
 			return true

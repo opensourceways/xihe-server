@@ -128,7 +128,7 @@ func (s *courseService) Get(cmd *CourseGetCmd) (dto CourseDTO, err error) {
 
 	if cmd.User != nil {
 		p, _ := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
-		if c.IsApplyed(&p.Player) {
+		if c.IsApplied(&p.Player) {
 			dto.toCourseDTO(&c, true, count)
 
 			return
@@ -241,7 +241,7 @@ func (s *courseService) GetAssignment(cmd *AsgGetCmd) (
 		return
 	}
 
-	if !c.IsApplyed(&p.Player) {
+	if !c.IsApplied(&p.Player) {
 		return
 	}
 
@@ -267,7 +267,7 @@ func (s *courseService) AddPlayRecord(cmd *RecordAddCmd) (
 	// check permission
 	player, err := s.playerRepo.FindPlayer(cmd.Cid, cmd.User)
 
-	if !course.IsApplyed(&player.Player) {
+	if !course.IsApplied(&player.Player) {
 		code = errorNoPermission
 		return
 	}

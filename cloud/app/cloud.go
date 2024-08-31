@@ -113,7 +113,7 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 	}
 
 	// check
-	_, ok, err := s.cloudService.CheckUserCanSubsribe(cmd.User, cmd.CloudId)
+	_, ok, err := s.cloudService.CheckUserCanSubscribe(cmd.User, cmd.CloudId)
 	if err != nil {
 		return
 	}

@@ -83,7 +83,7 @@ func (c *Course) IsPreliminary() bool {
 	return c.Status != nil && c.Status.IsPreliminary()
 }
 
-func (c *Course) IsApplyed(p *Player) bool {
+func (c *Course) IsApplied(p *Player) bool {
 	return p.CourseId == c.Id
 }
 

@@ -483,7 +483,7 @@ func (ctl *UserController) GetInfo(ctx *gin.Context) {
 // @Summary		UpdateUserRegistrationInfo
 // @Description	update user info
 // @Tags			User
-// @Param			body	body	userctl.UserInfoUpdateRequest	true	"body of update user infomation"
+// @Param			body	body	userctl.UserInfoUpdateRequest	true	"body of update user information"
 // @Accept			json
 // @Success		201	{object}			UserBasicInfoUpdateRequest
 // @Failure		400	bad_request_body	can't	parse		request	body

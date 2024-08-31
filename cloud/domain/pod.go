@@ -28,10 +28,10 @@ func (r *Pod) IsOnwer(owner otypes.Account) bool {
 }
 
 func (p *PodInfo) CanRelease() bool {
-	return p.Status.IsRunning() && !p.IsExpiried()
+	return p.Status.IsRunning() && !p.IsExpired()
 }
 
-func (p *PodInfo) IsExpiried() bool {
+func (p *PodInfo) IsExpired() bool {
 	return utils.Now() > p.Expiry.PodExpiry()
 }
 
@@ -39,8 +39,8 @@ func (p *PodInfo) IsFailedOrTerminated() bool {
 	return p.Status.IsFailed() || p.IsTerminated()
 }
 
-func (p *PodInfo) IsHoldingAndNotExpiried() bool {
-	if p.IsExpiried() {
+func (p *PodInfo) IsHoldingAndNotExpired() bool {
+	if p.IsExpired() {
 		return false
 	}
 
@@ -120,9 +120,9 @@ func (p *PodInfo) IsAscend() bool {
 }
 
 func (p *PodInfo) IsTerminated() bool {
-	return p.IsExpiried()
+	return p.IsExpired()
 }
 
 func (p *PodInfo) IsTerminating() bool {
-	return !p.IsExpiried() && (p.Status.IsTerminated() || p.Status.IsTerminating())
+	return !p.IsExpired() && (p.Status.IsTerminated() || p.Status.IsTerminating())
 }
