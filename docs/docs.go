@@ -6621,7 +6621,7 @@ const docTemplate = `{
         "app.UserFinetunesDTO": {
             "type": "object",
             "properties": {
-                "datas": {
+                "data": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/app.FinetuneSummaryDTO"
