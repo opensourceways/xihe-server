@@ -152,7 +152,7 @@ func (s *cloudService) ReleaseCloud(cmd *ReleaseCloudCmd) error {
 		return err
 	}
 
-	if !podInfo.IsOnwer(cmd.User) {
+	if !podInfo.IsOwner(cmd.User) {
 		return ErrCloudNotAllowed
 	}
 

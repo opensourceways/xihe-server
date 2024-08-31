@@ -86,13 +86,13 @@ func (impl finetuneImpl) List(user domain.Account) (
 		return
 	}
 
-	datas := make([]domain.FinetuneSummary, len(v.Data))
+	data := make([]domain.FinetuneSummary, len(v.Data))
 	for i := range v.Data {
-		if err = v.Data[i].toFinetuneSummary(&datas[i]); err != nil {
+		if err = v.Data[i].toFinetuneSummary(&data[i]); err != nil {
 			return
 		}
 	}
-	r.Data = datas
+	r.Data = data
 
 	return
 }

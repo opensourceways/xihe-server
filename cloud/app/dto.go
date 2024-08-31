@@ -20,11 +20,6 @@ type GetCloudConfCmd struct {
 	User      types.Account
 }
 
-type RelasePodCmd struct {
-	User  types.Account
-	PodId string
-}
-
 type UpdatePodInternalCmd struct {
 	PodId     string
 	PodError  domain.PodError

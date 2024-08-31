@@ -121,11 +121,11 @@ func (s finetuneService) List(user domain.Account) (
 		return
 	}
 
-	datas := make([]FinetuneSummaryDTO, len(v.Data))
+	data := make([]FinetuneSummaryDTO, len(v.Data))
 	for i := range v.Data {
-		s.toFinetuneSummaryDTO(&v.Data[i], &datas[i])
+		s.toFinetuneSummaryDTO(&v.Data[i], &data[i])
 	}
-	r.Data = datas
+	r.Data = data
 
 	return
 }

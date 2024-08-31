@@ -23,7 +23,7 @@ type PodInfo struct {
 	CreatedAt types.Time
 }
 
-func (r *Pod) IsOnwer(owner otypes.Account) bool {
+func (r *Pod) IsOwner(owner otypes.Account) bool {
 	return r.Owner == owner
 }
 
@@ -85,7 +85,7 @@ func (p *PodInfo) SetStatus() {
 }
 
 func (p *PodInfo) SetDefaultExpiry() (err error) {
-	if p.Expiry, err = NewPodExpiry(utils.Now() + 2*60*60); err != nil { // TODO conifg
+	if p.Expiry, err = NewPodExpiry(utils.Now() + 2*60*60); err != nil { // TODO config
 		return
 	}
 

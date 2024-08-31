@@ -773,7 +773,7 @@ definitions:
     type: object
   app.UserFinetunesDTO:
     properties:
-      datas:
+      data:
         items:
           $ref: '#/definitions/app.FinetuneSummaryDTO'
         type: array
