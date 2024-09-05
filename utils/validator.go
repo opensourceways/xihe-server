@@ -2,6 +2,7 @@ package utils
 
 import (
 	"html/template"
+	"net/url"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -101,4 +102,15 @@ func isMatchRegex(pattern string, v string) bool {
 // filter
 func XSSFilter(input string) (output string) {
 	return template.HTMLEscapeString(input)
+}
+
+// XSSEscapeString escapes the input string for safe use in HTML content.
+func XSSEscapeString(input string) (output string) {
+	return template.HTMLEscapeString(input)
+}
+
+// IsUrl checks if the given string is a valid URL.
+func IsUrl(str string) bool {
+	u, err := url.ParseRequestURI(str)
+	return err == nil && u.Scheme != "" && u.Host != ""
 }

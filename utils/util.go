@@ -141,3 +141,18 @@ func RetryThreeTimes(f func() error) {
 		}
 	}
 }
+
+// Contains returns true if target is in slice
+func Contains(slice []string, target string) bool {
+	for _, item := range slice {
+		if item == target {
+			return true
+		}
+	}
+	return false
+}
+
+// Time returns the current time formatted according to the timeLayout variable.
+func Time() string {
+	return time.Now().Format(timeLayout)
+}

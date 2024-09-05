@@ -171,3 +171,17 @@ func (m *administrator) GetToken(userId string) (result userdomain.PlatformToken
 	err = fmt.Errorf("token not found")
 	return
 }
+
+func (m *administrator) CreateGroup(userId string) (result userdomain.PlatformToken, err error) {
+	group := &sdk.CreateGroupOptions{
+		Name:       sdk.String("Your Group Name"),
+		Path:       sdk.String("your-group-path"),
+		Visibility: sdk.Visibility(sdk.PublicVisibility),
+	}
+
+	r, _, err := m.cli.Groups.CreateGroup(group)
+	fmt.Printf("r: %v\n", r)
+
+	err = fmt.Errorf("token not found")
+	return
+}
