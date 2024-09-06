@@ -37,12 +37,17 @@ type ReleaseInternalCmd struct {
 
 type CloudConfDTO struct {
 	Id        string   `json:"id"`
-	Spec      string   `json:"spec"`
+	Specs     []Spec   `json:"specs"`
 	Name      string   `json:"name"`
 	Images    []string `json:"images"`
 	Feature   string   `json:"feature"`
 	Processor string   `json:"processor"`
 	Credit    int64    `json:"credit"`
+}
+
+type Spec struct {
+	Desc     string `json:"desc"`
+	CardsNum int    `json:"cards_num"`
 }
 
 type CloudDTO struct {
@@ -103,11 +108,18 @@ func (r *UpdatePodInternalCmd) toPodInfo(p *domain.PodInfo) (err error) {
 func (r *CloudConfDTO) toCloudConfDTO(c *domain.CloudConf) {
 	*r = CloudConfDTO{
 		Id:        c.Id,
-		Spec:      c.Spec.CloudSpec(),
 		Name:      c.Name.CloudName(),
 		Feature:   c.Feature.CloudFeature(),
 		Processor: c.Processor.CloudProcessor(),
 		Credit:    c.Credit.Credit(),
+	}
+
+	r.Specs = make([]Spec, 0, len(c.Specs))
+	for i := range c.Specs {
+		r.Specs = append(r.Specs, Spec{
+			Desc:     c.Specs[i].Desc.CloudSpecDesc(),
+			CardsNum: c.Specs[i].CardsNum.CloudSpecCardsNum(),
+		})
 	}
 
 	c.MoveDefaultImageToHead()

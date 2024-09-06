@@ -21,6 +21,7 @@ type PodInfo struct {
 	Error     PodError
 	AccessURL AccessURL
 	CreatedAt types.Time
+	CardsNum  CloudSpecCardsNum
 }
 
 func (r *Pod) IsOnwer(owner otypes.Account) bool {

@@ -30,7 +30,7 @@ func (r *CloudService) caculateRemain(
 	var count int
 	for i := range p.PodInfos {
 		if !p.PodInfos[i].IsExpiried() {
-			count++
+			count += p.PodInfos[i].CardsNum.CloudSpecCardsNum()
 		}
 	}
 	remain := c.CloudConf.Limited.CloudLimited() - count

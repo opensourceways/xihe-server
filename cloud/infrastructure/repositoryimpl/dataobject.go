@@ -20,8 +20,19 @@ func (doc *DCloudConf) toCloudConf(c *domain.CloudConf) (err error) {
 		return
 	}
 
-	if c.Spec, err = domain.NewCloudSpec(doc.Spec); err != nil {
-		return
+	c.Specs = make([]domain.CloudSpec, 0, len(doc.Specs))
+	for i := range doc.Specs {
+		cloudSpec := domain.CloudSpec{}
+
+		if cloudSpec.Desc, err = domain.NewCloudSpecDesc(doc.Specs[i].Desc); err != nil {
+			return
+		}
+
+		if cloudSpec.CardsNum, err = domain.NewCloudSpecCardsNum(doc.Specs[i].CardsNum); err != nil {
+			return
+		}
+
+		c.Specs = append(c.Specs, cloudSpec)
 	}
 
 	c.Images = make([]domain.CloudImage, 0, len(doc.Images))

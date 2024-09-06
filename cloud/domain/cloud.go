@@ -15,7 +15,7 @@ const (
 type CloudConf struct {
 	Id        string
 	Name      CloudName
-	Spec      CloudSpec
+	Specs     []CloudSpec
 	Images    []CloudImage
 	Feature   CloudFeature
 	Processor CloudProcessor
@@ -27,6 +27,11 @@ type CloudImage struct {
 	Alias   CloudImageAlias
 	Image   ICloudImage
 	Default bool
+}
+
+type CloudSpec struct {
+	Desc     CloudSpecDesc
+	CardsNum CloudSpecCardsNum
 }
 
 func (c *CloudConf) IsNPU() bool {
