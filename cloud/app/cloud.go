@@ -68,7 +68,7 @@ func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err erro
 	if cmd.IsVisitor {
 		dto = make([]CloudDTO, len(c))
 		for i := range c {
-			dto[i].toCloudDTO(&c[i], c[i].HasIdle(), false)
+			dto[i].toCloudDTO(&c[i], c[i].HasSingleCardIdle() || c[i].HasMultiCardsIdle(), false)
 		}
 
 		return
@@ -86,7 +86,7 @@ func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err erro
 			err = nil
 		}
 
-		dto[i].toCloudDTO(&c[i], c[i].HasIdle(), b)
+		dto[i].toCloudDTO(&c[i], c[i].HasSingleCardIdle() || c[i].HasMultiCardsIdle(), b)
 	}
 
 	return
@@ -133,15 +133,24 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 		return
 	}
 
-	if !c.HasIdle() {
+	singleCardBusy := cmd.CardsNum.CloudSpecCardsNum() == 1 && !c.HasSingleCardIdle()
+	if singleCardBusy {
 		code = errorResourceBusy
 		err = errors.New("no idle resource remain")
 
 		return
 	}
 
+	multiCardsBusy := cmd.CardsNum.CloudSpecCardsNum() > 1 && !c.HasMultiCardsIdle()
+	if multiCardsBusy {
+		code = errorResourceBusy
+		err = errors.New("no idle multiple cards remain")
+
+		return
+	}
+
 	// subscribe
-	err = s.cloudService.SubscribeCloud(&c.CloudConf, cmd.User, cmd.ImageAlias.CloudImageAlias())
+	err = s.cloudService.SubscribeCloud(&c.CloudConf, cmd.User, cmd.ImageAlias, cmd.CardsNum)
 
 	return
 }

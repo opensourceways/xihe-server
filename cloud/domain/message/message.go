@@ -6,11 +6,12 @@ import (
 )
 
 type MsgCloudConf struct {
-	User       string `json:"user"`
-	PodId      string `json:"pod_id"`
-	CloudId    string `json:"cloud_id"`
-	CloudName  string `json:"cloud_name"`
-	CloudImage string `json:"cloud_image"`
+	User          string `json:"user"`
+	PodId         string `json:"pod_id"`
+	CloudId       string `json:"cloud_id"`
+	CloudName     string `json:"cloud_name"`
+	CloudImage    string `json:"cloud_image"`
+	CloudCardsNum int    `json:"cloud_cards_num"`
 }
 
 type MsgPod struct {
@@ -24,13 +25,16 @@ type CloudMessageProducer interface {
 	ReleaseCloud(*ReleaseCloudEvent) error
 }
 
-func (r *MsgCloudConf) ToMsgCloudConf(c *domain.CloudConf, u types.Account, pid string, cloudImage domain.ICloudImage) {
+func (r *MsgCloudConf) ToMsgCloudConf(
+	c *domain.CloudConf, u types.Account, pid string, cloudImage domain.ICloudImage, cardsNum domain.CloudSpecCardsNum,
+) {
 	*r = MsgCloudConf{
-		User:       u.Account(),
-		PodId:      pid,
-		CloudId:    c.Id,
-		CloudName:  c.Name.CloudName(),
-		CloudImage: cloudImage.Image(),
+		User:          u.Account(),
+		PodId:         pid,
+		CloudId:       c.Id,
+		CloudName:     c.Name.CloudName(),
+		CloudImage:    cloudImage.Image(),
+		CloudCardsNum: cardsNum.CloudSpecCardsNum(),
 	}
 }
 

@@ -60,7 +60,10 @@ func (doc *DCloudConf) toCloudConf(c *domain.CloudConf) (err error) {
 		return
 	}
 
-	if c.Limited, err = domain.NewCloudLimited(doc.Limited); err != nil {
+	if c.SingleLimited, err = domain.NewCloudLimited(doc.SingleLimited); err != nil {
+		return
+	}
+	if c.MultiLimited, err = domain.NewCloudLimited(doc.MultiLimited); err != nil {
 		return
 	}
 

@@ -27,18 +27,32 @@ func (r *CloudService) caculateRemain(
 	c *domain.Cloud, p *repository.PodInfoList,
 ) (err error) {
 	// caculate running and not expiry pod
-	var count int
+	var singleCount, multiCount int
 	for i := range p.PodInfos {
 		if !p.PodInfos[i].IsExpiried() {
-			count += p.PodInfos[i].CardsNum.CloudSpecCardsNum()
+			count := p.PodInfos[i].CardsNum.CloudSpecCardsNum()
+			if count == 1 {
+				singleCount += count
+			} else {
+				multiCount += count
+			}
 		}
 	}
-	remain := c.CloudConf.Limited.CloudLimited() - count
+
+	var remain int
+	remain = c.SingleLimited.CloudLimited() - singleCount
 	if remain < 0 {
 		remain = 0
 	}
+	if c.SingleRemain, err = domain.NewCloudRemain(remain); err != nil {
+		return
+	}
 
-	if c.Remain, err = domain.NewCloudRemain(remain); err != nil {
+	remain = c.MultiLimited.CloudLimited() - multiCount
+	if remain < 0 {
+		remain = 0
+	}
+	if c.MultiRemain, err = domain.NewCloudRemain(remain); err != nil {
 		return
 	}
 
@@ -55,16 +69,16 @@ func (r *CloudService) ToCloud(c *domain.Cloud) (err error) {
 }
 
 func (r *CloudService) SubscribeCloud(
-	c *domain.CloudConf, u types.Account, imageAlias string,
+	c *domain.CloudConf, u types.Account, imageAlias domain.CloudImageAlias, cardsNum domain.CloudSpecCardsNum,
 ) (err error) {
 	var image domain.ICloudImage
-	if image, err = c.GetImage(imageAlias); err != nil {
+	if image, err = c.GetImage(imageAlias.CloudImageAlias()); err != nil {
 		return
 	}
 
 	// save into repo
 	p := new(domain.PodInfo)
-	if err := p.SetStartingPodInfo(c.Id, u); err != nil {
+	if err := p.SetStartingPodInfo(c.Id, u, cardsNum); err != nil {
 		return err
 	}
 
@@ -75,7 +89,7 @@ func (r *CloudService) SubscribeCloud(
 
 	// send msg to call pod instance api
 	msg := new(message.MsgCloudConf)
-	msg.ToMsgCloudConf(c, u, pid, image)
+	msg.ToMsgCloudConf(c, u, pid, image, cardsNum)
 
 	return r.sender.SubscribeCloud(msg)
 }

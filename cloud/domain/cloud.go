@@ -13,14 +13,15 @@ const (
 )
 
 type CloudConf struct {
-	Id        string
-	Name      CloudName
-	Specs     []CloudSpec
-	Images    []CloudImage
-	Feature   CloudFeature
-	Processor CloudProcessor
-	Limited   CloudLimited
-	Credit    Credit
+	Id            string
+	Name          CloudName
+	Specs         []CloudSpec
+	Images        []CloudImage
+	Feature       CloudFeature
+	Processor     CloudProcessor
+	SingleLimited CloudLimited
+	MultiLimited  CloudLimited
+	Credit        Credit
 }
 
 type CloudImage struct {
@@ -41,11 +42,16 @@ func (c *CloudConf) IsNPU() bool {
 type Cloud struct {
 	CloudConf
 
-	Remain CloudRemain
+	SingleRemain CloudRemain
+	MultiRemain  CloudRemain
 }
 
-func (c *Cloud) HasIdle() bool {
-	return c.Remain.CloudRemain() > 0
+func (c *Cloud) HasSingleCardIdle() bool {
+	return c.SingleRemain.CloudRemain() > 0
+}
+
+func (c *Cloud) HasMultiCardsIdle() bool {
+	return c.MultiRemain.CloudRemain() > 0
 }
 
 func (c *CloudConf) GetImage(alias string) (ICloudImage, error) {

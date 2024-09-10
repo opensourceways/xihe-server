@@ -10,10 +10,11 @@ import (
 
 type CloudCreateMsg struct {
 	common.MsgNormal
-	PodId      string `json:"pod_id"`
-	CloudId    string `json:"cloud_id"`
-	CloudName  string `json:"cloud_name"`
-	CloudImage string `json:"cloud_image"`
+	PodId         string `json:"pod_id"`
+	CloudId       string `json:"cloud_id"`
+	CloudName     string `json:"cloud_name"`
+	CloudImage    string `json:"cloud_image"`
+	CloudCardsNum int    `json:"cloud_cards_num"`
 }
 
 type CloudReleaseMsg struct {
@@ -38,10 +39,11 @@ func (s publisher) SubscribeCloud(m *message.MsgCloudConf) error {
 			CreatedAt: utils.Now(),
 			Desc:      fmt.Sprintf("start a jupyter notebook on %s", m.CloudName),
 		},
-		PodId:      m.PodId,
-		CloudId:    m.CloudId,
-		CloudName:  m.CloudName,
-		CloudImage: m.CloudImage,
+		PodId:         m.PodId,
+		CloudId:       m.CloudId,
+		CloudName:     m.CloudName,
+		CloudImage:    m.CloudImage,
+		CloudCardsNum: m.CloudCardsNum,
 	}
 
 	return s.publisher.Publish(s.cfg.JupyterCreated.Topic, msg, nil)

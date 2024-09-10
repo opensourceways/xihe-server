@@ -10,6 +10,7 @@ import (
 type SubscribeCloudCmd struct {
 	User       types.Account
 	ImageAlias domain.CloudImageAlias
+	CardsNum   domain.CloudSpecCardsNum
 	CloudId    string
 }
 
@@ -70,7 +71,7 @@ type PodInfoDTO struct {
 
 func (cmd *SubscribeCloudCmd) Validate() error {
 	b := cmd.User.Account() != "" &&
-		cmd.CloudId != "" && cmd.ImageAlias != nil
+		cmd.CloudId != "" && cmd.ImageAlias != nil && cmd.CardsNum != nil
 
 	if !b {
 		return errors.New("invalid cmd")

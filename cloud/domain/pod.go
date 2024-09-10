@@ -93,9 +93,10 @@ func (p *PodInfo) SetDefaultExpiry() (err error) {
 	return
 }
 
-func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account) (err error) {
+func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account, cardsNum CloudSpecCardsNum) (err error) {
 	p.CloudId = cid
 	p.Owner = owner
+	p.CardsNum = cardsNum
 
 	if p.Status, err = NewPodStatus(CloudPodStatusStarting); err != nil {
 		return

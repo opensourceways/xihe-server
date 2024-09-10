@@ -1,14 +1,15 @@
 package repositoryimpl
 
 type DCloudConf struct {
-	Id        string    `bson:"id"         json:"id"`
-	Name      string    `bson:"name"       json:"name"`
-	Specs     []SpecDO  `bson:"specs"      json:"specs"`
-	Images    []ImageDO `bson:"images"     json:"images"`
-	Feature   string    `bson:"feature"    json:"feature"`
-	Processor string    `bson:"processor"  json:"processor"`
-	Limited   int       `bson:"limited"    json:"limited"`
-	Credit    int64     `bson:"credit"     json:"credit"`
+	Id            string    `bson:"id"                json:"id"`
+	Name          string    `bson:"name"              json:"name"`
+	Specs         []SpecDO  `bson:"specs"             json:"specs"`
+	Images        []ImageDO `bson:"images"            json:"images"`
+	Feature       string    `bson:"feature"           json:"feature"`
+	Processor     string    `bson:"processor"         json:"processor"`
+	SingleLimited int       `bson:"single_limited"    json:"single_limited"`
+	MultiLimited  int       `bson:"multi_limited"     json:"multi_limited"`
+	Credit        int64     `bson:"credit"            json:"credit"`
 }
 
 type ImageDO struct {
