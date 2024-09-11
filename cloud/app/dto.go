@@ -67,6 +67,8 @@ type PodInfoDTO struct {
 	Error     string `json:"error"`
 	AccessURL string `json:"access_url"`
 	CreatedAt int64  `json:"created_at"`
+	Image     string `json:"image"`
+	Spec      string `json:"spec"`
 }
 
 func (cmd *SubscribeCloudCmd) Validate() error {
@@ -123,7 +125,6 @@ func (r *CloudConfDTO) toCloudConfDTO(c *domain.CloudConf) {
 		})
 	}
 
-	c.MoveDefaultImageToHead()
 	r.Images = make([]string, 0, len(c.Images))
 	for i := range c.Images {
 		r.Images = append(r.Images, c.Images[i].Alias.CloudImageAlias())
@@ -140,6 +141,8 @@ func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isIdle bool, hasHolding bool) {
 func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	r.Id = p.Id
 	r.CloudId = p.CloudId
+	r.Image = p.Image
+	r.Spec = p.Spec
 
 	if p.Owner != nil {
 		r.Owner = p.Owner.Account()

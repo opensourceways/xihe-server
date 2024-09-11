@@ -72,14 +72,25 @@ func (r *CloudService) ToCloud(c *domain.Cloud) (err error) {
 func (r *CloudService) SubscribeCloud(
 	c *domain.CloudConf, u types.Account, imageAlias domain.CloudImageAlias, cardsNum domain.CloudSpecCardsNum,
 ) (err error) {
-	var image domain.ICloudImage
+	var (
+		image domain.ICloudImage
+		spec  domain.CloudSpecDesc
+	)
+
 	if image, err = c.GetImage(imageAlias.CloudImageAlias()); err != nil {
 		return
 	}
 
+	if spec, err = c.GetSpecDesc(cardsNum.CloudSpecCardsNum()); err != nil {
+		return
+	}
+
 	// save into repo
-	p := new(domain.PodInfo)
-	if err := p.SetStartingPodInfo(c.Id, u, cardsNum); err != nil {
+	p := &domain.PodInfo{
+		CardsNum: cardsNum,
+		Spec:     spec.CloudSpecDesc(),
+	}
+	if err := p.SetStartingPodInfo(c.Id, u, image); err != nil {
 		return err
 	}
 
@@ -132,7 +143,8 @@ func (r *CloudService) HasHolding(user types.Account, c *domain.CloudConf) (bool
 }
 
 // CheckWhitelistItems returns whether whitelist items are enabled based on isSingleCard.
-// It will return true if isSingleCard is true and one of items is enabled, or check multi-cloud whitelist is enabled
+// It will return true if isSingleCard is true and one of items is enabled,
+// or check whether multi-cloud whitelist is enabled
 func (r *CloudService) CheckWhitelistItems(isSingleCard bool, items []userdomain.WhiteListInfo) bool {
 	for _, item := range items {
 		if item.Type.WhiteListType() != userdomain.WhitelistTypeCloud &&

@@ -13,9 +13,8 @@ type DCloudConf struct {
 }
 
 type ImageDO struct {
-	Alias   string `bson:"alias" json:"alias"`
-	Image   string `bson:"image" json:"image"`
-	Default bool   `bson:"default" json:"default"`
+	Alias string `bson:"alias" json:"alias"`
+	Image string `bson:"image" json:"image"`
 }
 
 type SpecDO struct {

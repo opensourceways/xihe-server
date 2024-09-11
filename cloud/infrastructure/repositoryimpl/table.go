@@ -10,6 +10,8 @@ type TPod struct {
 	AccessURL string `gorm:"column:access_url"`
 	CreatedAt int64  `gorm:"column:created_at;not null;default:extract(epoch from now())"`
 	CardsNum  int    `gorm:"column:cards_num;not null"`
+	Spec      string `gorm:"column:spec;not null"`
+	Image     string `gorm:"column:image;not null"`
 }
 
 func (TPod) TableName() string {

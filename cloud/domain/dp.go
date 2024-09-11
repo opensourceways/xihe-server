@@ -16,6 +16,13 @@ const (
 	CloudPodStatusTerminating = "terminating"
 )
 
+var cloudSpecCardsNumRange = map[int]struct{}{
+	1: {},
+	2: {},
+	4: {},
+	8: {},
+}
+
 // CloudName
 type CloudName interface {
 	CloudName() string
@@ -60,8 +67,8 @@ type CloudSpecCardsNum interface {
 }
 
 func NewCloudSpecCardsNum(v int) (CloudSpecCardsNum, error) {
-	if v < 1 {
-		return nil, errors.New("invalid number of cards")
+	if _, ok := cloudSpecCardsNumRange[v]; !ok {
+		return nil, errors.New("the number of cards of npu is not supported")
 	}
 
 	return cloudSpecCardsNum(v), nil

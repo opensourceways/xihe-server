@@ -57,7 +57,7 @@ func (impl *userWhiteListImpl) GetWhiteListInfoItems(
 			fieldWhiteListType: bson.M{"$in": whitelistTypeList},
 		}
 
-		return impl.cli.GetDoc(ctx, filter, nil, &v)
+		return impl.cli.GetDocs(ctx, filter, nil, &v)
 	}
 
 	if err := withContext(f); err != nil {

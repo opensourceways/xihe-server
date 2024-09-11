@@ -9,7 +9,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain/service"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
-	userdomain "github.com/opensourceways/xihe-server/user/domain"
+	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
@@ -33,20 +33,20 @@ func NewCloudService(
 	whitelistRepo userrepo.WhiteList,
 ) *cloudService {
 	return &cloudService{
-		cloudRepo:     cloudRepo,
-		podRepo:       podRepo,
-		producer:      producer,
-		cloudService:  service.NewCloudService(podRepo, producer),
-		whitelistRepo: whitelistRepo,
+		cloudRepo:        cloudRepo,
+		podRepo:          podRepo,
+		producer:         producer,
+		cloudService:     service.NewCloudService(podRepo, producer),
+		whitelistService: userapp.NewWhiteListService(whitelistRepo),
 	}
 }
 
 type cloudService struct {
-	cloudRepo     repository.Cloud
-	podRepo       repository.Pod
-	producer      message.CloudMessageProducer
-	cloudService  service.CloudService
-	whitelistRepo userrepo.WhiteList
+	cloudRepo        repository.Cloud
+	podRepo          repository.Pod
+	producer         message.CloudMessageProducer
+	cloudService     service.CloudService
+	whitelistService userapp.WhiteListService
 }
 
 func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err error) {
@@ -69,7 +69,7 @@ func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err erro
 	if cmd.IsVisitor {
 		dto = make([]CloudDTO, len(c))
 		for i := range c {
-			dto[i].toCloudDTO(&c[i], c[i].HasSingleCardIdle() || c[i].HasMultiCardsIdle(), false)
+			dto[i].toCloudDTO(&c[i], c[i].HasSingleCardIdle() || c[i].HasMultiCardsIdle(0), false)
 		}
 
 		return
@@ -87,7 +87,7 @@ func (s *cloudService) ListCloud(cmd *GetCloudConfCmd) (dto []CloudDTO, err erro
 			err = nil
 		}
 
-		dto[i].toCloudDTO(&c[i], c[i].HasSingleCardIdle() || c[i].HasMultiCardsIdle(), b)
+		dto[i].toCloudDTO(&c[i], c[i].HasSingleCardIdle() || c[i].HasMultiCardsIdle(0), b)
 	}
 
 	return
@@ -102,14 +102,14 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 
 	// whitelist
 	if cloudConf.IsNPU() {
-		whitelistItems, err := s.whitelistRepo.GetWhiteListInfoItems(cmd.User,
-			[]string{userdomain.WhitelistTypeCloud, userdomain.WhitelistTypeMultiCloud})
+		useNPU, useMultiNPU, err := s.whitelistService.CheckCloudWhitelist(cmd.User)
 		if err != nil {
 			return "", err
 		}
 
-		if s.cloudService.CheckWhitelistItems(cmd.CardsNum.CloudSpecCardsNum() == 1, whitelistItems) {
-			return errorWhitelistNotAllowed, errors.New("not allowed for this module")
+		if (cmd.CardsNum.CloudSpecCardsNum() > 1 && !useMultiNPU) ||
+			(cmd.CardsNum.CloudSpecCardsNum() == 1 && !useNPU) {
+			return errorWhitelistNotAllowed, errors.New("not in cloud whitelist")
 		}
 	}
 
@@ -134,7 +134,9 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 		return
 	}
 
-	singleCardBusy := cmd.CardsNum.CloudSpecCardsNum() == 1 && !c.HasSingleCardIdle()
+	deduction := cmd.CardsNum.CloudSpecCardsNum()
+
+	singleCardBusy := deduction == 1 && !c.HasSingleCardIdle()
 	if singleCardBusy {
 		code = errorResourceBusy
 		err = errors.New("no idle resource remain")
@@ -142,7 +144,7 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 		return
 	}
 
-	multiCardsBusy := cmd.CardsNum.CloudSpecCardsNum() > 1 && !c.HasMultiCardsIdle()
+	multiCardsBusy := deduction > 1 && !c.HasMultiCardsIdle(deduction)
 	if multiCardsBusy {
 		code = errorResourceBusy
 		err = errors.New("no idle multiple cards remain")

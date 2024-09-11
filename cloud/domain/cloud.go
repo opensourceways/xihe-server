@@ -1,8 +1,8 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
-	"sort"
 )
 
 const (
@@ -25,9 +25,8 @@ type CloudConf struct {
 }
 
 type CloudImage struct {
-	Alias   CloudImageAlias
-	Image   ICloudImage
-	Default bool
+	Alias CloudImageAlias
+	Image ICloudImage
 }
 
 type CloudSpec struct {
@@ -50,8 +49,8 @@ func (c *Cloud) HasSingleCardIdle() bool {
 	return c.SingleRemain.CloudRemain() > 0
 }
 
-func (c *Cloud) HasMultiCardsIdle() bool {
-	return c.MultiRemain.CloudRemain() > 0
+func (c *Cloud) HasMultiCardsIdle(deduction int) bool {
+	return c.MultiRemain.CloudRemain()-deduction >= 0
 }
 
 func (c *CloudConf) GetImage(alias string) (ICloudImage, error) {
@@ -64,8 +63,12 @@ func (c *CloudConf) GetImage(alias string) (ICloudImage, error) {
 	return nil, fmt.Errorf("%s doesn't exist", alias)
 }
 
-func (c *CloudConf) MoveDefaultImageToHead() {
-	sort.Slice(c.Images, func(i, j int) bool {
-		return c.Images[i].Default
-	})
+func (c *CloudConf) GetSpecDesc(cardsNum int) (CloudSpecDesc, error) {
+	for _, spec := range c.Specs {
+		if spec.CardsNum.CloudSpecCardsNum() == cardsNum {
+			return spec.Desc, nil
+		}
+	}
+
+	return nil, errors.New("invalid cards number")
 }
