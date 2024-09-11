@@ -9,6 +9,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain/service"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
@@ -101,13 +102,13 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 
 	// whitelist
 	if cloudConf.IsNPU() {
-		const whitelistTypeCloud = "cloud"
-		whitelist, err := s.whitelistRepo.GetWhiteListInfo(cmd.User, whitelistTypeCloud)
+		whitelistItems, err := s.whitelistRepo.GetWhiteListInfoItems(cmd.User,
+			[]string{userdomain.WhitelistTypeCloud, userdomain.WhitelistTypeMultiCloud})
 		if err != nil {
 			return "", err
 		}
 
-		if !whitelist.Enable() {
+		if s.cloudService.CheckWhitelistItems(cmd.CardsNum.CloudSpecCardsNum() == 1, whitelistItems) {
 			return errorWhitelistNotAllowed, errors.New("not allowed for this module")
 		}
 	}

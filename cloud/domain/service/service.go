@@ -6,6 +6,7 @@ import (
 	"github.com/opensourceways/xihe-server/cloud/domain/repository"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 )
 
 type CloudService struct {
@@ -128,4 +129,31 @@ func (r *CloudService) HasHolding(user types.Account, c *domain.CloudConf) (bool
 	}
 
 	return false, nil
+}
+
+// CheckWhitelistItems returns whether whitelist items are enabled based on isSingleCard.
+// It will return true if isSingleCard is true and one of items is enabled, or check multi-cloud whitelist is enabled
+func (r *CloudService) CheckWhitelistItems(isSingleCard bool, items []userdomain.WhiteListInfo) bool {
+	for _, item := range items {
+		if item.Type.WhiteListType() != userdomain.WhitelistTypeCloud &&
+			item.Type.WhiteListType() != userdomain.WhitelistTypeMultiCloud {
+			return false
+		}
+	}
+
+	enabled := false
+
+	if isSingleCard {
+		for _, item := range items {
+			enabled = enabled || item.Enable()
+		}
+
+		return enabled
+	}
+
+	for _, item := range items {
+		enabled = enabled || (item.Type.WhiteListType() == userdomain.WhitelistTypeMultiCloud && item.Enable())
+	}
+
+	return enabled
 }
