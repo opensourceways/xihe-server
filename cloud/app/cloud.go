@@ -194,7 +194,12 @@ func (s *cloudService) GetReleasedPod(cmd *GetReleasedPodCmd) (PodInfoDTO, error
 		return podInfoDto, ErrPodNotFound
 	}
 
-	podInfoDto.toPodInfoDTO(&podInfo)
+	cloudConf, err := s.cloudRepo.GetCloudConf(podInfo.CloudId)
+	if err != nil {
+		return podInfoDto, err
+	}
+
+	podInfoDto.toPodInfoDTO(&podInfo, &cloudConf)
 
 	return podInfoDto, nil
 }

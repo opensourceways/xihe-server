@@ -72,3 +72,13 @@ func (c *CloudConf) GetSpecDesc(cardsNum int) (CloudSpecDesc, error) {
 
 	return nil, errors.New("invalid cards number")
 }
+
+func (c *CloudConf) GetImageAlias(image string) (CloudImageAlias, error) {
+	for i := range c.Images {
+		if image == c.Images[i].Image.Image() {
+			return c.Images[i].Alias, nil
+		}
+	}
+
+	return nil, fmt.Errorf("%s doesn't exist", image)
+}

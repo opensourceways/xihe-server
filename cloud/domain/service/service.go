@@ -72,25 +72,14 @@ func (r *CloudService) ToCloud(c *domain.Cloud) (err error) {
 func (r *CloudService) SubscribeCloud(
 	c *domain.CloudConf, u types.Account, imageAlias domain.CloudImageAlias, cardsNum domain.CloudSpecCardsNum,
 ) (err error) {
-	var (
-		image domain.ICloudImage
-		spec  domain.CloudSpecDesc
-	)
-
-	if image, err = c.GetImage(imageAlias.CloudImageAlias()); err != nil {
-		return
-	}
-
-	if spec, err = c.GetSpecDesc(cardsNum.CloudSpecCardsNum()); err != nil {
+	image, err := c.GetImage(imageAlias.CloudImageAlias())
+	if err != nil {
 		return
 	}
 
 	// save into repo
-	p := &domain.PodInfo{
-		CardsNum: cardsNum,
-		Spec:     spec.CloudSpecDesc(),
-	}
-	if err := p.SetStartingPodInfo(c.Id, u, image); err != nil {
+	p := new(domain.PodInfo)
+	if err := p.SetStartingPodInfo(c.Id, u, image, cardsNum); err != nil {
 		return err
 	}
 

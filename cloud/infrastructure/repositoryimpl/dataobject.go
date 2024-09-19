@@ -76,7 +76,6 @@ func (table *TPod) toPodInfo(p *domain.PodInfo) (err error) {
 	p.Id = table.Id
 	p.CloudId = table.CloudId
 	p.Image = table.Image
-	p.Spec = table.Spec
 
 	if p.Owner, err = otypes.NewAccount(table.Owner); err != nil {
 		return
@@ -113,7 +112,6 @@ func (table *TPod) toTPod(p *domain.PodInfo) {
 	*table = TPod{
 		CloudId: p.CloudId,
 		Image:   p.Image,
-		Spec:    p.Spec,
 	}
 
 	if p.Id != "" {

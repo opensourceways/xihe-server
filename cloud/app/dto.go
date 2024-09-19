@@ -138,11 +138,9 @@ func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isIdle bool, hasHolding bool) {
 	r.HasHolding = hasHolding
 }
 
-func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
+func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo, c *domain.CloudConf) error {
 	r.Id = p.Id
 	r.CloudId = p.CloudId
-	r.Image = p.Image
-	r.Spec = p.Spec
 
 	if p.Owner != nil {
 		r.Owner = p.Owner.Account()
@@ -172,6 +170,20 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	if p.CreatedAt != nil {
 		r.CreatedAt = p.CreatedAt.Time()
 	}
+
+	alias, err := c.GetImageAlias(p.Image)
+	if err != nil {
+		return err
+	}
+	r.Image = alias.CloudImageAlias()
+
+	spec, err := c.GetSpecDesc(p.CardsNum.CloudSpecCardsNum())
+	if err != nil {
+		return err
+	}
+	r.Spec = spec.CloudSpecDesc()
+
+	return nil
 }
 
 type ReleaseCloudCmd struct {

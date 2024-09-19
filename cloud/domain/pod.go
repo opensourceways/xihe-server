@@ -22,7 +22,6 @@ type PodInfo struct {
 	AccessURL AccessURL
 	CreatedAt types.Time
 	CardsNum  CloudSpecCardsNum
-	Spec      string
 }
 
 func (r *Pod) IsOnwer(owner otypes.Account) bool {
@@ -94,10 +93,11 @@ func (p *PodInfo) SetDefaultExpiry() (err error) {
 	return
 }
 
-func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account, image ICloudImage) (err error) {
+func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account, image ICloudImage, cardsNum CloudSpecCardsNum) (err error) {
 	p.CloudId = cid
 	p.Owner = owner
 	p.Image = image.Image()
+	p.CardsNum = cardsNum
 
 	if p.Status, err = NewPodStatus(CloudPodStatusStarting); err != nil {
 		return
