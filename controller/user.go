@@ -389,7 +389,7 @@ func (ctl *UserController) SendBindEmail(ctx *gin.Context) {
 // @Summary		BindEmail
 // @Description	bind email according the code
 // @Tags			User
-// @Param			body	body	userCreateRequest	true	"body of creating user"
+// @Param			body	body	EmailCode	true	"email and code"
 // @Accept			json
 // @Success		201	{object}			app.UserDTO
 // @Failure		400	bad_request_body	can't	parse		request	body
@@ -461,7 +461,6 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 // @Summary		GetInfo
 // @Description	get user apply info
 // @Tags			User
-// @Param			body	body	userCreateRequest	true	"body of creating user"
 // @Accept			json
 // @Success		200	{object}			app.UserDTO
 // @Failure		400	bad_request_body	can't	parse	request	body
@@ -540,7 +539,7 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 // @Tags			User
 // @Param			type	path	string	true	"type"
 // @Accept			json
-// @Success		200	{object}			whitelistResp
+// @Success		200	{object}			userapp.WhitelistDTO
 // @Failure		400	bad_request_body	can't	parse	request	body
 // @Router			/v1/user/whitelist/{type} [Get]
 func (ctl *UserController) CheckWhiteList(ctx *gin.Context) {

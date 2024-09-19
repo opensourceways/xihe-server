@@ -82,17 +82,17 @@ func (impl finetuneImpl) List(user domain.Account) (
 	r.Version = version
 	r.Expiry = v.Expiry
 
-	if len(v.Datas) == 0 {
+	if len(v.Data) == 0 {
 		return
 	}
 
-	datas := make([]domain.FinetuneSummary, len(v.Datas))
-	for i := range v.Datas {
-		if err = v.Datas[i].toFinetuneSummary(&datas[i]); err != nil {
+	data := make([]domain.FinetuneSummary, len(v.Data))
+	for i := range v.Data {
+		if err = v.Data[i].toFinetuneSummary(&data[i]); err != nil {
 			return
 		}
 	}
-	r.Datas = datas
+	r.Data = data
 
 	return
 }

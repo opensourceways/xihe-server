@@ -225,7 +225,7 @@ func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 // @Summary		CanRead
 // @Description	get cloud pod
 // @Tags			Cloud
-// @Param			owner	path	string	true	""
+// @Param			owner	path	string	true	"user name"
 // @Accept			json
 // @Success		201	{object}			app.InferenceDTO
 // @Failure		400	bad_request	not allowed
@@ -275,8 +275,7 @@ func (ctl *CloudController) CanRead(ctx *gin.Context) {
 // @Summary		Release
 // @Description	release cloud resource
 // @Tags			Cloud
-// @Param			id	path	string	true	""
-// @Param			cloud_id	query	string	true	""
+// @Param			id	path	string	true	"pod id"
 // @Accept			json
 // @Success		204
 // @Failure		404	{string} string "not found"

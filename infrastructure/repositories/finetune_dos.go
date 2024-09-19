@@ -112,5 +112,5 @@ func (do *FinetuneSummaryDO) toFinetuneSummary(obj *domain.FinetuneSummary) (err
 type UserFinetunesDO struct {
 	Expiry int64
 
-	Datas []FinetuneSummaryDO
+	Data []FinetuneSummaryDO
 }

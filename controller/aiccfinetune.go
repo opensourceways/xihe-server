@@ -184,7 +184,7 @@ func (ctl *AICCFinetuneController) Terminate(ctx *gin.Context) {
 //
 // @Param			id		path	string	true	"finetune id"
 // @Accept			json
-// @Success		200	{object}		finetuneDetail
+// @Success		200	{object}		aiccFinetuneDetail
 // @Failure		500	system_error	system	error
 // @Router			/v1/aiccfinetune/{model}/{id} [get]
 func (ctl *AICCFinetuneController) Get(ctx *gin.Context) {

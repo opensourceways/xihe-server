@@ -66,15 +66,15 @@ func (s finetuneService) Create(cmd *FinetuneCreateCmd) (
 		return
 	}
 
-	if len(v.Datas) >= appConfig.FinetuneMaxNum {
+	if len(v.Data) >= appConfig.FinetuneMaxNum {
 		code = ErrorFinetuneExccedMaxNum
 		err = errors.New("exceed max record num")
 
 		return
 	}
 
-	for i := range v.Datas {
-		if !s.isJobDone(v.Datas[i].Status) {
+	for i := range v.Data {
+		if !s.isJobDone(v.Data[i].Status) {
 			code = ErrorFinetuneRunningJobExists
 			err = errors.New("a job is running")
 
@@ -117,15 +117,15 @@ func (s finetuneService) List(user domain.Account) (
 
 	r.Expiry = v.Expiry
 
-	if len(v.Datas) == 0 {
+	if len(v.Data) == 0 {
 		return
 	}
 
-	datas := make([]FinetuneSummaryDTO, len(v.Datas))
-	for i := range v.Datas {
-		s.toFinetuneSummaryDTO(&v.Datas[i], &datas[i])
+	data := make([]FinetuneSummaryDTO, len(v.Data))
+	for i := range v.Data {
+		s.toFinetuneSummaryDTO(&v.Data[i], &data[i])
 	}
-	r.Datas = datas
+	r.Data = data
 
 	return
 }

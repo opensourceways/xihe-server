@@ -35,7 +35,7 @@ func AddRouterForCompetitionController(
 	rg.POST("/v1/competition/:id/submissions", ctl.Submit)
 	rg.POST("/v1/competition/:id/competitor", ctl.Apply)
 	rg.PUT("/v1/competition/:id/team", ctl.JoinTeam)
-	rg.PUT("/v1/competition/:id/realted_project", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedProject)
+	rg.PUT("/v1/competition/:id/related_project", checkUserEmailMiddleware(&ctl.baseController), ctl.AddRelatedProject)
 	rg.PUT("/v1/competition/:id/team/action/change_name", ctl.ChangeName)
 	rg.PUT("/v1/competition/:id/team/action/transfer_leader", ctl.TransferLeader)
 	rg.PUT("/v1/competition/:id/team/action/quit", ctl.QuitTeam)
@@ -416,7 +416,7 @@ func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 // @Accept			json
 // @Success		202
 // @Failure		500	system_error	system	error
-// @Router			/v1/competition/{id}/realted_project [put]
+// @Router			/v1/competition/{id}/related_project [put]
 func (ctl *CompetitionController) AddRelatedProject(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {

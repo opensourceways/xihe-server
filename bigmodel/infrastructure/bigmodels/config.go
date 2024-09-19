@@ -72,7 +72,7 @@ type Endpoints struct {
 	CodeGeex         string `json:"codegeex"           required:"true"`
 	DescPicture      string `json:"desc_picture"       required:"true"`
 	DescPictureHF    string `json:"desc_picture_hf"    required:"true"`
-	SinglePicture    string `json:"signle_picture"     required:"true"`
+	SinglePicture    string `json:"single_picture"     required:"true"`
 	MultiplePictures string `json:"multiple_pictures"  required:"true"`
 	AIDetector       string `json:"ai_detector"        required:"true"`
 	BaiChuan         string `json:"baichuan"           required:"true"`

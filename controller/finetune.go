@@ -235,10 +235,10 @@ func (ctl *FinetuneController) watchFinetunes(ws *websocket.Conn, user domain.Ac
 				continue
 			}
 
-			if len(dto.Datas) == 0 {
+			if len(dto.Data) == 0 {
 				break
 			}
-			v = dto.Datas
+			v = dto.Data
 
 			done, index := finished(v)
 			if done {
