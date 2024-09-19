@@ -147,7 +147,7 @@ func (s *cloudService) SubscribeCloud(cmd *SubscribeCloudCmd) (code string, err 
 	multiCardsBusy := deduction > 1 && !c.HasMultiCardsIdle(deduction)
 	if multiCardsBusy {
 		code = errorResourceBusy
-		err = errors.New("no idle multiple cards remain")
+		err = errors.New("no idle cards remain")
 
 		return
 	}
