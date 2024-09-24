@@ -55,11 +55,12 @@ func (c *cloudMessageService) CreatePodInstance(p *domain.PodInfo) error {
 
 	err = c.manager.Create(
 		&cloud.CloudPodCreateInfo{
-			PodId:        p.Id,
-			SurvivalTime: survivalTime,
-			User:         p.Owner.Account(),
-			CloudType:    p.GetCloudType(),
-			CloudImage:   p.Image,
+			PodId:         p.Id,
+			SurvivalTime:  survivalTime,
+			User:          p.Owner.Account(),
+			CloudType:     p.GetCloudType(),
+			CloudImage:    p.Image,
+			CloudCardsNum: p.CardsNum.CloudSpecCardsNum(),
 		},
 	)
 

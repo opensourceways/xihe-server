@@ -67,5 +67,5 @@ func (se symmetricEncryption) Decrypt(ciphertext []byte) ([]byte, error) {
 	}
 
 	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
-	return se.aead.Open(nil, nonce, ciphertext, nil)
+	return se.aead.Open(nil, nonce, ciphertext, nil) // #nosec G407
 }

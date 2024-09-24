@@ -16,6 +16,13 @@ const (
 	CloudPodStatusTerminating = "terminating"
 )
 
+var cloudSpecCardsNumRange = map[int]struct{}{
+	1: {},
+	2: {},
+	4: {},
+	8: {},
+}
+
 // CloudName
 type CloudName interface {
 	CloudName() string
@@ -36,22 +43,41 @@ func (r cloudName) CloudName() string {
 }
 
 // CloudSpec
-type CloudSpec interface {
-	CloudSpec() string
+type CloudSpecDesc interface {
+	CloudSpecDesc() string
 }
 
-func NewCloudSpec(v string) (CloudSpec, error) {
+func NewCloudSpecDesc(v string) (CloudSpecDesc, error) {
 	if v == "" {
 		return nil, errors.New("empty value")
 	}
 
-	return cloudSpec(v), nil
+	return cloudSpecDesc(v), nil
 }
 
-type cloudSpec string
+type cloudSpecDesc string
 
-func (r cloudSpec) CloudSpec() string {
+func (r cloudSpecDesc) CloudSpecDesc() string {
 	return string(r)
+}
+
+// CloudSpecCardsNum
+type CloudSpecCardsNum interface {
+	CloudSpecCardsNum() int
+}
+
+func NewCloudSpecCardsNum(v int) (CloudSpecCardsNum, error) {
+	if _, ok := cloudSpecCardsNumRange[v]; !ok {
+		return nil, errors.New("the number of cards of npu is not supported")
+	}
+
+	return cloudSpecCardsNum(v), nil
+}
+
+type cloudSpecCardsNum int
+
+func (r cloudSpecCardsNum) CloudSpecCardsNum() int {
+	return int(r)
 }
 
 // CloudFeature

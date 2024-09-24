@@ -19,11 +19,12 @@ type cloudpodImpl struct {
 
 func (impl *cloudpodImpl) Create(info *cloud.CloudPodCreateInfo) error {
 	opt := &sdk.CloudPodCreateOption{
-		PodId:        info.PodId,
-		User:         info.User,
-		SurvivalTime: info.SurvivalTime,
-		CloudType:    info.CloudType,
-		CloudImage:   info.CloudImage,
+		PodId:         info.PodId,
+		User:          info.User,
+		SurvivalTime:  info.SurvivalTime,
+		CloudType:     info.CloudType,
+		CloudImage:    info.CloudImage,
+		CloudCardsNum: info.CloudCardsNum,
 	}
 
 	return impl.cli.CreateCloudPod(opt)

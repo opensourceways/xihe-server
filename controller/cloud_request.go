@@ -7,8 +7,9 @@ import (
 )
 
 type cloudSubscribeRequest struct {
-	CloudId string `json:"cloud_id"`
-	Image   string `json:"image" binding:"required"`
+	CloudId  string `json:"cloud_id"`
+	Image    string `json:"image" binding:"required"`
+	CardsNum int    `json:"cards_num" binding:"required,min=1"`
 }
 
 func (req *cloudSubscribeRequest) toCmd(user domain.Account) cloudapp.SubscribeCloudCmd {
@@ -18,6 +19,7 @@ func (req *cloudSubscribeRequest) toCmd(user domain.Account) cloudapp.SubscribeC
 	}
 
 	cmd.ImageAlias, _ = cloudtypes.NewCloudImageAlias(req.Image)
+	cmd.CardsNum, _ = cloudtypes.NewCloudSpecCardsNum(req.CardsNum)
 
 	return cmd
 }

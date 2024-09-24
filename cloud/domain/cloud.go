@@ -1,8 +1,8 @@
 package domain
 
 import (
+	"errors"
 	"fmt"
-	"sort"
 )
 
 const (
@@ -13,20 +13,25 @@ const (
 )
 
 type CloudConf struct {
-	Id        string
-	Name      CloudName
-	Spec      CloudSpec
-	Images    []CloudImage
-	Feature   CloudFeature
-	Processor CloudProcessor
-	Limited   CloudLimited
-	Credit    Credit
+	Id            string
+	Name          CloudName
+	Specs         []CloudSpec
+	Images        []CloudImage
+	Feature       CloudFeature
+	Processor     CloudProcessor
+	SingleLimited CloudLimited
+	MultiLimited  CloudLimited
+	Credit        Credit
 }
 
 type CloudImage struct {
-	Alias   CloudImageAlias
-	Image   ICloudImage
-	Default bool
+	Alias CloudImageAlias
+	Image ICloudImage
+}
+
+type CloudSpec struct {
+	Desc     CloudSpecDesc
+	CardsNum CloudSpecCardsNum
 }
 
 func (c *CloudConf) IsNPU() bool {
@@ -36,11 +41,16 @@ func (c *CloudConf) IsNPU() bool {
 type Cloud struct {
 	CloudConf
 
-	Remain CloudRemain
+	SingleRemain CloudRemain
+	MultiRemain  CloudRemain
 }
 
-func (c *Cloud) HasIdle() bool {
-	return c.Remain.CloudRemain() > 0
+func (c *Cloud) HasSingleCardIdle() bool {
+	return c.SingleRemain.CloudRemain() > 0
+}
+
+func (c *Cloud) HasMultiCardsIdle(deduction int) bool {
+	return c.MultiRemain.CloudRemain()-deduction >= 0
 }
 
 func (c *CloudConf) GetImage(alias string) (ICloudImage, error) {
@@ -53,8 +63,22 @@ func (c *CloudConf) GetImage(alias string) (ICloudImage, error) {
 	return nil, fmt.Errorf("%s doesn't exist", alias)
 }
 
-func (c *CloudConf) MoveDefaultImageToHead() {
-	sort.Slice(c.Images, func(i, j int) bool {
-		return c.Images[i].Default
-	})
+func (c *CloudConf) GetSpecDesc(cardsNum int) (CloudSpecDesc, error) {
+	for _, spec := range c.Specs {
+		if spec.CardsNum.CloudSpecCardsNum() == cardsNum {
+			return spec.Desc, nil
+		}
+	}
+
+	return nil, errors.New("invalid cards number")
+}
+
+func (c *CloudConf) GetImageAlias(image string) (CloudImageAlias, error) {
+	for i := range c.Images {
+		if image == c.Images[i].Image.Image() {
+			return c.Images[i].Alias, nil
+		}
+	}
+
+	return nil, fmt.Errorf("%s doesn't exist", image)
 }

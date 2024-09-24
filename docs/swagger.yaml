@@ -1,4 +1,25 @@
 definitions:
+  app.AICCFinetuneSummaryDTO:
+    properties:
+      created_at:
+        type: string
+      desc:
+        type: string
+      duration:
+        type: integer
+      error:
+        type: string
+      id:
+        type: string
+      is_done:
+        type: boolean
+      name:
+        type: string
+      status:
+        type: string
+      task:
+        type: string
+    type: object
   app.AIQuestionDTO:
     properties:
       answer:
@@ -145,8 +166,10 @@ definitions:
         type: boolean
       id:
         type: string
-      image:
-        type: string
+      images:
+        items:
+          type: string
+        type: array
       is_idle:
         type: boolean
       name:
@@ -172,15 +195,6 @@ definitions:
       desc:
         type: string
       info:
-        type: string
-    type: object
-  app.ComputeDTO:
-    properties:
-      flavor:
-        type: string
-      type:
-        type: string
-      version:
         type: string
     type: object
   app.CourseDTO:
@@ -451,6 +465,22 @@ definitions:
       total:
         type: integer
     type: object
+  app.InferenceDTO:
+    properties:
+      access_url:
+        type: string
+      error:
+        type: string
+      inference_id:
+        type: string
+    type: object
+  app.KeyValueDTO:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
   app.LessonDTO:
     properties:
       desc:
@@ -536,6 +566,25 @@ definitions:
       updated_at:
         type: string
     type: object
+  app.PodInfoDTO:
+    properties:
+      access_url:
+        type: string
+      cloud_id:
+        type: string
+      created_at:
+        type: integer
+      error:
+        type: string
+      expiry:
+        type: integer
+      id:
+        type: string
+      owner:
+        type: string
+      status:
+        type: string
+    type: object
   app.PointDTO:
     properties:
       id:
@@ -604,6 +653,46 @@ definitions:
         type: string
       owner:
         type: string
+    type: object
+  app.PromotionDTO:
+    properties:
+      desc:
+        type: string
+      duration:
+        type: string
+      host:
+        type: string
+      id:
+        type: string
+      intro:
+        type: string
+      is_register:
+        type: boolean
+      is_static:
+        type: boolean
+      name:
+        type: string
+      poster:
+        type: string
+      registrants_num:
+        type: integer
+      status:
+        type: string
+      total:
+        type: integer
+      type:
+        type: string
+      way:
+        type: string
+    type: object
+  app.PromotionsDTO:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/app.PromotionDTO'
+        type: array
+      total:
+        type: integer
     type: object
   app.RelateProjectDTO:
     properties:
@@ -729,6 +818,48 @@ definitions:
           $ref: '#/definitions/app.TaskCompletionInfoDTO'
         type: array
     type: object
+  app.TrainingConfigDTO:
+    properties:
+      boot_file:
+        type: string
+      code_dir:
+        type: string
+      compute:
+        $ref: '#/definitions/github_com_opensourceways_xihe-server_app.ComputeDTO'
+      desc:
+        type: string
+      enable_aim:
+        type: boolean
+      enable_output:
+        type: boolean
+      env:
+        items:
+          $ref: '#/definitions/app.KeyValueDTO'
+        type: array
+      hyperparameter:
+        items:
+          $ref: '#/definitions/app.KeyValueDTO'
+        type: array
+      inputs:
+        items:
+          $ref: '#/definitions/app.TrainingRefDTO'
+        type: array
+      name:
+        type: string
+    type: object
+  app.TrainingRefDTO:
+    properties:
+      File:
+        type: string
+      key:
+        type: string
+      name:
+        type: string
+      owner:
+        type: string
+      type:
+        type: string
+    type: object
   app.TrainingSummaryDTO:
     properties:
       created_at:
@@ -747,6 +878,15 @@ definitions:
         type: string
       status:
         type: string
+    type: object
+  app.UploadDataDTO:
+    properties:
+      file_name:
+        type: string
+      status:
+        type: string
+      upload_at:
+        type: integer
     type: object
   app.UserDTO:
     properties:
@@ -814,10 +954,22 @@ definitions:
       total:
         type: integer
     type: object
+  app.WhitelistDTO:
+    properties:
+      allowed:
+        type: boolean
+    type: object
   app.WuKongRankDTO:
     properties:
       rank:
         type: integer
+    type: object
+  controller.AICCKeyValue:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
     type: object
   controller.AddCourseRelatedProjectRequest:
     properties:
@@ -878,6 +1030,13 @@ definitions:
       competitor_account:
         type: string
     type: object
+  controller.EmailCode:
+    properties:
+      code:
+        type: string
+      email:
+        type: string
+    type: object
   controller.FinetuneCreateRequest:
     properties:
       hyperparameter:
@@ -914,6 +1073,27 @@ definitions:
       point_id:
         type: string
       section_id:
+        type: string
+    type: object
+  controller.PromotionApplyReq:
+    properties:
+      city:
+        type: string
+      detail:
+        additionalProperties:
+          type: string
+        type: object
+      email:
+        type: string
+      identity:
+        type: string
+      name:
+        type: string
+      origin:
+        type: string
+      phone:
+        type: string
+      province:
         type: string
     type: object
   controller.RepoFileCreateRequest:
@@ -1005,6 +1185,36 @@ definitions:
       type:
         $ref: '#/definitions/app.AgreementType'
     type: object
+  controller.UserBasicInfoUpdateRequest:
+    properties:
+      avatar_id:
+        type: string
+      bio:
+        type: string
+    type: object
+  controller.UserInfoUpdateRequest:
+    properties:
+      avatar_id:
+        type: string
+      bio:
+        type: string
+      city:
+        type: string
+      detail:
+        additionalProperties:
+          type: string
+        type: object
+      email:
+        type: string
+      identity:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      province:
+        type: string
+    type: object
   controller.aiDetectorReq:
     properties:
       lang:
@@ -1032,6 +1242,54 @@ definitions:
     properties:
       score:
         type: integer
+    type: object
+  controller.aiccFinetuneCreateRequest:
+    properties:
+      desc:
+        type: string
+      env:
+        items:
+          $ref: '#/definitions/controller.AICCKeyValue'
+        type: array
+      hyperparameter:
+        items:
+          $ref: '#/definitions/controller.AICCKeyValue'
+        type: array
+      name:
+        type: string
+      task:
+        type: string
+    type: object
+  controller.aiccFinetuneCreateResp:
+    properties:
+      id:
+        type: string
+    type: object
+  controller.aiccFinetuneDetail:
+    properties:
+      created_at:
+        type: string
+      desc:
+        type: string
+      duration:
+        type: integer
+      error:
+        type: string
+      id:
+        type: string
+      is_done:
+        type: boolean
+      log:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+  controller.aiccFinetuneLogResp:
+    properties:
+      log_url:
+        type: string
     type: object
   controller.applyApiReq:
     properties:
@@ -1073,6 +1331,15 @@ definitions:
     properties:
       can_apply:
         type: boolean
+    type: object
+  controller.cloudSubscribeRequest:
+    properties:
+      cloud_id:
+        type: string
+      image:
+        type: string
+    required:
+    - image
     type: object
   controller.competitorApplyRequest:
     properties:
@@ -1244,6 +1511,19 @@ definitions:
         items:
           $ref: '#/definitions/app.CourseSummaryDTO'
         type: array
+    type: object
+  controller.iflyteksparkRequest:
+    properties:
+      repetition_penalty:
+        type: number
+      sampling:
+        type: boolean
+      temperature:
+        type: number
+      text:
+        type: string
+      top_k:
+        type: integer
     type: object
   controller.isApplyResp:
     properties:
@@ -1531,6 +1811,14 @@ definitions:
           type: string
         type: array
     type: object
+  controller.responseData:
+    properties:
+      code:
+        type: string
+      data: {}
+      msg:
+        type: string
+    type: object
   controller.skyWorkRequest:
     properties:
       history:
@@ -1562,7 +1850,7 @@ definitions:
       aim_path:
         type: string
       compute:
-        $ref: '#/definitions/app.ComputeDTO'
+        $ref: '#/definitions/github_com_opensourceways_xihe-server_app.ComputeDTO'
       created_at:
         type: string
       desc:
@@ -1589,24 +1877,6 @@ definitions:
   controller.trainingLogResp:
     properties:
       log_url:
-        type: string
-    type: object
-  controller.userBasicInfoUpdateRequest:
-    properties:
-      avatar_id:
-        type: string
-      bio:
-        type: string
-    type: object
-  controller.userCreateRequest:
-    properties:
-      account:
-        type: string
-      avatar_id:
-        type: string
-      bio:
-        type: string
-      email:
         type: string
     type: object
   controller.userDetail:
@@ -1686,6 +1956,15 @@ definitions:
           type: string
         type: array
       kind:
+        type: string
+    type: object
+  github_com_opensourceways_xihe-server_app.ComputeDTO:
+    properties:
+      flavor:
+        type: string
+      type:
+        type: string
+      version:
         type: string
     type: object
   github_com_opensourceways_xihe-server_bigmodel_app.LuoJiaRecordDTO:
@@ -1921,6 +2200,227 @@ paths:
             type: not_allowed
       tags:
       - User
+  /v1/aiccfinetune/{model}:
+    get:
+      consumes:
+      - application/json
+      description: get AICC finetunes
+      parameters:
+      - description: project id
+        in: path
+        name: pid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.AICCFinetuneSummaryDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: List
+      tags:
+      - AICC Finetune
+    post:
+      consumes:
+      - application/json
+      description: create aicc finetune
+      parameters:
+      - description: model name
+        in: path
+        name: model
+        required: true
+        type: string
+      - description: body of creating aicc finetune
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.aiccFinetuneCreateRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.aiccFinetuneCreateResp'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_body
+        "401":
+          description: Unauthorized
+          schema:
+            type: bad_request_param
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: Create
+      tags:
+      - AICC Finetune
+  /v1/aiccfinetune/{model}/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: delete AICC Finetune
+      parameters:
+      - description: model name
+        in: path
+        name: model
+        required: true
+        type: string
+      - description: finetune id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: Delete
+      tags:
+      - AICC Finetune
+    get:
+      consumes:
+      - application/json
+      description: get AICC finetune info
+      parameters:
+      - description: model name
+        in: path
+        name: model
+        required: true
+        type: string
+      - description: finetune id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.aiccFinetuneDetail'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: Get
+      tags:
+      - AICC Finetune
+    put:
+      consumes:
+      - application/json
+      description: terminate AICC Finetune
+      parameters:
+      - description: model name
+        in: path
+        name: model
+        required: true
+        type: string
+      - description: finetune id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "202":
+          description: Accepted
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: Terminate
+      tags:
+      - AICC Finetune
+  /v1/aiccfinetune/{model}/{id}/result/{type}:
+    get:
+      consumes:
+      - application/json
+      description: get log url of AICC Finetune for downloading
+      parameters:
+      - description: project id
+        in: path
+        name: pid
+        required: true
+        type: string
+      - description: finetune id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'aicc finetune result: log, output'
+        in: path
+        name: type
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controller.aiccFinetuneLogResp'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetLog
+      tags:
+      - AICC Finetune
+  /v1/aiccfinetune/{model}/{task}/data:
+    post:
+      consumes:
+      - application/json
+      description: Upload Data
+      parameters:
+      - description: model name
+        in: path
+        name: model
+        required: true
+        type: string
+      - description: result file
+        in: formData
+        name: file
+        required: true
+        type: file
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.UploadDataDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: UploadData
+      tags:
+      - AICC Finetune
+  /v1/aiccfinetune/{model}/ws:
+    get:
+      consumes:
+      - application/json
+      description: get AICC Finetunes
+      parameters:
+      - description: project id
+        in: path
+        name: pid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.AICCFinetuneSummaryDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: List
+      tags:
+      - AICC Finetune
   /v1/bigmodel/ai_detector:
     post:
       consumes:
@@ -2088,6 +2588,29 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/controller.glm2Request'
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      tags:
+      - BigModel
+  /v1/bigmodel/iflytekspark:
+    post:
+      consumes:
+      - application/json
+      description: conversational AI
+      parameters:
+      - description: body of iflytekspark
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.iflyteksparkRequest'
       responses:
         "202":
           description: Accepted
@@ -2590,6 +3113,134 @@ paths:
       summary: List
       tags:
       - Cloud
+  /v1/cloud/{cid}:
+    get:
+      consumes:
+      - application/json
+      description: get cloud pod
+      parameters:
+      - description: cloud config id
+        in: path
+        name: cid
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.InferenceDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_body
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetHttp
+      tags:
+      - Cloud
+  /v1/cloud/pod/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: release cloud resource
+      parameters:
+      - description: pod id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: not found
+          schema:
+            type: string
+        "500":
+          description: system error
+          schema:
+            $ref: '#/definitions/controller.responseData'
+      summary: Release
+      tags:
+      - Cloud
+    get:
+      consumes:
+      - application/json
+      description: WsSendReleasedPod is a websocket api which sends a released pod
+        data to client.
+      parameters:
+      - description: pod id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.PodInfoDTO'
+        "404":
+          description: not found
+          schema:
+            type: string
+        "500":
+          description: system error
+          schema:
+            $ref: '#/definitions/controller.responseData'
+      summary: WsSendReleasedPod
+      tags:
+      - Cloud
+  /v1/cloud/read/{owner}:
+    get:
+      consumes:
+      - application/json
+      description: get cloud pod
+      parameters:
+      - description: user name
+        in: path
+        name: owner
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.InferenceDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: CanRead
+      tags:
+      - Cloud
+  /v1/cloud/subscribe:
+    post:
+      consumes:
+      - application/json
+      description: subscribe cloud
+      parameters:
+      - description: body of subscribe cloud
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.cloudSubscribeRequest'
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: Subscribe
+      tags:
+      - Cloud
   /v1/competition:
     get:
       consumes:
@@ -2689,7 +3340,7 @@ paths:
       summary: GetRankingList
       tags:
       - Competition
-  /v1/competition/{id}/realted_project:
+  /v1/competition/{id}/related_project:
     put:
       consumes:
       - application/json
@@ -3162,33 +3813,6 @@ paths:
       summary: Apply
       tags:
       - Course
-  /v1/course/{id}/realted_project:
-    put:
-      consumes:
-      - application/json
-      description: add related project
-      parameters:
-      - description: course id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: project info
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.AddCourseRelatedProjectRequest'
-      responses:
-        "202":
-          description: Accepted
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      summary: AddCourseRelatedProject
-      tags:
-      - Course
   /v1/course/{id}/record:
     put:
       consumes:
@@ -3214,6 +3838,33 @@ paths:
           schema:
             type: system_error
       summary: AddPlayRecord
+      tags:
+      - Course
+  /v1/course/{id}/related_project:
+    put:
+      consumes:
+      - application/json
+      description: add related project
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: project info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.AddCourseRelatedProjectRequest'
+      responses:
+        "202":
+          description: Accepted
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: AddCourseRelatedProject
       tags:
       - Course
   /v1/course/reginfo:
@@ -3649,6 +4300,42 @@ paths:
       summary: ListAllElectricity
       tags:
       - HomePage
+  /v1/inference/project/{owner}/{pid}:
+    get:
+      consumes:
+      - application/json
+      description: create inference
+      parameters:
+      - description: project owner
+        in: path
+        name: owner
+        required: true
+        type: string
+      - description: project id
+        in: path
+        name: pid
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/app.InferenceDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_body
+        "401":
+          description: Unauthorized
+          schema:
+            type: bad_request_param
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: Create
+      tags:
+      - Inference
   /v1/login:
     get:
       consumes:
@@ -4379,6 +5066,136 @@ paths:
       summary: AddRelatedModel
       tags:
       - Project
+  /v1/promotion/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get promotion
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.PromotionDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.responseData'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.responseData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.responseData'
+      summary: Get
+      tags:
+      - Promotion
+  /v1/promotion/{id}/apply:
+    post:
+      consumes:
+      - application/json
+      description: apply the Promotion
+      parameters:
+      - description: promotion id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: body of applying
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.PromotionApplyReq'
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: Apply
+      tags:
+      - Promotion
+  /v1/promotion/{promotion}/points/{account}:
+    get:
+      consumes:
+      - application/json
+      description: get user points in promotion
+      parameters:
+      - description: username
+        in: path
+        name: account
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetUserPoints
+      tags:
+      - Promotion
+  /v1/promotion/{promotion}/ranking:
+    get:
+      consumes:
+      - application/json
+      description: get user points ranking in promotion
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetUserRanking
+      tags:
+      - Promotion
+  /v1/promotion/user/{account}:
+    get:
+      consumes:
+      - application/json
+      description: get user registrater promotion
+      parameters:
+      - description: username
+        in: path
+        name: account
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetUserRegitration
+      tags:
+      - Promotion
+  /v1/promotions:
+    get:
+      consumes:
+      - application/json
+      description: list promotions
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.PromotionsDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.responseData'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.responseData'
+      summary: List
+      tags:
+      - Promotion
   /v1/repo/{type}/{name}/dir/{path}:
     delete:
       consumes:
@@ -4778,6 +5595,29 @@ paths:
             type: system_error
       tags:
       - Tags
+  /v1/train/project/{pid}/config:
+    get:
+      consumes:
+      - application/json
+      description: get user last preset training config
+      parameters:
+      - description: project id
+        in: path
+        name: pid
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.TrainingConfigDTO'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: GetLastTrainingConfig
+      tags:
+      - Training
   /v1/train/project/{pid}/training:
     get:
       consumes:
@@ -5036,23 +5876,6 @@ paths:
       summary: Get
       tags:
       - User
-    put:
-      consumes:
-      - application/json
-      description: update user basic info
-      parameters:
-      - description: body of updating user
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.userBasicInfoUpdateRequest'
-      produces:
-      - application/json
-      responses: {}
-      summary: Update
-      tags:
-      - User
   /v1/user/activity/{account}:
     get:
       consumes:
@@ -5113,12 +5936,12 @@ paths:
       - application/json
       description: bind email according the code
       parameters:
-      - description: body of creating user
+      - description: email and code
         in: body
         name: body
         required: true
         schema:
-          $ref: '#/definitions/controller.userCreateRequest'
+          $ref: '#/definitions/controller.EmailCode'
       responses:
         "201":
           description: Created
@@ -5264,18 +6087,39 @@ paths:
             type: system_error
       tags:
       - Following
+  /v1/user/info:
+    put:
+      consumes:
+      - application/json
+      description: update user info
+      parameters:
+      - description: body of update user infomation
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.UserInfoUpdateRequest'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/controller.UserBasicInfoUpdateRequest'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: UpdateUserRegistrationInfo
+      tags:
+      - User
   /v1/user/info/{account}:
     get:
       consumes:
       - application/json
       description: get user apply info
-      parameters:
-      - description: body of creating user
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.userCreateRequest'
       responses:
         "200":
           description: OK
@@ -5387,6 +6231,29 @@ paths:
             type: system_error
       tags:
       - Like
+  /v1/user/whitelist/{type}:
+    get:
+      consumes:
+      - application/json
+      description: check user whitelist info
+      parameters:
+      - description: type
+        in: path
+        name: type
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.WhitelistDTO'
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_body
+      summary: CheckWhiteList
+      tags:
+      - User
   /v1/user_points:
     get:
       consumes:

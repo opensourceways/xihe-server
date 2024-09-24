@@ -29,7 +29,7 @@ func AddRouterForCourseController(
 	rg.POST("/v1/course/:id/player", ctl.Apply)
 	rg.GET("/v1/course", ctl.List)
 	rg.GET("/v1/course/:id", ctl.Get)
-	rg.PUT("/v1/course/:id/realted_project", checkUserEmailMiddleware(&ctl.baseController), ctl.AddCourseRelatedProject)
+	rg.PUT("/v1/course/:id/related_project", checkUserEmailMiddleware(&ctl.baseController), ctl.AddCourseRelatedProject)
 	rg.GET("/v1/course/:id/asg/list", ctl.ListAssignments)
 	rg.GET("/v1/course/:id/asg/result", ctl.GetSubmissions)
 	rg.GET("/v1/course/:id/cert", ctl.GetCertification)
@@ -178,7 +178,7 @@ func (ctl *CourseController) Get(ctx *gin.Context) {
 // @Accept			json
 // @Success		202
 // @Failure		500	system_error	system	error
-// @Router			/v1/course/{id}/realted_project [put]
+// @Router			/v1/course/{id}/related_project [put]
 func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {

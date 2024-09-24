@@ -17,8 +17,9 @@ type userWhiteListImpl struct {
 	cli mongodbClient
 }
 
-func (impl *userWhiteListImpl) GetWhiteListInfo(accout types.Account,
-	wtype string) (u domain.WhiteListInfo, err error) {
+func (impl *userWhiteListImpl) GetWhiteListInfo(
+	accout types.Account, wtype string,
+) (u domain.WhiteListInfo, err error) {
 	var v DWhiteListInfo
 
 	f := func(ctx context.Context) error {
@@ -43,4 +44,36 @@ func (impl *userWhiteListImpl) GetWhiteListInfo(accout types.Account,
 	}
 
 	return
+}
+
+func (impl *userWhiteListImpl) GetWhiteListInfoItems(
+	accout types.Account, whitelistTypeList []string,
+) ([]domain.WhiteListInfo, error) {
+	var v []DWhiteListInfo
+
+	f := func(ctx context.Context) error {
+		filter := bson.M{
+			fieldAccount:       accout.Account(),
+			fieldWhiteListType: bson.M{"$in": whitelistTypeList},
+		}
+
+		return impl.cli.GetDocs(ctx, filter, nil, &v)
+	}
+
+	if err := withContext(f); err != nil {
+		if impl.cli.IsDocNotExists(err) {
+			return nil, nil
+		}
+
+		return nil, err
+	}
+
+	whitelistItems := make([]domain.WhiteListInfo, len(v))
+	for i := range v {
+		if err := v[i].toWhiteListInfo(&whitelistItems[i]); err != nil {
+			return nil, err
+		}
+	}
+
+	return whitelistItems, nil
 }

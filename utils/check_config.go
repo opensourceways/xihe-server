@@ -50,7 +50,7 @@ func CheckConfig(opts interface{}, parent string) error {
 	}
 
 	if optsValue.Kind() != reflect.Struct {
-		return fmt.Errorf("Options type is not a struct.")
+		return fmt.Errorf("options type is not a struct")
 	}
 
 	fieldChain := func(s string) string {
