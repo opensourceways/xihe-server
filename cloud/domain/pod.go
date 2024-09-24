@@ -93,7 +93,9 @@ func (p *PodInfo) SetDefaultExpiry() (err error) {
 	return
 }
 
-func (p *PodInfo) SetStartingPodInfo(cid string, owner otypes.Account, image ICloudImage, cardsNum CloudSpecCardsNum) (err error) {
+func (p *PodInfo) SetStartingPodInfo(
+	cid string, owner otypes.Account, image ICloudImage, cardsNum CloudSpecCardsNum,
+) (err error) {
 	p.CloudId = cid
 	p.Owner = owner
 	p.Image = image.Image()

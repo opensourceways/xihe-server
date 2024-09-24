@@ -11,7 +11,7 @@ func (s *cloudService) Get(cmd *PodInfoCmd) (dto PodInfoDTO, err error) {
 		return
 	}
 
-	dto.toPodInfoDTO(&p, &cloudConf)
+	err = dto.toPodInfoDTO(&p, &cloudConf)
 
 	return
 }
