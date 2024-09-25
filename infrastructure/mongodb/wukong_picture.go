@@ -97,16 +97,16 @@ func (col wukongPicture) listFieldNameByUserName(user, fieldName string) ([]repo
 func (col wukongPicture) InsertIntoLikes(user string, do *repositories.WuKongPictureDO, version int) (
 	identity string, err error,
 ) {
-	return col.inserIntoFieldName(user, do, version, fieldLikes)
+	return col.insertIntoFieldName(user, do, version, fieldLikes)
 }
 
 func (col wukongPicture) InsertIntoPublics(user string, do *repositories.WuKongPictureDO, version int) (
 	identity string, err error,
 ) {
-	return col.inserIntoFieldName(user, do, version, fieldPublics)
+	return col.insertIntoFieldName(user, do, version, fieldPublics)
 }
 
-func (col wukongPicture) inserIntoFieldName(
+func (col wukongPicture) insertIntoFieldName(
 	user string, do *repositories.WuKongPictureDO,
 	version int, fieldName string,
 ) (

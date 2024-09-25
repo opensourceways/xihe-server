@@ -19,7 +19,7 @@ type CmdToAddPointsItem struct {
 func (cmd *CmdToAddPointsItem) dateAndTime() (string, string) {
 	now := time.Now().Unix()
 
-	if cmd.Time > now || cmd.Time < (now-minValueOfInvlidTime) {
+	if cmd.Time > now || cmd.Time < (now-minValueOfInvalidTime) {
 		return "", ""
 	}
 

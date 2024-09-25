@@ -164,11 +164,11 @@ func (e *Endpoints) parse(s string) ([]string, error) {
 }
 
 type Moderation struct {
-	Endpoint   string `json:"endpoint"       required:"true"`
-	AccessKey  string `json:"access_key"     required:"true"`
-	SecretKey  string `json:"secret_key"     required:"true"`
-	IAMEndpint string `json:"iam_endpoint"   required:"true"`
-	Region     string `json:"region"         required:"true"`
+	Endpoint    string `json:"endpoint"       required:"true"`
+	AccessKey   string `json:"access_key"     required:"true"`
+	SecretKey   string `json:"secret_key"     required:"true"`
+	IAMEndpoint string `json:"iam_endpoint"   required:"true"`
+	Region      string `json:"region"         required:"true"`
 }
 
 type WuKong struct {

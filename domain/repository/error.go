@@ -42,10 +42,10 @@ func IsErrorConcurrentUpdating(err error) bool {
 	return errors.As(err, &ErrorConcurrentUpdating{})
 }
 
-type ExcendMaxiumPageNumError struct {
+type ExcendMaximumPageNumError struct {
 	error
 }
 
-func NewExcendMaxiumPageNumError(err error) ExcendMaxiumPageNumError {
-	return ExcendMaxiumPageNumError{err}
+func NewExcendMaximumPageNumError(err error) ExcendMaximumPageNumError {
+	return ExcendMaximumPageNumError{err}
 }

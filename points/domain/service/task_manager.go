@@ -39,7 +39,7 @@ type taskService struct {
 
 	mutex sync.RWMutex
 	tasks map[string]int    // map task id to version
-	docs  map[string][]byte // map lanuage to doc path
+	docs  map[string][]byte // map language to doc path
 }
 
 func (tm *taskService) Doc(lang common.Language) ([]byte, error) {

@@ -269,7 +269,7 @@ func (ctl baseController) checkUserApiTokenBase(
 }
 
 func (ctl baseController) setRespCookieToken(ctx *gin.Context, token, username, domain string) error {
-	// encrpt username
+	// encrypt username
 	u, err := ctl.encryptData(username)
 	if err != nil {
 		return err

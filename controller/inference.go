@@ -137,7 +137,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
 		}
 
-		log.Errorf("inference failed: get reource, err:%s", err.Error())
+		log.Errorf("inference failed: get resource, err:%s", err.Error())
 
 		return
 	}

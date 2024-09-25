@@ -74,7 +74,7 @@ func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
 		return
 	}
 
-	r.Use(controller.ClearSenstiveInfoMiddleware())
+	r.Use(controller.ClearSensitiveInfoMiddleware())
 
 	srv := &http.Server{
 		Addr:              fmt.Sprintf(":%d", port),
@@ -174,13 +174,13 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	promotionTaskRepo := promotionadapter.TaskAdapter(mongodb.NewCollection(collections.PromotionTask))
 
 	bigmodel := bigmodels.NewBigModelService()
-	gitlabUser := gitlab.NewUserSerivce()
+	gitlabUser := gitlab.NewUserService()
 	gitlabRepo := gitlab.NewRepoFile()
 	authingUser := authingimpl.NewAuthingUser()
 	publisher := kafka.PublisherAdapter()
-	operater := kafka.OperateLogPublisherAdapter(cfg.MQTopics.OperateLog, publisher)
+	operator := kafka.OperateLogPublisherAdapter(cfg.MQTopics.OperateLog, publisher)
 	trainingAdapter := trainingimpl.NewTraining(&cfg.Training.Config)
-	repoAdapter := messages.NewDownloadMessageAdapter(cfg.MQTopics.Download, &cfg.Download, publisher, operater)
+	repoAdapter := messages.NewDownloadMessageAdapter(cfg.MQTopics.Download, &cfg.Download, publisher, operator)
 	finetuneImpl := finetuneimpl.NewFinetune(&cfg.Finetune)
 	uploader := competitionimpl.NewCompetitionService()
 	aiccUploader := aiccimpl.NewAICCUploadService()
@@ -192,7 +192,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	// sender
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
 	// resource producer
-	resProducer := messages.NewResourceMessageAdapter(&cfg.Resource, publisher, operater)
+	resProducer := messages.NewResourceMessageAdapter(&cfg.Resource, publisher, operator)
 
 	userRegService := userapp.NewRegService(
 		userrepoimpl.NewUserRegRepo(

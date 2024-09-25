@@ -79,7 +79,7 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 	if isprivate, ok := s.rs.IsPrivate(
 		cmd.ResourceOwner, cmd.ResourceType, cmd.ResourceId,
 	); !ok || isprivate {
-		return errors.New("cannot like private or not exsit resource")
+		return errors.New("cannot like private or not exist resource")
 	} else {
 		repotype, _ = domain.NewRepoType(domain.RepoTypePublic)
 	}
@@ -149,7 +149,7 @@ func (s likeService) Delete(owner domain.Account, cmd LikeRemoveCmd) error {
 	if isprivate, ok := s.rs.IsPrivate(
 		cmd.ResourceOwner, cmd.ResourceType, cmd.ResourceId,
 	); !ok || isprivate {
-		return errors.New("cannot like private or not exsit resource")
+		return errors.New("cannot like private or not exist resource")
 	}
 
 	// check if resource has liked

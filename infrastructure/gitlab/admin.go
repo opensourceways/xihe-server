@@ -22,7 +22,7 @@ var (
 	maxFileCount int
 )
 
-func NewUserSerivce() platform.User {
+func NewUserService() platform.User {
 	return admin
 }
 

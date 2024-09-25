@@ -9,7 +9,7 @@ type UserTraining struct {
 
 	CreatedAt int64
 
-	// following fileds is not under the controlling of version
+	// following fields is not under the controlling of version
 	Job       JobInfo
 	JobDetail JobDetail
 }

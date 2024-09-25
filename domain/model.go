@@ -17,7 +17,7 @@ type Model struct {
 
 	Version int
 
-	// following fileds is not under the controlling of version
+	// following fields is not under the controlling of version
 	LikeCount       int
 	DownloadCount   int
 	RelatedProjects RelatedResources

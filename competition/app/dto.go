@@ -78,14 +78,14 @@ func (cmd *CompetitionSubmitCMD) Validate() error {
 	return nil
 }
 
-type CompetitionAddReleatedProjectCMD struct {
+type CompetitionAddRelatedProjectCMD struct {
 	Id      string
 	User    types.Account
 	Project types.ResourceSummary
 	Lang    domain.Language
 }
 
-func (cmd *CompetitionAddReleatedProjectCMD) repo() string {
+func (cmd *CompetitionAddRelatedProjectCMD) repo() string {
 	return cmd.User.Account() + "/" + cmd.Project.Name.ResourceName()
 }
 
@@ -125,7 +125,7 @@ type UserCompetitionDTO struct {
 }
 
 // ranking
-type CompetitonRankingDTO struct {
+type CompetitionRankingDTO struct {
 	Final       []RankingDTO `json:"final"`
 	Preliminary []RankingDTO `json:"preliminary"`
 }

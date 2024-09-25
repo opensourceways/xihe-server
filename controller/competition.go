@@ -305,7 +305,7 @@ func (ctl *CompetitionController) GetMyTeam(ctx *gin.Context) {
 // @Tags			Competition
 // @Param			id	path	string	true	"competition id"
 // @Accept			json
-// @Success		200	{object}		app.CompetitonRankingDTO
+// @Success		200	{object}		app.CompetitionRankingDTO
 // @Failure		500	system_error	system	error
 // @Router			/v1/competition/{id}/ranking [get]
 func (ctl *CompetitionController) GetRankingList(ctx *gin.Context) {
@@ -369,7 +369,7 @@ func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 		return
 	}
 
-	if f.Size > apiConfig.MaxCompetitionSubmmitFileSzie {
+	if f.Size > apiConfig.MaxCompetitionSubmmitFileSize {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorBadRequestParam, "too big picture",
 		))
@@ -453,7 +453,7 @@ func (ctl *CompetitionController) AddRelatedProject(ctx *gin.Context) {
 		return
 	}
 
-	cmd := app.CompetitionAddReleatedProjectCMD{
+	cmd := app.CompetitionAddRelatedProjectCMD{
 		Id:      ctx.Param("id"),
 		User:    pl.DomainAccount(),
 		Project: p,

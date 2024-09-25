@@ -24,13 +24,13 @@ func NewCloudService(
 	}
 }
 
-func (r *CloudService) caculateRemain(
+func (r *CloudService) calculateRemain(
 	c *domain.Cloud, p *repository.PodInfoList,
 ) (err error) {
-	// caculate running and not expiry pod
+	// calculate running and not expiry pod
 	var singleCount, multiCount int
 	for i := range p.PodInfos {
-		if !p.PodInfos[i].IsExpiried() {
+		if !p.PodInfos[i].IsExpired() {
 			count := p.PodInfos[i].CardsNum.CloudSpecCardsNum()
 			if count == 1 {
 				singleCount += count
@@ -66,7 +66,7 @@ func (r *CloudService) ToCloud(c *domain.Cloud) (err error) {
 		return
 	}
 
-	return r.caculateRemain(c, &plist)
+	return r.calculateRemain(c, &plist)
 }
 
 func (r *CloudService) SubscribeCloud(
@@ -95,7 +95,7 @@ func (r *CloudService) SubscribeCloud(
 	return r.sender.SubscribeCloud(msg)
 }
 
-func (r *CloudService) CheckUserCanSubsribe(user types.Account, cid string) (
+func (r *CloudService) CheckUserCanSubscribe(user types.Account, cid string) (
 	p domain.PodInfo, ok bool, err error,
 ) {
 	p, err = r.podRepo.GetUserCloudIdLastPod(user, cid)
@@ -107,7 +107,7 @@ func (r *CloudService) CheckUserCanSubsribe(user types.Account, cid string) (
 		return
 	}
 
-	if p.IsExpiried() || p.IsFailedOrTerminated() {
+	if p.IsExpired() || p.IsFailedOrTerminated() {
 		return p, true, err
 	}
 
@@ -124,7 +124,7 @@ func (r *CloudService) HasHolding(user types.Account, c *domain.CloudConf) (bool
 		return false, err
 	}
 
-	if p.IsHoldingAndNotExpiried() {
+	if p.IsHoldingAndNotExpired() {
 		return true, nil
 	}
 

@@ -18,13 +18,13 @@ type userWhiteListImpl struct {
 }
 
 func (impl *userWhiteListImpl) GetWhiteListInfo(
-	accout types.Account, wtype string,
+	account types.Account, wtype string,
 ) (u domain.WhiteListInfo, err error) {
 	var v DWhiteListInfo
 
 	f := func(ctx context.Context) error {
 		filter := bson.M{
-			fieldAccount:       accout.Account(),
+			fieldAccount:       account.Account(),
 			fieldWhiteListType: wtype,
 		}
 
@@ -47,13 +47,13 @@ func (impl *userWhiteListImpl) GetWhiteListInfo(
 }
 
 func (impl *userWhiteListImpl) GetWhiteListInfoItems(
-	accout types.Account, whitelistTypeList []string,
+	account types.Account, whitelistTypeList []string,
 ) ([]domain.WhiteListInfo, error) {
 	var v []DWhiteListInfo
 
 	f := func(ctx context.Context) error {
 		filter := bson.M{
-			fieldAccount:       accout.Account(),
+			fieldAccount:       account.Account(),
 			fieldWhiteListType: bson.M{"$in": whitelistTypeList},
 		}
 

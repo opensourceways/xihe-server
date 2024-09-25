@@ -285,7 +285,7 @@ func (ctl *DatasetController) Update(ctx *gin.Context) {
 		return
 	}
 
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update propery of dataset")
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update property of dataset")
 
 	if pl.isNotMe(owner) {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(

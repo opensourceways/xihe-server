@@ -22,7 +22,7 @@ const (
 	errorPreviewLFSFile        = "preview_lfs_file"
 	errorUnavailableRepoFile   = "unavailable_repo_file"
 	errorDuplicateTrainingName = "duplicate_training_name"
-	errorExccedMaxiumPageNum   = "excend_maximum_page_num"
+	errorExccedMaximumPageNum  = "excend_maximum_page_num"
 )
 
 var (
@@ -61,8 +61,8 @@ func newResponseError(err error) responseData {
 		code = errorPreviewLFSFile
 	} else if errors.As(err, &app.ErrorDuplicateTrainingName{}) {
 		code = errorDuplicateTrainingName
-	} else if errors.As(err, &repository.ExcendMaxiumPageNumError{}) {
-		code = errorExccedMaxiumPageNum
+	} else if errors.As(err, &repository.ExcendMaximumPageNumError{}) {
+		code = errorExccedMaximumPageNum
 	}
 
 	return responseData{

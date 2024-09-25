@@ -3,7 +3,7 @@ package domain
 type Inference struct {
 	InferenceInfo
 
-	// following fileds is not under the controlling of version
+	// following fields is not under the controlling of version
 	InferenceDetail
 }
 

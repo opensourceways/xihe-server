@@ -31,7 +31,7 @@ type CompetitionService interface {
 
 	GetRankingList(cid string, phase domain.CompetitionPhase) ([]RankingDTO, error)
 
-	AddRelatedProject(*CompetitionAddReleatedProjectCMD) error
+	AddRelatedProject(*CompetitionAddRelatedProjectCMD) error
 }
 
 func NewCompetitionService(
@@ -261,7 +261,7 @@ func (s competitionService) GetSubmissions(index *CompetitionIndex, competitor d
 	return
 }
 
-func (s competitionService) AddRelatedProject(cmd *CompetitionAddReleatedProjectCMD) (
+func (s competitionService) AddRelatedProject(cmd *CompetitionAddRelatedProjectCMD) (
 	err error,
 ) {
 	if cmd.Index.Phase.IsFinal() {

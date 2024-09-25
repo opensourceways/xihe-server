@@ -24,15 +24,15 @@ type PodInfo struct {
 	CardsNum  CloudSpecCardsNum
 }
 
-func (r *Pod) IsOnwer(owner otypes.Account) bool {
+func (r *Pod) IsOwner(owner otypes.Account) bool {
 	return r.Owner == owner
 }
 
 func (p *PodInfo) CanRelease() bool {
-	return p.Status.IsRunning() && !p.IsExpiried()
+	return p.Status.IsRunning() && !p.IsExpired()
 }
 
-func (p *PodInfo) IsExpiried() bool {
+func (p *PodInfo) IsExpired() bool {
 	return utils.Now() > p.Expiry.PodExpiry()
 }
 
@@ -40,8 +40,8 @@ func (p *PodInfo) IsFailedOrTerminated() bool {
 	return p.Status.IsFailed() || p.IsTerminated()
 }
 
-func (p *PodInfo) IsHoldingAndNotExpiried() bool {
-	if p.IsExpiried() {
+func (p *PodInfo) IsHoldingAndNotExpired() bool {
+	if p.IsExpired() {
 		return false
 	}
 
@@ -86,7 +86,7 @@ func (p *PodInfo) SetStatus() {
 }
 
 func (p *PodInfo) SetDefaultExpiry() (err error) {
-	if p.Expiry, err = NewPodExpiry(utils.Now() + 2*60*60); err != nil { // TODO conifg
+	if p.Expiry, err = NewPodExpiry(utils.Now() + 2*60*60); err != nil { // TODO config
 		return
 	}
 
@@ -125,9 +125,9 @@ func (p *PodInfo) IsAscend() bool {
 }
 
 func (p *PodInfo) IsTerminated() bool {
-	return p.IsExpiried()
+	return p.IsExpired()
 }
 
 func (p *PodInfo) IsTerminating() bool {
-	return !p.IsExpiried() && (p.Status.IsTerminated() || p.Status.IsTerminating())
+	return !p.IsExpired() && (p.Status.IsTerminated() || p.Status.IsTerminating())
 }

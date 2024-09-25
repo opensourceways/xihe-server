@@ -148,7 +148,7 @@ func (ctl *CourseController) List(ctx *gin.Context) {
 }
 
 // @Summary		Get
-// @Description	get course infomation
+// @Description	get course information
 // @Tags			Course
 // @Param			id	path	string	true	"course id"
 // @Accept			json
@@ -215,13 +215,13 @@ func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 		return
 	}
 
-	cmd := app.CourseAddReleatedProjectCmd{
+	cmd := app.CourseAddRelatedProjectCmd{
 		Cid:     ctx.Param("id"),
 		User:    pl.DomainAccount(),
 		Project: p,
 	}
 
-	if code, err := ctl.s.AddReleatedProject(&cmd); err != nil {
+	if code, err := ctl.s.AddRelatedProject(&cmd); err != nil {
 		ctl.sendCodeMessage(ctx, code, err)
 	} else {
 		ctl.sendRespOfPut(ctx, "success")

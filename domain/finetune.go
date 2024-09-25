@@ -12,7 +12,7 @@ type Finetune struct {
 
 	FinetuneConfig
 
-	// following fileds is not under the controlling of version
+	// following fields is not under the controlling of version
 	Job       FinetuneJobInfo
 	JobDetail FinetuneJobDetail
 }
@@ -68,7 +68,7 @@ func NewFinetuneParameter(model, task string, hyperparameters map[string]string)
 		// check: if invalid value
 		if !(utils.IsPositiveFloatPoint(v) ||
 			utils.IsPositiveScientificNotation(v) ||
-			utils.IsPositiveInterger(v)) {
+			utils.IsPositiveInteger(v)) {
 			return nil, errors.New("invalid hyperparameter")
 		}
 	}

@@ -179,7 +179,7 @@ definitions:
       spec:
         type: string
     type: object
-  app.CompetitonRankingDTO:
+  app.CompetitionRankingDTO:
     properties:
       final:
         items:
@@ -913,7 +913,7 @@ definitions:
     type: object
   app.UserFinetunesDTO:
     properties:
-      datas:
+      data:
         items:
           $ref: '#/definitions/app.FinetuneSummaryDTO'
         type: array
@@ -2425,7 +2425,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: detecte if text generate by ai
+      description: detect if text generate by ai
       parameters:
       - description: body of ai detector
         in: body
@@ -3332,7 +3332,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/app.CompetitonRankingDTO'
+            $ref: '#/definitions/app.CompetitionRankingDTO'
         "500":
           description: Internal Server Error
           schema:
@@ -3694,7 +3694,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get course infomation
+      description: get course information
       parameters:
       - description: course id
         in: path
@@ -3811,6 +3811,33 @@ paths:
           schema:
             type: system_error
       summary: Apply
+      tags:
+      - Course
+  /v1/course/{id}/record:
+    put:
+      consumes:
+      - application/json
+      description: add related project
+      parameters:
+      - description: course id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: project info
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.AddCourseRelatedProjectRequest'
+      responses:
+        "202":
+          description: Accepted
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: AddCourseRelatedProject
       tags:
       - Course
   /v1/course/{id}/record:
@@ -6093,7 +6120,7 @@ paths:
       - application/json
       description: update user info
       parameters:
-      - description: body of update user infomation
+      - description: body of update user information
         in: body
         name: body
         required: true

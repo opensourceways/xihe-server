@@ -249,14 +249,14 @@ func (s bigModelService) GetWuKongLastTaskResp(user types.Account) (dtos []wukon
 		if bigmodel.IsErrorSensitiveInfo(err) {
 			code = ErrorBigModelSensitiveInfo
 		} else {
-			code = ErrorCodeSytem
+			code = ErrorCodeSystem
 		}
 
 		return
 	}
 
 	if p.Status.IsRunning() {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 		err = errors.New("task is running, please try it later")
 
 		return
@@ -302,7 +302,7 @@ func (s bigModelService) AddLikeFromTempPicture(cmd *WuKongAddLikeFromTempCmd) (
 		return
 	}
 
-	if s.bigmodelService.IsPathCotain(p, v) {
+	if s.bigmodelService.IsPathContain(p, v) {
 		code = ErrorWuKongDuplicateLike
 		err = errors.New("the picture has been saved")
 
@@ -361,7 +361,7 @@ func (s bigModelService) AddLikeFromPublicPicture(
 		return
 	}
 
-	if s.bigmodelService.IsPathCotain(likePath, v) {
+	if s.bigmodelService.IsPathContain(likePath, v) {
 		code = ErrorWuKongDuplicateLike
 		err = errors.New("the picture has been liked")
 
@@ -370,7 +370,7 @@ func (s bigModelService) AddLikeFromPublicPicture(
 
 	// copy picture from public dir to like dir on obs
 	if err = s.fm.MoveWuKongPictureToDir(likePath, p.OBSPath.OBSPath()); err != nil {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 		return
 	}
 
@@ -473,7 +473,7 @@ func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCm
 		return
 	}
 
-	if s.bigmodelService.IsPathCotain(publicPath, v) {
+	if s.bigmodelService.IsPathContain(publicPath, v) {
 		code = ErrorWuKongDuplicateLike
 		err = errors.New("the picture has been publiced")
 
@@ -482,7 +482,7 @@ func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCm
 
 	// copy picture from public dir to like dir on obs
 	if err = s.fm.MoveWuKongPictureToDir(publicPath, cmd.OBSPath.OBSPath()); err != nil {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 
 		return
 	}
@@ -509,7 +509,7 @@ func (s bigModelService) AddPublicFromTempPicture(cmd *WuKongAddPublicFromTempCm
 func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCmd) (
 	pid string, code string, err error,
 ) {
-	// get like infomation
+	// get like information
 	p, err := s.wukongPicture.GetLikeByUserName(cmd.User, cmd.Id)
 	if err != nil {
 		code = ErrorWuKongInvalidPath
@@ -531,7 +531,7 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 		return
 	}
 
-	if s.bigmodelService.IsPathCotain(publicPath, v) {
+	if s.bigmodelService.IsPathContain(publicPath, v) {
 		code = ErrorWuKongDuplicateLike
 		err = errors.New("the picture has been publiced")
 
@@ -540,7 +540,7 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 
 	// copy picture from public dir to like dir on obs
 	if err = s.fm.MoveWuKongPictureToDir(publicPath, p.OBSPath.OBSPath()); err != nil {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 
 		return
 	}
@@ -555,7 +555,7 @@ func (s bigModelService) AddPublicFromLikePicture(cmd *WuKongAddPublicFromLikeCm
 		WuKongPictureMeta: p.WuKongPictureMeta,
 	}
 	if pid, err = s.wukongPicture.SavePublic(ps, version); err != nil {
-		code = ErrorCodeSytem
+		code = ErrorCodeSystem
 
 		return
 	}

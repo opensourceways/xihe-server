@@ -32,7 +32,7 @@ type CoverId interface {
 	CoverId() string
 }
 
-func NewConverId(v string) (CoverId, error) {
+func NewCoverId(v string) (CoverId, error) {
 	if !DomainConfig.hasCover(v) {
 		return nil, errors.New("invalid cover id")
 	}
@@ -91,7 +91,7 @@ type TrainingPlatform interface {
 
 func NewTrainingPlatform(v string) (TrainingPlatform, error) {
 	if !DomainConfig.hasPlatform(v) {
-		return nil, errors.New("unsupport training platform")
+		return nil, errors.New("unsupported training platform")
 	}
 
 	return trainingPlatform(v), nil

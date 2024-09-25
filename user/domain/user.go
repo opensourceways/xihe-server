@@ -24,7 +24,7 @@ type User struct {
 
 	Version int
 
-	// following fileds is not under the controlling of version
+	// following fields is not under the controlling of version
 	FollowerCount  int
 	FollowingCount int
 }

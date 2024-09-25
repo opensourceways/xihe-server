@@ -30,8 +30,8 @@ type CompetitionService interface {
 	// work
 	Submit(*CompetitionSubmitCMD) (CompetitionSubmissionDTO, string, error)
 	GetSubmissions(*CompetitionGetCmd) (CompetitionSubmissionsDTO, error)
-	GetRankingList(string) (CompetitonRankingDTO, error)
-	AddRelatedProject(*CompetitionAddReleatedProjectCMD) (string, error)
+	GetRankingList(string) (CompetitionRankingDTO, error)
+	AddRelatedProject(*CompetitionAddRelatedProjectCMD) (string, error)
 }
 
 var _ CompetitionService = (*competitionService)(nil)
@@ -46,24 +46,24 @@ func NewCompetitionService(
 	user userrepo.User,
 ) *competitionService {
 	return &competitionService{
-		repo:             repo,
-		workRepo:         workRepo,
-		playerRepo:       playerRepo,
-		producer:         producer,
-		submissionServie: domain.NewSubmissionService(uploader),
-		userCli:          userCli,
-		userRepo:         user,
+		repo:              repo,
+		workRepo:          workRepo,
+		playerRepo:        playerRepo,
+		producer:          producer,
+		submissionService: domain.NewSubmissionService(uploader),
+		userCli:           userCli,
+		userRepo:          user,
 	}
 }
 
 type competitionService struct {
-	repo             repository.Competition
-	workRepo         repository.Work
-	playerRepo       repository.Player
-	producer         message.MessageProducer
-	submissionServie domain.SubmissionService
-	userCli          user.User
-	userRepo         userrepo.User
+	repo              repository.Competition
+	workRepo          repository.Work
+	playerRepo        repository.Player
+	producer          message.MessageProducer
+	submissionService domain.SubmissionService
+	userCli           user.User
+	userRepo          userrepo.User
 }
 
 // show competition detail

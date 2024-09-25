@@ -348,7 +348,7 @@ const docTemplate = `{
         },
         "/v1/bigmodel/ai_detector": {
             "post": {
-                "description": "detecte if text generate by ai",
+                "description": "detect if text generate by ai",
                 "consumes": [
                     "application/json"
                 ],
@@ -1779,7 +1779,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/app.CompetitonRankingDTO"
+                            "$ref": "#/definitions/app.CompetitionRankingDTO"
                         }
                     },
                     "500": {
@@ -2323,7 +2323,7 @@ const docTemplate = `{
         },
         "/v1/course/{id}": {
             "get": {
-                "description": "get course infomation",
+                "description": "get course information",
                 "consumes": [
                     "application/json"
                 ],
@@ -2508,16 +2508,57 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/course/{id}/record": {
+        "/v1/course/{id}/related_project": {
             "put": {
-                "description": "add play record",
+                "description": "add related project",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Course"
                 ],
-                "summary": "AddPlayRecord",
+                "summary": "AddCourseRelatedProject",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "project info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.AddCourseRelatedProjectRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/course/{id}/related_project": {
+            "put": {
+                "description": "add related project",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "AddCourseRelatedProject",
                 "parameters": [
                     {
                         "type": "string",
@@ -5921,32 +5962,12 @@ const docTemplate = `{
                 "summary": "UpdateUserRegistrationInfo",
                 "parameters": [
                     {
-                        "description": "body of update user infomation",
+                        "description": "body of update user information",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.UserInfoUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/controller.UserBasicInfoUpdateRequest"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "type": "bad_request_param"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
+                            "$ref": "#/definitions/controller.userCreateRequest"
                         }
                     }
                 }
@@ -6600,7 +6621,7 @@ const docTemplate = `{
                 }
             }
         },
-        "app.CompetitonRankingDTO": {
+        "app.CompetitionRankingDTO": {
             "type": "object",
             "properties": {
                 "final": {
@@ -7724,7 +7745,7 @@ const docTemplate = `{
         "app.UserFinetunesDTO": {
             "type": "object",
             "properties": {
-                "datas": {
+                "data": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/app.FinetuneSummaryDTO"

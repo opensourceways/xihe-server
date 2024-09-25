@@ -563,7 +563,7 @@ func (ctl *AICCFinetuneController) UploadData(ctx *gin.Context) {
 		return
 	}
 
-	if f.Size > apiConfig.MaxFinetuneSubmmitFileSzie {
+	if f.Size > apiConfig.MaxFinetuneSubmmitFileSize {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
 			errorBadRequestParam, "too big file",
 		))

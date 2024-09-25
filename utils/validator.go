@@ -9,7 +9,7 @@ import (
 
 const (
 	// number
-	RePositiveInterger           = "^[1-9]\\d*$"
+	RePositiveInteger            = "^[1-9]\\d*$"
 	RePositiveScientificNotation = "^(\\d+(.{0}|.\\d+))[Ee]{1}([\\+|-]?\\d+)$"
 	RePositiveFloatPoint         = "^(?:[1-9][0-9]*\\.[0-9]+|0\\.(?!0+$)[0-9]+)$"
 
@@ -25,8 +25,8 @@ const (
 )
 
 // validator
-func IsPositiveInterger(num string) bool {
-	return isMatchRegex(RePositiveInterger, num)
+func IsPositiveInteger(num string) bool {
+	return isMatchRegex(RePositiveInteger, num)
 }
 
 func IsPositiveScientificNotation(num string) bool {

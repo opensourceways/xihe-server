@@ -1,0 +1,47 @@
+[files]
+extend-exclude = [
+"*.yaml", 
+"*.yml", 
+"*.md", 
+"*.sh", 
+"*.tpl",
+"go.mod",
+"go.sum",
+"tests/",
+"api/",
+]
+ignore-hidden = true
+ignore-files = true
+ignore-dot = true
+ignore-vcs = true
+ignore-global = true
+ignore-parent = true
+
+[default]
+locale = "en"
+extend-glob = []
+extend-ignore-identifiers = []
+extend-ignore-words-re = []
+extend-ignore-re = []
+
+[default.extend-identifiers]
+cann_version = "cann_version"
+CannVersion = "CannVersion"
+Encrypter = "Encrypter"
+NotificatonWeb = "NotificatonWeb"
+Mininum = "Mininum"
+cannVersion = "cannVersion"
+cann_6 = "cann_6"
+cann_5 = "cann_5"
+Cann = "Cann"
+cann_7 = "cann_7"
+"mindspore_1.7.0-cann_5.1.0-py_3.7-euler_2.8.3-aarch64" = "mindspore_1.7.0-cann_5.1.0-py_3.7-euler_2.8.3-aarch64"
+"mindspore_1.9.0-cann_6.0.RC1-py_3.7-ubuntu_18.04-amd64" = "mindspore_1.9.0-cann_6.0.RC1-py_3.7-ubuntu_18.04-amd64"
+"mindspore_2.2.10-cann_7.0.RC1-py_3.9-euler_2.8.3" = "mindspore_2.2.10-cann_7.0.RC1-py_3.9-euler_2.8.3"
+"mindspore_1.3.0-cuda_10.1-py_3.7-ubuntu_1804-x86_64" = "mindspore_1.3.0-cuda_10.1-py_3.7-ubuntu_1804-x86_64"
+"mindspore_1.9.0-cann_6.0.RC1-py_3.9-ubuntu_18.04-amd64" = "mindspore_1.9.0-cann_6.0.RC1-py_3.9-ubuntu_18.04-amd64"
+computeVersionCudaMS13   = "computeVersionCudaMS13"
+computeVersionCannMS17   = "computeVersionCannMS17"
+computeVersionCannMS19_1 = "computeVersionCannMS19_1"
+computeVersionCannMS19_2 = "computeVersionCannMS19_2"
+computeVersionCannMS22   = "computeVersionCannMS22"
