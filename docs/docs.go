@@ -2508,7 +2508,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/course/{id}/realted_project": {
+        "/v1/course/{id}/related_project": {
             "put": {
                 "description": "add related project",
                 "consumes": [
@@ -5962,7 +5962,7 @@ const docTemplate = `{
                 "summary": "UpdateUserRegistrationInfo",
                 "parameters": [
                     {
-                        "description": "body of update user infomation",
+                        "description": "body of update user information",
                         "name": "body",
                         "in": "body",
                         "required": true,
