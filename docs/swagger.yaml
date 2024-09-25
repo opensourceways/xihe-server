@@ -176,8 +176,10 @@ definitions:
         type: string
       processor:
         type: string
-      spec:
-        type: string
+      specs:
+        items:
+          $ref: '#/definitions/app.Spec'
+        type: array
     type: object
   app.CompetitionRankingDTO:
     properties:
@@ -580,7 +582,11 @@ definitions:
         type: integer
       id:
         type: string
+      image:
+        type: string
       owner:
+        type: string
+      spec:
         type: string
       status:
         type: string
@@ -793,6 +799,13 @@ definitions:
       name:
         type: string
     type: object
+  app.Spec:
+    properties:
+      cards_num:
+        type: integer
+      desc:
+        type: string
+    type: object
   app.TaskCompletionInfoDTO:
     properties:
       addr:
@@ -958,6 +971,8 @@ definitions:
     properties:
       allowed:
         type: boolean
+      item:
+        type: string
     type: object
   app.WuKongRankDTO:
     properties:
@@ -1334,11 +1349,15 @@ definitions:
     type: object
   controller.cloudSubscribeRequest:
     properties:
+      cards_num:
+        minimum: 1
+        type: integer
       cloud_id:
         type: string
       image:
         type: string
     required:
+    - cards_num
     - image
     type: object
   controller.competitorApplyRequest:
@@ -3817,33 +3836,6 @@ paths:
     put:
       consumes:
       - application/json
-      description: add related project
-      parameters:
-      - description: course id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: project info
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/controller.AddCourseRelatedProjectRequest'
-      responses:
-        "202":
-          description: Accepted
-        "500":
-          description: Internal Server Error
-          schema:
-            type: system_error
-      summary: AddCourseRelatedProject
-      tags:
-      - Course
-  /v1/course/{id}/record:
-    put:
-      consumes:
-      - application/json
       description: add play record
       parameters:
       - description: course id
@@ -6258,6 +6250,23 @@ paths:
             type: system_error
       tags:
       - Like
+  /v1/user/whitelist:
+    get:
+      description: list user whitelist
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.responseData'
+      summary: ListWhiteList
+      tags:
+      - user
   /v1/user/whitelist/{type}:
     get:
       consumes:

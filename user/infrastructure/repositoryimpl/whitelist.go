@@ -46,15 +46,18 @@ func (impl *userWhiteListImpl) GetWhiteListInfo(
 	return
 }
 
-func (impl *userWhiteListImpl) GetWhiteListInfoItems(
+func (impl *userWhiteListImpl) FindByAccountAndWhitelistType(
 	account types.Account, whitelistTypeList []string,
 ) ([]domain.WhiteListInfo, error) {
 	var v []DWhiteListInfo
 
 	f := func(ctx context.Context) error {
 		filter := bson.M{
-			fieldAccount:       account.Account(),
-			fieldWhiteListType: bson.M{"$in": whitelistTypeList},
+			fieldAccount: account.Account(),
+		}
+
+		if len(whitelistTypeList) != 0 {
+			filter[fieldWhiteListType] = bson.M{"$in": whitelistTypeList}
 		}
 
 		return impl.cli.GetDocs(ctx, filter, nil, &v)

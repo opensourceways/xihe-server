@@ -9,6 +9,7 @@ type WhiteListService interface {
 	// register
 	CheckWhiteList(*UserWhiteListCmd) (*WhitelistDTO, error)
 	CheckCloudWhitelist(domain.Account) (bool, bool, error)
+	List(domain.Account) ([]string, error)
 }
 
 var _ RegService = (*regService)(nil)
@@ -26,17 +27,17 @@ type whiteListService struct {
 }
 
 func (s *whiteListService) CheckWhiteList(cmd *UserWhiteListCmd) (*WhitelistDTO, error) {
-	whitelistType := cmd.Type.WhiteListType()
 	whitelistDTO := &WhitelistDTO{}
 
-	if whitelistType == domain.WhitelistTypeCloud || whitelistType == domain.WhitelistTypeMultiCloud {
+	if cmd.Type.WhiteListType() == domain.WhitelistTypeCloud ||
+		cmd.Type.WhiteListType() == domain.WhitelistTypeMultiCloud {
 		useNPU, useMultiNPU, err := s.CheckCloudWhitelist(cmd.Account)
 		if err != nil {
 			return nil, err
 		}
 
 		whitelistDTO.Allowed = useNPU
-		if whitelistType == domain.WhitelistTypeMultiCloud {
+		if cmd.Type.WhiteListType() == domain.WhitelistTypeMultiCloud {
 			whitelistDTO.Allowed = useMultiNPU
 
 		}
@@ -58,25 +59,51 @@ func (s *whiteListService) CheckWhiteList(cmd *UserWhiteListCmd) (*WhitelistDTO,
 func (s *whiteListService) CheckCloudWhitelist(account domain.Account) (useNPU bool, useMultiNPU bool, err error) {
 	var whitelistItems []domain.WhiteListInfo
 
-	whitelistItems, err = s.whiteRepo.GetWhiteListInfoItems(
+	whitelistItems, err = s.whiteRepo.FindByAccountAndWhitelistType(
 		account, []string{domain.WhitelistTypeCloud, domain.WhitelistTypeMultiCloud})
 	if err != nil {
 		return
 	}
 
-	for _, item := range whitelistItems {
-		switch item.Type.WhiteListType() {
-		case domain.WhitelistTypeCloud:
-			useNPU = item.Enable()
-		case domain.WhitelistTypeMultiCloud:
-			useMultiNPU = item.Enable()
-		}
-	}
+	pairs := s.getWhitelistTypePairs(whitelistItems)
+	useNPU, useMultiNPU = pairs[domain.WhitelistTypeCloud], pairs[domain.WhitelistTypeMultiCloud]
 
-	// user who can use multiple cards can use single card
+	// user who uses multiple cards can use single card
 	if useMultiNPU {
 		useNPU = useMultiNPU
 	}
 
 	return
+}
+
+// List return a list of whiyelist by account
+func (s *whiteListService) List(account domain.Account) ([]string, error) {
+	items, err := s.whiteRepo.FindByAccountAndWhitelistType(account, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	pairs := s.getWhitelistTypePairs(items)
+	if pairs[domain.WhitelistTypeMultiCloud] {
+		pairs[domain.WhitelistTypeCloud] = true
+	}
+
+	list := make([]string, 0, len(items))
+	for k, v := range pairs {
+		if v {
+			list = append(list, k)
+		}
+	}
+
+	return list, nil
+}
+
+func (s *whiteListService) getWhitelistTypePairs(items []domain.WhiteListInfo) map[string]bool {
+	mp := make(map[string]bool)
+
+	for _, v := range items {
+		mp[v.Type.WhiteListType()] = v.Enable()
+	}
+
+	return mp
 }
