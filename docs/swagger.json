@@ -2497,7 +2497,7 @@
                 }
             }
         },
-        "/v1/course/{id}/realted_project": {
+        "/v1/course/{id}/related_project": {
             "put": {
                 "description": "add related project",
                 "consumes": [
