@@ -22,7 +22,7 @@ const (
 	errorPreviewLFSFile        = "preview_lfs_file"
 	errorUnavailableRepoFile   = "unavailable_repo_file"
 	errorDuplicateTrainingName = "duplicate_training_name"
-	errorExccedMaxiumPageNum   = "excend_maximum_page_num"
+	errorExccedMaximumPageNum  = "excend_maximum_page_num"
 )
 
 var (

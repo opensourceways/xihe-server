@@ -30,7 +30,7 @@ func (r *CloudService) calculateRemain(
 	// caculate running and not expiry pod
 	var singleCount, multiCount int
 	for i := range p.PodInfos {
-		if !p.PodInfos[i].IsExpiried() {
+		if !p.PodInfos[i].IsExpired() {
 			count := p.PodInfos[i].CardsNum.CloudSpecCardsNum()
 			if count == 1 {
 				singleCount += count

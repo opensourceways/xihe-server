@@ -3,7 +3,6 @@ package repositoryimpl
 import (
 	"context"
 
-	"github.com/aws/aws-sdk-go/service/account"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
@@ -19,7 +18,7 @@ type userWhiteListImpl struct {
 }
 
 func (impl *userWhiteListImpl) GetWhiteListInfo(
-	accout types.Account, wtype string,
+	account types.Account, wtype string,
 ) (u domain.WhiteListInfo, err error) {
 	var v DWhiteListInfo
 
