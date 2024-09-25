@@ -35,7 +35,7 @@ type taskDocImpl struct {
 func (impl *taskDocImpl) Doc(tasks []domain.Task, lang common.Language) ([]byte, error) {
 	t, ok := impl.templates[lang.Language()]
 	if !ok {
-		return nil, errors.New("unsupporteded language")
+		return nil, errors.New("unsupported language")
 	}
 
 	buf := new(bytes.Buffer)
