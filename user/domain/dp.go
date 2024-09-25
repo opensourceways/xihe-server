@@ -15,8 +15,9 @@ const (
 	identityTeacher   = "teacher"
 	identityDeveloper = "developer"
 
-	typeCloud     = "cloud"
-	typeInference = "inference"
+	WhitelistTypeCloud      = "cloud"
+	WhitelistTypeMultiCloud = "multi-cloud"
+	WhitelistTypeInference  = "inference"
 )
 
 // DomainValue
@@ -277,7 +278,7 @@ type WhiteListType interface {
 }
 
 func NewWhiteListType(w string) (WhiteListType, error) {
-	b := w == typeCloud || w == typeInference
+	b := w == WhitelistTypeCloud || w == WhitelistTypeMultiCloud || w == WhitelistTypeInference
 
 	if !b {
 		return nil, errors.New("invalid type")

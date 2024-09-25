@@ -34,12 +34,12 @@ func AddRouterForBigModelController(
 	}
 
 	// luojia
-	rg.POST("/v1/bigmodel/luojia_upload_picture", ctl.LuoJiaUploadPicture)
-	rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
-	rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
+	// rg.POST("/v1/bigmodel/luojia_upload_picture", ctl.LuoJiaUploadPicture)
+	// rg.POST("/v1/bigmodel/luojia", ctl.LuoJia)
+	// rg.GET("/v1/bigmodel/luojia", ctl.ListLuoJiaRecord)
 
 	// wukong
-	rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
+	// rg.POST("/v1/bigmodel/wukong", ctl.WuKong)
 	rg.POST("/v1/bigmodel/wukong_async", ctl.WuKongAsync)
 	rg.GET("/v1/bigmodel/wukong/rank", ctl.WuKongRank)
 	rg.GET("/v1/bigmodel/wukong/task", ctl.WuKongLastFinishedTask)
@@ -56,18 +56,18 @@ func AddRouterForBigModelController(
 	rg.DELETE("/v1/bigmodel/wukong/digg", ctl.CancelDigg)
 
 	// others
-	rg.POST("/v1/bigmodel/ai_detector", ctl.AIDetector)
-	rg.POST("/v1/bigmodel/baichuan2_7b_chat", ctl.BaiChuan)
-	rg.POST("/v1/bigmodel/glm2_6b", ctl.GLM2)
-	rg.POST("/v1/bigmodel/llama2_7b", ctl.LLAMA2)
-	rg.POST("/v1/bigmodel/skywork_13b", ctl.SkyWork)
-	rg.POST("/v1/bigmodel/iflytekspark", ctl.IFlytekSpark)
+	// rg.POST("/v1/bigmodel/ai_detector", ctl.AIDetector)
+	// rg.POST("/v1/bigmodel/baichuan2_7b_chat", ctl.BaiChuan)
+	// rg.POST("/v1/bigmodel/glm2_6b", ctl.GLM2)
+	// rg.POST("/v1/bigmodel/llama2_7b", ctl.LLAMA2)
+	// rg.POST("/v1/bigmodel/skywork_13b", ctl.SkyWork)
+	// rg.POST("/v1/bigmodel/iflytekspark", ctl.IFlytekSpark)
 
 	// api apply
 	rg.POST("/v1/bigmodel/api/apply/:model", ctl.ApplyApi)
 	rg.GET("/v1/bigmodel/api/get", ctl.GetUserApplyRecord)
 	rg.GET("/v1/bigmodel/api/apply/:model", ctl.IsApplied)
-	rg.POST("/v1/bigmodel/api/wukong", ctl.WukongAPI)
+	// rg.POST("/v1/bigmodel/api/wukong", ctl.WukongAPI)
 	rg.GET("/v1/bigmodel/apiinfo/get/:model", ctl.GetApiInfo)
 	rg.GET("/v1/bigmodel/api/refresh/:model", ctl.RefreshApiToken)
 }

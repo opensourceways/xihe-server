@@ -15,6 +15,337 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/v1/aiccfinetune/{model}": {
+            "get": {
+                "description": "get AICC finetunes",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AICC Finetune"
+                ],
+                "summary": "List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "project id",
+                        "name": "pid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.AICCFinetuneSummaryDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create aicc finetune",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AICC Finetune"
+                ],
+                "summary": "Create",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model name",
+                        "name": "model",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body of creating aicc finetune",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.aiccFinetuneCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.aiccFinetuneCreateResp"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_body"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/aiccfinetune/{model}/ws": {
+            "get": {
+                "description": "get AICC Finetunes",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AICC Finetune"
+                ],
+                "summary": "List",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "project id",
+                        "name": "pid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.AICCFinetuneSummaryDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/aiccfinetune/{model}/{id}": {
+            "get": {
+                "description": "get AICC finetune info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AICC Finetune"
+                ],
+                "summary": "Get",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model name",
+                        "name": "model",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "finetune id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.aiccFinetuneDetail"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "terminate AICC Finetune",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AICC Finetune"
+                ],
+                "summary": "Terminate",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model name",
+                        "name": "model",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "finetune id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete AICC Finetune",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AICC Finetune"
+                ],
+                "summary": "Delete",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model name",
+                        "name": "model",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "finetune id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/aiccfinetune/{model}/{id}/result/{type}": {
+            "get": {
+                "description": "get log url of AICC Finetune for downloading",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AICC Finetune"
+                ],
+                "summary": "GetLog",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "project id",
+                        "name": "pid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "finetune id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "aicc finetune result: log, output",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/controller.aiccFinetuneLogResp"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/aiccfinetune/{model}/{task}/data": {
+            "post": {
+                "description": "Upload Data",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "AICC Finetune"
+                ],
+                "summary": "UploadData",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "model name",
+                        "name": "model",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "result file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/app.UploadDataDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/bigmodel/ai_detector": {
             "post": {
                 "description": "detect if text generate by ai",
@@ -274,6 +605,42 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/controller.glm2Request"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/bigmodel/iflytekspark": {
+            "post": {
+                "description": "conversational AI",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BigModel"
+                ],
+                "parameters": [
+                    {
+                        "description": "body of iflytekspark",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.iflyteksparkRequest"
                         }
                     }
                 ],
@@ -1043,6 +1410,199 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/app.CloudDTO"
                             }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cloud/pod/{id}": {
+            "get": {
+                "description": "WsSendReleasedPod is a websocket api which sends a released pod data to client.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "WsSendReleasedPod",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "pod id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.PodInfoDTO"
+                        }
+                    },
+                    "404": {
+                        "description": "not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "system error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.responseData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "release cloud resource",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "Release",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "pod id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "404": {
+                        "description": "not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "system error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.responseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cloud/read/{owner}": {
+            "get": {
+                "description": "get cloud pod",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "CanRead",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user name",
+                        "name": "owner",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/app.InferenceDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cloud/subscribe": {
+            "post": {
+                "description": "subscribe cloud",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "Subscribe",
+                "parameters": [
+                    {
+                        "description": "body of subscribe cloud",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.cloudSubscribeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cloud/{cid}": {
+            "get": {
+                "description": "get cloud pod",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "GetHttp",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "cloud config id",
+                        "name": "cid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/app.InferenceDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_body"
                         }
                     },
                     "500": {
@@ -1948,7 +2508,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/course/{id}/related_project": {
+        "/v1/course/{id}/realted_project": {
             "put": {
                 "description": "add related project",
                 "consumes": [
@@ -1989,16 +2549,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/course/{id}/record": {
+        "/v1/course/{id}/related_project": {
             "put": {
-                "description": "add play record",
+                "description": "add related project",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Course"
                 ],
-                "summary": "AddPlayRecord",
+                "summary": "AddCourseRelatedProject",
                 "parameters": [
                     {
                         "type": "string",
@@ -2014,6 +2574,47 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/controller.PlayRecordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/course/{id}/related_project": {
+            "put": {
+                "description": "add related project",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Course"
+                ],
+                "summary": "AddCourseRelatedProject",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "course id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "project info",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.AddCourseRelatedProjectRequest"
                         }
                     }
                 ],
@@ -2648,6 +3249,60 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/controller.homeElectricityInfo"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/inference/project/{owner}/{pid}": {
+            "get": {
+                "description": "create inference",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Inference"
+                ],
+                "summary": "Create",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "project owner",
+                        "name": "owner",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "project id",
+                        "name": "pid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/app.InferenceDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_body"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "type": "bad_request_param"
                         }
                     },
                     "500": {
@@ -3753,6 +4408,204 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/promotion/user/{account}": {
+            "get": {
+                "description": "get user registrater promotion",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "GetUserRegitration",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "account",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/promotion/{id}": {
+            "get": {
+                "description": "get promotion",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "Get",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.PromotionDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.responseData"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.responseData"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.responseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/promotion/{id}/apply": {
+            "post": {
+                "description": "apply the Promotion",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "Apply",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "promotion id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body of applying",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.PromotionApplyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/promotion/{promotion}/points/{account}": {
+            "get": {
+                "description": "get user points in promotion",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "GetUserPoints",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "username",
+                        "name": "account",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/promotion/{promotion}/ranking": {
+            "get": {
+                "description": "get user points ranking in promotion",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "GetUserRanking",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/promotions": {
+            "get": {
+                "description": "list promotions",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Promotion"
+                ],
+                "summary": "List",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.PromotionsDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.responseData"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.responseData"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/repo/{type}/{name}/dir/{path}": {
             "delete": {
                 "description": "Delete repo directory",
@@ -4351,6 +5204,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/train/project/{pid}/config": {
+            "get": {
+                "description": "get user last preset training config",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Training"
+                ],
+                "summary": "GetLastTrainingConfig",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "project id",
+                        "name": "pid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.TrainingConfigDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/train/project/{pid}/training": {
             "get": {
                 "description": "get trainings",
@@ -4736,31 +5624,6 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
-            "put": {
-                "description": "update user basic info",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Update",
-                "parameters": [
-                    {
-                        "description": "body of updating user",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.userBasicInfoUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {}
             }
         },
         "/v1/user/activity/{account}": {
@@ -4858,12 +5721,12 @@ const docTemplate = `{
                 "summary": "BindEmail",
                 "parameters": [
                     {
-                        "description": "body of creating user",
+                        "description": "email and code",
                         "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.userCreateRequest"
+                            "$ref": "#/definitions/controller.EmailCode"
                         }
                     }
                 ],
@@ -5087,6 +5950,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/user/info": {
+            "put": {
+                "description": "update user info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "UpdateUserRegistrationInfo",
+                "parameters": [
+                    {
+                        "description": "body of update user infomation",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.userCreateRequest"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/user/info/{account}": {
             "get": {
                 "description": "get user apply info",
@@ -5097,17 +5983,6 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "GetInfo",
-                "parameters": [
-                    {
-                        "description": "body of creating user",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.userCreateRequest"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -5276,6 +6151,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/user/whitelist/{type}": {
+            "get": {
+                "description": "check user whitelist info",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "CheckWhiteList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "type",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.WhitelistDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_body"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/user_points": {
             "get": {
                 "description": "get user points details",
@@ -5436,6 +6346,38 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "app.AICCFinetuneSummaryDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_done": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "task": {
+                    "type": "string"
+                }
+            }
+        },
         "app.AIQuestionDTO": {
             "type": "object",
             "properties": {
@@ -5659,8 +6601,11 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
-                "image": {
-                    "type": "string"
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 },
                 "is_idle": {
                     "type": "boolean"
@@ -5700,20 +6645,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "info": {
-                    "type": "string"
-                }
-            }
-        },
-        "app.ComputeDTO": {
-            "type": "object",
-            "properties": {
-                "flavor": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "version": {
                     "type": "string"
                 }
             }
@@ -6127,6 +7058,31 @@ const docTemplate = `{
                 }
             }
         },
+        "app.InferenceDTO": {
+            "type": "object",
+            "properties": {
+                "access_url": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "inference_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.KeyValueDTO": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
         "app.LessonDTO": {
             "type": "object",
             "properties": {
@@ -6257,6 +7213,35 @@ const docTemplate = `{
                 }
             }
         },
+        "app.PodInfoDTO": {
+            "type": "object",
+            "properties": {
+                "access_url": {
+                    "type": "string"
+                },
+                "cloud_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "expiry": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "app.PointDTO": {
             "type": "object",
             "properties": {
@@ -6359,6 +7344,67 @@ const docTemplate = `{
                 },
                 "owner": {
                     "type": "string"
+                }
+            }
+        },
+        "app.PromotionDTO": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "intro": {
+                    "type": "string"
+                },
+                "is_register": {
+                    "type": "boolean"
+                },
+                "is_static": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "poster": {
+                    "type": "string"
+                },
+                "registrants_num": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "way": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.PromotionsDTO": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.PromotionDTO"
+                    }
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         },
@@ -6554,6 +7600,70 @@ const docTemplate = `{
                 }
             }
         },
+        "app.TrainingConfigDTO": {
+            "type": "object",
+            "properties": {
+                "boot_file": {
+                    "type": "string"
+                },
+                "code_dir": {
+                    "type": "string"
+                },
+                "compute": {
+                    "$ref": "#/definitions/github_com_opensourceways_xihe-server_app.ComputeDTO"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "enable_aim": {
+                    "type": "boolean"
+                },
+                "enable_output": {
+                    "type": "boolean"
+                },
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.KeyValueDTO"
+                    }
+                },
+                "hyperparameter": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.KeyValueDTO"
+                    }
+                },
+                "inputs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.TrainingRefDTO"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.TrainingRefDTO": {
+            "type": "object",
+            "properties": {
+                "File": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                }
+            }
+        },
         "app.TrainingSummaryDTO": {
             "type": "object",
             "properties": {
@@ -6580,6 +7690,20 @@ const docTemplate = `{
                 },
                 "status": {
                     "type": "string"
+                }
+            }
+        },
+        "app.UploadDataDTO": {
+            "type": "object",
+            "properties": {
+                "file_name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "upload_at": {
+                    "type": "integer"
                 }
             }
         },
@@ -6681,11 +7805,30 @@ const docTemplate = `{
                 }
             }
         },
+        "app.WhitelistDTO": {
+            "type": "object",
+            "properties": {
+                "allowed": {
+                    "type": "boolean"
+                }
+            }
+        },
         "app.WuKongRankDTO": {
             "type": "object",
             "properties": {
                 "rank": {
                     "type": "integer"
+                }
+            }
+        },
+        "controller.AICCKeyValue": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },
@@ -6781,6 +7924,17 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.EmailCode": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                }
+            }
+        },
         "controller.FinetuneCreateRequest": {
             "type": "object",
             "properties": {
@@ -6836,6 +7990,38 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "section_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.PromotionApplyReq": {
+            "type": "object",
+            "properties": {
+                "city": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "origin": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "province": {
                     "type": "string"
                 }
             }
@@ -6977,6 +8163,52 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.UserBasicInfoUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "avatar_id": {
+                    "type": "string"
+                },
+                "bio": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.UserInfoUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "avatar_id": {
+                    "type": "string"
+                },
+                "bio": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "identity": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "province": {
+                    "type": "string"
+                }
+            }
+        },
         "controller.aiDetectorReq": {
             "type": "object",
             "properties": {
@@ -7018,6 +8250,80 @@ const docTemplate = `{
             "properties": {
                 "score": {
                     "type": "integer"
+                }
+            }
+        },
+        "controller.aiccFinetuneCreateRequest": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "string"
+                },
+                "env": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.AICCKeyValue"
+                    }
+                },
+                "hyperparameter": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/controller.AICCKeyValue"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "task": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.aiccFinetuneCreateResp": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.aiccFinetuneDetail": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_done": {
+                    "type": "boolean"
+                },
+                "log": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.aiccFinetuneLogResp": {
+            "type": "object",
+            "properties": {
+                "log_url": {
+                    "type": "string"
                 }
             }
         },
@@ -7081,6 +8387,20 @@ const docTemplate = `{
             "properties": {
                 "can_apply": {
                     "type": "boolean"
+                }
+            }
+        },
+        "controller.cloudSubscribeRequest": {
+            "type": "object",
+            "required": [
+                "image"
+            ],
+            "properties": {
+                "cloud_id": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
                 }
             }
         },
@@ -7343,6 +8663,26 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/app.CourseSummaryDTO"
                     }
+                }
+            }
+        },
+        "controller.iflyteksparkRequest": {
+            "type": "object",
+            "properties": {
+                "repetition_penalty": {
+                    "type": "number"
+                },
+                "sampling": {
+                    "type": "boolean"
+                },
+                "temperature": {
+                    "type": "number"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "top_k": {
+                    "type": "integer"
                 }
             }
         },
@@ -7785,6 +9125,18 @@ const docTemplate = `{
                 }
             }
         },
+        "controller.responseData": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "data": {},
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
         "controller.skyWorkRequest": {
             "type": "object",
             "properties": {
@@ -7832,7 +9184,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "compute": {
-                    "$ref": "#/definitions/app.ComputeDTO"
+                    "$ref": "#/definitions/github_com_opensourceways_xihe-server_app.ComputeDTO"
                 },
                 "created_at": {
                     "type": "string"
@@ -7873,34 +9225,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "log_url": {
-                    "type": "string"
-                }
-            }
-        },
-        "controller.userBasicInfoUpdateRequest": {
-            "type": "object",
-            "properties": {
-                "avatar_id": {
-                    "type": "string"
-                },
-                "bio": {
-                    "type": "string"
-                }
-            }
-        },
-        "controller.userCreateRequest": {
-            "type": "object",
-            "properties": {
-                "account": {
-                    "type": "string"
-                },
-                "avatar_id": {
-                    "type": "string"
-                },
-                "bio": {
-                    "type": "string"
-                },
-                "email": {
                     "type": "string"
                 }
             }
@@ -8024,6 +9348,20 @@ const docTemplate = `{
                     }
                 },
                 "kind": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_opensourceways_xihe-server_app.ComputeDTO": {
+            "type": "object",
+            "properties": {
+                "flavor": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "version": {
                     "type": "string"
                 }
             }

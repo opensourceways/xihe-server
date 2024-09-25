@@ -374,7 +374,7 @@ func (ctl *baseController) checkTokenForWebsocket(
 	pl = new(oldUserTokenPayload)
 	ok = ctl.checkCSRFTokenForWebSocket(ctx, csrftoken, pl)
 	if !ok {
-		if pl == nil || pl.Account == "" {
+		if pl.Account == "" {
 			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check token for web socket")
 		} else {
 			prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_SYSTEM, "check token for web socket")

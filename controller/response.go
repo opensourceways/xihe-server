@@ -16,13 +16,13 @@ const (
 	errorBadRequestParam       = "bad_request_param"
 	errorDuplicateCreating     = "duplicate_creating"
 	errorResourceNotExists     = "resource_not_exists"
-	errorConcurrentUpdating    = "concurrent_updateing"
+	errorConcurrentUpdating    = "concurrent_updating"
 	errorExccedMaxNum          = "exceed_max_num"
 	errorUpdateLFSFile         = "update_lfs_file"
 	errorPreviewLFSFile        = "preview_lfs_file"
 	errorUnavailableRepoFile   = "unavailable_repo_file"
 	errorDuplicateTrainingName = "duplicate_training_name"
-	errorExccedMaximumPageNum  = "excend_maxium_page_num"
+	errorExccedMaxiumPageNum   = "excend_maximum_page_num"
 )
 
 var (

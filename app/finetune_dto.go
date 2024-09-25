@@ -58,7 +58,7 @@ func (s finetuneService) toFinetuneSummaryDTO(
 
 type UserFinetunesDTO struct {
 	Expiry int64                `json:"expiry"`
-	Data   []FinetuneSummaryDTO `json:"datas"`
+	Data   []FinetuneSummaryDTO `json:"data"`
 }
 
 type FinetuneJobDTO struct {

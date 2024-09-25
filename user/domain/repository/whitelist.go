@@ -7,4 +7,5 @@ import (
 
 type WhiteList interface {
 	GetWhiteListInfo(types.Account, string) (domain.WhiteListInfo, error)
+	GetWhiteListInfoItems(types.Account, []string) ([]domain.WhiteListInfo, error)
 }

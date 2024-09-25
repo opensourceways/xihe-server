@@ -65,7 +65,7 @@ type Endpoints struct {
 	WuKong           string `json:"wukong"             required:"true"`
 	CodeGeex         string `json:"codegeex"           required:"true"`
 	DescPicture      string `json:"desc_picture"       required:"true"`
-	SinglePicture    string `json:"signle_picture"     required:"true"`
+	SinglePicture    string `json:"single_picture"     required:"true"`
 	MultiplePictures string `json:"multiple_pictures"  required:"true"`
 }
 

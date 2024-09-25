@@ -303,6 +303,11 @@ func (r *register) registerHandlerForCloud(handler interface{}) error {
 			return
 		}
 
+		cloudCardsNum, err := cloudtypes.NewCloudSpecCardsNum(body.CloudCardsNum)
+		if err != nil {
+			return
+		}
+
 		v := cloudtypes.PodInfo{
 			Pod: cloudtypes.Pod{
 				Id:      body.PodId,
@@ -310,6 +315,7 @@ func (r *register) registerHandlerForCloud(handler interface{}) error {
 				Owner:   user,
 				Image:   body.CloudImage,
 			},
+			CardsNum: cloudCardsNum,
 		}
 		if err = v.SetDefaultExpiry(); err != nil {
 			return

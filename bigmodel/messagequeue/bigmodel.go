@@ -108,13 +108,13 @@ func (c *consumer) handleEventBigModelWuKongInferenceError(body []byte, h map[st
 		return err
 	}
 
-	taskId, err := strconv.Atoi(b.Details["task_id"])
+	taskId, err := strconv.ParseUint(b.Details["task_id"], 10, 64)
 	if err != nil {
 		return err
 	}
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(taskId),
+			Id:     taskId,
 			Status: status,
 		},
 	}
@@ -139,14 +139,14 @@ func (c *consumer) handleEventBigModelWuKongAsyncTaskStart(body []byte, h map[st
 		return err
 	}
 
-	taskId, err := strconv.Atoi(b.Details["task_id"])
+	taskId, err := strconv.ParseUint(b.Details["task_id"], 10, 64)
 	if err != nil {
 		return err
 	}
 
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(taskId),
+			Id:     taskId,
 			Status: status,
 		},
 	}
@@ -165,13 +165,13 @@ func (c *consumer) handleEventBigModelWuKongAsyncTaskFinish(body []byte, h map[s
 		return err
 	}
 
-	taskId, err := strconv.Atoi(b.Details["task_id"])
+	taskId, err := strconv.ParseUint(b.Details["task_id"], 10, 64)
 	if err != nil {
 		return err
 	}
 	v := asyncrepo.WuKongResp{
 		WuKongTask: asyncrepo.WuKongTask{
-			Id:     uint64(taskId),
+			Id:     taskId,
 			Status: status,
 		},
 	}

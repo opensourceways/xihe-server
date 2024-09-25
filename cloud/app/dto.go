@@ -10,6 +10,7 @@ import (
 type SubscribeCloudCmd struct {
 	User       types.Account
 	ImageAlias domain.CloudImageAlias
+	CardsNum   domain.CloudSpecCardsNum
 	CloudId    string
 }
 
@@ -32,12 +33,17 @@ type ReleaseInternalCmd struct {
 
 type CloudConfDTO struct {
 	Id        string   `json:"id"`
-	Spec      string   `json:"spec"`
+	Specs     []Spec   `json:"specs"`
 	Name      string   `json:"name"`
 	Images    []string `json:"images"`
 	Feature   string   `json:"feature"`
 	Processor string   `json:"processor"`
 	Credit    int64    `json:"credit"`
+}
+
+type Spec struct {
+	Desc     string `json:"desc"`
+	CardsNum int    `json:"cards_num"`
 }
 
 type CloudDTO struct {
@@ -56,11 +62,13 @@ type PodInfoDTO struct {
 	Error     string `json:"error"`
 	AccessURL string `json:"access_url"`
 	CreatedAt int64  `json:"created_at"`
+	Image     string `json:"image"`
+	Spec      string `json:"spec"`
 }
 
 func (cmd *SubscribeCloudCmd) Validate() error {
 	b := cmd.User.Account() != "" &&
-		cmd.CloudId != "" && cmd.ImageAlias != nil
+		cmd.CloudId != "" && cmd.ImageAlias != nil && cmd.CardsNum != nil
 
 	if !b {
 		return errors.New("invalid cmd")
@@ -98,14 +106,20 @@ func (r *UpdatePodInternalCmd) toPodInfo(p *domain.PodInfo) (err error) {
 func (r *CloudConfDTO) toCloudConfDTO(c *domain.CloudConf) {
 	*r = CloudConfDTO{
 		Id:        c.Id,
-		Spec:      c.Spec.CloudSpec(),
 		Name:      c.Name.CloudName(),
 		Feature:   c.Feature.CloudFeature(),
 		Processor: c.Processor.CloudProcessor(),
 		Credit:    c.Credit.Credit(),
 	}
 
-	c.MoveDefaultImageToHead()
+	r.Specs = make([]Spec, 0, len(c.Specs))
+	for i := range c.Specs {
+		r.Specs = append(r.Specs, Spec{
+			Desc:     c.Specs[i].Desc.CloudSpecDesc(),
+			CardsNum: c.Specs[i].CardsNum.CloudSpecCardsNum(),
+		})
+	}
+
 	r.Images = make([]string, 0, len(c.Images))
 	for i := range c.Images {
 		r.Images = append(r.Images, c.Images[i].Alias.CloudImageAlias())
@@ -119,7 +133,7 @@ func (r *CloudDTO) toCloudDTO(c *domain.Cloud, isIdle bool, hasHolding bool) {
 	r.HasHolding = hasHolding
 }
 
-func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
+func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo, c *domain.CloudConf) error {
 	r.Id = p.Id
 	r.CloudId = p.CloudId
 
@@ -151,6 +165,20 @@ func (r *PodInfoDTO) toPodInfoDTO(p *domain.PodInfo) {
 	if p.CreatedAt != nil {
 		r.CreatedAt = p.CreatedAt.Time()
 	}
+
+	alias, err := c.GetImageAlias(p.Image)
+	if err != nil {
+		return err
+	}
+	r.Image = alias.CloudImageAlias()
+
+	spec, err := c.GetSpecDesc(p.CardsNum.CloudSpecCardsNum())
+	if err != nil {
+		return err
+	}
+	r.Spec = spec.CloudSpecDesc()
+
+	return nil
 }
 
 type ReleaseCloudCmd struct {

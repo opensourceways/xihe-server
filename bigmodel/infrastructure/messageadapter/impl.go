@@ -49,7 +49,7 @@ func (impl *messageAdapter) SendWuKongInferenceError(v *domain.WuKongInferenceEr
 	msg := common.MsgNormal{
 		User: v.Account.Account(),
 		Details: map[string]string{
-			"task_id": strconv.Itoa(int(v.TaskId)),
+			"task_id": strconv.FormatUint(v.TaskId, 10),
 			"status":  "error",
 			"error":   v.ErrMsg,
 		},
@@ -67,7 +67,7 @@ func (impl *messageAdapter) SendWuKongAsyncTaskStart(v *domain.WuKongAsyncTaskSt
 		User: v.Account.Account(),
 		Details: map[string]string{
 			"status":  "running",
-			"task_id": strconv.Itoa(int(v.TaskId)),
+			"task_id": strconv.FormatUint(v.TaskId, 10),
 		},
 	}
 
@@ -86,7 +86,7 @@ func (impl *messageAdapter) SendWuKongAsyncInferenceFinish(
 		ls += v.Links[k] + ","
 	}
 
-	taskid := strconv.Itoa(int(v.TaskId))
+	taskid := strconv.FormatUint(v.TaskId, 10)
 
 	msg := common.MsgNormal{
 		User: v.Account.Account(),

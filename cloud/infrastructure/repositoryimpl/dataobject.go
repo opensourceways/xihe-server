@@ -20,8 +20,19 @@ func (doc *DCloudConf) toCloudConf(c *domain.CloudConf) (err error) {
 		return
 	}
 
-	if c.Spec, err = domain.NewCloudSpec(doc.Spec); err != nil {
-		return
+	c.Specs = make([]domain.CloudSpec, 0, len(doc.Specs))
+	for i := range doc.Specs {
+		cloudSpec := domain.CloudSpec{}
+
+		if cloudSpec.Desc, err = domain.NewCloudSpecDesc(doc.Specs[i].Desc); err != nil {
+			return
+		}
+
+		if cloudSpec.CardsNum, err = domain.NewCloudSpecCardsNum(doc.Specs[i].CardsNum); err != nil {
+			return
+		}
+
+		c.Specs = append(c.Specs, cloudSpec)
 	}
 
 	c.Images = make([]domain.CloudImage, 0, len(doc.Images))
@@ -36,8 +47,6 @@ func (doc *DCloudConf) toCloudConf(c *domain.CloudConf) (err error) {
 			return
 		}
 
-		cloudImage.Default = doc.Images[i].Default
-
 		c.Images = append(c.Images, cloudImage)
 	}
 
@@ -49,7 +58,10 @@ func (doc *DCloudConf) toCloudConf(c *domain.CloudConf) (err error) {
 		return
 	}
 
-	if c.Limited, err = domain.NewCloudLimited(doc.Limited); err != nil {
+	if c.SingleLimited, err = domain.NewCloudLimited(doc.SingleLimited); err != nil {
+		return
+	}
+	if c.MultiLimited, err = domain.NewCloudLimited(doc.MultiLimited); err != nil {
 		return
 	}
 
@@ -63,6 +75,7 @@ func (doc *DCloudConf) toCloudConf(c *domain.CloudConf) (err error) {
 func (table *TPod) toPodInfo(p *domain.PodInfo) (err error) {
 	p.Id = table.Id
 	p.CloudId = table.CloudId
+	p.Image = table.Image
 
 	if p.Owner, err = otypes.NewAccount(table.Owner); err != nil {
 		return
@@ -88,12 +101,17 @@ func (table *TPod) toPodInfo(p *domain.PodInfo) (err error) {
 		return
 	}
 
+	if p.CardsNum, err = domain.NewCloudSpecCardsNum(table.CardsNum); err != nil {
+		return
+	}
+
 	return
 }
 
 func (table *TPod) toTPod(p *domain.PodInfo) {
 	*table = TPod{
 		CloudId: p.CloudId,
+		Image:   p.Image,
 	}
 
 	if p.Id != "" {
@@ -122,5 +140,9 @@ func (table *TPod) toTPod(p *domain.PodInfo) {
 
 	if p.Status != nil {
 		table.Status = p.Status.PodStatus()
+	}
+
+	if p.CardsNum != nil {
+		table.CardsNum = p.CardsNum.CloudSpecCardsNum()
 	}
 }

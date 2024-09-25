@@ -416,7 +416,7 @@ func (ctl *CompetitionController) Submit(ctx *gin.Context) {
 // @Accept			json
 // @Success		202
 // @Failure		500	system_error	system	error
-// @Router			/v1/competition/{id}/realted_project  [put]
+// @Router			/v1/competition/{id}/related_project [put]
 func (ctl *CompetitionController) AddRelatedProject(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
