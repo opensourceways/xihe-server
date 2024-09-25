@@ -47,7 +47,7 @@ func (impl *apiServiceRepoImpl) GetApiByUserModel(user types.Account, model doma
 	f := func(ctx context.Context) error {
 		return impl.cli.GetDoc(
 			ctx,
-			bson.M{fieddUser: user.Account(), fieldModelName: model.ModelName()},
+			bson.M{fieldUser: user.Account(), fieldModelName: model.ModelName()},
 			nil,
 			&v,
 		)
@@ -70,7 +70,7 @@ func (impl *apiServiceRepoImpl) GetApiByUser(user types.Account) (u []domain.Use
 	f := func(ctx context.Context) error {
 		return impl.cli.GetDocs(
 			ctx,
-			bson.M{fieddUser: user.Account()},
+			bson.M{fieldUser: user.Account()},
 			nil,
 			&v,
 		)
@@ -94,7 +94,7 @@ func (impl *apiServiceRepoImpl) AddApiCallCount(user types.Account, model domain
 	f := func(ctx context.Context) error {
 		return impl.cli.UpdateIncDoc(
 			ctx,
-			bson.M{fieddUser: user.Account(), fieldModelName: model.ModelName()},
+			bson.M{fieldUser: user.Account(), fieldModelName: model.ModelName()},
 			bson.M{fieldCallCount: 1},
 			version,
 		)
@@ -126,7 +126,7 @@ func (a *dApiApply) toUserApiRecord(d *domain.UserApiRecord) (err error) {
 
 func (impl *apiServiceRepoImpl) UpdateToken(user types.Account,
 	model domain.ModelName, token string, date string, version int) (err error) {
-	filter := bson.M{fieddUser: user.Account(), fieldModelName: model.ModelName()}
+	filter := bson.M{fieldUser: user.Account(), fieldModelName: model.ModelName()}
 
 	f := func(ctx context.Context) error {
 		err = impl.cli.UpdateDoc(
