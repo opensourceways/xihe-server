@@ -2508,57 +2508,16 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/course/{id}/related_project": {
+        "/v1/course/{id}/record": {
             "put": {
-                "description": "add related project",
+                "description": "add play record",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "Course"
                 ],
-                "summary": "AddCourseRelatedProject",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "course id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "project info",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/controller.AddCourseRelatedProjectRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "202": {
-                        "description": "Accepted"
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "system_error"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/course/{id}/related_project": {
-            "put": {
-                "description": "add related project",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Course"
-                ],
-                "summary": "AddCourseRelatedProject",
+                "summary": "AddPlayRecord",
                 "parameters": [
                     {
                         "type": "string",
@@ -5967,7 +5926,27 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/controller.userCreateRequest"
+                            "$ref": "#/definitions/controller.UserInfoUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/controller.UserBasicInfoUpdateRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
                         }
                     }
                 }
@@ -6146,6 +6125,32 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/whitelist": {
+            "get": {
+                "description": "list user whitelist",
+                "tags": [
+                    "user"
+                ],
+                "summary": "ListWhiteList",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.responseData"
                         }
                     }
                 }
@@ -6616,8 +6621,11 @@ const docTemplate = `{
                 "processor": {
                     "type": "string"
                 },
-                "spec": {
-                    "type": "string"
+                "specs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.Spec"
+                    }
                 }
             }
         },
@@ -7234,7 +7242,13 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "image": {
+                    "type": "string"
+                },
                 "owner": {
+                    "type": "string"
+                },
+                "spec": {
                     "type": "string"
                 },
                 "status": {
@@ -7561,6 +7575,17 @@ const docTemplate = `{
                 }
             }
         },
+        "app.Spec": {
+            "type": "object",
+            "properties": {
+                "cards_num": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "type": "string"
+                }
+            }
+        },
         "app.TaskCompletionInfoDTO": {
             "type": "object",
             "properties": {
@@ -7810,6 +7835,9 @@ const docTemplate = `{
             "properties": {
                 "allowed": {
                     "type": "boolean"
+                },
+                "item": {
+                    "type": "string"
                 }
             }
         },
@@ -8393,9 +8421,14 @@ const docTemplate = `{
         "controller.cloudSubscribeRequest": {
             "type": "object",
             "required": [
+                "cards_num",
                 "image"
             ],
             "properties": {
+                "cards_num": {
+                    "type": "integer",
+                    "minimum": 1
+                },
                 "cloud_id": {
                     "type": "string"
                 },

@@ -194,9 +194,11 @@ func (cmd *UserRegisterInfoCmd) Validate() error {
 type UserWhiteListCmd domain.WhiteListInfo
 
 type WhitelistDTO struct {
-	Allowed bool `json:"allowed"`
+	Item    string `json:"item,omitempty"`
+	Allowed bool   `json:"allowed"`
 }
 
-func (w *WhitelistDTO) toWhitelistDTO(whitelist *domain.WhiteListInfo) {
-	w.Allowed = whitelist.Enable()
+func (w *WhitelistDTO) toWhitelistDTO(info *domain.WhiteListInfo) {
+	w.Item = info.Type.WhiteListType()
+	w.Allowed = info.Enable()
 }

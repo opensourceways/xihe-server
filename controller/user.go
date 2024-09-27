@@ -61,6 +61,7 @@ func AddRouterForUserController(
 
 	// whitelist
 	rg.GET("/v1/user/whitelist/:type", ctl.CheckWhiteList)
+	rg.GET("/v1/user/whitelist", ctl.ListWhitelist)
 }
 
 type UserController struct {
@@ -563,4 +564,27 @@ func (ctl *UserController) CheckWhiteList(ctx *gin.Context) {
 	}
 
 	ctl.sendRespOfGet(ctx, whitelistDTO)
+}
+
+// @Summary		ListWhiteList
+// @Description	list user whitelist
+// @Tags		user
+// @Success		200	{object} []string
+// @Failure		500	{object} responseData
+// @Router		/v1/user/whitelist [Get]
+func (ctl *UserController) ListWhitelist(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "list user whitelist")
+
+	list, err := ctl.whitelist.List(pl.DomainAccount())
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+
+	ctl.sendRespOfGet(ctx, list)
 }
