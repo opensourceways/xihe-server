@@ -921,8 +921,8 @@ github.com/hashicorp/golang-lru v0.5.1/go.mod h1:/m3WP610KZHVQ1SGc6re/UDhFvYD7pJ
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/huaweicloud/huaweicloud-sdk-go-obs v3.23.9+incompatible h1:zUhCrGMMpJxZGAB30GbQzluDhQuPENxRQfxss7KlpKU=
 github.com/huaweicloud/huaweicloud-sdk-go-obs v3.23.9+incompatible/go.mod h1:l7VUhRbTKCzdOacdT4oWCwATKyvZqUOlOqr0Ous3k4s=
-github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.72 h1:sf1+e0G3i+KZALjAmWKK+MaRfRkz0y+cBV9ZVr+RYRg=
-github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.72/go.mod h1:AZT3IyeViMA1qIoo6lM2eDobcTXORpqIQzSqdodah7E=
+github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.76 h1:+BhxGt3dZ+vlX2HfB3c5fmmKJqhMz4Y4SD6Upq9SYKA=
+github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.76/go.mod h1:AZT3IyeViMA1qIoo6lM2eDobcTXORpqIQzSqdodah7E=
 github.com/iancoleman/strcase v0.2.0/go.mod h1:iwCmte+B7n89clKwxIoIXy/HfoL7AsD47ZCWhYzw7ho=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
@@ -1059,8 +1059,8 @@ github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c h
 github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c/go.mod h1:1iVJ+C3L9e0GJMUhGfbegH4CecnALntzfTW29GzBGUk=
 github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1 h1:iy7RQZk/5GiihoHGYAZbbs58OZjEfacGERgTPLCroWI=
 github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1/go.mod h1:KM9s7Ws5FQdBv8suFTLXNtrvOphxFSgIvYaDWEvN3xQ=
-github.com/opensourceways/xihe-extra-services v0.0.0-20231215030123-df06ee77c3d1 h1:Cq1xUhUdrT+2oSEO/XT72aaBRmxBoW/jRofFzE5WU4M=
-github.com/opensourceways/xihe-extra-services v0.0.0-20231215030123-df06ee77c3d1/go.mod h1:kyKZx4SVK5m8kIw/hx3hwxigQziU+p7CxFxZZLl3Id4=
+github.com/opensourceways/xihe-extra-services v1.3.0 h1:p5jRvnjMQeIQdLw/pha5jsOxXbvYMnzzpv6MInz+QWI=
+github.com/opensourceways/xihe-extra-services v1.3.0/go.mod h1:umthEXsl3BqIcQlNbfKx2VeOTUI2pO8reMQwLahiwRk=
 github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43 h1:9u9AcfJeR2zvnjiJXrShL83LtEBhqD3GK7o45eVZ0o0=
 github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43/go.mod h1:VYpD1Hx3gcIT3Oqw/r+Fqzgz6wLr01yS2Y0PvVAZ3uo=
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142ee87 h1:yTxoRp9jLCSbDF+3WlSvjvCN2uZx0k8FFs+eRxUm0xY=
