@@ -3,20 +3,23 @@ package controller
 import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
+	"golang.org/x/xerrors"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 type projectCreateRequest struct {
-	Owner    string   `json:"owner" required:"true"`
-	Name     string   `json:"name" required:"true"`
-	Desc     string   `json:"desc"`
-	Type     string   `json:"type" required:"true"`
-	CoverId  string   `json:"cover_id" required:"true"`
-	Protocol string   `json:"protocol" required:"true"`
-	Training string   `json:"training" required:"true"`
-	RepoType string   `json:"repo_type" required:"true"`
-	Title    string   `json:"title"`
-	Tags     []string `json:"tags"`
+	Owner     string   `json:"owner" required:"true"`
+	Name      string   `json:"name" required:"true"`
+	Desc      string   `json:"desc"`
+	Type      string   `json:"type" required:"true"`
+	CoverId   string   `json:"cover_id" required:"true"`
+	Protocol  string   `json:"protocol" required:"true"`
+	Training  string   `json:"training" required:"true"`
+	RepoType  string   `json:"repo_type" required:"true"`
+	Title     string   `json:"title"`
+	Tags      []string `json:"tags"`
+	Hardware  string   `json:"hardware"        required:"true"`
+	BaseImage string   `json:"base_image"      required:"true"`
 }
 
 func (p *projectCreateRequest) toCmd(
@@ -51,6 +54,16 @@ func (p *projectCreateRequest) toCmd(
 	}
 
 	if cmd.Training, err = domain.NewTrainingPlatform(p.Training); err != nil {
+		return
+	}
+
+	if cmd.Hardware, err = domain.NewHardware(p.Hardware, p.Type); err != nil {
+		err = xerrors.Errorf("invalid hardware: %w", err)
+		return
+	}
+
+	if cmd.BaseImage, err = domain.NewBaseImage(p.BaseImage, p.Hardware); err != nil {
+		err = xerrors.Errorf("invalid base image: %w", err)
 		return
 	}
 

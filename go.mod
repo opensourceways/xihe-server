@@ -3,17 +3,18 @@ module github.com/opensourceways/xihe-server
 go 1.21
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.23.9+incompatible
-	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.72
+	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.76
 	github.com/opensourceways/community-robot-lib v0.0.0-20231106030104-fefc5fa67771
 	github.com/opensourceways/kafka-lib v0.0.0-20231114071554-b2af9944cf3a
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
 	github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1
-	github.com/opensourceways/xihe-extra-services v0.0.0-20231215030123-df06ee77c3d1
+	github.com/opensourceways/xihe-extra-services v1.3.0
 	github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43
 	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142ee87
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
@@ -24,8 +25,10 @@ require (
 	github.com/xanzy/go-gitlab v0.95.2
 	go.mongodb.org/mongo-driver v1.13.1
 	golang.org/x/text v0.15.0
+	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
+	gorm.io/plugin/opentelemetry v0.1.7
 	k8s.io/apimachinery v0.29.1
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -46,6 +49,8 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
+	github.com/go-logr/logr v1.4.1 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.20.2 // indirect
 	github.com/go-openapi/jsonreference v0.20.4 // indirect
 	github.com/go-openapi/spec v0.20.13 // indirect
@@ -96,6 +101,9 @@ require (
 	github.com/xdg-go/scram v1.1.2 // indirect
 	github.com/xdg-go/stringprep v1.0.4 // indirect
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
+	go.opentelemetry.io/otel v1.19.0 // indirect
+	go.opentelemetry.io/otel/metric v1.19.0 // indirect
+	go.opentelemetry.io/otel/trace v1.19.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/net v0.23.0 // indirect

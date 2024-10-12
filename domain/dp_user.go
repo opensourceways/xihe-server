@@ -21,6 +21,11 @@ func NewAccount(v string) (Account, error) {
 	return dpAccount(v), nil
 }
 
+// CreateAccount is usually called internally, such as repository.
+func CreateAccount(v string) Account {
+	return dpAccount(v)
+}
+
 type dpAccount string
 
 func (r dpAccount) Account() string {

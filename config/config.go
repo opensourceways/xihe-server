@@ -15,6 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
 	"github.com/opensourceways/xihe-server/competition"
+	"github.com/opensourceways/xihe-server/computility"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/course"
 	"github.com/opensourceways/xihe-server/domain"
@@ -69,6 +70,7 @@ type Config struct {
 	Like         messages.LikeConfig             `json:"like"`
 	Agreement    agreement.Config                `json:"agreement"`
 	AICCFinetune aiccconfig.Config               `json:"aicc_finetune"`
+	Computility  computility.Config              `json:"computility"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
@@ -192,10 +194,14 @@ type MongodbCollections struct {
 	UserWhiteList     string `json:"user_whitelist"         required:"true"`
 }
 
-func (cfg *Config) InitDomainConfig() {
-	domain.Init(&cfg.Domain)
+func (cfg *Config) InitDomainConfig() error {
+	if err := domain.Init(&cfg.Domain); err != nil {
+		return err
+	}
 
 	pointsdomain.Init(&cfg.Points.Domain)
+
+	return nil
 }
 
 func (cfg *Config) InitAppConfig() {

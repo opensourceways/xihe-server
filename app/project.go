@@ -3,27 +3,32 @@ package app
 import (
 	"errors"
 
+	computilityapp "github.com/opensourceways/xihe-server/computility/app"
+	computilitydomain "github.com/opensourceways/xihe-server/computility/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+	"github.com/sirupsen/logrus"
 )
 
 type ProjectCreateCmd struct {
-	Owner    domain.Account
-	Name     domain.ResourceName
-	Desc     domain.ResourceDesc
-	Title    domain.ResourceTitle
-	Type     domain.ProjType
-	CoverId  domain.CoverId
-	RepoType domain.RepoType
-	Protocol domain.ProtocolName
-	Training domain.TrainingPlatform
-	Tags     []string
-	TagKinds []string
-	All      []domain.DomainTags
+	Owner     domain.Account
+	Name      domain.ResourceName
+	Desc      domain.ResourceDesc
+	Title     domain.ResourceTitle
+	Type      domain.ProjType
+	CoverId   domain.CoverId
+	RepoType  domain.RepoType
+	Protocol  domain.ProtocolName
+	Training  domain.TrainingPlatform
+	Tags      []string
+	TagKinds  []string
+	All       []domain.DomainTags
+	Hardware  domain.Hardware
+	BaseImage domain.BaseImage
 }
 
 func (cmd *ProjectCreateCmd) Validate() error {
@@ -71,6 +76,8 @@ func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
 		Training:  cmd.Training,
 		CreatedAt: now,
 		UpdatedAt: now,
+		Hardware:  cmd.Hardware,
+		BaseImage: cmd.BaseImage,
 		ProjectModifiableProperty: domain.ProjectModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     cmd.Desc,
@@ -157,6 +164,7 @@ func NewProjectService(
 	activity repository.Activity,
 	pr platform.Repository,
 	sender message.ResourceProducer,
+	computilityApp computilityapp.ComputilityInternalAppService,
 ) ProjectService {
 	return projectService{
 		repo:     repo,
@@ -168,15 +176,17 @@ func NewProjectService(
 			project: repo,
 			dataset: dataset,
 		},
+		computilityApp: computilityApp,
 	}
 }
 
 type projectService struct {
 	repo repository.Project
 	//pr       platform.Repository
-	activity repository.Activity
-	sender   message.ResourceProducer
-	rs       resourceService
+	activity       repository.Activity
+	sender         message.ResourceProducer
+	rs             resourceService
+	computilityApp computilityapp.ComputilityInternalAppService
 }
 
 func (s projectService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -184,6 +194,27 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 }
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
+	v := new(domain.Project)
+	cmd.toProject(v)
+	count := v.GetQuotaCount()
+	hdType := v.GetComputeType()
+	id := domain.CreateIdentity(domain.GetId())
+	compCmd := computilityapp.CmdToUserQuotaUpdate{
+		Index: computilitydomain.ComputilityAccountRecordIndex{
+			UserName:    cmd.Owner,
+			ComputeType: hdType,
+			SpaceId:     id,
+		},
+		QuotaCount: count,
+	}
+
+	err = s.computilityApp.UserQuotaConsume(compCmd)
+	if err != nil {
+		logrus.Errorf("space create error | call api for quota consume failed | user:%s ,err: %s", cmd.Owner, err)
+
+		// return ProjectDTO{}, err
+	}
+
 	// step1: create repo on gitlab
 	pid, err := pr.New(&platform.RepoOption{
 		Name:     cmd.Name,
@@ -193,9 +224,6 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 		return
 	}
 
-	// step2: save
-	v := new(domain.Project)
-	cmd.toProject(v)
 	v.RepoId = pid
 
 	p, err := s.repo.Save(v)

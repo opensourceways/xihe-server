@@ -27,10 +27,13 @@ import (
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
+	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
 	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
 	competitionusercli "github.com/opensourceways/xihe-server/competition/infrastructure/usercli"
+	computilityapp "github.com/opensourceways/xihe-server/computility/app"
+	comprepositoryadapter "github.com/opensourceways/xihe-server/computility/infrastructure/repositoryadapter"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
@@ -250,7 +253,17 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		userRegService,
 	)
 
-	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, resProducer)
+	err = comprepositoryadapter.Init(pgsql.DB(), &cfg.Computility.Tables)
+	if err != nil {
+		return err
+	}
+	computilityService := computilityapp.NewComputilityInternalAppService(
+		comprepositoryadapter.ComputilityDetailAdapter(),
+		comprepositoryadapter.ComputilityAccountAdapter(),
+		comprepositoryadapter.ComputilityAccountRecordAdapter(),
+	)
+
+	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, resProducer, computilityService)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
 
@@ -292,7 +305,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository,
+			newPlatformRepository, computilityService,
 		)
 
 		controller.AddRouterForModelController(
