@@ -14,7 +14,7 @@ func (impl inference) toInferenceIndexDO(index *domain.InferenceIndex) Inference
 	return InferenceIndexDO{
 		Id:         index.Id,
 		LastCommit: index.LastCommit,
-		Project:    toResourceIndexDO(&index.Project),
+		Project:    ToResourceIndexDO(&index.Project),
 	}
 }
 

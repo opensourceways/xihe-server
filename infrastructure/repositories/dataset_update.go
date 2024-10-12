@@ -6,7 +6,7 @@ import (
 )
 
 func (impl dataset) IncreaseDownload(index *domain.ResourceIndex) error {
-	err := impl.mapper.IncreaseDownload(toResourceIndexDO(index))
+	err := impl.mapper.IncreaseDownload(ToResourceIndexDO(index))
 	if err != nil {
 		err = convertError(err)
 	}
@@ -15,7 +15,7 @@ func (impl dataset) IncreaseDownload(index *domain.ResourceIndex) error {
 }
 
 func (impl dataset) AddLike(d *domain.ResourceIndex) error {
-	err := impl.mapper.AddLike(toResourceIndexDO(d))
+	err := impl.mapper.AddLike(ToResourceIndexDO(d))
 	if err != nil {
 		err = convertError(err)
 	}
@@ -24,7 +24,7 @@ func (impl dataset) AddLike(d *domain.ResourceIndex) error {
 }
 
 func (impl dataset) RemoveLike(d *domain.ResourceIndex) error {
-	err := impl.mapper.RemoveLike(toResourceIndexDO(d))
+	err := impl.mapper.RemoveLike(ToResourceIndexDO(d))
 	if err != nil {
 		err = convertError(err)
 	}
@@ -36,7 +36,7 @@ func (impl dataset) UpdateProperty(info *repository.DatasetPropertyUpdateInfo) e
 	p := &info.Property
 
 	do := DatasetPropertyDO{
-		ResourceToUpdateDO: toResourceToUpdateDO(&info.ResourceToUpdate),
+		ResourceToUpdateDO: ToResourceToUpdateDO(&info.ResourceToUpdate),
 
 		FL:       p.Name.FirstLetterOfName(),
 		Name:     p.Name.ResourceName(),
@@ -104,7 +104,7 @@ func (impl dataset) list(
 	info repository.UserDatasetsInfo, err error,
 ) {
 	return impl.doList(func() ([]DatasetSummaryDO, int, error) {
-		do := toResourceListDO(option)
+		do := ToResourceListDO(option)
 
 		return f(owner.Account(), &do)
 	})

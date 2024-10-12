@@ -3,6 +3,8 @@ package app
 import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 )
 
 type ReverselyRelatedResourceInfo = domain.ReverselyRelatedResourceInfo
@@ -153,10 +155,10 @@ type ProjectMessageService interface {
 }
 
 type projectMessageService struct {
-	repo repository.Project
+	repo spacerepo.Project
 }
 
-func NewProjectMessageService(repo repository.Project) ProjectMessageService {
+func NewProjectMessageService(repo spacerepo.Project) ProjectMessageService {
 	return projectMessageService{
 		repo: repo,
 	}
@@ -228,7 +230,7 @@ func (s projectMessageService) IncreaseDownload(index *domain.ResourceIndex) err
 	return s.repo.IncreaseDownload(index)
 }
 
-func (s projectMessageService) toResourceToUpdate(p *domain.Project) repository.ResourceToUpdate {
+func (s projectMessageService) toResourceToUpdate(p *spacedomain.Project) repository.ResourceToUpdate {
 	return repository.ResourceToUpdate{
 		Owner:     p.Owner,
 		Id:        p.Id,

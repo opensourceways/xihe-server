@@ -6,9 +6,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	"github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
 )
 
-func NewProjectMapper(name string) repositories.ProjectMapper {
+func NewProjectMapper(name string) repositoryimpl.ProjectMapper {
 	return project{name}
 }
 
@@ -39,7 +40,7 @@ func (col project) newDoc(owner string) error {
 	return nil
 }
 
-func (col project) Insert(do repositories.ProjectDO) (identity string, err error) {
+func (col project) Insert(do repositoryimpl.ProjectDO) (identity string, err error) {
 	if identity, err = col.insert(do); err == nil || !isDocNotExists(err) {
 		return
 	}
@@ -55,7 +56,7 @@ func (col project) Insert(do repositories.ProjectDO) (identity string, err error
 	return
 }
 
-func (col project) insert(do repositories.ProjectDO) (identity string, err error) {
+func (col project) insert(do repositoryimpl.ProjectDO) (identity string, err error) {
 	identity = newId()
 
 	do.Id = identity
@@ -79,7 +80,7 @@ func (col project) Delete(do *repositories.ResourceIndexDO) error {
 	return deleteResource(col.collectionName, do)
 }
 
-func (col project) UpdateProperty(do *repositories.ProjectPropertyDO) error {
+func (col project) UpdateProperty(do *repositoryimpl.ProjectPropertyDO) error {
 	p := &ProjectPropertyItem{
 		Level:    do.Level,
 		Name:     do.Name,
@@ -97,7 +98,7 @@ func (col project) UpdateProperty(do *repositories.ProjectPropertyDO) error {
 	return updateResourceProperty(col.collectionName, &do.ResourceToUpdateDO, p)
 }
 
-func (col project) Get(owner, identity string) (do repositories.ProjectDO, err error) {
+func (col project) Get(owner, identity string) (do repositoryimpl.ProjectDO, err error) {
 	var v []dProject
 
 	if err = getResourceById(col.collectionName, owner, identity, &v); err != nil {
@@ -115,7 +116,7 @@ func (col project) Get(owner, identity string) (do repositories.ProjectDO, err e
 	return
 }
 
-func (col project) GetByName(owner, name string) (do repositories.ProjectDO, err error) {
+func (col project) GetByName(owner, name string) (do repositoryimpl.ProjectDO, err error) {
 	var v []dProject
 
 	if err = getResourceByName(col.collectionName, owner, name, &v); err != nil {
@@ -134,7 +135,7 @@ func (col project) GetByName(owner, name string) (do repositories.ProjectDO, err
 }
 
 func (col project) GetSummary(owner string, projectId string) (
-	do repositories.ProjectResourceSummaryDO, err error,
+	do repositoryimpl.ProjectResourceSummaryDO, err error,
 ) {
 	var v []dProject
 
@@ -187,7 +188,7 @@ func (col project) GetSummaryByName(owner, name string) (
 }
 
 func (col project) ListUsersProjects(opts map[string][]string) (
-	r []repositories.ProjectSummaryDO, err error,
+	r []repositoryimpl.ProjectSummaryDO, err error,
 ) {
 	var v []dProject
 
@@ -196,13 +197,13 @@ func (col project) ListUsersProjects(opts map[string][]string) (
 		return
 	}
 
-	r = make([]repositories.ProjectSummaryDO, 0, len(v))
+	r = make([]repositoryimpl.ProjectSummaryDO, 0, len(v))
 
 	for i := range v {
 		owner := v[i].Owner
 		items := v[i].Items
 
-		dos := make([]repositories.ProjectSummaryDO, len(items))
+		dos := make([]repositoryimpl.ProjectSummaryDO, len(items))
 		for j := range items {
 			col.toProjectSummaryDO(owner, &items[j], &dos[j])
 		}
@@ -213,7 +214,7 @@ func (col project) ListUsersProjects(opts map[string][]string) (
 	return
 }
 
-func (col project) toProjectDoc(do *repositories.ProjectDO) (bson.M, error) {
+func (col project) toProjectDoc(do *repositoryimpl.ProjectDO) (bson.M, error) {
 	docObj := projectItem{
 		Id:        do.Id,
 		Type:      do.Type,
@@ -239,8 +240,8 @@ func (col project) toProjectDoc(do *repositories.ProjectDO) (bson.M, error) {
 	return genDoc(docObj)
 }
 
-func (col project) toProjectDO(owner string, item *projectItem, do *repositories.ProjectDO) {
-	*do = repositories.ProjectDO{
+func (col project) toProjectDO(owner string, item *projectItem, do *repositoryimpl.ProjectDO) {
+	*do = repositoryimpl.ProjectDO{
 		Id:            item.Id,
 		Owner:         owner,
 		Name:          item.Name,

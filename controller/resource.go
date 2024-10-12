@@ -79,7 +79,7 @@ func convertToRelatedResource(data interface{}) (r app.ResourceDTO) {
 		r.UpdateAt = utils.ToDate(v.UpdatedAt)
 		r.LikeCount = v.LikeCount
 		r.DownloadCount = v.DownloadCount
-		
+
 	default:
 
 	}

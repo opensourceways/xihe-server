@@ -10,6 +10,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -18,7 +19,7 @@ func AddRouterForModelController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
 	repo repository.Model,
-	proj repository.Project,
+	proj spacerepo.Project,
 	dataset repository.Dataset,
 	activity repository.Activity,
 	tags repository.Tags,

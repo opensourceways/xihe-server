@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -21,23 +22,23 @@ func NewActivityService(
 	repo repository.Activity,
 	user userrepo.User,
 	model repository.Model,
-	project repository.Project,
+	project spacerepo.Project,
 	dataset repository.Dataset,
 ) ActivityService {
 	return activityService{
 		repo: repo,
-		rs: resourceService{
-			user:    user,
-			model:   model,
-			project: project,
-			dataset: dataset,
+		rs: ResourceService{
+			User:    user,
+			Model:   model,
+			Project: project,
+			Dataset: dataset,
 		},
 	}
 }
 
 type activityService struct {
 	repo repository.Activity
-	rs   resourceService
+	rs   ResourceService
 }
 
 func (s activityService) List(owner domain.Account, all bool) (
@@ -105,7 +106,7 @@ func (s activityService) list(owner domain.Account, all bool) (
 	return
 }
 
-func genActivityForCreatingResource(obj domain.ResourceObject, repotype domain.RepoType) domain.UserActivity {
+func GenActivityForCreatingResource(obj domain.ResourceObject, repotype domain.RepoType) domain.UserActivity {
 	return domain.UserActivity{
 		Owner: obj.Owner,
 		Activity: domain.Activity{
@@ -117,7 +118,7 @@ func genActivityForCreatingResource(obj domain.ResourceObject, repotype domain.R
 	}
 }
 
-func genActivityForDeletingResource(obj *domain.ResourceObject, repoType domain.RepoType) domain.UserActivity {
+func GenActivityForDeletingResource(obj *domain.ResourceObject, repoType domain.RepoType) domain.UserActivity {
 	return domain.UserActivity{
 		Owner: obj.Owner,
 		Activity: domain.Activity{

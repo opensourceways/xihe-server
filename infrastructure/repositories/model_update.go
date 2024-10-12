@@ -6,7 +6,7 @@ import (
 )
 
 func (impl model) IncreaseDownload(index *domain.ResourceIndex) error {
-	err := impl.mapper.IncreaseDownload(toResourceIndexDO(index))
+	err := impl.mapper.IncreaseDownload(ToResourceIndexDO(index))
 	if err != nil {
 		err = convertError(err)
 	}
@@ -15,7 +15,7 @@ func (impl model) IncreaseDownload(index *domain.ResourceIndex) error {
 }
 
 func (impl model) AddLike(m *domain.ResourceIndex) error {
-	err := impl.mapper.AddLike(toResourceIndexDO(m))
+	err := impl.mapper.AddLike(ToResourceIndexDO(m))
 	if err != nil {
 		err = convertError(err)
 	}
@@ -24,7 +24,7 @@ func (impl model) AddLike(m *domain.ResourceIndex) error {
 }
 
 func (impl model) RemoveLike(m *domain.ResourceIndex) error {
-	err := impl.mapper.RemoveLike(toResourceIndexDO(m))
+	err := impl.mapper.RemoveLike(ToResourceIndexDO(m))
 	if err != nil {
 		err = convertError(err)
 	}
@@ -33,7 +33,7 @@ func (impl model) RemoveLike(m *domain.ResourceIndex) error {
 }
 
 func (impl model) AddRelatedDataset(info *repository.RelatedResourceInfo) error {
-	do := toRelatedResourceDO(info)
+	do := ToRelatedResourceDO(info)
 
 	if err := impl.mapper.AddRelatedDataset(&do); err != nil {
 		return convertError(err)
@@ -43,7 +43,7 @@ func (impl model) AddRelatedDataset(info *repository.RelatedResourceInfo) error 
 }
 
 func (impl model) RemoveRelatedDataset(info *repository.RelatedResourceInfo) error {
-	do := toRelatedResourceDO(info)
+	do := ToRelatedResourceDO(info)
 
 	if err := impl.mapper.RemoveRelatedDataset(&do); err != nil {
 		return convertError(err)
@@ -76,7 +76,7 @@ func (impl model) UpdateProperty(info *repository.ModelPropertyUpdateInfo) error
 	p := &info.Property
 
 	do := ModelPropertyDO{
-		ResourceToUpdateDO: toResourceToUpdateDO(&info.ResourceToUpdate),
+		ResourceToUpdateDO: ToResourceToUpdateDO(&info.ResourceToUpdate),
 
 		FL:       p.Name.FirstLetterOfName(),
 		Name:     p.Name.ResourceName(),
@@ -144,7 +144,7 @@ func (impl model) list(
 	info repository.UserModelsInfo, err error,
 ) {
 	return impl.doList(func() ([]ModelSummaryDO, int, error) {
-		do := toResourceListDO(option)
+		do := ToResourceListDO(option)
 
 		return f(owner.Account(), &do)
 	})

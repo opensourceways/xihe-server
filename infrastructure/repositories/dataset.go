@@ -70,7 +70,7 @@ func (impl dataset) Save(d *domain.Dataset) (r domain.Dataset, err error) {
 }
 
 func (impl dataset) Delete(index *domain.ResourceIndex) (err error) {
-	do := toResourceIndexDO(index)
+	do := ToResourceIndexDO(index)
 
 	if err = impl.mapper.Delete(&do); err != nil {
 		err = convertError(err)
@@ -251,11 +251,11 @@ func (do *DatasetDO) toDataset(r *domain.Dataset) (err error) {
 		return
 	}
 
-	if r.RelatedModels, err = convertToResourceIndex(do.RelatedModels); err != nil {
+	if r.RelatedModels, err = ConvertToResourceIndex(do.RelatedModels); err != nil {
 		return
 	}
 
-	if r.RelatedProjects, err = convertToResourceIndex(do.RelatedProjects); err != nil {
+	if r.RelatedProjects, err = ConvertToResourceIndex(do.RelatedProjects); err != nil {
 		return
 	}
 

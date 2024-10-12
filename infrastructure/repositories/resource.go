@@ -5,6 +5,37 @@ import (
 	"github.com/opensourceways/xihe-server/domain/repository"
 )
 
+func ToRelatedResourceDO(info *repository.RelatedResourceInfo) RelatedResourceDO {
+	return RelatedResourceDO{
+		ResourceToUpdateDO: ToResourceToUpdateDO(&info.ResourceToUpdate),
+		ResourceOwner:      info.RelatedResource.Owner.Account(),
+		ResourceId:         info.RelatedResource.Id,
+	}
+}
+
+type RelatedResourceDO struct {
+	ResourceToUpdateDO
+
+	ResourceOwner string
+	ResourceId    string
+}
+
+type ResourceToUpdateDO struct {
+	Id        string
+	Owner     string
+	Version   int
+	UpdatedAt int64
+}
+
+func ToResourceToUpdateDO(info *repository.ResourceToUpdate) ResourceToUpdateDO {
+	return ResourceToUpdateDO{
+		Id:        info.Id,
+		Owner:     info.Owner.Account(),
+		Version:   info.Version,
+		UpdatedAt: info.UpdatedAt,
+	}
+}
+
 type ResourceListDO struct {
 	Name         string
 	RepoType     []string
@@ -12,7 +43,7 @@ type ResourceListDO struct {
 	CountPerPage int
 }
 
-func toResourceListDO(r *repository.ResourceListOption) ResourceListDO {
+func ToResourceListDO(r *repository.ResourceListOption) ResourceListDO {
 	do := ResourceListDO{
 		Name:         r.Name,
 		PageNum:      r.PageNum,
@@ -71,14 +102,14 @@ func (do *ResourceIndexDO) toResourceIndex(r *domain.ResourceIndex) (err error) 
 	return
 }
 
-func toResourceIndexDO(r *domain.ResourceIndex) ResourceIndexDO {
+func ToResourceIndexDO(r *domain.ResourceIndex) ResourceIndexDO {
 	return ResourceIndexDO{
 		Owner: r.Owner.Account(),
 		Id:    r.Id,
 	}
 }
 
-func convertToResourceIndex(v []ResourceIndexDO) (r []domain.ResourceIndex, err error) {
+func ConvertToResourceIndex(v []ResourceIndexDO) (r []domain.ResourceIndex, err error) {
 	if len(v) == 0 {
 		return
 	}
@@ -98,8 +129,8 @@ func toReverselyRelatedResourceInfoDO(
 	info *domain.ReverselyRelatedResourceInfo,
 ) ReverselyRelatedResourceInfoDO {
 	return ReverselyRelatedResourceInfoDO{
-		Promoter: toResourceIndexDO(info.Promoter),
-		Resource: toResourceIndexDO(info.Resource),
+		Promoter: ToResourceIndexDO(info.Promoter),
+		Resource: ToResourceIndexDO(info.Resource),
 	}
 }
 
@@ -116,7 +147,7 @@ type ResourceSummaryDO struct {
 	RepoType string
 }
 
-func (do *ResourceSummaryDO) toProject() (s domain.ResourceSummary, err error) {
+func (do *ResourceSummaryDO) ToProject() (s domain.ResourceSummary, err error) {
 	if s.Name, err = domain.NewResourceName(do.Name); err != nil {
 		return
 	}

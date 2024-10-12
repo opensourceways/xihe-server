@@ -70,7 +70,7 @@ func (impl model) Save(m *domain.Model) (r domain.Model, err error) {
 }
 
 func (impl model) Delete(index *domain.ResourceIndex) (err error) {
-	do := toResourceIndexDO(index)
+	do := ToResourceIndexDO(index)
 
 	if err = impl.mapper.Delete(&do); err != nil {
 		err = convertError(err)
@@ -253,11 +253,11 @@ func (do *ModelDO) toModel(r *domain.Model) (err error) {
 		return
 	}
 
-	if r.RelatedDatasets, err = convertToResourceIndex(do.RelatedDatasets); err != nil {
+	if r.RelatedDatasets, err = ConvertToResourceIndex(do.RelatedDatasets); err != nil {
 		return
 	}
 
-	if r.RelatedProjects, err = convertToResourceIndex(do.RelatedProjects); err != nil {
+	if r.RelatedProjects, err = ConvertToResourceIndex(do.RelatedProjects); err != nil {
 		return
 	}
 

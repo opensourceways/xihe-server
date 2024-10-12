@@ -14,6 +14,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -22,7 +23,7 @@ func AddRouterForInferenceController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
 	repo repository.Inference,
-	project repository.Project,
+	project spacerepo.Project,
 	sender message.Sender,
 	whitelist userapp.WhiteListService,
 ) {
@@ -45,7 +46,7 @@ type InferenceController struct {
 
 	s app.InferenceService
 
-	project repository.Project
+	project spacerepo.Project
 
 	inferenceDir      domain.Directory
 	inferenceBootFile domain.FilePath

@@ -9,7 +9,7 @@ import (
 	cc "github.com/opensourceways/xihe-server/competition/controller"
 	"github.com/opensourceways/xihe-server/competition/domain"
 	types "github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 )
 
@@ -17,7 +17,7 @@ func AddRouterForCompetitionController(
 	rg *gin.RouterGroup,
 	s app.CompetitionService,
 	us userapp.RegService,
-	project repository.Project,
+	project spacerepo.Project,
 ) {
 	ctl := CompetitionController{
 		s:       s,
@@ -48,7 +48,7 @@ type CompetitionController struct {
 
 	s       app.CompetitionService
 	us      userapp.RegService
-	project repository.Project
+	project spacerepo.Project
 }
 
 // @Summary		Apply

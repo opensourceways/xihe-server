@@ -12,76 +12,13 @@ type GlobalResourceListCmd struct {
 	SortType domain.SortType
 }
 
-func (cmd *GlobalResourceListCmd) toResourceListOption() repository.GlobalResourceListOption {
+func (cmd *GlobalResourceListCmd) ToResourceListOption() repository.GlobalResourceListOption {
 	// only allow to list public resources.
 	type1, _ := domain.NewRepoType(domain.RepoTypePublic)
 	type2, _ := domain.NewRepoType(domain.RepoTypeOnline)
 	cmd.RepoType = append(cmd.RepoType, type1)
 	cmd.RepoType = append(cmd.RepoType, type2)
 	return cmd.GlobalResourceListOption
-}
-
-// Project
-type GlobalProjectsDTO struct {
-	Total    int                `json:"total"`
-	Projects []GlobalProjectDTO `json:"projects"`
-}
-
-type GlobalProjectDTO struct {
-	ProjectSummaryDTO
-	AvatarId string `json:"avatar_id"`
-}
-
-func (s projectService) ListGlobal(cmd *GlobalResourceListCmd) (
-	dto GlobalProjectsDTO, err error,
-) {
-	option := cmd.toResourceListOption()
-
-	var v repository.UserProjectsInfo
-
-	if cmd.SortType == nil {
-		v, err = s.repo.ListGlobalAndSortByUpdateTime(&option)
-	} else {
-		switch cmd.SortType.SortType() {
-		case domain.SortTypeUpdateTime:
-			v, err = s.repo.ListGlobalAndSortByUpdateTime(&option)
-
-		case domain.SortTypeFirstLetter:
-			v, err = s.repo.ListGlobalAndSortByFirstLetter(&option)
-
-		case domain.SortTypeDownloadCount:
-			v, err = s.repo.ListGlobalAndSortByDownloadCount(&option)
-		}
-	}
-
-	items := v.Projects
-
-	if err != nil || len(items) == 0 {
-		return
-	}
-
-	// find avatars
-	users := make([]userdomain.Account, len(items))
-	for i := range items {
-		users[i] = items[i].Owner
-	}
-
-	avatars, err := s.rs.findUserAvater(users)
-	if err != nil {
-		return
-	}
-
-	// gen result
-	dtos := make([]GlobalProjectDTO, len(items))
-	for i := range items {
-		s.toProjectSummaryDTO(&items[i], &dtos[i].ProjectSummaryDTO)
-		dtos[i].AvatarId = avatars[i]
-	}
-
-	dto.Total = v.Total
-	dto.Projects = dtos
-
-	return
 }
 
 // Model
@@ -98,7 +35,7 @@ type GlobalModelDTO struct {
 func (s modelService) ListGlobal(cmd *GlobalResourceListCmd) (
 	dto GlobalModelsDTO, err error,
 ) {
-	option := cmd.toResourceListOption()
+	option := cmd.ToResourceListOption()
 
 	var v repository.UserModelsInfo
 
@@ -129,7 +66,7 @@ func (s modelService) ListGlobal(cmd *GlobalResourceListCmd) (
 		users[i] = items[i].Owner
 	}
 
-	avatars, err := s.rs.findUserAvater(users)
+	avatars, err := s.rs.FindUserAvater(users)
 	if err != nil {
 		return
 	}
@@ -161,7 +98,7 @@ type GlobalDatasetDTO struct {
 func (s datasetService) ListGlobal(cmd *GlobalResourceListCmd) (
 	dto GlobalDatasetsDTO, err error,
 ) {
-	option := cmd.toResourceListOption()
+	option := cmd.ToResourceListOption()
 
 	var v repository.UserDatasetsInfo
 
@@ -192,7 +129,7 @@ func (s datasetService) ListGlobal(cmd *GlobalResourceListCmd) (
 		users[i] = items[i].Owner
 	}
 
-	avatars, err := s.rs.findUserAvater(users)
+	avatars, err := s.rs.FindUserAvater(users)
 	if err != nil {
 		return
 	}

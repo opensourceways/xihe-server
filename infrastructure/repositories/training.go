@@ -78,7 +78,7 @@ func (impl training) GetTrainingConfig(info *domain.TrainingIndex) (domain.Train
 }
 
 func (impl training) GetLastTrainingConfig(res *domain.ResourceIndex) (domain.TrainingConfig, error) {
-	do := toResourceIndexDO(res)
+	do := ToResourceIndexDO(res)
 	v, err := impl.mapper.GetLastTrainingConfig(&do)
 	if err != nil {
 		return domain.TrainingConfig{}, convertError(err)

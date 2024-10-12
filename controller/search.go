@@ -7,6 +7,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -14,7 +15,7 @@ import (
 func AddRouterForSearchController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
-	proj repository.Project,
+	proj spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 ) {

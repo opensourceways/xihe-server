@@ -5,7 +5,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/repository"
 )
 
-func searchOptionToListDO(
+func SearchOptionToListDO(
 	opt *repository.ResourceSearchOption,
 ) (do GlobalResourceListDO) {
 	do.Name = opt.Name
@@ -26,10 +26,10 @@ type GlobalResourceListDO struct {
 	TagKinds []string
 }
 
-func toGlobalResourceListDO(
+func ToGlobalResourceListDO(
 	opt *repository.GlobalResourceListOption,
 ) (do GlobalResourceListDO) {
-	do.ResourceListDO = toResourceListDO(&opt.ResourceListOption)
+	do.ResourceListDO = ToResourceListDO(&opt.ResourceListOption)
 
 	if opt.Level != nil {
 		do.Level = opt.Level.Int()
@@ -38,71 +38,6 @@ func toGlobalResourceListDO(
 	do.TagKinds = opt.TagKinds
 
 	return
-}
-
-func (impl project) ListGlobalAndSortByUpdateTime(
-	option *repository.GlobalResourceListOption,
-) (repository.UserProjectsInfo, error) {
-	return impl.listGlobal(
-		option, impl.mapper.ListGlobalAndSortByUpdateTime,
-	)
-}
-
-func (impl project) ListGlobalAndSortByFirstLetter(
-	option *repository.GlobalResourceListOption,
-) (repository.UserProjectsInfo, error) {
-	return impl.listGlobal(
-		option, impl.mapper.ListGlobalAndSortByFirstLetter,
-	)
-}
-
-func (impl project) ListGlobalAndSortByDownloadCount(
-	option *repository.GlobalResourceListOption,
-) (repository.UserProjectsInfo, error) {
-	return impl.listGlobal(
-		option, impl.mapper.ListGlobalAndSortByDownloadCount,
-	)
-}
-
-func (impl project) listGlobal(
-	option *repository.GlobalResourceListOption,
-	f func(*GlobalResourceListDO) ([]ProjectSummaryDO, int, error),
-) (
-	info repository.UserProjectsInfo, err error,
-) {
-	return impl.doList(func() ([]ProjectSummaryDO, int, error) {
-		do := toGlobalResourceListDO(option)
-
-		return f(&do)
-	})
-}
-
-func (impl project) Search(option *repository.ResourceSearchOption) (
-	repository.ResourceSearchResult, error,
-) {
-	r := repository.ResourceSearchResult{}
-
-	do := searchOptionToListDO(option)
-	v, total, err := impl.mapper.Search(&do, option.TopNum)
-	if err != nil {
-		return r, err
-	}
-
-	items := make([]domain.ResourceSummary, len(v))
-	for i := range v {
-		if items[i].Owner, err = domain.NewAccount(v[i].Owner); err != nil {
-			return r, err
-		}
-
-		if items[i].Name, err = domain.NewResourceName(v[i].Name); err != nil {
-			return r, err
-		}
-	}
-
-	r.Top = items
-	r.Total = total
-
-	return r, nil
 }
 
 // Model
@@ -137,7 +72,7 @@ func (impl model) listGlobal(
 	info repository.UserModelsInfo, err error,
 ) {
 	return impl.doList(func() ([]ModelSummaryDO, int, error) {
-		do := toGlobalResourceListDO(option)
+		do := ToGlobalResourceListDO(option)
 
 		return f(&do)
 	})
@@ -148,7 +83,7 @@ func (impl model) Search(option *repository.ResourceSearchOption) (
 ) {
 	r := repository.ResourceSearchResult{}
 
-	do := searchOptionToListDO(option)
+	do := SearchOptionToListDO(option)
 	v, total, err := impl.mapper.Search(&do, option.TopNum)
 	if err != nil {
 		return r, err
@@ -203,7 +138,7 @@ func (impl dataset) listGlobal(
 	info repository.UserDatasetsInfo, err error,
 ) {
 	return impl.doList(func() ([]DatasetSummaryDO, int, error) {
-		do := toGlobalResourceListDO(option)
+		do := ToGlobalResourceListDO(option)
 
 		return f(&do)
 	})
@@ -214,7 +149,7 @@ func (impl dataset) Search(option *repository.ResourceSearchOption) (
 ) {
 	r := repository.ResourceSearchResult{}
 
-	do := searchOptionToListDO(option)
+	do := SearchOptionToListDO(option)
 	v, total, err := impl.mapper.Search(&do, option.TopNum)
 	if err != nil {
 		return r, err
