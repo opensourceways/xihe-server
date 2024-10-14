@@ -3,10 +3,11 @@ package message
 import (
 	bmdomain "github.com/opensourceways/xihe-server/bigmodel/domain"
 	"github.com/opensourceways/xihe-server/domain"
+	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
 type InferenceExtendInfo struct {
-	domain.InferenceInfo
+	spaceappdomain.InferenceInfo
 	Expiry int64
 }
 
@@ -28,7 +29,7 @@ type Sender interface {
 
 	CreateFinetune(*domain.FinetuneIndex) error
 
-	CreateInference(*domain.InferenceInfo) error
+	CreateInference(*spaceappdomain.InferenceInfo) error
 	ExtendInferenceSurvivalTime(*InferenceExtendInfo) error
 
 	CalcScore(*SubmissionInfo) error
@@ -79,6 +80,6 @@ type FinetuneHandler interface {
 }
 
 type InferenceHandler interface {
-	HandleEventCreateInference(*domain.InferenceInfo) error
+	HandleEventCreateInference(*spaceappdomain.InferenceInfo) error
 	HandleEventExtendInferenceSurvivalTime(*InferenceExtendInfo) error
 }

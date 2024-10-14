@@ -58,6 +58,7 @@ import (
 	promotionuseradapter "github.com/opensourceways/xihe-server/promotion/infrastructure/useradapter"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
+	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
@@ -147,7 +148,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
-	inference := repositories.NewInferenceRepository(
+	inference := spaceapprepo.NewInferenceRepository(
 		mongodb.NewInferenceMapper(
 			collections.Inference,
 		),

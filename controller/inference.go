@@ -9,12 +9,13 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 
-	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
+	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
+	spaceappApprepo "github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -22,13 +23,13 @@ import (
 func AddRouterForInferenceController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
-	repo repository.Inference,
+	repo spaceappApprepo.Inference,
 	project spacerepo.Project,
 	sender message.Sender,
 	whitelist userapp.WhiteListService,
 ) {
 	ctl := InferenceController{
-		s: app.NewInferenceService(
+		s: spaceappApp.NewInferenceService(
 			p, repo, sender, apiConfig.MinSurvivalTimeOfInference,
 		),
 		project:   project,
@@ -44,7 +45,7 @@ func AddRouterForInferenceController(
 type InferenceController struct {
 	baseController
 
-	s app.InferenceService
+	s spaceappApp.InferenceService
 
 	project spacerepo.Project
 
@@ -150,7 +151,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 		u = pl.PlatformUserInfo()
 	}
 
-	cmd := app.InferenceCreateCmd{
+	cmd := spaceappApp.InferenceCreateCmd{
 		ProjectId:     v.Id,
 		ProjectName:   v.Name,
 		ProjectOwner:  owner,
@@ -183,7 +184,7 @@ func (ctl *InferenceController) Create(ctx *gin.Context) {
 
 	time.Sleep(10 * time.Second)
 
-	info := app.InferenceIndex{
+	info := spaceappApp.InferenceIndex{
 		Id:         dto.InstanceId,
 		LastCommit: lastCommit,
 	}
