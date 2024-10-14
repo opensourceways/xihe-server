@@ -173,6 +173,8 @@ func (impl project) toProjectDO(p *spacedomain.Project) ProjectDO {
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
 		Version:   p.Version,
+		Hardware:  p.Hardware.Hardware(),
+		BaseImage: p.BaseImage.BaseImage(),
 	}
 
 	if p.Desc != nil {
@@ -207,6 +209,9 @@ type ProjectDO struct {
 	LikeCount     int
 	ForkCount     int
 	DownloadCount int
+
+	Hardware  string
+	BaseImage string
 
 	RelatedModels   []repositories.ResourceIndexDO
 	RelatedDatasets []repositories.ResourceIndexDO

@@ -26,6 +26,9 @@ type Project struct {
 	LikeCount     int
 	ForkCount     int
 	DownloadCount int
+
+	Hardware  domain.Hardware
+	BaseImage domain.BaseImage
 }
 
 func (p *Project) MaxRelatedResourceNum() int {
@@ -72,6 +75,28 @@ func (p *Project) RelatedResources() []domain.ResourceObjects {
 	}
 
 	return r
+}
+
+// GetQuotaCount returns the quota count of the Space.
+func (s *Project) GetQuotaCount() int {
+	if s.Hardware.IsNpu() {
+		return 1
+	} else if s.Hardware.IsCpu() {
+		return 0
+	}
+
+	return 0
+}
+
+// GetComputeType returns the compute type of the Space.
+func (s *Project) GetComputeType() domain.ComputilityType {
+	if s.Hardware.IsNpu() {
+		return domain.CreateComputilityType("npu")
+	} else if s.Hardware.IsCpu() {
+		return domain.CreateComputilityType("cpu")
+	}
+
+	return nil
 }
 
 type ProjectModifiableProperty struct {

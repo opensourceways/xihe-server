@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/opensourceways/xihe-server/app"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -39,7 +38,7 @@ func AddRouterForProjectController(
 		dataset: dataset,
 		tags:    tags,
 		like:    like,
-		s: app.NewProjectService(
+		s: spaceapp.NewProjectService(
 			user, repo, model, dataset, activity, nil, sender, computility,
 		),
 		newPlatformRepository: newPlatformRepository,

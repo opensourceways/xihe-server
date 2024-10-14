@@ -82,7 +82,7 @@ func (cmd *ProjectCreateCmd) toProject(r *spacedomain.Project) {
 		UpdatedAt: now,
 		Hardware:  cmd.Hardware,
 		BaseImage: cmd.BaseImage,
-		ProjectModifiableProperty: domain.ProjectModifiableProperty{
+		ProjectModifiableProperty: spacedomain.ProjectModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     cmd.Desc,
 			Title:    cmd.Title,
@@ -151,7 +151,7 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 }
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
-	v := new(domain.Project)
+	v := new(spacedomain.Project)
 	cmd.toProject(v)
 	count := v.GetQuotaCount()
 	hdType := v.GetComputeType()
@@ -182,7 +182,6 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	}
 
 	// step2: save
-	v := new(domain.Project)
 	cmd.toProject(v)
 	v.RepoId = pid
 
