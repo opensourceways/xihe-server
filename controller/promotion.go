@@ -26,7 +26,7 @@ func AddRouterForPromotionController(
 	rg.GET("/v1/promotions", ctl.List)
 	rg.GET("/v1/promotion/:id", ctl.Get)
 	rg.POST("/v1/promotion/:id/apply", ctl.Apply)
-	rg.GET("/v1/promotion/user/:account", ctl.GetUserRegitration)
+	rg.GET("/v1/promotion/user/:account", ctl.GetUserRegistration)
 
 	// user points
 	rg.GET("/v1/promotion/:id/points/:account", ctl.GetUserPoints)
@@ -78,7 +78,7 @@ func (ctl *PromotionController) Apply(ctx *gin.Context) {
 	}
 }
 
-// @Summary		GetUserRegitration
+// @Summary		GetUserRegistration
 // @Description	get user registrater promotion
 // @Tags			Promotion
 // @Param			account		path	string						true	"username"
@@ -86,7 +86,7 @@ func (ctl *PromotionController) Apply(ctx *gin.Context) {
 // @Success		201
 // @Failure		500	system_error	system	error
 // @Router			/v1/promotion/user/{account} [get]
-func (ctl *PromotionController) GetUserRegitration(ctx *gin.Context) {
+func (ctl *PromotionController) GetUserRegistration(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
