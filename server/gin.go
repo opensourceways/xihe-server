@@ -266,7 +266,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityAccountRecordAdapter(),
 	)
 
-	projectService := spaceapp.NewProjectService(user, proj, model, dataset, activity, nil, resProducer, computilityService)
+	projectService := spaceapp.NewProjectService(
+		user, proj, model, dataset, activity, nil, resProducer, computilityService,
+	)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
 
