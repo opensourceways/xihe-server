@@ -1,20 +1,21 @@
-package repositories
+package repositoryimpl
 
 import (
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
 type InferenceIndexDO struct {
 	Id         string
 	LastCommit string
-	Project    ResourceIndexDO
+	Project    repositories.ResourceIndexDO
 }
 
 func (impl inference) toInferenceIndexDO(index *domain.InferenceIndex) InferenceIndexDO {
 	return InferenceIndexDO{
 		Id:         index.Id,
 		LastCommit: index.LastCommit,
-		Project:    ToResourceIndexDO(&index.Project),
+		Project:    repositories.ToResourceIndexDO(&index.Project),
 	}
 }
 

@@ -7,9 +7,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
 )
 
-func NewInferenceMapper(name string) repositories.InferenceMapper {
+func NewInferenceMapper(name string) repositoryimpl.InferenceMapper {
 	return inference{name}
 }
 
@@ -25,7 +26,7 @@ type inference struct {
 	collectionName string
 }
 
-func (col inference) newDoc(do *repositories.InferenceDO) error {
+func (col inference) newDoc(do *repositoryimpl.InferenceDO) error {
 	docFilter := inferenceDocFilter(do.ProjectOwner, do.ProjectId, do.LastCommit)
 
 	doc := bson.M{
@@ -52,7 +53,7 @@ func (col inference) newDoc(do *repositories.InferenceDO) error {
 	return nil
 }
 
-func (col inference) Insert(do *repositories.InferenceDO, version int) (
+func (col inference) Insert(do *repositoryimpl.InferenceDO, version int) (
 	identity string, err error,
 ) {
 	identity, err = col.insert(do, version)
@@ -72,7 +73,7 @@ func (col inference) Insert(do *repositories.InferenceDO, version int) (
 	return
 }
 
-func (col inference) insert(do *repositories.InferenceDO, version int) (identity string, err error) {
+func (col inference) insert(do *repositoryimpl.InferenceDO, version int) (identity string, err error) {
 	identity = newId()
 
 	doc := bson.M{fieldId: identity}
@@ -91,8 +92,8 @@ func (col inference) insert(do *repositories.InferenceDO, version int) (identity
 }
 
 func (col inference) UpdateDetail(
-	index *repositories.InferenceIndexDO,
-	detail *repositories.InferenceDetailDO,
+	index *repositoryimpl.InferenceIndexDO,
+	detail *repositoryimpl.InferenceDetailDO,
 ) error {
 	data := inferenceItem{
 		Expiry:    detail.Expiry,
@@ -123,14 +124,14 @@ func (col inference) UpdateDetail(
 	return withContext(f)
 }
 
-func (col inference) docFilter(index *repositories.InferenceIndexDO) bson.M {
+func (col inference) docFilter(index *repositoryimpl.InferenceIndexDO) bson.M {
 	return inferenceDocFilter(
 		index.Project.Owner, index.Project.Id, index.LastCommit,
 	)
 }
 
-func (col inference) Get(index *repositories.InferenceIndexDO) (
-	r repositories.InferenceSummaryDO, err error,
+func (col inference) Get(index *repositoryimpl.InferenceIndexDO) (
+	r repositoryimpl.InferenceSummaryDO, err error,
 ) {
 	var v []dInference
 
@@ -159,7 +160,7 @@ func (col inference) Get(index *repositories.InferenceIndexDO) (
 }
 
 func (col inference) List(index *repositories.ResourceIndexDO, lastCommit string) (
-	[]repositories.InferenceSummaryDO, int, error,
+	[]repositoryimpl.InferenceSummaryDO, int, error,
 ) {
 	var v dInference
 
@@ -182,7 +183,7 @@ func (col inference) List(index *repositories.ResourceIndexDO, lastCommit string
 	}
 
 	t := v.Items
-	r := make([]repositories.InferenceSummaryDO, len(t))
+	r := make([]repositoryimpl.InferenceSummaryDO, len(t))
 
 	for i := range t {
 		col.toInferenceSummaryDO(&t[i], &r[i])
@@ -191,7 +192,7 @@ func (col inference) List(index *repositories.ResourceIndexDO, lastCommit string
 	return r, v.Version, nil
 }
 
-func (col inference) toInferenceSummaryDO(doc *inferenceItem, r *repositories.InferenceSummaryDO) {
+func (col inference) toInferenceSummaryDO(doc *inferenceItem, r *repositoryimpl.InferenceSummaryDO) {
 	r.Id = doc.Id
 	r.Error = doc.Error
 	r.Expiry = doc.Expiry

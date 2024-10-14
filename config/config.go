@@ -22,9 +22,9 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
-	"github.com/opensourceways/xihe-server/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/utils"
 )
 

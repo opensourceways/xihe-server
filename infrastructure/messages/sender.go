@@ -7,6 +7,7 @@ import (
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
+	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -32,7 +33,7 @@ func (s *sender) CreateFinetune(info *domain.FinetuneIndex) error {
 }
 
 // Inference
-func (s *sender) CreateInference(info *domain.InferenceInfo) error {
+func (s *sender) CreateInference(info *spaceappdomain.InferenceInfo) error {
 	v := s.toInferenceMsg(&info.InferenceIndex)
 	v.Action = actionCreate
 	v.ProjectName = info.ProjectName.ResourceName()
@@ -58,7 +59,7 @@ func (s *sender) ExtendInferenceSurvivalTime(info *message.InferenceExtendInfo) 
 	return s.send(s.topics.Inference, &v)
 }
 
-func (s *sender) toInferenceMsg(index *domain.InferenceIndex) msgInference {
+func (s *sender) toInferenceMsg(index *spaceappdomain.InferenceIndex) msgInference {
 	return msgInference{
 		ProjectId:    index.Project.Id,
 		LastCommit:   index.LastCommit,

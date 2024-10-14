@@ -4,8 +4,8 @@ import (
 	"github.com/opensourceways/xihe-inference-evaluate/sdk"
 	"github.com/sirupsen/logrus"
 
-	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/inference"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain/inference"
 )
 
 func NewInference(cfg *Config) *inferenceImpl {

@@ -1,7 +1,7 @@
 package inference
 
 import (
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
 type InferenceInfo struct {
