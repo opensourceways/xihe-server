@@ -13,6 +13,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/domain/training"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -21,7 +22,7 @@ func AddRouterForTrainingController(
 	ts training.Training,
 	repo repository.Training,
 	model repository.Model,
-	project repository.Project,
+	project spacerepo.Project,
 	dataset repository.Dataset,
 	sender message.MessageProducer,
 ) {
@@ -54,7 +55,7 @@ type TrainingController struct {
 	ts app.TrainingService
 
 	model   repository.Model
-	project repository.Project
+	project spacerepo.Project
 	dataset repository.Dataset
 }
 

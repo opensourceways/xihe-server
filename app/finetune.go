@@ -97,7 +97,7 @@ func (s finetuneService) Create(cmd *FinetuneCreateCmd) (
 		Id:    fid,
 	})
 	if err1 != nil {
-		logrus.Errorf("send message of creating finetune failed, err:%s", err.Error())
+		logrus.Errorf("send message of creating finetune failed, err:%s", err1.Error())
 	}
 
 	return

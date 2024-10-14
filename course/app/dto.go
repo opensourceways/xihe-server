@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/course/domain"
-	projdomain "github.com/opensourceways/xihe-server/domain"
 	types "github.com/opensourceways/xihe-server/domain"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -314,7 +314,7 @@ type RelateProjectDTO struct {
 	RelatedProject []ProjectSummuryDTO `json:"related_project"`
 }
 
-func toProjectSummuryDTO(p *projdomain.Project, dto *ProjectSummuryDTO) {
+func toProjectSummuryDTO(p *spacedomain.Project, dto *ProjectSummuryDTO) {
 	*dto = ProjectSummuryDTO{
 		Owner:         p.Owner.Account(),
 		Name:          p.Name.ResourceName(),

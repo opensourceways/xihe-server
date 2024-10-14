@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
@@ -48,7 +49,7 @@ type SearchService interface {
 func NewSearchService(
 	user userrepo.User,
 	model repository.Model,
-	project repository.Project,
+	project spacerepo.Project,
 	dataset repository.Dataset,
 ) SearchService {
 	return searchService{
@@ -62,7 +63,7 @@ func NewSearchService(
 type searchService struct {
 	user    userrepo.User
 	model   repository.Model
-	project repository.Project
+	project spacerepo.Project
 	dataset repository.Dataset
 }
 

@@ -3,18 +3,21 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/inference"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain/inference"
+	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 	"github.com/sirupsen/logrus"
 )
 
-type InferenceIndex = domain.InferenceIndex
-type InferenceDetail = domain.InferenceDetail
+type InferenceIndex = spaceappdomain.InferenceIndex
+type InferenceDetail = spaceappdomain.InferenceDetail
 
 type InferenceCreateCmd struct {
 	ProjectId     string
@@ -40,7 +43,7 @@ func (cmd *InferenceCreateCmd) Validate() error {
 	return nil
 }
 
-func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit, requester string) {
+func (cmd *InferenceCreateCmd) toInference(v *spaceappdomain.Inference, lastCommit, requester string) {
 	v.Project.Id = cmd.ProjectId
 	v.LastCommit = lastCommit
 	v.ProjectName = cmd.ProjectName
@@ -50,13 +53,13 @@ func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit, requ
 }
 
 type InferenceService interface {
-	Create(string, *UserInfo, *InferenceCreateCmd) (InferenceDTO, string, error)
+	Create(string, *app.UserInfo, *InferenceCreateCmd) (InferenceDTO, string, error)
 	Get(info *InferenceIndex) (InferenceDTO, error)
 }
 
 func NewInferenceService(
 	p platform.RepoFile,
-	repo repository.Inference,
+	repo spaceapprepo.Inference,
 	sender message.Sender,
 	minSurvivalTime int,
 ) InferenceService {
@@ -70,27 +73,12 @@ func NewInferenceService(
 
 type inferenceService struct {
 	p               platform.RepoFile
-	repo            repository.Inference
+	repo            spaceapprepo.Inference
 	sender          message.Sender
 	minSurvivalTime int64
 }
 
-type InferenceDTO struct {
-	expiry     int64
-	Error      string `json:"error"`
-	AccessURL  string `json:"access_url"`
-	InstanceId string `json:"inference_id"`
-}
-
-func (dto *InferenceDTO) hasResult() bool {
-	return dto.InstanceId != ""
-}
-
-func (dto *InferenceDTO) canReuseCurrent() bool {
-	return dto.AccessURL != ""
-}
-
-func (s inferenceService) Create(user string, owner *UserInfo, cmd *InferenceCreateCmd) (
+func (s inferenceService) Create(user string, owner *app.UserInfo, cmd *InferenceCreateCmd) (
 	dto InferenceDTO, sha string, err error,
 ) {
 	sha, b, err := s.p.GetDirFileInfo(owner, &platform.RepoDirFile{
@@ -103,14 +91,14 @@ func (s inferenceService) Create(user string, owner *UserInfo, cmd *InferenceCre
 	}
 
 	if !b {
-		err = ErrorUnavailableRepoFile{
+		err = UnavailableRepoFileError{
 			errors.New("no boot file"),
 		}
 
 		return
 	}
 
-	instance := new(domain.Inference)
+	instance := new(spaceappdomain.Inference)
 	cmd.toInference(instance, sha, user)
 	dto, version, err := s.check(instance)
 	if err != nil {
@@ -162,7 +150,7 @@ func (s inferenceService) Get(index *InferenceIndex) (dto InferenceDTO, err erro
 	return
 }
 
-func (s inferenceService) check(instance *domain.Inference) (
+func (s inferenceService) check(instance *spaceappdomain.Inference) (
 	dto InferenceDTO, version int, err error,
 ) {
 	v, version, err := s.repo.FindInstances(&instance.Project, instance.LastCommit)
@@ -170,7 +158,7 @@ func (s inferenceService) check(instance *domain.Inference) (
 		return
 	}
 
-	var target *repository.InferenceSummary
+	var target *spaceapprepo.InferenceSummary
 
 	for i := range v {
 		item := &v[i]
@@ -205,14 +193,14 @@ type InferenceInternalService interface {
 	UpdateDetail(*InferenceIndex, *InferenceDetail) error
 }
 
-func NewInferenceInternalService(repo repository.Inference) InferenceInternalService {
+func NewInferenceInternalService(repo spaceapprepo.Inference) InferenceInternalService {
 	return inferenceInternalService{
 		repo: repo,
 	}
 }
 
 type inferenceInternalService struct {
-	repo repository.Inference
+	repo spaceapprepo.Inference
 }
 
 func (s inferenceInternalService) UpdateDetail(index *InferenceIndex, detail *InferenceDetail) error {
@@ -220,12 +208,12 @@ func (s inferenceInternalService) UpdateDetail(index *InferenceIndex, detail *In
 }
 
 type InferenceMessageService interface {
-	CreateInferenceInstance(*domain.InferenceInfo) error
+	CreateInferenceInstance(*spaceappdomain.InferenceInfo) error
 	ExtendSurvivalTime(*message.InferenceExtendInfo) error
 }
 
 func NewInferenceMessageService(
-	repo repository.Inference,
+	repo spaceapprepo.Inference,
 	user userrepo.User,
 	manager inference.Inference,
 ) InferenceMessageService {
@@ -237,12 +225,12 @@ func NewInferenceMessageService(
 }
 
 type inferenceMessageService struct {
-	repo    repository.Inference
+	repo    spaceapprepo.Inference
 	user    userrepo.User
 	manager inference.Inference
 }
 
-func (s inferenceMessageService) CreateInferenceInstance(info *domain.InferenceInfo) error {
+func (s inferenceMessageService) CreateInferenceInstance(info *spaceappdomain.InferenceInfo) error {
 	v, err := s.user.GetByAccount(info.Project.Owner)
 	if err != nil {
 		return err
@@ -258,7 +246,7 @@ func (s inferenceMessageService) CreateInferenceInstance(info *domain.InferenceI
 
 	return s.repo.UpdateDetail(
 		&info.InferenceIndex,
-		&domain.InferenceDetail{Expiry: utils.Now() + int64(survivaltime)},
+		&spaceappdomain.InferenceDetail{Expiry: utils.Now() + int64(survivaltime)},
 	)
 }
 
@@ -289,5 +277,5 @@ func (s inferenceMessageService) ExtendSurvivalTime(info *message.InferenceExten
 		return err
 	}
 
-	return s.repo.UpdateDetail(&info.InferenceIndex, &domain.InferenceDetail{Expiry: n})
+	return s.repo.UpdateDetail(&info.InferenceIndex, &spaceappdomain.InferenceDetail{Expiry: n})
 }

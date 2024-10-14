@@ -6,6 +6,8 @@ import (
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
@@ -36,14 +38,24 @@ func (r *ResourceDTO) identity() string {
 	return fmt.Sprintf("%s_%s_%s", r.Owner.Name, r.Type, r.Id)
 }
 
-type resourceService struct {
-	user    userrepo.User
-	model   repository.Model
-	project repository.Project
-	dataset repository.Dataset
+type ResourceListCmd struct {
+	repository.ResourceListOption
+
+	SortType domain.SortType
 }
 
-func (s resourceService) list(resources []*domain.ResourceObject) (
+func (cmd *ResourceListCmd) ToResourceListOption() repository.ResourceListOption {
+	return cmd.ResourceListOption
+}
+
+type ResourceService struct {
+	User    userrepo.User
+	Model   repository.Model
+	Project spacerepo.Project
+	Dataset repository.Dataset
+}
+
+func (s ResourceService) list(resources []*domain.ResourceObject) (
 	dtos []ResourceDTO, err error,
 ) {
 	users, projects, datasets, models := s.toOptions(resources)
@@ -51,7 +63,7 @@ func (s resourceService) list(resources []*domain.ResourceObject) (
 	return s.listResources(users, projects, datasets, models, len(resources))
 }
 
-func (s resourceService) listProjects(resources []domain.ResourceIndex) (
+func (s ResourceService) listProjects(resources []domain.ResourceIndex) (
 	dtos []ResourceDTO, err error,
 ) {
 	if len(resources) == 0 {
@@ -63,7 +75,7 @@ func (s resourceService) listProjects(resources []domain.ResourceIndex) (
 	return s.listResources(users, options, nil, nil, len(resources))
 }
 
-func (s resourceService) listModels(resources []domain.ResourceIndex) (
+func (s ResourceService) ListModels(resources []domain.ResourceIndex) (
 	dtos []ResourceDTO, err error,
 ) {
 	if len(resources) == 0 {
@@ -75,7 +87,7 @@ func (s resourceService) listModels(resources []domain.ResourceIndex) (
 	return s.listResources(users, nil, nil, options, len(resources))
 }
 
-func (s resourceService) listDatasets(resources []domain.ResourceIndex) (
+func (s ResourceService) ListDatasets(resources []domain.ResourceIndex) (
 	dtos []ResourceDTO, err error,
 ) {
 	if len(resources) == 0 {
@@ -87,7 +99,7 @@ func (s resourceService) listDatasets(resources []domain.ResourceIndex) (
 	return s.listResources(users, nil, options, nil, len(resources))
 }
 
-func (s resourceService) singleResourceOptions(resources []domain.ResourceIndex) (
+func (s ResourceService) singleResourceOptions(resources []domain.ResourceIndex) (
 	users []userdomain.Account,
 	options []repository.UserResourceListOption,
 ) {
@@ -111,7 +123,7 @@ func (s resourceService) singleResourceOptions(resources []domain.ResourceIndex)
 	return
 }
 
-func (s resourceService) toOptions(resources []*domain.ResourceObject) (
+func (s ResourceService) toOptions(resources []*domain.ResourceObject) (
 	users []userdomain.Account,
 	projects []repository.UserResourceListOption,
 	datasets []repository.UserResourceListOption,
@@ -150,7 +162,7 @@ func (s resourceService) toOptions(resources []*domain.ResourceObject) (
 	return
 }
 
-func (s resourceService) listResources(
+func (s ResourceService) listResources(
 	users []userdomain.Account,
 	projects []repository.UserResourceListOption,
 	datasets []repository.UserResourceListOption,
@@ -159,7 +171,7 @@ func (s resourceService) listResources(
 ) (
 	dtos []ResourceDTO, err error,
 ) {
-	allUsers, err := s.user.FindUsersInfo(users)
+	allUsers, err := s.User.FindUsersInfo(users)
 	if err != nil {
 		return
 	}
@@ -175,7 +187,7 @@ func (s resourceService) listResources(
 	r := dtos
 
 	if len(projects) > 0 {
-		all, err := s.project.FindUserProjects(projects)
+		all, err := s.Project.FindUserProjects(projects)
 		if err != nil {
 			return nil, err
 		}
@@ -192,7 +204,7 @@ func (s resourceService) listResources(
 	}
 
 	if len(models) > 0 {
-		all, err := s.model.FindUserModels(models)
+		all, err := s.Model.FindUserModels(models)
 		if err != nil {
 			return nil, err
 		}
@@ -209,7 +221,7 @@ func (s resourceService) listResources(
 	}
 
 	if n := len(datasets); n > 0 {
-		all, err := s.dataset.FindUserDatasets(datasets)
+		all, err := s.Dataset.FindUserDatasets(datasets)
 		if err != nil {
 			return nil, err
 		}
@@ -229,9 +241,9 @@ func (s resourceService) listResources(
 	return
 }
 
-func (s resourceService) projectToResourceDTO(
+func (s ResourceService) projectToResourceDTO(
 	userInfos map[string]*userdomain.UserInfo,
-	projects []domain.ProjectSummary, dtos []ResourceDTO,
+	projects []spacedomain.ProjectSummary, dtos []ResourceDTO,
 ) {
 	for i := range projects {
 		p := &projects[i]
@@ -271,7 +283,7 @@ func (s resourceService) projectToResourceDTO(
 	}
 }
 
-func (s resourceService) modelToResourceDTO(
+func (s ResourceService) modelToResourceDTO(
 	userInfos map[string]*userdomain.UserInfo,
 	data []domain.ModelSummary, dtos []ResourceDTO,
 ) {
@@ -307,7 +319,7 @@ func (s resourceService) modelToResourceDTO(
 	}
 }
 
-func (s resourceService) datasetToResourceDTO(
+func (s ResourceService) datasetToResourceDTO(
 	userInfos map[string]*userdomain.UserInfo,
 	data []domain.DatasetSummary, dtos []ResourceDTO,
 ) {
@@ -343,7 +355,7 @@ func (s resourceService) datasetToResourceDTO(
 	}
 }
 
-func (s resourceService) store(v *domain.ResourceIndex, m map[string][]string) {
+func (s ResourceService) store(v *domain.ResourceIndex, m map[string][]string) {
 	a := v.Owner.Account()
 
 	if p, ok := m[a]; !ok {
@@ -353,7 +365,7 @@ func (s resourceService) store(v *domain.ResourceIndex, m map[string][]string) {
 	}
 }
 
-func (s resourceService) toOptionList(
+func (s ResourceService) toOptionList(
 	m map[string][]string, users map[string]userdomain.Account,
 ) []repository.UserResourceListOption {
 
@@ -376,7 +388,7 @@ func (s resourceService) toOptionList(
 	return r
 }
 
-func (s resourceService) userMapToList(m map[string]userdomain.Account) []userdomain.Account {
+func (s ResourceService) userMapToList(m map[string]userdomain.Account) []userdomain.Account {
 	if len(m) == 0 {
 		return nil
 	}
@@ -392,8 +404,8 @@ func (s resourceService) userMapToList(m map[string]userdomain.Account) []userdo
 	return r
 }
 
-func (s resourceService) findUserAvater(users []userdomain.Account) ([]string, error) {
-	allUsers, err := s.user.FindUsersInfo(users)
+func (s ResourceService) FindUserAvater(users []userdomain.Account) ([]string, error) {
+	allUsers, err := s.User.FindUsersInfo(users)
 	if err != nil {
 		return nil, err
 	}
@@ -413,35 +425,35 @@ func (s resourceService) findUserAvater(users []userdomain.Account) ([]string, e
 	return r, nil
 }
 
-func (s resourceService) canApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
-	if _, err := s.project.GetSummaryByName(owner, name); err == nil {
+func (s ResourceService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
+	if _, err := s.Project.GetSummaryByName(owner, name); err == nil {
 		return false
 	}
 
-	if _, err := s.model.GetSummaryByName(owner, name); err == nil {
+	if _, err := s.Model.GetSummaryByName(owner, name); err == nil {
 		return false
 	}
 
-	if _, err := s.dataset.GetSummaryByName(owner, name); err == nil {
+	if _, err := s.Dataset.GetSummaryByName(owner, name); err == nil {
 		return false
 	}
 
 	return true
 }
 
-func (s resourceService) IsPrivate(owner domain.Account, resourceType domain.ResourceType, id string,
+func (s ResourceService) IsPrivate(owner domain.Account, resourceType domain.ResourceType, id string,
 ) (isprivate bool, ok bool) {
 	switch resourceType.ResourceType() {
 	case domain.ResourceProject:
-		if p, err := s.project.Get(owner, id); err == nil {
+		if p, err := s.Project.Get(owner, id); err == nil {
 			return p.IsPrivate(), true
 		}
 	case domain.ResourceModel:
-		if m, err := s.model.Get(owner, id); err == nil {
+		if m, err := s.Model.Get(owner, id); err == nil {
 			return m.IsPrivate(), true
 		}
 	case domain.ResourceDataset:
-		if d, err := s.dataset.Get(owner, id); err == nil {
+		if d, err := s.Dataset.Get(owner, id); err == nil {
 			return d.IsPrivate(), true
 		}
 	default:

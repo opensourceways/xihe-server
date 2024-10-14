@@ -8,6 +8,7 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
@@ -15,7 +16,7 @@ func AddRouterForActivityController(
 	rg *gin.RouterGroup,
 	repo repository.Activity,
 	user userrepo.User,
-	proj repository.Project,
+	proj spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 ) {

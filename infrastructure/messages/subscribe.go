@@ -12,6 +12,7 @@ import (
 	common "github.com/opensourceways/xihe-server/common/domain/message"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
+	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
 const (
@@ -233,7 +234,7 @@ func (r *register) registerHandlerForInference(handler interface{}) error {
 			return
 		}
 
-		v := domain.InferenceIndex{}
+		v := spaceappdomain.InferenceIndex{}
 
 		if v.Project.Owner, err = domain.NewAccount(body.ProjectOwner); err != nil {
 			return
@@ -243,7 +244,7 @@ func (r *register) registerHandlerForInference(handler interface{}) error {
 		v.Project.Id = body.ProjectId
 		v.LastCommit = body.LastCommit
 
-		info := domain.InferenceInfo{
+		info := spaceappdomain.InferenceInfo{
 			InferenceIndex: v,
 			Requester:      body.User,
 		}

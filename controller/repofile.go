@@ -12,6 +12,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	uapp "github.com/opensourceways/xihe-server/user/app"
 )
 
@@ -19,7 +20,7 @@ func AddRouterForRepoFileController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
 	model repository.Model,
-	project repository.Project,
+	project spacerepo.Project,
 	dataset repository.Dataset,
 	sender message.RepoMessageProducer,
 	us uapp.UserService,
@@ -50,7 +51,7 @@ type RepoFileController struct {
 	s       app.RepoFileService
 	us      uapp.UserService
 	model   repository.Model
-	project repository.Project
+	project spacerepo.Project
 	dataset repository.Dataset
 }
 

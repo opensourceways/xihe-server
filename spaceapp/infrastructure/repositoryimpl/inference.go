@@ -1,17 +1,19 @@
-package repositories
+package repositoryimpl
 
 import (
 	"errors"
 
 	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 )
 
 type InferenceMapper interface {
 	Insert(*InferenceDO, int) (string, error)
 	Get(*InferenceIndexDO) (InferenceSummaryDO, error)
 	UpdateDetail(*InferenceIndexDO, *InferenceDetailDO) error
-	List(*ResourceIndexDO, string) ([]InferenceSummaryDO, int, error)
+	List(*repositories.ResourceIndexDO, string) ([]InferenceSummaryDO, int, error)
 }
 
 func NewInferenceRepository(mapper InferenceMapper) repository.Inference {
@@ -22,7 +24,7 @@ type inference struct {
 	mapper InferenceMapper
 }
 
-func (impl inference) Save(ut *domain.Inference, version int) (string, error) {
+func (impl inference) Save(ut *spaceappdomain.Inference, version int) (string, error) {
 	if ut.Id != "" {
 		return "", errors.New("must be a new project")
 	}
@@ -31,19 +33,19 @@ func (impl inference) Save(ut *domain.Inference, version int) (string, error) {
 
 	v, err := impl.mapper.Insert(&do, version)
 	if err != nil {
-		return "", convertError(err)
+		return "", repositories.ConvertError(err)
 	}
 
 	return v, nil
 }
 
-func (impl inference) FindInstance(info *domain.InferenceIndex) (
+func (impl inference) FindInstance(info *spaceappdomain.InferenceIndex) (
 	r repository.InferenceSummary, err error,
 ) {
 	index := impl.toInferenceIndexDO(info)
 	v, err := impl.mapper.Get(&index)
 	if err != nil {
-		err = convertError(err)
+		err = repositories.ConvertError(err)
 
 		return
 	}
@@ -57,10 +59,10 @@ func (impl inference) FindInstance(info *domain.InferenceIndex) (
 func (impl inference) FindInstances(info *domain.ResourceIndex, lastCommit string) (
 	r []repository.InferenceSummary, version int, err error,
 ) {
-	index := toResourceIndexDO(info)
+	index := repositories.ToResourceIndexDO(info)
 	v, version, err := impl.mapper.List(&index, lastCommit)
 	if err != nil {
-		err = convertError(err)
+		err = repositories.ConvertError(err)
 
 		return
 	}
@@ -76,12 +78,12 @@ func (impl inference) FindInstances(info *domain.ResourceIndex, lastCommit strin
 }
 
 func (impl inference) UpdateDetail(
-	info *domain.InferenceIndex, detail *domain.InferenceDetail,
+	info *spaceappdomain.InferenceIndex, detail *spaceappdomain.InferenceDetail,
 ) error {
 	index := impl.toInferenceIndexDO(info)
 
 	if err := impl.mapper.UpdateDetail(&index, detail); err != nil {
-		return convertError(err)
+		return repositories.ConvertError(err)
 	}
 
 	return nil

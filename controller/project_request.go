@@ -1,9 +1,9 @@
 package controller
 
 import (
-	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"golang.org/x/xerrors"
+	spaceapp "github.com/opensourceways/xihe-server/space/app"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
@@ -24,7 +24,7 @@ type projectCreateRequest struct {
 
 func (p *projectCreateRequest) toCmd(
 	validTags []domain.DomainTags,
-) (cmd app.ProjectCreateCmd, err error) {
+) (cmd spaceapp.ProjectCreateCmd, err error) {
 	if cmd.Owner, err = domain.NewAccount(p.Owner); err != nil {
 		return
 	}
@@ -101,7 +101,7 @@ type projectUpdateRequest struct {
 	CoverId  *string `json:"cover_id"`
 }
 
-func (p *projectUpdateRequest) toCmd() (cmd app.ProjectUpdateCmd, err error) {
+func (p *projectUpdateRequest) toCmd() (cmd spaceapp.ProjectUpdateCmd, err error) {
 	if p.Name != nil {
 		if cmd.Name, err = domain.NewResourceName(*p.Name); err != nil {
 			return
@@ -139,14 +139,14 @@ type projectDetail struct {
 	Liked    bool   `json:"liked"`
 	AvatarId string `json:"avatar_id"`
 
-	*app.ProjectDetailDTO
+	*spaceapp.ProjectDetailDTO
 }
 
 type projectsInfo struct {
 	Owner    string `json:"owner"`
 	AvatarId string `json:"avatar_id"`
 
-	*app.ProjectsDTO
+	*spaceapp.ProjectsDTO
 }
 
 type projectForkRequest struct {
@@ -154,7 +154,7 @@ type projectForkRequest struct {
 	Desc string `json:"desc"`
 }
 
-func (p *projectForkRequest) toCmd() (cmd app.ProjectForkCmd, err error) {
+func (p *projectForkRequest) toCmd() (cmd spaceapp.ProjectForkCmd, err error) {
 	if cmd.Name, err = domain.NewResourceName(p.Name); err != nil {
 		return
 	}

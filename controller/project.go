@@ -12,6 +12,9 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spaceapp "github.com/opensourceways/xihe-server/space/app"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -19,7 +22,7 @@ import (
 func AddRouterForProjectController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
-	repo repository.Project,
+	repo spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -69,8 +72,8 @@ type ProjectController struct {
 	baseController
 
 	user userrepo.User
-	repo repository.Project
-	s    app.ProjectService
+	repo spacerepo.Project
+	s    spaceapp.ProjectService
 
 	model   repository.Model
 	dataset repository.Dataset
@@ -921,7 +924,7 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 }
 
 func (ctl *ProjectController) checkPermission(ctx *gin.Context) (
-	info *oldUserTokenPayload, proj domain.Project, ok bool,
+	info *oldUserTokenPayload, proj spacedomain.Project, ok bool,
 ) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
 	if err != nil {

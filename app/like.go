@@ -6,6 +6,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -45,7 +46,7 @@ func NewLikeService(
 	repo repository.Like,
 	user userrepo.User,
 	model repository.Model,
-	project repository.Project,
+	project spacerepo.Project,
 	dataset repository.Dataset,
 	activity repository.Activity,
 	sender message.LikeMessageProducer,
@@ -55,11 +56,11 @@ func NewLikeService(
 		activity: activity,
 		sender:   sender,
 
-		rs: resourceService{
-			user:    user,
-			model:   model,
-			project: project,
-			dataset: dataset,
+		rs: ResourceService{
+			User:    user,
+			Model:   model,
+			Project: project,
+			Dataset: dataset,
 		},
 	}
 }
@@ -69,7 +70,7 @@ type likeService struct {
 	activity repository.Activity
 	sender   message.LikeMessageProducer
 
-	rs resourceService
+	rs ResourceService
 }
 
 // owner is the user who like the resource

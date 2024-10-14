@@ -7,6 +7,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -126,7 +127,7 @@ type DatasetService interface {
 func NewDatasetService(
 	user userrepo.User,
 	repo repository.Dataset,
-	proj repository.Project,
+	proj spacerepo.Project,
 	model repository.Model,
 	activity repository.Activity,
 	pr platform.Repository,
@@ -136,11 +137,11 @@ func NewDatasetService(
 		repo:     repo,
 		activity: activity,
 		sender:   sender,
-		rs: resourceService{
-			user:    user,
-			model:   model,
-			project: proj,
-			dataset: repo,
+		rs: ResourceService{
+			User:    user,
+			Model:   model,
+			Project: proj,
+			Dataset: repo,
 		},
 	}
 }
@@ -150,11 +151,11 @@ type datasetService struct {
 	//pr       platform.Repository
 	activity repository.Activity
 	sender   message.ResourceProducer
-	rs       resourceService
+	rs       ResourceService
 }
 
 func (s datasetService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
-	return s.rs.canApplyResourceName(owner, name)
+	return s.rs.CanApplyResourceName(owner, name)
 }
 
 func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (dto DatasetDTO, err error) {
@@ -179,7 +180,7 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 
 	// add activity
 	r, repoType := d.ResourceObject()
-	ua := genActivityForCreatingResource(r, repoType)
+	ua := GenActivityForCreatingResource(r, repoType)
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, d.Name)
@@ -217,7 +218,7 @@ func (s datasetService) Delete(r *domain.Dataset, pr platform.Repository) (err e
 	}
 
 	// add activity
-	ua := genActivityForDeletingResource(&obj, repoType)
+	ua := GenActivityForDeletingResource(&obj, repoType)
 
 	// ignore the error
 	_ = s.activity.Save(&ua)
@@ -240,7 +241,7 @@ func (s datasetService) GetByName(
 		return
 	}
 
-	d, err := s.rs.listModels(v.RelatedModels)
+	d, err := s.rs.ListModels(v.RelatedModels)
 	if err != nil {
 		return
 	}
@@ -260,7 +261,7 @@ func (s datasetService) GetByName(
 func (s datasetService) List(owner domain.Account, cmd *ResourceListCmd) (
 	dto DatasetsDTO, err error,
 ) {
-	option := cmd.toResourceListOption()
+	option := cmd.ToResourceListOption()
 
 	var v repository.UserDatasetsInfo
 

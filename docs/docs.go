@@ -4376,7 +4376,7 @@ const docTemplate = `{
                 "tags": [
                     "Promotion"
                 ],
-                "summary": "GetUserRegitration",
+                "summary": "GetUserRegistration",
                 "parameters": [
                     {
                         "type": "string",

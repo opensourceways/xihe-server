@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	compapp "github.com/opensourceways/xihe-server/competition/app"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
+	spaceapp "github.com/opensourceways/xihe-server/space/app"
 )
 
 type homeInfo struct {
@@ -14,7 +15,7 @@ type homeInfo struct {
 type homeElectricityInfo struct {
 	Comp    []compapp.CompetitionSummaryDTO `json:"comp"`
 	Course  []courseapp.CourseSummaryDTO    `json:"course"`
-	Peoject app.GlobalProjectsDTO           `json:"project"`
+	Peoject spaceapp.GlobalProjectsDTO      `json:"project"`
 	Dataset app.GlobalDatasetsDTO           `json:"dataset"`
 	Model   app.GlobalModelsDTO             `json:"model"`
 }

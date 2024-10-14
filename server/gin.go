@@ -59,6 +59,9 @@ import (
 	prmotionservice "github.com/opensourceways/xihe-server/promotion/domain/service"
 	promotionadapter "github.com/opensourceways/xihe-server/promotion/infrastructure/repositoryadapter"
 	promotionuseradapter "github.com/opensourceways/xihe-server/promotion/infrastructure/useradapter"
+	spaceapp "github.com/opensourceways/xihe-server/space/app"
+	spacerepo "github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
+	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
@@ -105,7 +108,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	collections := &cfg.Mongodb.Collections
 
-	proj := repositories.NewProjectRepository(
+	proj := spacerepo.NewProjectRepository(
 		mongodb.NewProjectMapper(collections.Project),
 	)
 
@@ -148,7 +151,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
-	inference := repositories.NewInferenceRepository(
+	inference := spaceapprepo.NewInferenceRepository(
 		mongodb.NewInferenceMapper(
 			collections.Inference,
 		),
@@ -263,7 +266,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityAccountRecordAdapter(),
 	)
 
-	projectService := app.NewProjectService(user, proj, model, dataset, activity, nil, resProducer, computilityService)
+	projectService := spaceapp.NewProjectService(user, proj, model, dataset, activity, nil, resProducer, computilityService)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
 

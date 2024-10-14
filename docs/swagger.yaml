@@ -5191,7 +5191,7 @@ paths:
           description: Internal Server Error
           schema:
             type: system_error
-      summary: GetUserRegitration
+      summary: GetUserRegistration
       tags:
       - Promotion
   /v1/promotions:

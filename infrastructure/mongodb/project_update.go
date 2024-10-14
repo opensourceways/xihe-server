@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	"github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
 )
 
 func (col project) AddLike(p repositories.ResourceIndexDO) error {
@@ -38,7 +39,7 @@ func (col project) IncreaseDownload(index repositories.ResourceIndexDO) error {
 
 func (col project) ListAndSortByUpdateTime(
 	owner string, do *repositories.ResourceListDO,
-) ([]repositories.ProjectSummaryDO, int, error) {
+) ([]repositoryimpl.ProjectSummaryDO, int, error) {
 
 	f := func(items []projectItem) []projectItem {
 		v := make([]updateAtSortData, len(items))
@@ -72,7 +73,7 @@ func (col project) ListAndSortByUpdateTime(
 
 func (col project) ListAndSortByFirstLetter(
 	owner string, do *repositories.ResourceListDO,
-) ([]repositories.ProjectSummaryDO, int, error) {
+) ([]repositoryimpl.ProjectSummaryDO, int, error) {
 
 	f := func(items []projectItem) []projectItem {
 		v := make([]firstLetterSortData, len(items))
@@ -106,7 +107,7 @@ func (col project) ListAndSortByFirstLetter(
 
 func (col project) ListAndSortByDownloadCount(
 	owner string, do *repositories.ResourceListDO,
-) ([]repositories.ProjectSummaryDO, int, error) {
+) ([]repositoryimpl.ProjectSummaryDO, int, error) {
 
 	f := func(items []projectItem) []projectItem {
 		v := make([]downloadSortData, len(items))
@@ -142,7 +143,7 @@ func (col project) listResource(
 	owner string,
 	do *repositories.ResourceListDO,
 	sortAndPagination func(items []projectItem) []projectItem,
-) (r []repositories.ProjectSummaryDO, total int, err error) {
+) (r []repositoryimpl.ProjectSummaryDO, total int, err error) {
 	var v []dProject
 
 	err = listResourceWithoutSort(
@@ -161,7 +162,7 @@ func (col project) listResource(
 		return
 	}
 
-	r = make([]repositories.ProjectSummaryDO, len(items))
+	r = make([]repositoryimpl.ProjectSummaryDO, len(items))
 	for i := range items {
 		col.toProjectSummaryDO(owner, &items[i], &r[i])
 	}
@@ -176,8 +177,8 @@ func (col project) summaryFields() []string {
 	}
 }
 
-func (col project) toProjectSummaryDO(owner string, item *projectItem, do *repositories.ProjectSummaryDO) {
-	*do = repositories.ProjectSummaryDO{
+func (col project) toProjectSummaryDO(owner string, item *projectItem, do *repositoryimpl.ProjectSummaryDO) {
+	*do = repositoryimpl.ProjectSummaryDO{
 		Id:            item.Id,
 		Owner:         owner,
 		Name:          item.Name,

@@ -1,5 +1,9 @@
 package domain
 
+import (
+	dp "github.com/opensourceways/xihe-server/domain"
+)
+
 type Inference struct {
 	InferenceInfo
 
@@ -10,7 +14,7 @@ type Inference struct {
 type InferenceInfo struct {
 	InferenceIndex
 
-	ProjectName   ResourceName
+	ProjectName   dp.ResourceName
 	ResourceLevel string
 	Requester     string
 }
@@ -27,7 +31,7 @@ type InferenceDetail struct {
 }
 
 type InferenceIndex struct {
-	Project    ResourceIndex
+	Project    dp.ResourceIndex
 	Id         string
 	LastCommit string
 }

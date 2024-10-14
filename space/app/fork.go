@@ -1,28 +1,30 @@
 package app
 
 import (
+	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/platform"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 )
 
 type ProjectForkCmd struct {
 	Name      domain.ResourceName
 	Desc      domain.ResourceDesc
-	From      domain.Project
+	From      spacedomain.Project
 	Owner     domain.Account
 	ValidTags []domain.DomainTags
 }
 
-func (cmd *ProjectForkCmd) toProject(r *domain.Project) {
+func (cmd *ProjectForkCmd) toProject(r *spacedomain.Project) {
 	p := &cmd.From
-	*r = domain.Project{
+	*r = spacedomain.Project{
 		Owner:     cmd.Owner,
 		Type:      p.Type,
 		Protocol:  p.Protocol,
 		Training:  p.Training,
 		CreatedAt: p.CreatedAt,
 		UpdatedAt: p.UpdatedAt,
-		ProjectModifiableProperty: domain.ProjectModifiableProperty{
+		ProjectModifiableProperty: spacedomain.ProjectModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     p.Desc,
 			CoverId:  p.CoverId,
@@ -31,11 +33,11 @@ func (cmd *ProjectForkCmd) toProject(r *domain.Project) {
 		},
 	}
 
-	h := ResourceTagsUpdateCmd{
+	h := app.ResourceTagsUpdateCmd{
 		All: cmd.ValidTags,
 	}
 
-	r.TagKinds = h.genTagKinds(p.Tags)
+	r.TagKinds = h.GenTagKinds(p.Tags)
 
 	if cmd.Desc != nil {
 		r.Desc = cmd.Desc
@@ -48,7 +50,7 @@ func (s projectService) Fork(cmd *ProjectForkCmd, pr platform.Repository) (dto P
 		return
 	}
 
-	v := new(domain.Project)
+	v := new(spacedomain.Project)
 	cmd.toProject(v)
 	v.RepoId = pid
 
@@ -61,7 +63,7 @@ func (s projectService) Fork(cmd *ProjectForkCmd, pr platform.Repository) (dto P
 
 	// create activity
 	r, repoType := p.ResourceObject()
-	ua := genActivityForCreatingResource(r, repoType)
+	ua := app.GenActivityForCreatingResource(r, repoType)
 	ua.Type = domain.ActivityTypeFork
 	_ = s.activity.Save(&ua)
 
