@@ -3,10 +3,13 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
 
@@ -20,7 +23,7 @@ type ProjectUpdateCmd struct {
 }
 
 func (cmd *ProjectUpdateCmd) toProject(
-	p *domain.ProjectModifiableProperty, repo *platform.RepoOption,
+	p *spacedomain.ProjectModifiableProperty, repo *platform.RepoOption,
 ) (b bool) {
 	f := func() {
 		if !b {
@@ -62,7 +65,7 @@ func (cmd *ProjectUpdateCmd) toProject(
 // For example, it can't set the project's name to the one existing.
 // gitlab will help to avoid this case.
 func (s projectService) Update(
-	p *domain.Project, cmd *ProjectUpdateCmd, pr platform.Repository,
+	p *spacedomain.Project, cmd *ProjectUpdateCmd, pr platform.Repository,
 ) (dto ProjectDTO, err error) {
 	opt := new(platform.RepoOption)
 	if !cmd.toProject(&p.ProjectModifiableProperty, opt) {
@@ -79,7 +82,7 @@ func (s projectService) Update(
 	}
 
 	// step2
-	info := repository.ProjectPropertyUpdateInfo{
+	info := spacerepo.ProjectPropertyUpdateInfo{
 		ResourceToUpdate: s.toResourceToUpdate(p),
 		Property:         p.ProjectModifiableProperty,
 	}
@@ -92,16 +95,16 @@ func (s projectService) Update(
 	return
 }
 
-func (s projectService) SetTags(p *domain.Project, cmd *ResourceTagsUpdateCmd) error {
-	tags, b := cmd.toTags(p.ProjectModifiableProperty.Tags)
+func (s projectService) SetTags(p *spacedomain.Project, cmd *app.ResourceTagsUpdateCmd) error {
+	tags, b := cmd.ToTags(p.ProjectModifiableProperty.Tags)
 	if !b {
 		return nil
 	}
 
 	p.ProjectModifiableProperty.Tags = tags
-	p.ProjectModifiableProperty.TagKinds = cmd.genTagKinds(tags)
+	p.ProjectModifiableProperty.TagKinds = cmd.GenTagKinds(tags)
 
-	info := repository.ProjectPropertyUpdateInfo{
+	info := spacerepo.ProjectPropertyUpdateInfo{
 		ResourceToUpdate: s.toResourceToUpdate(p),
 		Property:         p.ProjectModifiableProperty,
 	}
@@ -110,7 +113,7 @@ func (s projectService) SetTags(p *domain.Project, cmd *ResourceTagsUpdateCmd) e
 }
 
 func (s projectService) AddRelatedModel(
-	p *domain.Project, index *domain.ResourceIndex,
+	p *spacedomain.Project, index *domain.ResourceIndex,
 ) error {
 	return s.addRelatedResource(
 		p, p.RelatedModels, index, domain.ResourceTypeModel,
@@ -119,7 +122,7 @@ func (s projectService) AddRelatedModel(
 }
 
 func (s projectService) AddRelatedDataset(
-	p *domain.Project, index *domain.ResourceIndex,
+	p *spacedomain.Project, index *domain.ResourceIndex,
 ) error {
 	return s.addRelatedResource(
 		p, p.RelatedDatasets, index, domain.ResourceTypeDataset,
@@ -128,7 +131,7 @@ func (s projectService) AddRelatedDataset(
 }
 
 func (s projectService) addRelatedResource(
-	p *domain.Project, v domain.RelatedResources,
+	p *spacedomain.Project, v domain.RelatedResources,
 	index *domain.ResourceIndex, t domain.ResourceType,
 	f func(*repository.RelatedResourceInfo) error,
 ) error {
@@ -137,7 +140,7 @@ func (s projectService) addRelatedResource(
 	}
 
 	if v.Count()+1 > p.MaxRelatedResourceNum() {
-		return ErrorExceedMaxRelatedResourceNum{
+		return ExceedMaxRelatedResourceNumError{
 			errors.New("exceed max related reousrce num"),
 		}
 	}
@@ -169,7 +172,7 @@ func (s projectService) addRelatedResource(
 }
 
 func (s projectService) RemoveRelatedModel(
-	p *domain.Project, index *domain.ResourceIndex,
+	p *spacedomain.Project, index *domain.ResourceIndex,
 ) error {
 	return s.removeRelatedResource(
 		p, p.RelatedModels, index, domain.ResourceTypeModel,
@@ -178,7 +181,7 @@ func (s projectService) RemoveRelatedModel(
 }
 
 func (s projectService) RemoveRelatedDataset(
-	p *domain.Project, index *domain.ResourceIndex,
+	p *spacedomain.Project, index *domain.ResourceIndex,
 ) error {
 	return s.removeRelatedResource(
 		p, p.RelatedDatasets, index, domain.ResourceTypeDataset,
@@ -187,7 +190,7 @@ func (s projectService) RemoveRelatedDataset(
 }
 
 func (s projectService) removeRelatedResource(
-	p *domain.Project, v domain.RelatedResources,
+	p *spacedomain.Project, v domain.RelatedResources,
 	index *domain.ResourceIndex, t domain.ResourceType,
 	f func(*repository.RelatedResourceInfo) error,
 ) error {
@@ -221,7 +224,7 @@ func (s projectService) removeRelatedResource(
 	return nil
 }
 
-func (s projectService) toResourceToUpdate(p *domain.Project) repository.ResourceToUpdate {
+func (s projectService) toResourceToUpdate(p *spacedomain.Project) repository.ResourceToUpdate {
 	return repository.ResourceToUpdate{
 		Owner:     p.Owner,
 		Id:        p.Id,

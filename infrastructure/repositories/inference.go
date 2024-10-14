@@ -57,7 +57,7 @@ func (impl inference) FindInstance(info *domain.InferenceIndex) (
 func (impl inference) FindInstances(info *domain.ResourceIndex, lastCommit string) (
 	r []repository.InferenceSummary, version int, err error,
 ) {
-	index := toResourceIndexDO(info)
+	index := ToResourceIndexDO(info)
 	v, version, err := impl.mapper.List(&index, lastCommit)
 	if err != nil {
 		err = convertError(err)

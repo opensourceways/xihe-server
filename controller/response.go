@@ -5,6 +5,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spaceapp "github.com/opensourceways/xihe-server/space/app"
 )
 
 const (
@@ -39,7 +40,7 @@ type responseData struct {
 }
 
 func isErrorOfAccessingPrivateRepo(err error) bool {
-	return errors.As(err, &app.ErrorPrivateRepo{})
+	return errors.As(err, &app.ErrorPrivateRepo{}) || errors.As(err, &spaceapp.PrivateRepoError{})
 }
 
 func newResponseError(err error) responseData {
@@ -51,7 +52,8 @@ func newResponseError(err error) responseData {
 		code = errorResourceNotExists
 	} else if errors.As(err, &repository.ErrorConcurrentUpdating{}) {
 		code = errorConcurrentUpdating
-	} else if errors.As(err, &app.ErrorExceedMaxRelatedResourceNum{}) {
+	} else if errors.As(err, &app.ErrorExceedMaxRelatedResourceNum{}) ||
+		errors.As(err, &spaceapp.ExceedMaxRelatedResourceNumError{}) {
 		code = errorExccedMaxNum
 	} else if errors.As(err, &app.ErrorUpdateLFSFile{}) {
 		code = errorUpdateLFSFile

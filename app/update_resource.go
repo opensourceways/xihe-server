@@ -12,7 +12,7 @@ type ResourceTagsUpdateCmd struct {
 	All      []domain.DomainTags
 }
 
-func (cmd *ResourceTagsUpdateCmd) genTagKinds(tags []string) []string {
+func (cmd *ResourceTagsUpdateCmd) GenTagKinds(tags []string) []string {
 	if len(tags) == 0 {
 		return nil
 	}
@@ -28,7 +28,7 @@ func (cmd *ResourceTagsUpdateCmd) genTagKinds(tags []string) []string {
 	return r
 }
 
-func (cmd *ResourceTagsUpdateCmd) toTags(old []string) ([]string, bool) {
+func (cmd *ResourceTagsUpdateCmd) ToTags(old []string) ([]string, bool) {
 	tags := sets.NewString(old...)
 
 	if len(cmd.ToAdd) > 0 {

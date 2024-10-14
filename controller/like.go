@@ -10,6 +10,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
@@ -17,7 +18,7 @@ func AddRouterForLikeController(
 	rg *gin.RouterGroup,
 	repo repository.Like,
 	user userrepo.User,
-	proj repository.Project,
+	proj spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -43,7 +44,7 @@ type LikeController struct {
 
 	s app.LikeService
 
-	proj    repository.Project
+	proj    spacerepo.Project
 	model   repository.Model
 	dataset repository.Dataset
 }

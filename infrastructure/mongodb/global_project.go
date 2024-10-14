@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	"github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
 )
 
 type globalProject struct {
@@ -10,7 +11,7 @@ type globalProject struct {
 }
 
 func (col project) ListGlobalAndSortByUpdateTime(do *repositories.GlobalResourceListDO) (
-	[]repositories.ProjectSummaryDO, int, error,
+	[]repositoryimpl.ProjectSummaryDO, int, error,
 ) {
 
 	f := func(items []globalProject) []globalProject {
@@ -44,7 +45,7 @@ func (col project) ListGlobalAndSortByUpdateTime(do *repositories.GlobalResource
 }
 
 func (col project) ListGlobalAndSortByFirstLetter(do *repositories.GlobalResourceListDO) (
-	[]repositories.ProjectSummaryDO, int, error,
+	[]repositoryimpl.ProjectSummaryDO, int, error,
 ) {
 
 	f := func(items []globalProject) []globalProject {
@@ -78,7 +79,7 @@ func (col project) ListGlobalAndSortByFirstLetter(do *repositories.GlobalResourc
 }
 
 func (col project) ListGlobalAndSortByDownloadCount(do *repositories.GlobalResourceListDO) (
-	[]repositories.ProjectSummaryDO, int, error,
+	[]repositoryimpl.ProjectSummaryDO, int, error,
 ) {
 
 	f := func(items []globalProject) []globalProject {
@@ -114,7 +115,7 @@ func (col project) ListGlobalAndSortByDownloadCount(do *repositories.GlobalResou
 func (col project) listGlobalResource(
 	do *repositories.GlobalResourceListDO,
 	sortAndPagination func(items []globalProject) []globalProject,
-) (r []repositories.ProjectSummaryDO, total int, err error) {
+) (r []repositoryimpl.ProjectSummaryDO, total int, err error) {
 	var v []dProject
 
 	err = listGlobalResourceWithoutSort(
@@ -133,7 +134,7 @@ func (col project) listGlobalResource(
 		return
 	}
 
-	r = make([]repositories.ProjectSummaryDO, len(items))
+	r = make([]repositoryimpl.ProjectSummaryDO, len(items))
 	for i := range items {
 		col.toProjectSummaryDO(items[i].owner, items[i].projectItem, &r[i])
 	}

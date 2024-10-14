@@ -7,6 +7,7 @@ import (
 	compdomain "github.com/opensourceways/xihe-server/competition/domain"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
 	coursedomain "github.com/opensourceways/xihe-server/course/domain"
+	spaceapp "github.com/opensourceways/xihe-server/space/app"
 )
 
 func AddRouterForHomeController(
@@ -14,7 +15,7 @@ func AddRouterForHomeController(
 
 	course courseapp.CourseService,
 	comp compapp.CompetitionService,
-	project app.ProjectService,
+	project spaceapp.ProjectService,
 	model app.ModelService,
 	dataset app.DatasetService,
 
@@ -35,7 +36,7 @@ type HomeController struct {
 
 	course  courseapp.CourseService
 	comp    compapp.CompetitionService
-	project app.ProjectService
+	project spaceapp.ProjectService
 	model   app.ModelService
 	dataset app.DatasetService
 }

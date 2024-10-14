@@ -1,91 +1,94 @@
-package repositories
+package repositoryimpl
 
 import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/infrastructure/repositories"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 )
 
 func (impl project) IncreaseFork(p *domain.ResourceIndex) error {
-	err := impl.mapper.IncreaseFork(toResourceIndexDO(p))
+	err := impl.mapper.IncreaseFork(repositories.ToResourceIndexDO(p))
 	if err != nil {
-		err = convertError(err)
+		err = repositories.ConvertError(err)
 	}
 
 	return err
 }
 
 func (impl project) IncreaseDownload(index *domain.ResourceIndex) error {
-	err := impl.mapper.IncreaseDownload(toResourceIndexDO(index))
+	err := impl.mapper.IncreaseDownload(repositories.ToResourceIndexDO(index))
 	if err != nil {
-		err = convertError(err)
+		err = repositories.ConvertError(err)
 	}
 
 	return err
 }
 
 func (impl project) AddLike(p *domain.ResourceIndex) error {
-	err := impl.mapper.AddLike(toResourceIndexDO(p))
+	err := impl.mapper.AddLike(repositories.ToResourceIndexDO(p))
 	if err != nil {
-		err = convertError(err)
+		err = repositories.ConvertError(err)
 	}
 
 	return err
 }
 
 func (impl project) RemoveLike(p *domain.ResourceIndex) error {
-	err := impl.mapper.RemoveLike(toResourceIndexDO(p))
+	err := impl.mapper.RemoveLike(repositories.ToResourceIndexDO(p))
 	if err != nil {
-		err = convertError(err)
+		err = repositories.ConvertError(err)
 	}
 
 	return err
 }
 
 func (impl project) AddRelatedModel(info *repository.RelatedResourceInfo) error {
-	do := toRelatedResourceDO(info)
+	do := repositories.ToRelatedResourceDO(info)
 
 	if err := impl.mapper.AddRelatedModel(&do); err != nil {
-		return convertError(err)
+		return repositories.ConvertError(err)
 	}
 
 	return nil
 }
 
 func (impl project) RemoveRelatedModel(info *repository.RelatedResourceInfo) error {
-	do := toRelatedResourceDO(info)
+	do := repositories.ToRelatedResourceDO(info)
 
 	if err := impl.mapper.RemoveRelatedModel(&do); err != nil {
-		return convertError(err)
+		return repositories.ConvertError(err)
 	}
 
 	return nil
 }
 
 func (impl project) AddRelatedDataset(info *repository.RelatedResourceInfo) error {
-	do := toRelatedResourceDO(info)
+	do := repositories.ToRelatedResourceDO(info)
 
 	if err := impl.mapper.AddRelatedDataset(&do); err != nil {
-		return convertError(err)
+		return repositories.ConvertError(err)
 	}
 
 	return nil
 }
 
 func (impl project) RemoveRelatedDataset(info *repository.RelatedResourceInfo) error {
-	do := toRelatedResourceDO(info)
+	do := repositories.ToRelatedResourceDO(info)
 
 	if err := impl.mapper.RemoveRelatedDataset(&do); err != nil {
-		return convertError(err)
+		return repositories.ConvertError(err)
 	}
 
 	return nil
 }
 
-func (impl project) UpdateProperty(info *repository.ProjectPropertyUpdateInfo) error {
+func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) error {
 	p := &info.Property
 
 	do := ProjectPropertyDO{
-		ResourceToUpdateDO: toResourceToUpdateDO(&info.ResourceToUpdate),
+		ResourceToUpdateDO: repositories.ToResourceToUpdateDO(&info.ResourceToUpdate),
 
 		FL:       p.Name.FirstLetterOfName(),
 		Name:     p.Name.ResourceName(),
@@ -108,14 +111,14 @@ func (impl project) UpdateProperty(info *repository.ProjectPropertyUpdateInfo) e
 	}
 
 	if err := impl.mapper.UpdateProperty(&do); err != nil {
-		return convertError(err)
+		return repositories.ConvertError(err)
 	}
 
 	return nil
 }
 
 type ProjectPropertyDO struct {
-	ResourceToUpdateDO
+	repositories.ResourceToUpdateDO
 
 	FL       byte
 	Name     string
@@ -128,40 +131,9 @@ type ProjectPropertyDO struct {
 	TagKinds []string
 }
 
-func toRelatedResourceDO(info *repository.RelatedResourceInfo) RelatedResourceDO {
-	return RelatedResourceDO{
-		ResourceToUpdateDO: toResourceToUpdateDO(&info.ResourceToUpdate),
-		ResourceOwner:      info.RelatedResource.Owner.Account(),
-		ResourceId:         info.RelatedResource.Id,
-	}
-}
-
-type RelatedResourceDO struct {
-	ResourceToUpdateDO
-
-	ResourceOwner string
-	ResourceId    string
-}
-
-type ResourceToUpdateDO struct {
-	Id        string
-	Owner     string
-	Version   int
-	UpdatedAt int64
-}
-
-func toResourceToUpdateDO(info *repository.ResourceToUpdate) ResourceToUpdateDO {
-	return ResourceToUpdateDO{
-		Id:        info.Id,
-		Owner:     info.Owner.Account(),
-		Version:   info.Version,
-		UpdatedAt: info.UpdatedAt,
-	}
-}
-
 func (impl project) ListAndSortByUpdateTime(
 	owner domain.Account, option *repository.ResourceListOption,
-) (repository.UserProjectsInfo, error) {
+) (spacerepo.UserProjectsInfo, error) {
 	return impl.list(
 		owner, option, impl.mapper.ListAndSortByUpdateTime,
 	)
@@ -169,7 +141,7 @@ func (impl project) ListAndSortByUpdateTime(
 
 func (impl project) ListAndSortByFirstLetter(
 	owner domain.Account, option *repository.ResourceListOption,
-) (repository.UserProjectsInfo, error) {
+) (spacerepo.UserProjectsInfo, error) {
 	return impl.list(
 		owner, option, impl.mapper.ListAndSortByFirstLetter,
 	)
@@ -177,7 +149,7 @@ func (impl project) ListAndSortByFirstLetter(
 
 func (impl project) ListAndSortByDownloadCount(
 	owner domain.Account, option *repository.ResourceListOption,
-) (repository.UserProjectsInfo, error) {
+) (spacerepo.UserProjectsInfo, error) {
 	return impl.list(
 		owner, option, impl.mapper.ListAndSortByDownloadCount,
 	)
@@ -186,12 +158,12 @@ func (impl project) ListAndSortByDownloadCount(
 func (impl project) list(
 	owner domain.Account,
 	option *repository.ResourceListOption,
-	f func(string, *ResourceListDO) ([]ProjectSummaryDO, int, error),
+	f func(string, *repositories.ResourceListDO) ([]ProjectSummaryDO, int, error),
 ) (
-	info repository.UserProjectsInfo, err error,
+	info spacerepo.UserProjectsInfo, err error,
 ) {
 	return impl.doList(func() ([]ProjectSummaryDO, int, error) {
-		do := toResourceListDO(option)
+		do := repositories.ToResourceListDO(option)
 
 		return f(owner.Account(), &do)
 	})
@@ -200,11 +172,11 @@ func (impl project) list(
 func (impl project) doList(
 	f func() ([]ProjectSummaryDO, int, error),
 ) (
-	info repository.UserProjectsInfo, err error,
+	info spacerepo.UserProjectsInfo, err error,
 ) {
 	v, total, err := f()
 	if err != nil {
-		err = convertError(err)
+		err = repositories.ConvertError(err)
 
 		return
 	}
@@ -213,7 +185,7 @@ func (impl project) doList(
 		return
 	}
 
-	r := make([]domain.ProjectSummary, len(v))
+	r := make([]spacedomain.ProjectSummary, len(v))
 	for i := range v {
 		if err = v[i].toProjectSummary(&r[i]); err != nil {
 			r = nil
@@ -229,7 +201,7 @@ func (impl project) doList(
 }
 
 type ProjectResourceSummaryDO struct {
-	ResourceSummaryDO
+	repositories.ResourceSummaryDO
 
 	Tags []string
 }
@@ -249,7 +221,7 @@ type ProjectSummaryDO struct {
 	DownloadCount int
 }
 
-func (do *ProjectSummaryDO) toProjectSummary(r *domain.ProjectSummary) (err error) {
+func (do *ProjectSummaryDO) toProjectSummary(r *spacedomain.ProjectSummary) (err error) {
 	r.Id = do.Id
 
 	if r.Owner, err = domain.NewAccount(do.Owner); err != nil {

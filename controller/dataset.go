@@ -10,6 +10,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -19,7 +20,7 @@ func AddRouterForDatasetController(
 	user userrepo.User,
 	repo repository.Dataset,
 	model repository.Model,
-	proj repository.Project,
+	proj spacerepo.Project,
 	activity repository.Activity,
 	tags repository.Tags,
 	like repository.Like,

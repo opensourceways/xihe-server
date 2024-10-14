@@ -81,13 +81,13 @@ func (s modelService) Update(
 }
 
 func (s modelService) SetTags(m *domain.Model, cmd *ResourceTagsUpdateCmd) error {
-	tags, b := cmd.toTags(m.ModelModifiableProperty.Tags)
+	tags, b := cmd.ToTags(m.ModelModifiableProperty.Tags)
 	if !b {
 		return nil
 	}
 
 	m.ModelModifiableProperty.Tags = tags
-	m.ModelModifiableProperty.TagKinds = cmd.genTagKinds(tags)
+	m.ModelModifiableProperty.TagKinds = cmd.GenTagKinds(tags)
 
 	info := repository.ModelPropertyUpdateInfo{
 		ResourceToUpdate: s.toResourceToUpdate(m),

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/xihe-server/course/app"
 	"github.com/opensourceways/xihe-server/course/domain"
-	"github.com/opensourceways/xihe-server/domain/repository"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
@@ -16,7 +16,7 @@ func AddRouterForCourseController(
 
 	s app.CourseService,
 	us userapp.RegService,
-	project repository.Project,
+	project spacerepo.Project,
 	user userrepo.User,
 ) {
 	ctl := CourseController{
@@ -43,7 +43,7 @@ type CourseController struct {
 
 	s       app.CourseService
 	us      userapp.RegService
-	project repository.Project
+	project spacerepo.Project
 	user    userrepo.User
 }
 

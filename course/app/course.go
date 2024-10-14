@@ -6,9 +6,10 @@ import (
 	"github.com/opensourceways/xihe-server/course/domain/message"
 	"github.com/opensourceways/xihe-server/course/domain/repository"
 	"github.com/opensourceways/xihe-server/course/domain/user"
-	projdomain "github.com/opensourceways/xihe-server/domain"
-	projectrepo "github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/domain"
 	repoerr "github.com/opensourceways/xihe-server/domain/repository"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
 
@@ -30,7 +31,7 @@ type CourseService interface {
 func NewCourseService(
 	userCli user.User,
 
-	projectRepo projectrepo.Project,
+	projectRepo spacerepo.Project,
 
 	courseRepo repository.Course,
 	playerRepo repository.Player,
@@ -55,7 +56,7 @@ func NewCourseService(
 type courseService struct {
 	userCli     user.User
 	userRepo    userrepo.User
-	projectRepo projectrepo.Project
+	projectRepo spacerepo.Project
 
 	courseRepo repository.Course
 	playerRepo repository.Player
@@ -200,7 +201,7 @@ func (s *courseService) GetSubmissions(cmd *GetSubmissionCmd) (
 	}
 	name := strings.Split(repo, "/")
 
-	resource, err := projdomain.NewResourceName(name[1])
+	resource, err := domain.NewResourceName(name[1])
 	if err != nil {
 		return
 	}
@@ -217,7 +218,7 @@ func (s *courseService) GetSubmissions(cmd *GetSubmissionCmd) (
 	return
 }
 
-func (s *courseService) listRelatedProject(project projdomain.Project, count int) (
+func (s *courseService) listRelatedProject(project spacedomain.Project, count int) (
 	dtos []ProjectSummuryDTO, err error,
 ) {
 	dtos = make([]ProjectSummuryDTO, count)

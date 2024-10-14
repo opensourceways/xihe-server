@@ -78,13 +78,13 @@ func (s datasetService) Update(
 }
 
 func (s datasetService) SetTags(d *domain.Dataset, cmd *ResourceTagsUpdateCmd) error {
-	tags, b := cmd.toTags(d.DatasetModifiableProperty.Tags)
+	tags, b := cmd.ToTags(d.DatasetModifiableProperty.Tags)
 	if !b {
 		return nil
 	}
 
 	d.DatasetModifiableProperty.Tags = tags
-	d.DatasetModifiableProperty.TagKinds = cmd.genTagKinds(tags)
+	d.DatasetModifiableProperty.TagKinds = cmd.GenTagKinds(tags)
 
 	info := repository.DatasetPropertyUpdateInfo{
 		ResourceToUpdate: s.toResourceToUpdate(d),

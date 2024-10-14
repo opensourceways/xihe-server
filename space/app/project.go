@@ -3,10 +3,14 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
+	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -58,20 +62,20 @@ func (cmd *ProjectCreateCmd) genTagKinds(tags []string) []string {
 	return r
 }
 
-func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
+func (cmd *ProjectCreateCmd) toProject(r *spacedomain.Project) {
 	now := utils.Now()
 	normTags := []string{cmd.Type.ProjType(),
 		cmd.Protocol.ProtocolName(),
 		cmd.Training.TrainingPlatform()}
 
-	*r = domain.Project{
+	*r = spacedomain.Project{
 		Owner:     cmd.Owner,
 		Type:      cmd.Type,
 		Protocol:  cmd.Protocol,
 		Training:  cmd.Training,
 		CreatedAt: now,
 		UpdatedAt: now,
-		ProjectModifiableProperty: domain.ProjectModifiableProperty{
+		ProjectModifiableProperty: spacedomain.ProjectModifiableProperty{
 			Name:     cmd.Name,
 			Desc:     cmd.Desc,
 			Title:    cmd.Title,
@@ -83,75 +87,28 @@ func (cmd *ProjectCreateCmd) toProject(r *domain.Project) {
 	}
 }
 
-type ProjectsDTO struct {
-	Total    int                 `json:"total"`
-	Projects []ProjectSummaryDTO `json:"projects"`
-}
-
-type ProjectSummaryDTO struct {
-	Id            string   `json:"id"`
-	Owner         string   `json:"owner"`
-	Name          string   `json:"name"`
-	Desc          string   `json:"desc"`
-	Title         string   `json:"title"`
-	Level         string   `json:"level"`
-	CoverId       string   `json:"cover_id"`
-	Tags          []string `json:"tags"`
-	UpdatedAt     string   `json:"updated_at"`
-	LikeCount     int      `json:"like_count"`
-	ForkCount     int      `json:"fork_count"`
-	DownloadCount int      `json:"download_count"`
-}
-
-type ProjectDTO struct {
-	Id            string   `json:"id"`
-	Owner         string   `json:"owner"`
-	Name          string   `json:"name"`
-	Desc          string   `json:"desc"`
-	Title         string   `json:"title"`
-	Type          string   `json:"type"`
-	CoverId       string   `json:"cover_id"`
-	Protocol      string   `json:"protocol"`
-	Training      string   `json:"training"`
-	RepoType      string   `json:"repo_type"`
-	RepoId        string   `json:"repo_id"`
-	Tags          []string `json:"tags"`
-	CreatedAt     string   `json:"created_at"`
-	UpdatedAt     string   `json:"updated_at"`
-	LikeCount     int      `json:"like_count"`
-	ForkCount     int      `json:"fork_count"`
-	DownloadCount int      `json:"download_count"`
-}
-
-type ProjectDetailDTO struct {
-	ProjectDTO
-
-	RelatedModels   []ResourceDTO `json:"related_models"`
-	RelatedDatasets []ResourceDTO `json:"related_datasets"`
-}
-
 type ProjectService interface {
 	CanApplyResourceName(domain.Account, domain.ResourceName) bool
 	Create(*ProjectCreateCmd, platform.Repository) (ProjectDTO, error)
-	Delete(*domain.Project, platform.Repository) error
+	Delete(*spacedomain.Project, platform.Repository) error
 	GetByName(domain.Account, domain.ResourceName, bool) (ProjectDetailDTO, error)
-	List(domain.Account, *ResourceListCmd) (ProjectsDTO, error)
-	ListGlobal(*GlobalResourceListCmd) (GlobalProjectsDTO, error)
-	Update(*domain.Project, *ProjectUpdateCmd, platform.Repository) (ProjectDTO, error)
+	List(domain.Account, *app.ResourceListCmd) (ProjectsDTO, error)
+	ListGlobal(*app.GlobalResourceListCmd) (GlobalProjectsDTO, error)
+	Update(*spacedomain.Project, *ProjectUpdateCmd, platform.Repository) (ProjectDTO, error)
 	Fork(*ProjectForkCmd, platform.Repository) (ProjectDTO, error)
 
-	AddRelatedModel(*domain.Project, *domain.ResourceIndex) error
-	RemoveRelatedModel(*domain.Project, *domain.ResourceIndex) error
+	AddRelatedModel(*spacedomain.Project, *domain.ResourceIndex) error
+	RemoveRelatedModel(*spacedomain.Project, *domain.ResourceIndex) error
 
-	AddRelatedDataset(*domain.Project, *domain.ResourceIndex) error
-	RemoveRelatedDataset(*domain.Project, *domain.ResourceIndex) error
+	AddRelatedDataset(*spacedomain.Project, *domain.ResourceIndex) error
+	RemoveRelatedDataset(*spacedomain.Project, *domain.ResourceIndex) error
 
-	SetTags(*domain.Project, *ResourceTagsUpdateCmd) error
+	SetTags(*spacedomain.Project, *app.ResourceTagsUpdateCmd) error
 }
 
 func NewProjectService(
 	user userrepo.User,
-	repo repository.Project,
+	repo spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -162,25 +119,25 @@ func NewProjectService(
 		repo:     repo,
 		activity: activity,
 		sender:   sender,
-		rs: resourceService{
-			user:    user,
-			model:   model,
-			project: repo,
-			dataset: dataset,
+		rs: app.ResourceService{
+			User:    user,
+			Model:   model,
+			Project: repo,
+			Dataset: dataset,
 		},
 	}
 }
 
 type projectService struct {
-	repo repository.Project
+	repo spacerepo.Project
 	//pr       platform.Repository
 	activity repository.Activity
 	sender   message.ResourceProducer
-	rs       resourceService
+	rs       app.ResourceService
 }
 
 func (s projectService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
-	return s.rs.canApplyResourceName(owner, name)
+	return s.rs.CanApplyResourceName(owner, name)
 }
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
@@ -194,7 +151,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	}
 
 	// step2: save
-	v := new(domain.Project)
+	v := new(spacedomain.Project)
 	cmd.toProject(v)
 	v.RepoId = pid
 
@@ -207,7 +164,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 
 	// add activity
 	r, repoType := p.ResourceObject()
-	ua := genActivityForCreatingResource(r, repoType)
+	ua := app.GenActivityForCreatingResource(r, repoType)
 	_ = s.activity.Save(&ua)
 
 	_ = s.sender.AddOperateLogForCreateResource(r, p.Name)
@@ -220,7 +177,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	return
 }
 
-func (s projectService) Delete(r *domain.Project, pr platform.Repository) (err error) {
+func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (err error) {
 	// step1: delete repo on gitlab
 	if err = pr.Delete(r.RepoId); err != nil {
 		return
@@ -245,7 +202,7 @@ func (s projectService) Delete(r *domain.Project, pr platform.Repository) (err e
 	}
 
 	// add activity
-	ua := genActivityForDeletingResource(&obj, repoType)
+	ua := app.GenActivityForDeletingResource(&obj, repoType)
 
 	// ignore the error
 	_ = s.activity.Save(&ua)
@@ -263,18 +220,20 @@ func (s projectService) GetByName(
 	}
 
 	if !allowPrivacy && v.IsPrivate() {
-		err = ErrorPrivateRepo{errors.New("private repo")}
+		err = PrivateRepoError{
+			errors.New("private repo"),
+		}
 
 		return
 	}
 
-	m, err := s.rs.listModels(v.RelatedModels)
+	m, err := s.rs.ListModels(v.RelatedModels)
 	if err != nil {
 		return
 	}
 	dto.RelatedModels = m
 
-	d, err := s.rs.listDatasets(v.RelatedDatasets)
+	d, err := s.rs.ListDatasets(v.RelatedDatasets)
 	if err != nil {
 		return
 	}
@@ -285,22 +244,64 @@ func (s projectService) GetByName(
 	return
 }
 
-type ResourceListCmd struct {
-	repository.ResourceListOption
+func (s projectService) ListGlobal(cmd *app.GlobalResourceListCmd) (
+	dto GlobalProjectsDTO, err error,
+) {
+	option := cmd.ToResourceListOption()
 
-	SortType domain.SortType
+	var v spacerepo.UserProjectsInfo
+
+	if cmd.SortType == nil {
+		v, err = s.repo.ListGlobalAndSortByUpdateTime(&option)
+	} else {
+		switch cmd.SortType.SortType() {
+		case domain.SortTypeUpdateTime:
+			v, err = s.repo.ListGlobalAndSortByUpdateTime(&option)
+
+		case domain.SortTypeFirstLetter:
+			v, err = s.repo.ListGlobalAndSortByFirstLetter(&option)
+
+		case domain.SortTypeDownloadCount:
+			v, err = s.repo.ListGlobalAndSortByDownloadCount(&option)
+		}
+	}
+
+	items := v.Projects
+
+	if err != nil || len(items) == 0 {
+		return
+	}
+
+	// find avatars
+	users := make([]userdomain.Account, len(items))
+	for i := range items {
+		users[i] = items[i].Owner
+	}
+
+	avatars, err := s.rs.FindUserAvater(users)
+	if err != nil {
+		return
+	}
+
+	// gen result
+	dtos := make([]GlobalProjectDTO, len(items))
+	for i := range items {
+		s.toProjectSummaryDTO(&items[i], &dtos[i].ProjectSummaryDTO)
+		dtos[i].AvatarId = avatars[i]
+	}
+
+	dto.Total = v.Total
+	dto.Projects = dtos
+
+	return
 }
 
-func (cmd *ResourceListCmd) toResourceListOption() repository.ResourceListOption {
-	return cmd.ResourceListOption
-}
-
-func (s projectService) List(owner domain.Account, cmd *ResourceListCmd) (
+func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 	dto ProjectsDTO, err error,
 ) {
-	option := cmd.toResourceListOption()
+	option := cmd.ToResourceListOption()
 
-	var v repository.UserProjectsInfo
+	var v spacerepo.UserProjectsInfo
 
 	if cmd.SortType == nil {
 		v, err = s.repo.ListAndSortByUpdateTime(owner, &option)
@@ -334,7 +335,7 @@ func (s projectService) List(owner domain.Account, cmd *ResourceListCmd) (
 	return
 }
 
-func (s projectService) toProjectDTO(p *domain.Project, dto *ProjectDTO) {
+func (s projectService) toProjectDTO(p *spacedomain.Project, dto *ProjectDTO) {
 	*dto = ProjectDTO{
 		Id:            p.Id,
 		Owner:         p.Owner.Account(),
@@ -363,7 +364,7 @@ func (s projectService) toProjectDTO(p *domain.Project, dto *ProjectDTO) {
 
 }
 
-func (s projectService) toProjectSummaryDTO(p *domain.ProjectSummary, dto *ProjectSummaryDTO) {
+func (s projectService) toProjectSummaryDTO(p *spacedomain.ProjectSummary, dto *ProjectSummaryDTO) {
 	*dto = ProjectSummaryDTO{
 		Id:            p.Id,
 		Owner:         p.Owner.Account(),
