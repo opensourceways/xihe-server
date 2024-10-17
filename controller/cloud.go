@@ -40,13 +40,13 @@ type CloudController struct {
 	us userapp.WhiteListService
 }
 
-// @Summary		List
-// @Description	list cloud config
-// @Tags			Cloud
-// @Accept			json
-// @Success		200	{object}		[]app.CloudDTO
-// @Failure		500	system_error	system	error
-// @Router			/v1/cloud [get]
+//	@Summary		List
+//	@Description	list cloud config
+//	@Tags			Cloud
+//	@Accept			json
+//	@Success		200	{object}		[]app.CloudDTO
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/cloud [get]
 func (ctl *CloudController) List(ctx *gin.Context) {
 	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -68,14 +68,14 @@ func (ctl *CloudController) List(ctx *gin.Context) {
 	}
 }
 
-// @Summary		Subscribe
-// @Description	subscribe cloud
-// @Tags			Cloud
-// @Param			body	body	cloudSubscribeRequest	true	"body of subscribe cloud"
-// @Accept			json
-// @Success		201
-// @Failure		500	system_error	system	error
-// @Router			/v1/cloud/subscribe [post]
+//	@Summary		Subscribe
+//	@Description	subscribe cloud
+//	@Tags			Cloud
+//	@Param			body	body	cloudSubscribeRequest	true	"body of subscribe cloud"
+//	@Accept			json
+//	@Success		201
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/cloud/subscribe [post]
 func (ctl *CloudController) Subscribe(ctx *gin.Context) {
 	req := cloudSubscribeRequest{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -107,15 +107,15 @@ func (ctl *CloudController) Subscribe(ctx *gin.Context) {
 	}
 }
 
-// @Summary		Get
-// @Description	get cloud pod
-// @Tags			Cloud
-// @Param			cid	path	string	true	"cloud config id"
-// @Accept			json
-// @Success		201	{object}			app.InferenceDTO
-// @Failure		400	bad_request_body	can't	parse	request	body
-// @Failure		500	system_error		system	error
-// @Router			/v1/cloud/{cid} [get]
+//	@Summary		Get
+//	@Description	get cloud pod
+//	@Tags			Cloud
+//	@Param			cid	path	string	true	"cloud config id"
+//	@Accept			json
+//	@Success		201	{object}			app.InferenceDTO
+//	@Failure		400	bad_request_body	can't	parse	request	body
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/cloud/{cid} [get]
 func (ctl *CloudController) Get(ctx *gin.Context) {
 	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
@@ -190,15 +190,15 @@ func (ctl *CloudController) Get(ctx *gin.Context) {
 	}
 }
 
-// @Summary		GetHttp
-// @Description	get cloud pod
-// @Tags			Cloud
-// @Param			cid	path	string	true	"cloud config id"
-// @Accept			json
-// @Success		201	{object}			app.InferenceDTO
-// @Failure		400	bad_request_body	can't	parse	request	body
-// @Failure		500	system_error		system	error
-// @Router			/v1/cloud/{cid} [get]
+//	@Summary		GetHttp
+//	@Description	get cloud pod
+//	@Tags			Cloud
+//	@Param			cid	path	string	true	"cloud config id"
+//	@Accept			json
+//	@Success		201	{object}			app.InferenceDTO
+//	@Failure		400	bad_request_body	can't	parse	request	body
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/cloud/{cid} [get]
 func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -222,15 +222,15 @@ func (ctl *CloudController) GetHttp(ctx *gin.Context) {
 	}
 }
 
-// @Summary		CanRead
-// @Description	get cloud pod
-// @Tags			Cloud
-// @Param			owner	path	string	true	"user name"
-// @Accept			json
-// @Success		201	{object}			app.InferenceDTO
-// @Failure		400	bad_request	not allowed
-// @Failure		500	system_error		system	error
-// @Router			/v1/cloud/read/{owner} [get]
+//	@Summary		CanRead
+//	@Description	get cloud pod
+//	@Tags			Cloud
+//	@Param			owner	path	string	true	"user name"
+//	@Accept			json
+//	@Success		201	{object}		app.InferenceDTO
+//	@Failure		400	bad_request		not		allowed
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/cloud/read/{owner} [get]
 func (ctl *CloudController) CanRead(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
@@ -272,15 +272,15 @@ func (ctl *CloudController) CanRead(ctx *gin.Context) {
 	ctl.sendRespOfGet(ctx, res)
 }
 
-// @Summary		Release
-// @Description	release cloud resource
-// @Tags			Cloud
-// @Param			id	path	string	true	"pod id"
-// @Accept			json
-// @Success		204
-// @Failure		404	{string} string "not found"
-// @Failure		500	{object} responseData "system error"
-// @Router			/v1/cloud/pod/{id} [delete]
+//	@Summary		Release
+//	@Description	release cloud resource
+//	@Tags			Cloud
+//	@Param			id	path	string	true	"pod id"
+//	@Accept			json
+//	@Success		204
+//	@Failure		404	{string}	string			"not found"
+//	@Failure		500	{object}	responseData	"system error"
+//	@Router			/v1/cloud/pod/{id} [delete]
 func (ctl *CloudController) ReleasePod(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -315,15 +315,15 @@ func (ctl *CloudController) ReleasePod(ctx *gin.Context) {
 	ctl.sendRespOfDelete(ctx)
 }
 
-// @Summary		WsSendReleasedPod
-// @Description	WsSendReleasedPod is a websocket api which sends a released pod data to client.
-// @Tags			Cloud
-// @Param			id	    path	string	true	"pod id"
-// @Accept			json
-// @Success		200 {object} app.PodInfoDTO
-// @Failure		404	{string} string "not found"
-// @Failure		500	{object} responseData "system error"
-// @Router			/v1/cloud/pod/{id} [get]
+//	@Summary		WsSendReleasedPod
+//	@Description	WsSendReleasedPod is a websocket api which sends a released pod data to client.
+//	@Tags			Cloud
+//	@Param			id	path	string	true	"pod id"
+//	@Accept			json
+//	@Success		200	{object}	app.PodInfoDTO
+//	@Failure		404	{string}	string			"not found"
+//	@Failure		500	{object}	responseData	"system error"
+//	@Router			/v1/cloud/pod/{id} [get]
 func (ctl *CloudController) WsSendReleasedPod(ctx *gin.Context) {
 	_, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
 	if !ok {
