@@ -4,6 +4,7 @@ import (
 	redislib "github.com/opensourceways/redis-lib"
 
 	asyncrepoimpl "github.com/opensourceways/xihe-extra-services/async-server/infrastructure/repositoryimpl"
+
 	agreement "github.com/opensourceways/xihe-server/agreement/app"
 	aiccconfig "github.com/opensourceways/xihe-server/aiccfinetune/config"
 	"github.com/opensourceways/xihe-server/app"
@@ -25,6 +26,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	"github.com/opensourceways/xihe-server/spaceapp"
 	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/utils"
 )
@@ -71,6 +73,7 @@ type Config struct {
 	Agreement    agreement.Config                `json:"agreement"`
 	AICCFinetune aiccconfig.Config               `json:"aicc_finetune"`
 	Computility  computility.Config              `json:"computility"`
+	SpaceApp     spaceapp.Config                 `json:"space_app"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {

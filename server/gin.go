@@ -61,6 +61,7 @@ import (
 	promotionuseradapter "github.com/opensourceways/xihe-server/promotion/infrastructure/useradapter"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
+	spaceappmsg "github.com/opensourceways/xihe-server/spaceapp/infrastructure/messageimpl"
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
@@ -197,6 +198,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	// sender
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
+
+	spaceappSender := spaceappmsg.NewMessageAdapter(&cfg.SpaceApp.Message, publisher)
 	// resource producer
 	resProducer := messages.NewResourceMessageAdapter(&cfg.Resource, publisher, operator)
 
@@ -265,6 +268,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityAccountAdapter(),
 		comprepositoryadapter.ComputilityAccountRecordAdapter(),
 	)
+	computilityWebService := computilityapp.NewComputilityAppService(
+		comprepositoryadapter.ComputilityOrgAdapter(),
+		comprepositoryadapter.ComputilityDetailAdapter(),
+		comprepositoryadapter.ComputilityAccountAdapter(),
+	)
 
 	projectService := spaceapp.NewProjectService(
 		user, proj, model, dataset, activity, nil, resProducer, computilityService,
@@ -275,6 +283,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, resProducer)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
+	internal := engine.Group("internal")
 
 	pointsAppService, err := addRouterForUserPointsController(v1, cfg)
 	if err != nil {
@@ -310,6 +319,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService,
+		)
+		controller.AddRouterForProjectInternalController(
+			internal, user, proj, model, dataset, activity, tags, like, resProducer,
 			newPlatformRepository, computilityService,
 		)
 
@@ -368,7 +381,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, inference, proj, sender, userWhiteListService,
+			v1, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender,
+		)
+
+		controller.AddRouterForInferenceInternalController(
+			internal, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender,
 		)
 
 		controller.AddRouterForSearchController(
@@ -397,6 +414,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForCloudController(
 			v1, cloudAppService, userWhiteListService,
+		)
+
+		controller.AddRouterForComputilityWebController(
+			v1, computilityWebService,
 		)
 	}
 

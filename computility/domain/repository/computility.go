@@ -10,6 +10,16 @@ import (
 	primitive "github.com/opensourceways/xihe-server/domain"
 )
 
+// ComputilityOrgRepositoryAdapter is an interface for interacting with computility org repositories.
+type ComputilityOrgRepositoryAdapter interface {
+	Delete(primitive.Identity) error
+	FindByOrgName(primitive.Account) (domain.ComputilityOrg, error)
+	SetQuotaByOrgName(domain.ComputilityOrg, int) (domain.ComputilityOrg, error)
+
+	OrgAssignQuota(domain.ComputilityOrg, int) error
+	OrgRecallQuota(domain.ComputilityOrg, int) error
+}
+
 // ComputilityDetailRepositoryAdapter is an interface for interacting with computility detail repositories.
 type ComputilityDetailRepositoryAdapter interface {
 	Add(*domain.ComputilityDetail) error

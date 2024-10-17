@@ -15,6 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/repository"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
+	spacemesage "github.com/opensourceways/xihe-server/spaceapp/domain/message"
 	spaceappApprepo "github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/utils"
@@ -27,10 +28,11 @@ func AddRouterForInferenceController(
 	project spacerepo.Project,
 	sender message.Sender,
 	whitelist userapp.WhiteListService,
+	spacesender spacemesage.SpaceAppMessageProducer,
 ) {
 	ctl := InferenceController{
 		s: spaceappApp.NewInferenceService(
-			p, repo, sender, apiConfig.MinSurvivalTimeOfInference,
+			p, repo, sender, apiConfig.MinSurvivalTimeOfInference, spacesender,
 		),
 		project:   project,
 		whitelist: whitelist,
@@ -52,6 +54,8 @@ type InferenceController struct {
 	inferenceDir      domain.Directory
 	inferenceBootFile domain.FilePath
 	whitelist         userapp.WhiteListService
+
+	spacesender spacemesage.SpaceAppMessageProducer
 }
 
 // @Summary		Create

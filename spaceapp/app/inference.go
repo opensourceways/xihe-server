@@ -10,6 +10,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/repository"
 	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/inference"
+	spacemesage "github.com/opensourceways/xihe-server/spaceapp/domain/message"
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
@@ -55,6 +56,7 @@ func (cmd *InferenceCreateCmd) toInference(v *spaceappdomain.Inference, lastComm
 type InferenceService interface {
 	Create(string, *app.UserInfo, *InferenceCreateCmd) (InferenceDTO, string, error)
 	Get(info *InferenceIndex) (InferenceDTO, error)
+	CreateSpaceApp(CmdToCreateApp) error
 }
 
 func NewInferenceService(
@@ -62,11 +64,13 @@ func NewInferenceService(
 	repo spaceapprepo.Inference,
 	sender message.Sender,
 	minSurvivalTime int,
+	spacesender spacemesage.SpaceAppMessageProducer,
 ) InferenceService {
 	return inferenceService{
 		p:               p,
 		repo:            repo,
 		sender:          sender,
+		spacesender:     spacesender,
 		minSurvivalTime: int64(minSurvivalTime),
 	}
 }
@@ -75,6 +79,7 @@ type inferenceService struct {
 	p               platform.RepoFile
 	repo            spaceapprepo.Inference
 	sender          message.Sender
+	spacesender     spacemesage.SpaceAppMessageProducer
 	minSurvivalTime int64
 }
 
@@ -187,6 +192,17 @@ func (s inferenceService) check(instance *spaceappdomain.Inference) (
 	}
 
 	return
+}
+
+func (s inferenceService) CreateSpaceApp(cmd CmdToCreateApp) error {
+	if err := s.spacesender.SendSpaceAppCreateMsg(&spaceappdomain.SpaceAppCreateEvent{
+		Id:       cmd.SpaceId.Identity(),
+		CommitId: cmd.CommitId,
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 type InferenceInternalService interface {
