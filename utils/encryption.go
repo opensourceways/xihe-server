@@ -4,9 +4,18 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"io"
+
+	"github.com/xdg-go/pbkdf2"
+)
+
+const (
+	pbkdf2Iterations = 10000
+	pbkdf2KeyLength  = 32
 )
 
 type SymmetricEncryption interface {
@@ -68,4 +77,17 @@ func (se symmetricEncryption) Decrypt(ciphertext []byte) ([]byte, error) {
 
 	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
 	return se.aead.Open(nil, nonce, ciphertext, nil) // #nosec G407
+}
+
+// EncodeToken encodes the given token using the provided salt and returns the encoded token as a string.
+func EncodeToken(token string, salt string) (string, error) {
+	saltByte, err := base64.RawStdEncoding.DecodeString(salt)
+	if err != nil {
+		return "", err
+	}
+
+	encBytes := pbkdf2.Key([]byte(token), saltByte, pbkdf2Iterations, pbkdf2KeyLength, sha256.New)
+	enc := base64.RawStdEncoding.EncodeToString(encBytes)
+
+	return enc, nil
 }

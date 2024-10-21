@@ -31,6 +31,9 @@ const (
 
 	// ErrorCodeNoNpuPermission user has no npu permission
 	ErrorCodeNoNpuPermission = "no_npu_permission"
+
+	// ErrorCodeAccessTokenInvalid This error code is for restful api
+	ErrorCodeAccessTokenInvalid = "access_token_invalid"
 )
 
 // errorImpl

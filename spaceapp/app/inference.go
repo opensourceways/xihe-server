@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
@@ -201,6 +202,8 @@ func (s inferenceService) CreateSpaceApp(cmd CmdToCreateApp) error {
 	}); err != nil {
 		return err
 	}
+
+	fmt.Println("success ====================================== send ======================= space ================================ create")
 
 	return nil
 }
