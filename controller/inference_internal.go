@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 
 	"github.com/opensourceways/xihe-server/domain"
@@ -33,7 +35,7 @@ func AddRouterForInferenceInternalController(
 	ctl.inferenceDir, _ = domain.NewDirectory(apiConfig.InferenceDir)
 	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
 
-	rg.GET("/v1/inference/project/:owner/:pid", internalApiCheckMiddleware(&ctl.baseController), ctl.Create)
+	rg.POST("/v1/inference", internalApiCheckMiddleware(&ctl.baseController), ctl.Create)
 }
 
 type InferenceInternalController struct {
@@ -79,6 +81,6 @@ func (ctl *InferenceInternalController) Create(ctx *gin.Context) {
 	if err := ctl.s.CreateSpaceApp(cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		ctx.JSON(http.StatusCreated, newResponseData("string"))
 	}
 }
