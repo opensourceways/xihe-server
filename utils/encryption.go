@@ -15,7 +15,7 @@ import (
 
 const (
 	pbkdf2Iterations = 10000
-	pbkdf2KeyLength  = 32
+	pbkdf2KeyLength  = 128
 )
 
 type SymmetricEncryption interface {
