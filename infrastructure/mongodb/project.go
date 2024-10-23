@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -130,6 +131,28 @@ func (col project) GetByName(owner, name string) (do repositoryimpl.ProjectDO, e
 	}
 
 	col.toProjectDO(owner, &v[0].Items[0], &do)
+
+	return
+}
+
+func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
+	// var v []projectItem
+	var v []struct {
+		Items projectItem `bson:"items"`
+	}
+
+	fmt.Printf("======================empty v: %+v\n", v)
+	if err = getResourceByIdOnly(col.collectionName, id, &v); err != nil {
+		return
+	}
+	fmt.Printf("mongodb out =============================v: %+v\n", v)
+
+	var owner []dProject
+	if err = getOwnerByIdOnly(col.collectionName, id, &owner); err != nil {
+		return
+	}
+
+	col.toProjectDO(owner[0].Owner, &v[0].Items, &do)
 
 	return
 }

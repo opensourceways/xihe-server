@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 )
@@ -126,6 +127,63 @@ func getResourceById(collection, owner, rid string, result interface{}) error {
 	}
 
 	return withContext(f)
+}
+
+func getResourceByIdOnly(collection, rid string, result interface{}) error {
+	// f := func(ctx context.Context) error {
+	// 	return cli.getArrayElem(
+	// 		ctx, collection, fieldItems,
+	// 		bson.M{}, resourceIdFilter(rid),
+	// 		nil, result,
+	// 	)
+	// }
+	filter := bson.M{
+		"items.repo_id": rid, // 假设你的数组元素中有一个名为 "id" 的字段
+	}
+	opts := options.Find()
+	opts.SetProjection(bson.M{"items": 1}) // 只返回匹配的数组元素
+
+	// 假设 cli 是 *mongo.Collection 类型的实例
+	f := func(ctx context.Context) error {
+		return cli.getDocs(ctx, collection, filter, opts, result)
+	}
+
+	return withContext(f)
+}
+
+func getOwnerByIdOnly(collection, rid string, result interface{}) error {
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{"items.repo_id": rid}, // 替换为你想要筛选的repo_id
+		},
+		{
+			"$unwind": "$items",
+		},
+		{
+			"$match": bson.M{"items.repo_id": rid}, // 确保筛选条件仍然有效
+		},
+	}
+	col := cli.collection(collection)
+
+	// 执行聚合查询
+	cur, err := col.Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		return err
+	}
+
+	// 迭代结果
+	// var results []bson.M
+	if err = cur.All(context.TODO(), &result); err != nil {
+		return err
+	}
+
+	// 打印结果
+	// for _, result := range results {
+	// 	fmt.Println(result)
+	// }
+
+	// 假设 cli 是 *mongo.Collection 类型的实例
+	return nil
 }
 
 func getResourceSummary(collection, owner, rId string, result interface{}) error {

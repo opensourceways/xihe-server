@@ -15,15 +15,14 @@ type messageAdapter struct {
 }
 
 func (impl *messageAdapter) SendSpaceAppCreateMsg(v *domain.SpaceAppCreateEvent) error {
-	msg := common.MsgNormal{
-		User: v.User.Account(),
-		Details: map[string]string{
-			"id":        v.Id,
-			"commit_id": v.CommitId,
-		},
-	}
+	// msg := common.MsgNormal{
+	// 	Details: map[string]string{
+	// 		"id":        v.Id,
+	// 		"commit_id": v.CommitId,
+	// 	},
+	// }
 
-	return impl.publisher.Publish(impl.topics.SpaceAppCreated, &msg, nil)
+	return impl.publisher.Publish(impl.topics.SpaceAppCreated, v, nil)
 }
 
 type Topics struct {

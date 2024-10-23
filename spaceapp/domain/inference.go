@@ -2,7 +2,6 @@ package domain
 
 import (
 	dp "github.com/opensourceways/xihe-server/domain"
-	types "github.com/opensourceways/xihe-server/domain"
 )
 
 type Inference struct {
@@ -38,7 +37,6 @@ type InferenceIndex struct {
 }
 
 type SpaceAppCreateEvent struct {
-	User     types.Account
-	Id       string
-	CommitId string
+	Id       string `json:"space_id"`
+	CommitId string `json:"commit_id"`
 }
