@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"net/http"
+	"fmt"
 
 	"github.com/gin-gonic/gin"
 
@@ -41,7 +41,7 @@ func AddRouterForProjectInternalController(
 		newPlatformRepository: newPlatformRepository,
 	}
 
-	rg.POST("/v1/project/create", checkUserEmailMiddleware(&ctl.baseController), ctl.GetSpaceById)
+	rg.POST("/v1/space/:id", ctl.GetSpaceById)
 }
 
 type ProjectInternalController struct {
@@ -69,38 +69,7 @@ type ProjectInternalController struct {
 // @Produce		json
 // @Router			/v1/project/{owner}/{name}/check [get]
 func (ctl *ProjectInternalController) GetSpaceById(ctx *gin.Context) {
-	owner, err := domain.NewAccount(ctx.Param("owner"))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
-			errorBadRequestParam, err,
-		))
-
-		return
-	}
-
-	name, err := domain.NewResourceName(ctx.Param("name"))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
-			errorBadRequestParam, err,
-		))
-
-		return
-	}
-
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
-	if !ok {
-		return
-	}
-
-	if pl.isNotMe(owner) {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorNotAllowed, "not allowed",
-		))
-
-		return
-	}
-
-	b := ctl.s.CanApplyResourceName(owner, name)
-
-	ctx.JSON(http.StatusOK, newResponseData(canApplyResourceNameResp{b}))
+	id, err := domain.NewIdentity(ctx.Param("id"))
+	fmt.Printf("id: %v\n", id)
+	fmt.Printf("err: %v\n", err)
 }

@@ -3,6 +3,9 @@ package app
 import (
 	"errors"
 
+	"github.com/sirupsen/logrus"
+	// sdk "github.com/opensourceways/xihe-sdk/space"
+
 	"github.com/opensourceways/xihe-server/app"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	computilitydomain "github.com/opensourceways/xihe-server/computility/domain"
@@ -15,7 +18,6 @@ import (
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
-	"github.com/sirupsen/logrus"
 )
 
 type ProjectCreateCmd struct {
@@ -99,6 +101,7 @@ type ProjectService interface {
 	Create(*ProjectCreateCmd, platform.Repository) (ProjectDTO, error)
 	Delete(*spacedomain.Project, platform.Repository) error
 	GetByName(domain.Account, domain.ResourceName, bool) (ProjectDetailDTO, error)
+	// GetById(domain.Identity) (sdk.Spa, error)
 	List(domain.Account, *app.ResourceListCmd) (ProjectsDTO, error)
 	ListGlobal(*app.GlobalResourceListCmd) (GlobalProjectsDTO, error)
 	Update(*spacedomain.Project, *ProjectUpdateCmd, platform.Repository) (ProjectDTO, error)
