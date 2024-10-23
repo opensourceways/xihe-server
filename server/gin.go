@@ -61,6 +61,7 @@ import (
 	promotionuseradapter "github.com/opensourceways/xihe-server/promotion/infrastructure/useradapter"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
+	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
 	spaceappmsg "github.com/opensourceways/xihe-server/spaceapp/infrastructure/messageimpl"
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
 	userapp "github.com/opensourceways/xihe-server/user/app"
@@ -316,6 +317,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		whitelist,
 	)
 
+	spaceappInternalAppService := spaceappApp.NewSpaceappInternalAppService(
+		spaceapprepo.NewSpaceAppRepository(),
+	)
+
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
@@ -418,6 +423,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForComputilityWebController(
 			v1, computilityWebService,
+		)
+
+		controller.AddRouteForSpaceappInternalController(
+			v1, spaceappInternalAppService,
 		)
 	}
 
