@@ -4,6 +4,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/opensourceways/xihe-server/common/domain/repository"
 	"gorm.io/gorm"
 )
 
@@ -145,4 +146,19 @@ func (t dbTable) IsRowNotFound(err error) bool {
 
 func (t dbTable) IsRowExists(err error) bool {
 	return errors.Is(err, errRowExists)
+}
+
+func (t dbTable) UpdateWithOmitingSpecificFields(filter, values any, columns ...string) error {
+	r := db.Table(t.name).Where(filter).Select(`*`).Omit(columns...).Updates(values)
+	if r.Error != nil {
+		return r.Error
+	}
+
+	if r.RowsAffected == 0 {
+		return repository.NewErrorConcurrentUpdating(
+			errors.New("concurrent updating"),
+		)
+	}
+
+	return nil
 }
