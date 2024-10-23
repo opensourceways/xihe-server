@@ -33,7 +33,6 @@ require (
 	gorm.io/plugin/opentelemetry v0.1.7
 	k8s.io/apimachinery v0.29.1
 	sigs.k8s.io/yaml v1.4.0
-	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da
 )
 
 require (
