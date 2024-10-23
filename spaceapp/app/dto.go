@@ -1,6 +1,10 @@
 package app
 
-import "github.com/opensourceways/xihe-server/domain"
+import (
+	commondomain "github.com/opensourceways/xihe-server/common/domain"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
+)
 
 type InferenceDTO struct {
 	expiry     int64
@@ -21,3 +25,32 @@ type CmdToCreateApp struct {
 	SpaceId  domain.Identity
 	CommitId string
 }
+
+// CmdToNotifyServiceIsStarted is a command to notify that the service has started.
+type CmdToNotifyServiceIsStarted struct {
+	CmdToNotifyBuildIsStarted
+
+	AppURL domain.AppURL
+}
+
+// CmdToNotifyBuildIsStarted is a command to notify that the build has started.
+type CmdToNotifyBuildIsStarted struct {
+	domain.SpaceAppIndex
+
+	LogURL commondomain.URL
+}
+
+// CmdToCreateApp is a command to create an app.
+type CmdToCreateApp = domain.SpaceAppIndex
+
+// SpaceAppDTO is a data transfer object for space app.
+type SpaceAppDTO struct {
+	Id          int64  `json:"id"`
+	Status      string `json:"status"`
+	Reason      string `json:"reason"`
+	AppURL      string `json:"app_url"`
+	AppLogURL   string `json:"-"`
+	BuildLogURL string `json:"-"`
+}
+
+type GetSpaceAppCmd = spacedomain.SpaceIndex

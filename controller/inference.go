@@ -42,12 +42,14 @@ func AddRouterForInferenceController(
 	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
 
 	rg.GET("/v1/inference/project/:owner/:pid", ctl.Create)
+	rg.GET("/v1/space-app/:owner/:name", ctl.Get)
 }
 
 type InferenceController struct {
 	baseController
 
-	s spaceappApp.InferenceService
+	s          spaceappApp.InferenceService
+	appService spaceappApp.SpaceappAppService
 
 	project spacerepo.Project
 
@@ -247,6 +249,49 @@ func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid strin
 
 	if resources[0].Level != nil {
 		level = resources[0].Level.ResourceLevel()
+	}
+
+	return
+}
+
+// @Summary  Get
+// @Description  get space app
+// @Tags     SpaceAppWeb
+// @Param    owner  path  string  true  "owner of space" MaxLength(40)
+// @Param    name   path  string  true  "name of space" MaxLength(100)
+// @Accept   json
+// @Success  200  {object}  commonctl.ResponseData{data=app.SpaceAppDTO,msg=string,code=string}
+// @Router   /v1/space-app/{owner}/{name} [get]
+func (ctl *InferenceController) Get(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	cmd, err := ctl.parseIndex(ctx)
+	if err != nil {
+		return
+	}
+
+	if dto, err := ctl.appService.GetByName(ctx.Request.Context(), pl.DomainAccount(), &cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, &dto)
+	}
+}
+
+// parseIndex parses the index from the request.
+func (ctl *InferenceController) parseIndex(ctx *gin.Context) (cmd spaceappApp.GetSpaceAppCmd, err error) {
+	cmd.Owner, err = domain.NewAccount(ctx.Param("owner"))
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	cmd.Name, err = domain.NewResourceName(ctx.Param("name"))
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
 	}
 
 	return
