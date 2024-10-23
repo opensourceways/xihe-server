@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -77,6 +78,8 @@ func (ctl *InferenceInternalController) Create(ctx *gin.Context) {
 
 		return
 	}
+
+	fmt.Printf("=====================cmd: %+v\n", cmd)
 
 	if err := ctl.s.CreateSpaceApp(cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

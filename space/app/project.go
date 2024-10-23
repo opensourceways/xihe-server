@@ -2,9 +2,10 @@ package app
 
 import (
 	"errors"
+	"fmt"
 
+	sdk "github.com/opensourceways/xihe-sdk/space"
 	"github.com/sirupsen/logrus"
-	// sdk "github.com/opensourceways/xihe-sdk/space"
 
 	"github.com/opensourceways/xihe-server/app"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
@@ -101,7 +102,7 @@ type ProjectService interface {
 	Create(*ProjectCreateCmd, platform.Repository) (ProjectDTO, error)
 	Delete(*spacedomain.Project, platform.Repository) error
 	GetByName(domain.Account, domain.ResourceName, bool) (ProjectDetailDTO, error)
-	// GetById(domain.Identity) (sdk.Spa, error)
+	GetById(domain.Identity) (sdk.SpaceMetaDTO, error)
 	List(domain.Account, *app.ResourceListCmd) (ProjectsDTO, error)
 	ListGlobal(*app.GlobalResourceListCmd) (GlobalProjectsDTO, error)
 	Update(*spacedomain.Project, *ProjectUpdateCmd, platform.Repository) (ProjectDTO, error)
@@ -275,6 +276,28 @@ func (s projectService) GetByName(
 	s.toProjectDTO(&v, &dto.ProjectDTO)
 
 	return
+}
+
+func (s projectService) GetById(id domain.Identity) (sdk.SpaceMetaDTO, error) {
+	v, err := s.repo.GetById(id)
+
+	fmt.Printf("====================v: %+v\n", v)
+	if err != nil {
+		return sdk.SpaceMetaDTO{}, err
+	}
+
+	return sdk.SpaceMetaDTO{
+		Id:           v.Id,
+		SDK:          v.Type.ProjType(),
+		Name:         v.Name.ResourceName(),
+		Owner:        v.Owner.Account(),
+		Hardware:     v.Hardware.Hardware(),
+		BaseImage:    v.BaseImage.BaseImage(),
+		Visibility:   v.RepoType.RepoType(),
+		Disable:      false,
+		HardwareType: v.Hardware.Hardware(),
+		CommitId:     "",
+	}, err
 }
 
 func (s projectService) ListGlobal(cmd *app.GlobalResourceListCmd) (

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -41,7 +42,7 @@ func AddRouterForProjectInternalController(
 		newPlatformRepository: newPlatformRepository,
 	}
 
-	rg.POST("/v1/space/:id", ctl.GetSpaceById)
+	rg.GET("/v1/space/:id", ctl.GetSpaceById)
 }
 
 type ProjectInternalController struct {
@@ -70,6 +71,22 @@ type ProjectInternalController struct {
 // @Router			/v1/project/{owner}/{name}/check [get]
 func (ctl *ProjectInternalController) GetSpaceById(ctx *gin.Context) {
 	id, err := domain.NewIdentity(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+	proj, err := ctl.s.GetById(id)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+
 	fmt.Printf("id: %v\n", id)
 	fmt.Printf("err: %v\n", err)
+
+	ctx.JSON(http.StatusOK, newResponseData(proj))
 }

@@ -83,7 +83,7 @@ func checkToken(ctx *gin.Context) error {
 			allerror.ErrorCodeAccessTokenInvalid, "check token failed", err,
 		)
 	}
-
+	fmt.Printf("apiConfig.InternalTokenHash: %v\n", apiConfig.InternalTokenHash)
 	if calcTokenHash != apiConfig.InternalTokenHash {
 		return allerror.New(
 			allerror.ErrorCodeAccessTokenInvalid, "invalid token", errors.New("token mismatch"),
