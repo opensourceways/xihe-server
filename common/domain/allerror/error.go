@@ -34,6 +34,9 @@ const (
 
 	// ErrorCodeAccessTokenInvalid This error code is for restful api
 	ErrorCodeAccessTokenInvalid = "access_token_invalid"
+
+	// ErrorCodeSpaceAppUnmatchedStatus is const
+	ErrorCodeSpaceAppUnmatchedStatus = "space_app_unmatched_status"
 )
 
 // errorImpl

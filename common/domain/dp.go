@@ -52,6 +52,11 @@ func NewURL(v string) (URL, error) {
 	return dpURL(v), nil
 }
 
+// CreateURL creates a new URL instance with the given value without validation.
+func CreateURL(v string) URL {
+	return dpURL(v)
+}
+
 type dpURL string
 
 func (r dpURL) URL() string {
