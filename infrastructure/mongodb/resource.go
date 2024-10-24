@@ -141,7 +141,7 @@ func getResourceByIdOnly(collection, rid string, result interface{}) error {
 		"items.repo_id": rid, // 假设你的数组元素中有一个名为 "id" 的字段
 	}
 	opts := options.Find()
-	opts.SetProjection(bson.M{"items": 1}) // 只返回匹配的数组元素
+	opts.SetProjection(bson.M{"items": 1, "owner": 1}) // 只返回匹配的数组元素
 
 	// 假设 cli 是 *mongo.Collection 类型的实例
 	f := func(ctx context.Context) error {
@@ -177,12 +177,6 @@ func getOwnerByIdOnly(collection, rid string, result interface{}) error {
 		return err
 	}
 
-	// 打印结果
-	// for _, result := range results {
-	// 	fmt.Println(result)
-	// }
-
-	// 假设 cli 是 *mongo.Collection 类型的实例
 	return nil
 }
 
