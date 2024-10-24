@@ -148,7 +148,8 @@ func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	if err = getResourceByIdOnly(col.collectionName, id, &v); err != nil {
 		return
 	}
-	fmt.Printf("mongodb out =============================v: %+v\n", v)
+	fmt.Printf("mongodb out BaseImage CommitId=============================v: %+v\n", v[0].Items[0].CommitId)
+	fmt.Printf("mongodb out BaseImage HardwareType=============================v: %+v\n", v[0].Items[0].HardwareType)
 
 	// type ProjectOwner struct {
 	// 	Id    primitive.ObjectID `bson:"_id"`
@@ -162,9 +163,9 @@ func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	// }
 
 	// fmt.Printf("owner:==================================== %+v\n", owner)
-	fmt.Printf("================================v[0].Owner: %+v\n", v[0].Owner)
+	fmt.Printf("v[0].Owner:================================ %+v\n", v[0].Owner)
 	col.toProjectDO(v[0].Owner, &v[0].Items[0], &do)
-	fmt.Printf("==============================do: %+v\n", do)
+	fmt.Printf("==============================do: %+v\n", do.CommitId)
 
 	return
 }
@@ -259,15 +260,19 @@ func (col project) toProjectDoc(do *repositoryimpl.ProjectDO) (bson.M, error) {
 		CreatedAt: do.CreatedAt,
 		UpdatedAt: do.UpdatedAt,
 		ProjectPropertyItem: ProjectPropertyItem{
-			FL:       do.FL,
-			Name:     do.Name,
-			Desc:     do.Desc,
-			Title:    do.Title,
-			CoverId:  do.CoverId,
-			RepoType: do.RepoType,
-			Tags:     do.Tags,
-			TagKinds: do.TagKinds,
+			FL:                do.FL,
+			Name:              do.Name,
+			Desc:              do.Desc,
+			Title:             do.Title,
+			CoverId:           do.CoverId,
+			RepoType:          do.RepoType,
+			Tags:              do.Tags,
+			TagKinds:          do.TagKinds,
+			CommitId:          do.CommitId,
+			NoApplicationFile: do.NoApplicationFile,
 		},
+		HardwareType: do.Hardware,
+		BaseImage:    do.BaseImage,
 	}
 
 	docObj.ProjectPropertyItem.setDefault()
@@ -297,6 +302,8 @@ func (col project) toProjectDO(owner string, item *projectItem, do *repositoryim
 		LikeCount:         item.LikeCount,
 		ForkCount:         item.ForkCount,
 		DownloadCount:     item.DownloadCount,
+		Hardware:          item.HardwareType,
+		BaseImage:         item.BaseImage,
 		CommitId:          item.CommitId,
 		NoApplicationFile: item.NoApplicationFile,
 

@@ -90,13 +90,14 @@ func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) er
 	do := ProjectPropertyDO{
 		ResourceToUpdateDO: repositories.ToResourceToUpdateDO(&info.ResourceToUpdate),
 
-		FL:       p.Name.FirstLetterOfName(),
-		Name:     p.Name.ResourceName(),
-		CoverId:  p.CoverId.CoverId(),
-		RepoType: p.RepoType.RepoType(),
-		Tags:     p.Tags,
-		TagKinds: p.TagKinds,
-		CommitId: p.CommitId,
+		FL:                p.Name.FirstLetterOfName(),
+		Name:              p.Name.ResourceName(),
+		CoverId:           p.CoverId.CoverId(),
+		RepoType:          p.RepoType.RepoType(),
+		Tags:              p.Tags,
+		TagKinds:          p.TagKinds,
+		CommitId:          p.CommitId,
+		NoApplicationFile: p.NoApplicationFile,
 	}
 
 	if p.Desc != nil {

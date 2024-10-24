@@ -87,13 +87,15 @@ func (cmd *ProjectCreateCmd) toProject(r *spacedomain.Project) {
 		Hardware:  cmd.Hardware,
 		BaseImage: cmd.BaseImage,
 		ProjectModifiableProperty: spacedomain.ProjectModifiableProperty{
-			Name:     cmd.Name,
-			Desc:     cmd.Desc,
-			Title:    cmd.Title,
-			CoverId:  cmd.CoverId,
-			RepoType: cmd.RepoType,
-			Tags:     append(cmd.Tags, normTags...),
-			TagKinds: cmd.genTagKinds(cmd.Tags),
+			Name:              cmd.Name,
+			Desc:              cmd.Desc,
+			Title:             cmd.Title,
+			CoverId:           cmd.CoverId,
+			RepoType:          cmd.RepoType,
+			Tags:              append(cmd.Tags, normTags...),
+			TagKinds:          cmd.genTagKinds(cmd.Tags),
+			CommitId:          "",
+			NoApplicationFile: false,
 		},
 	}
 }
@@ -159,6 +161,7 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
 	v := new(spacedomain.Project)
+	fmt.Printf("create cmd ===============================================: %+v\n", cmd)
 	cmd.toProject(v)
 	count := v.GetQuotaCount()
 	hdType := v.GetComputeType()
@@ -189,7 +192,6 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	}
 
 	// step2: save
-	cmd.toProject(v)
 	v.RepoId = pid
 
 	p, err := s.repo.Save(v)
@@ -231,6 +233,28 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 		if err != nil {
 			return
 		}
+	}
+
+	if r.Hardware.IsNpu() {
+		logrus.Infof("release quota after user:%s npu space:%s delete", r.Owner.Account(), r.Id)
+
+		// id, err := domain.NewIdentity(r.RepoId)
+		// c := computilityapp.CmdToUserQuotaUpdate{
+		// 	Index: computilitydomain.ComputilityAccountRecordIndex{
+		// 		UserName:    r.Owner,
+		// 		ComputeType: r.GetComputeType(),
+		// 		SpaceId:     id,
+		// 	},
+		// 	QuotaCount: r.GetQuotaCount(),
+		// }
+
+		// err = s.computilityApp.UserQuotaRelease(c)
+		// if err != nil {
+		// 	logrus.Errorf("failed to release user:%s quota after space:%s delete: %s",
+		// 		user.Account(), spaceId.Identity(), err)
+
+		// 	return "", nil
+		// }
 	}
 
 	// step3: delete

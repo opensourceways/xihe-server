@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -60,7 +61,9 @@ func (impl project) Save(p *spacedomain.Project) (r spacedomain.Project, err err
 
 		return
 	}
-
+	n := impl.toProjectDO(p)
+	fmt.Printf("new space -==================================================: %+v\n", n)
+	fmt.Printf("n.Hardware: %+v\n", n.Hardware)
 	v, err := impl.mapper.Insert(impl.toProjectDO(p))
 	if err != nil {
 		err = repositories.ConvertError(err)
@@ -282,6 +285,18 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 		return
 	}
 
+	if do.Hardware != "" {
+		if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
+			return
+		}
+
+	}
+	if do.BaseImage != "" {
+		if r.BaseImage, err = domain.NewBaseImage(do.BaseImage, do.Hardware); err != nil {
+			return
+		}
+	}
+
 	r.Level = domain.NewResourceLevelByNum(do.Level)
 	r.RepoId = do.RepoId
 	r.Tags = do.Tags
@@ -293,6 +308,7 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 	r.ForkCount = do.ForkCount
 	r.DownloadCount = do.DownloadCount
 	r.CommitId = do.CommitId
+	r.NoApplicationFile = do.NoApplicationFile
 
 	return
 }
