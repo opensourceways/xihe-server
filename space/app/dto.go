@@ -59,3 +59,9 @@ type ProjectDetailDTO struct {
 	RelatedModels   []app.ResourceDTO `json:"related_models"`
 	RelatedDatasets []app.ResourceDTO `json:"related_datasets"`
 }
+
+// CmdToNotifyUpdateCode is to update no application file and commitId
+type CmdToNotifyUpdateCode struct {
+	CommitId          string
+	NoApplicationFile bool
+}

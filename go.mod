@@ -8,7 +8,6 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/gorilla/websocket v1.5.1
-	github.com/opensourceways/xihe-sdk v0.0.0-20241022122920-59279dd6cc0c
 	github.com/huaweicloud/huaweicloud-sdk-go-obs v3.23.9+incompatible
 	github.com/huaweicloud/huaweicloud-sdk-go-v3 v0.1.76
 	github.com/opensourceways/community-robot-lib v0.0.0-20231106030104-fefc5fa67771
@@ -18,6 +17,7 @@ require (
 	github.com/opensourceways/xihe-extra-services v1.3.0
 	github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43
 	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142ee87
+	github.com/opensourceways/xihe-sdk v0.0.0-20241022122920-59279dd6cc0c
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/files v1.0.1
@@ -92,7 +92,6 @@ require (
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/onsi/gomega v1.30.0 // indirect
 	github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c // indirect
-	github.com/opensourceways/xihe-sdk v0.0.0-20241022122920-59279dd6cc0c // indirect
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/pierrec/lz4/v4 v4.1.19 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect

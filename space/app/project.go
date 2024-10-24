@@ -6,6 +6,7 @@ import (
 
 	sdk "github.com/opensourceways/xihe-sdk/space"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
 
 	"github.com/opensourceways/xihe-server/app"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
@@ -115,6 +116,8 @@ type ProjectService interface {
 	RemoveRelatedDataset(*spacedomain.Project, *domain.ResourceIndex) error
 
 	SetTags(*spacedomain.Project, *app.ResourceTagsUpdateCmd) error
+
+	NotifyUpdateCodes(domain.Identity, *CmdToNotifyUpdateCode) error
 }
 
 func NewProjectService(
@@ -389,6 +392,29 @@ func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 	dto.Projects = dtos
 
 	return
+}
+
+func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUpdateCode) (
+	err error,
+) {
+	space, err := s.repo.GetById(id)
+	if err != nil {
+		return err
+	}
+
+	space.SetSpaceCommitId(cmd.CommitId)
+	space.SetNoApplicationFile(cmd.NoApplicationFile)
+	space, err = s.repo.Save(&space)
+
+	if err != nil {
+		err = xerrors.Errorf("save space failed, err: %w", err)
+
+		return err
+	}
+	logrus.Infof("spaceId:%s set notify commitId:%s, req:%v success",
+		id, cmd.CommitId, cmd)
+
+	return nil
 }
 
 func (s projectService) toProjectDTO(p *spacedomain.Project, dto *ProjectDTO) {

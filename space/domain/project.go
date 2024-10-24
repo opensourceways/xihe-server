@@ -1,6 +1,8 @@
 package domain
 
-import "github.com/opensourceways/xihe-server/domain"
+import (
+	"github.com/opensourceways/xihe-server/domain"
+)
 
 type Project struct {
 	Id string
@@ -29,6 +31,10 @@ type Project struct {
 
 	Hardware  domain.Hardware
 	BaseImage domain.BaseImage
+
+	CommitId          string
+	NoApplicationFile bool
+	Exception         string
 }
 
 func (p *Project) MaxRelatedResourceNum() int {
@@ -97,6 +103,23 @@ func (s *Project) GetComputeType() domain.ComputilityType {
 	}
 
 	return nil
+}
+
+// SetSpaceCommitId for update space commitId.
+func (s *Project) SetSpaceCommitId(commitId string) {
+	s.CommitId = commitId
+}
+
+// SetNoApplicationFile for set NoApplicationFile and Exception.
+func (s *Project) SetNoApplicationFile(noApplicationFile bool) {
+	s.NoApplicationFile = noApplicationFile
+	// if noApplicationFile {
+	// 	s.Exception = primitive.CreateException(primitive.NoApplicationFile)
+	// 	return
+	// }
+	// if !noApplicationFile && s.Exception == primitive.ExceptionNoApplicationFile {
+	// 	s.Exception = primitive.CreateException("")
+	// }
 }
 
 type ProjectModifiableProperty struct {
