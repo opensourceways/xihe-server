@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
@@ -138,7 +139,8 @@ func (col project) GetByName(owner, name string) (do repositoryimpl.ProjectDO, e
 func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	// var v []projectItem
 	type Project struct {
-		Items []projectItem `bson:"items"`
+		Id    primitive.ObjectID `bson:"_id"`
+		Items []projectItem      `bson:"items"`
 	}
 
 	var v []Project
