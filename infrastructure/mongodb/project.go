@@ -138,7 +138,7 @@ func (col project) GetByName(owner, name string) (do repositoryimpl.ProjectDO, e
 func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	// var v []projectItem
 	var v []struct {
-		Items projectItem `bson:"items"`
+		Items []projectItem `bson:"items"`
 	}
 
 	fmt.Printf("======================empty v: %+v\n", v)
@@ -152,7 +152,7 @@ func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 		return
 	}
 
-	col.toProjectDO(owner[0].Owner, &v[0].Items, &do)
+	col.toProjectDO(owner[0].Owner, &v[0].Items[0], &do)
 
 	return
 }

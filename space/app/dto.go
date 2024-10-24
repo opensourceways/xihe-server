@@ -51,6 +51,7 @@ type ProjectDTO struct {
 	LikeCount     int      `json:"like_count"`
 	ForkCount     int      `json:"fork_count"`
 	DownloadCount int      `json:"download_count"`
+	CommitId      string   `json:"commit_id"`
 }
 
 type ProjectDetailDTO struct {

@@ -223,6 +223,7 @@ type ProjectDO struct {
 	LikeCount     int
 	ForkCount     int
 	DownloadCount int
+	CommitId      string
 
 	Hardware  string
 	BaseImage string
@@ -288,6 +289,7 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 	r.LikeCount = do.LikeCount
 	r.ForkCount = do.ForkCount
 	r.DownloadCount = do.DownloadCount
+	r.CommitId = do.CommitId
 
 	return
 }
