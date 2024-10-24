@@ -2,8 +2,8 @@ package controller
 
 import (
 	"github.com/opensourceways/xihe-server/domain"
-	"golang.org/x/xerrors"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
+	"golang.org/x/xerrors"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
@@ -166,4 +166,16 @@ func (p *projectForkRequest) toCmd() (cmd spaceapp.ProjectForkCmd, err error) {
 
 type canApplyResourceNameResp struct {
 	CanApply bool `json:"can_apply"`
+}
+
+// reqToNotifyUpdateCode
+type reqToNotifyUpdateCode struct {
+	NoApplicationFile bool   `json:"no_application_file"`
+	CommitId          string `json:"commit_id"`
+}
+
+func (req *reqToNotifyUpdateCode) toCmd() (cmd spaceapp.CmdToNotifyUpdateCode, err error) {
+	cmd.NoApplicationFile = req.NoApplicationFile
+	cmd.CommitId = req.CommitId
+	return
 }

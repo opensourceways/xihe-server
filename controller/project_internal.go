@@ -43,6 +43,7 @@ func AddRouterForProjectInternalController(
 	}
 
 	rg.GET("/v1/space/:id", ctl.GetSpaceById)
+	rg.PUT("/v1/space/:id/notify_update_code", ctl.NotifyUpdateCode)
 }
 
 type ProjectInternalController struct {
@@ -89,4 +90,48 @@ func (ctl *ProjectInternalController) GetSpaceById(ctx *gin.Context) {
 	fmt.Printf("err: %v\n", err)
 
 	ctx.JSON(http.StatusOK, newResponseData(proj))
+}
+
+// @Summary  NotifyUpdateCode space
+// @Description  NotifyUpdateCode space
+// @Tags     SpaceInternal
+// @Param    id    path  string            true  "id of space" MaxLength(20)
+// @Param    body  body  reqToNotifyUpdateCode  true  "body"
+// @Accept   json
+// @Security Internal
+// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Router   /v1/space/{id}/notify_update_code [put]
+func (ctl *ProjectInternalController) NotifyUpdateCode(ctx *gin.Context) {
+	req := reqToNotifyUpdateCode{}
+	if err := ctx.BindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	spaceId, err := domain.NewIdentity(ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	if err = ctl.s.NotifyUpdateCodes(spaceId, &cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctx.JSON(http.StatusOK, newResponseData(""))
+	}
 }

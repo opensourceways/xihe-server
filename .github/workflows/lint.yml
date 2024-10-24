@@ -11,7 +11,7 @@ permissions:
   checks: write
 
 env:
-  GOPRIVATE: "github.com/openmerlin"
+  GOPRIVATE: "github.com/opensourceways"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
