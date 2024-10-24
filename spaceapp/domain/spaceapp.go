@@ -3,20 +3,19 @@ package domain
 import (
 	"fmt"
 
-	"github.com/opensourceways/xihe-server/common/domain"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
-	"github.com/opensourceways/xihe-server/common/domain/primitive"
+	"github.com/opensourceways/xihe-server/domain"
 )
 
 // SpaceAppIndex represents the index for a space app.
 type SpaceAppIndex struct {
-	SpaceId  primitive.Identity
+	SpaceId  domain.Identity
 	CommitId string
 }
 
 // SpaceApp represents a space app.
 type SpaceApp struct {
-	Id primitive.Identity
+	Id domain.Identity
 
 	SpaceAppIndex
 
@@ -46,4 +45,12 @@ func (app *SpaceApp) StartServing(appURL AppURL, logURL domain.URL) error {
 
 	e := fmt.Errorf("old status is %s, can not set", app.Status.AppStatus())
 	return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
+}
+
+// GetFailedReason app only return failed reason
+func (app *SpaceApp) GetFailedReason() string {
+	if !app.Status.IsUpdateStatusAccept() {
+		return ""
+	}
+	return app.Reason
 }

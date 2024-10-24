@@ -1,12 +1,12 @@
 package repository
 
 import (
-	"context"
-
-	"github.com/opensourceways/xihe-server/spaceapp/domain"
+	"github.com/opensourceways/xihe-server/domain"
+	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
 type SpaceAppRepository interface {
-	SaveWithoutAllBuildLog(context.Context, *domain.SpaceApp) error
-	FindBySpaceId(context.Context, string) (domain.SpaceApp, error)
+	SaveWithoutAllBuildLog(*spaceappdomain.SpaceApp) error
+	FindBySpaceId(domain.Identity) (spaceappdomain.SpaceApp, error)
+	FindById(domain.Identity) (spaceappdomain.SpaceApp, error)
 }

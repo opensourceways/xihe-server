@@ -64,6 +64,7 @@ import (
 	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
 	spaceappmsg "github.com/opensourceways/xihe-server/spaceapp/infrastructure/messageimpl"
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/sseadapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
@@ -317,8 +318,13 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		whitelist,
 	)
 
-	spaceappInternalAppService := spaceappApp.NewSpaceappInternalAppService(
-		spaceapprepo.NewSpaceAppRepository(),
+	spaceappRepository, err := spaceapprepo.NewSpaceAppRepository()
+	if err != nil {
+		return err
+	}
+
+	spaceappAppService := spaceappApp.NewSpaceappAppService(
+		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller),
 	)
 
 	{
@@ -386,7 +392,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender,
+			v1, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender, spaceappAppService,
 		)
 
 		controller.AddRouterForInferenceInternalController(
@@ -423,10 +429,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForComputilityWebController(
 			v1, computilityWebService,
-		)
-
-		controller.AddRouteForSpaceappInternalController(
-			v1, spaceappInternalAppService,
 		)
 	}
 

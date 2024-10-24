@@ -1,5 +1,7 @@
 package repositoryimpl
 
 type SpaceAppDAO interface {
-	UpdateWithOmitingSpecificFields(filter, values any, columns ...string) error
+	UpdateWithOmittingSpecificFields(filter, values any, columns ...string) error
+	GetRecord(filter, result any) error
+	GetByPrimaryKey(row any) error
 }

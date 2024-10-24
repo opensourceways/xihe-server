@@ -1,8 +1,12 @@
 package repositoryimpl
 
-import "github.com/opensourceways/xihe-server/spaceapp/domain"
+import (
+	commondomain "github.com/opensourceways/xihe-server/common/domain"
+	"github.com/opensourceways/xihe-server/domain"
+	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
+)
 
-func toSpaceAppDO(m *domain.SpaceApp) spaceappDO {
+func toSpaceAppDO(m *spaceappdomain.SpaceApp) spaceappDO {
 	do := spaceappDO{
 		Status:      m.Status.AppStatus(),
 		SpaceId:     m.SpaceId.Integer(),
@@ -51,4 +55,33 @@ type spaceappDO struct {
 	BuildLogURL string `gorm:"column:build_log_url"`
 
 	Version int `gorm:"column:version"`
+}
+
+func (do *spaceappDO) toSpaceApp() spaceappdomain.SpaceApp {
+	v := spaceappdomain.SpaceApp{
+		Id: domain.CreateIdentity(do.Id),
+		SpaceAppIndex: spaceappdomain.SpaceAppIndex{
+			SpaceId:  domain.CreateIdentity(do.SpaceId),
+			CommitId: do.CommitId,
+		},
+		Status:      spaceappdomain.CreateAppStatus(do.Status),
+		Reason:      do.Reason,
+		RestartedAt: do.RestartedAt,
+		ResumedAt:   do.ResumedAt,
+		Version:     do.Version,
+	}
+
+	if do.AppURL != "" {
+		v.AppURL = spaceappdomain.CreateAppURL(do.AppURL)
+	}
+
+	if do.AppLogURL != "" {
+		v.AppLogURL = commondomain.CreateURL(do.AppLogURL)
+	}
+
+	if do.BuildLogURL != "" {
+		v.BuildLogURL = commondomain.CreateURL(do.BuildLogURL)
+	}
+
+	return v
 }

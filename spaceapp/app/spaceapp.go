@@ -3,10 +3,12 @@ package app
 import (
 	"context"
 
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/domain"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
+	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	"golang.org/x/xerrors"
 )
@@ -14,19 +16,22 @@ import (
 // SpaceappAppService is the interface for the space app service.
 type SpaceappAppService interface {
 	GetByName(context.Context, domain.Account, *spacedomain.SpaceIndex) (SpaceAppDTO, error)
-	// GetBuildLog(context.Context, domain.Account, *spacedomain.SpaceIndex) (string, error)
-	// GetBuildLogs(context.Context, domain.Account, *spacedomain.SpaceIndex) (BuildLogsDTO, error)
-	// GetSpaceLog(context.Context, domain.Account, *spacedomain.SpaceIndex) (string, error)
+	GetBuildLog(context.Context, domain.Account, *spacedomain.SpaceIndex) (string, error)
+	GetBuildLogs(context.Context, domain.Account, *spacedomain.SpaceIndex) (BuildLogsDTO, error)
+	GetRequestDataStream(*spaceappdomain.SeverSentStream) error
+	GetSpaceLog(context.Context, domain.Account, *spacedomain.SpaceIndex) (string, error)
 }
 
 // NewSpaceappAppService creates a new instance of the space app service.
 func NewSpaceappAppService(
 	repo repository.SpaceAppRepository,
 	spaceRepo spacerepo.Project,
+	sse spaceappdomain.SeverSentEvent,
 ) *spaceappAppService {
 	return &spaceappAppService{
 		repo:      repo,
 		spaceRepo: spaceRepo,
+		sse:       sse,
 	}
 }
 
@@ -34,6 +39,7 @@ func NewSpaceappAppService(
 type spaceappAppService struct {
 	repo      repository.SpaceAppRepository
 	spaceRepo spacerepo.Project
+	sse       spaceappdomain.SeverSentEvent
 }
 
 // GetByName retrieves the space app by name.
@@ -51,23 +57,155 @@ func (s *spaceappAppService) GetByName(
 		return dto, commonrepo.NewErrorResourceNotExists(xerrors.New("not found"))
 	}
 
-	app, err := s.repo.FindBySpaceId(ctx, space.Id)
+	spaceId, err := domain.NewIdentity(space.RepoId)
+	if err != nil {
+		return dto, err
+	}
+
+	app, err := s.repo.FindBySpaceId(spaceId)
 	if err == nil {
 		return toSpaceAppDTO(&app), nil
 	}
 
-	if space.Hardware.IsNpu() && !space.CompPowerAllocated {
+	if space.Hardware.IsNpu() && false {
 		return toSpaceNoCompQuotaDTO(&space), nil
 	}
 
-	if space.GitTemplate != "" {
-		return toSpaceGitTemplateDTO(&space), nil
-	}
-
 	if commonrepo.IsErrorResourceNotExists(err) {
-		err = newSpaceAppNotFound(xerrors.Errorf("not found, err: %w", err))
+		err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)
 	} else {
 		err = xerrors.Errorf("find space app by id failed, err: %w", err)
 	}
 	return dto, err
+}
+
+// GetBuildLogs
+func (s *spaceappAppService) GetBuildLogs(ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex) (
+	dto BuildLogsDTO, err error,
+) {
+	app, err := s.getPrivateReadSpaceApp(ctx, user, index)
+	if err != nil {
+		err = xerrors.Errorf("failed to get space app, err:%w", err)
+		return
+	}
+
+	spaceApp, err := s.repo.FindById(app.Id)
+	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)
+		} else {
+			err = xerrors.Errorf("find space app by id failed, err: %w", err)
+		}
+
+		return
+	}
+
+	dto.Logs = spaceApp.AppLogURL.URL()
+
+	return
+}
+
+// GetBuildLog for get build log
+func (s *spaceappAppService) GetBuildLog(
+	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex,
+) (string, error) {
+	app, err := s.getPrivateReadSpaceApp(ctx, user, index)
+	if err != nil {
+		return "", xerrors.Errorf("failed to get space app:%w", err)
+	}
+
+	if app.BuildLogURL == nil {
+		return "", xerrors.New("space app is not building")
+	}
+	if app.BuildLogURL.URL() == "" {
+		return "", xerrors.New("space app is not building")
+	}
+
+	return app.BuildLogURL.URL(), nil
+}
+
+func (s *spaceappAppService) getPrivateReadSpaceApp(
+	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex,
+) (spaceappdomain.SpaceApp, error) {
+	var spaceApp spaceappdomain.SpaceApp
+
+	space, err := s.spaceRepo.GetByName(user, index.Name)
+	if err != nil {
+		return spaceApp, err
+	}
+
+	if space.Owner.Account() != index.Owner.Account() {
+		return spaceApp, commonrepo.NewErrorResourceNotExists(xerrors.New("not found"))
+	}
+
+	spaceId, err := domain.NewIdentity(space.RepoId)
+	if err != nil {
+		return spaceApp, err
+	}
+
+	app, err := s.repo.FindBySpaceId(spaceId)
+	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)
+		} else {
+			err = xerrors.Errorf("find space app by id failed, err: %w", err)
+		}
+	}
+
+	return app, err
+}
+
+// GetRequestDataStream
+func (s *spaceappAppService) GetRequestDataStream(cmd *spaceappdomain.SeverSentStream) error {
+	return s.sse.Request(cmd)
+}
+
+// GetSpaceLog for get serving log
+func (s *spaceappAppService) GetSpaceLog(
+	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex,
+) (string, error) {
+	app, err := s.getPrivateReadSpaceApp(ctx, user, index)
+	if err != nil {
+		return "", xerrors.Errorf("failed to get space app:%w", err)
+	}
+
+	if app.AppLogURL == nil {
+		return "", xerrors.New("space app is not serving")
+	}
+	if app.AppLogURL.URL() == "" {
+		return "", xerrors.New("space app is not serving")
+	}
+
+	return app.AppLogURL.URL(), nil
+}
+
+func toSpaceAppDTO(app *spaceappdomain.SpaceApp) SpaceAppDTO {
+	dto := SpaceAppDTO{
+		Id:     app.Id.Identity(),
+		Status: app.Status.AppStatus(),
+		Reason: app.GetFailedReason(),
+	}
+
+	if app.AppURL != nil {
+		dto.AppURL = app.AppURL.AppURL()
+	}
+
+	if app.AppLogURL != nil {
+		dto.AppLogURL = app.AppLogURL.URL()
+	}
+
+	if app.BuildLogURL != nil {
+		dto.BuildLogURL = app.BuildLogURL.URL()
+	}
+
+	return dto
+}
+
+func toSpaceNoCompQuotaDTO(space *spacedomain.Project) SpaceAppDTO {
+	dto := SpaceAppDTO{
+		Id:     space.RepoId,
+		Status: spaceappdomain.NoCompQuotaException,
+		Reason: spaceappdomain.ExceptionMap[spaceappdomain.NoCompQuotaException],
+	}
+	return dto
 }

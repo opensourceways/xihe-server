@@ -42,7 +42,7 @@ func (s *spaceappInternalAppService) NotifyIsServing(ctx context.Context, cmd *C
 		return err
 	}
 
-	if err := s.repo.SaveWithoutAllBuildLog(ctx, &v); err != nil {
+	if err := s.repo.SaveWithoutAllBuildLog(&v); err != nil {
 		logrus.Errorf("spaceId:%s save db failed", cmd.SpaceId.Identity())
 		return err
 	}

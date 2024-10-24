@@ -37,6 +37,9 @@ const (
 
 	// ErrorCodeSpaceAppUnmatchedStatus is const
 	ErrorCodeSpaceAppUnmatchedStatus = "space_app_unmatched_status"
+
+	// ErrorCodeSpaceAppNotFound space app
+	ErrorCodeSpaceAppNotFound = "space_app_not_found"
 )
 
 // errorImpl

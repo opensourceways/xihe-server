@@ -148,7 +148,7 @@ func (t dbTable) IsRowExists(err error) bool {
 	return errors.Is(err, errRowExists)
 }
 
-func (t dbTable) UpdateWithOmitingSpecificFields(filter, values any, columns ...string) error {
+func (t dbTable) UpdateWithOmittingSpecificFields(filter, values any, columns ...string) error {
 	r := db.Table(t.name).Where(filter).Select(`*`).Omit(columns...).Updates(values)
 	if r.Error != nil {
 		return r.Error
@@ -161,4 +161,14 @@ func (t dbTable) UpdateWithOmitingSpecificFields(filter, values any, columns ...
 	}
 
 	return nil
+}
+
+func (t dbTable) GetByPrimaryKey(row any) error {
+	err := db.Table(t.name).First(row).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return repository.NewErrorResourceNotExists(errors.New("not found"))
+	}
+
+	return err
 }
