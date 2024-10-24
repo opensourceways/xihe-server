@@ -393,10 +393,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForInferenceController(
 			v1, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender, spaceappAppService,
+			spaceappRepository,
 		)
 
 		controller.AddRouterForInferenceInternalController(
-			internal, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender,
+			internal, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender, spaceappRepository,
 		)
 
 		controller.AddRouterForSearchController(

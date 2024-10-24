@@ -32,10 +32,11 @@ func AddRouterForInferenceController(
 	whitelist userapp.WhiteListService,
 	spacesender spacemesage.SpaceAppMessageProducer,
 	appService spaceappApp.SpaceappAppService,
+	spaceappRepo spaceappApprepo.SpaceAppRepository,
 ) {
 	ctl := InferenceController{
 		s: spaceappApp.NewInferenceService(
-			p, repo, sender, apiConfig.MinSurvivalTimeOfInference, spacesender,
+			p, repo, sender, apiConfig.MinSurvivalTimeOfInference, spacesender, spaceappRepo, project,
 		),
 		project:    project,
 		whitelist:  whitelist,
@@ -46,10 +47,10 @@ func AddRouterForInferenceController(
 	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
 
 	rg.GET("/v1/inference/project/:owner/:pid", ctl.Create)
-	rg.GET("/v1/space-app/:owner/:name", ctl.Get)
-	rg.GET("/v1/space-app/:owner/:name/buildlog/complete", ctl.GetBuildLogs)
-	rg.GET("/v1/space-app/:owner/:name/buildlog/realtime", ctl.GetRealTimeBuildLog)
-	rg.GET("/v1/space-app/:owner/:name/spacelog/realtime", ctl.GetRealTimeSpaceLog)
+	rg.GET("/v1/inference/:owner/:name", ctl.Get)
+	rg.GET("/v1/inference/:owner/:name/buildlog/complete", ctl.GetBuildLogs)
+	rg.GET("/v1/inference/:owner/:name/buildlog/realtime", ctl.GetRealTimeBuildLog)
+	rg.GET("/v1/inference/:owner/:name/spacelog/realtime", ctl.GetRealTimeSpaceLog)
 }
 
 type InferenceController struct {

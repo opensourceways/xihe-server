@@ -54,3 +54,60 @@ func (app *SpaceApp) GetFailedReason() string {
 	}
 	return app.Reason
 }
+
+// StartBuilding starts the building process for the space app and sets the build log URL.
+func (app *SpaceApp) StartBuilding(logURL domain.URL) error {
+	if !app.Status.IsInit() {
+		e := fmt.Errorf("old status is %s, can not set", app.Status.AppStatus())
+		return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
+	}
+
+	app.Status = AppStatusBuilding
+	app.BuildLogURL = logURL
+
+	return nil
+}
+
+// SetBuildFailed set app status is build failed.
+func (app *SpaceApp) SetBuildFailed(status AppStatus, reason string) error {
+	if !app.Status.IsBuilding() {
+		e := fmt.Errorf("old status is %s, can not set", app.Status.AppStatus())
+		return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
+	}
+
+	app.Status = status
+	app.Reason = reason
+
+	return nil
+}
+
+// SetStarting sets the starting status of the space app based on the success parameter.
+func (app *SpaceApp) SetStarting() error {
+	if !app.Status.IsBuilding() {
+		e := fmt.Errorf("old status is %s, can not set", app.Status.AppStatus())
+		return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
+	}
+
+	app.Status = AppStatusServeStarting
+
+	return nil
+}
+
+// SetStartFailed set app status is start failed.
+func (app *SpaceApp) SetStartFailed(status AppStatus, reason string) error {
+	if !app.Status.IsStarting() {
+		e := fmt.Errorf("old status is %s, can not set", app.Status.AppStatus())
+		return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
+	}
+
+	app.Status = status
+	app.Reason = reason
+
+	return nil
+}
+
+// SpaceAppBuildLog is the value object of log
+type SpaceAppBuildLog struct {
+	AppId domain.Identity
+	Logs  string
+}

@@ -40,6 +40,12 @@ const (
 
 	// ErrorCodeSpaceAppNotFound space app
 	ErrorCodeSpaceAppNotFound = "space_app_not_found"
+
+	// ErrorCodeSpaceNotFound is const
+	ErrorCodeSpaceNotFound = "space_not_found"
+
+	// ErrorCodeSpaceCommitConflict is const
+	ErrorCodeSpaceCommitConflict = "space_commit_conflict"
 )
 
 // errorImpl

@@ -3,7 +3,7 @@ package app
 import (
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
-	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
 type InferenceDTO struct {
@@ -25,18 +25,35 @@ func (dto *InferenceDTO) canReuseCurrent() bool {
 type CmdToNotifyServiceIsStarted struct {
 	CmdToNotifyBuildIsStarted
 
-	AppURL spaceappdomain.AppURL
+	AppURL domain.AppURL
 }
 
 // CmdToNotifyBuildIsStarted is a command to notify that the build has started.
 type CmdToNotifyBuildIsStarted struct {
-	spaceappdomain.SpaceAppIndex
+	domain.SpaceAppIndex
 
 	LogURL commondomain.URL
 }
 
 // CmdToCreateApp is a command to create an app.
-type CmdToCreateApp = spaceappdomain.SpaceAppIndex
+type CmdToCreateApp = domain.SpaceAppIndex
+
+// CmdToNotifyFailedStatus is a command to notify that status has update.
+type CmdToNotifyFailedStatus struct {
+	domain.SpaceAppIndex
+
+	Reason string
+	Status domain.AppStatus
+
+	Logs string
+}
+
+// CmdToNotifyStarting is a command to notify that the build has finished.
+type CmdToNotifyStarting struct {
+	domain.SpaceAppIndex
+
+	Logs string
+}
 
 // SpaceAppDTO is a data transfer object for space app.
 type SpaceAppDTO struct {

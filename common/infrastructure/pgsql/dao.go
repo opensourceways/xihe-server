@@ -172,3 +172,18 @@ func (t dbTable) GetByPrimaryKey(row any) error {
 
 	return err
 }
+
+func (t dbTable) Update(filter, values any) error {
+	r := db.Table(t.name).Where(filter).Select(`*`).Updates(values)
+	if r.Error != nil {
+		return r.Error
+	}
+
+	if r.RowsAffected == 0 {
+		return repository.NewErrorConcurrentUpdating(
+			errors.New("concurrent updating"),
+		)
+	}
+
+	return nil
+}

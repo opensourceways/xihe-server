@@ -2,8 +2,8 @@ package repositoryimpl
 
 import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
-	"github.com/opensourceways/xihe-server/domain"
-	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
+	types "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 )
 
@@ -26,7 +26,7 @@ type spaceAppRepoImpl struct {
 }
 
 // Save saves space application into repository without all build log
-func (impl spaceAppRepoImpl) SaveWithoutAllBuildLog(app *spaceappdomain.SpaceApp) error {
+func (impl spaceAppRepoImpl) Save(app *domain.SpaceApp) error {
 	do := toSpaceAppDO(app)
 	do.Version += 1
 
@@ -36,25 +36,34 @@ func (impl spaceAppRepoImpl) SaveWithoutAllBuildLog(app *spaceappdomain.SpaceApp
 }
 
 // FindBySpaceId finds a space application in the repository based on the space ID.
-func (impl spaceAppRepoImpl) FindBySpaceId(id domain.Identity) (spaceappdomain.SpaceApp, error) {
+func (impl spaceAppRepoImpl) FindBySpaceId(id types.Identity) (domain.SpaceApp, error) {
 	do := spaceappDO{SpaceId: id.Integer()}
 
 	// It must new a new DO, otherwise the sql statement will include duplicate conditions.
 	result := spaceappDO{}
 
 	if err := impl.dao.GetRecord(&do, &result); err != nil {
-		return spaceappdomain.SpaceApp{}, err
+		return domain.SpaceApp{}, err
 	}
 
 	return result.toSpaceApp(), nil
 }
 
-func (impl spaceAppRepoImpl) FindById(id domain.Identity) (spaceappdomain.SpaceApp, error) {
+func (impl spaceAppRepoImpl) FindById(id types.Identity) (domain.SpaceApp, error) {
 	do := spaceappDO{Id: id.Integer()}
 
 	if err := impl.dao.GetByPrimaryKey(&do); err != nil {
-		return spaceappdomain.SpaceApp{}, err
+		return domain.SpaceApp{}, err
 	}
 
 	return do.toSpaceApp(), nil
+}
+
+// SaveWithBuildLog saves a space application and build log in the repository.
+func (impl spaceAppRepoImpl) SaveWithBuildLog(m *domain.SpaceApp, log *domain.SpaceAppBuildLog) error {
+	do := toSpaceAppDO(m)
+	do.Version += 1
+	do.AllBuildLog = log.Logs
+
+	return impl.dao.Update(&spaceappDO{Id: do.Id, Version: m.Version}, &do)
 }
