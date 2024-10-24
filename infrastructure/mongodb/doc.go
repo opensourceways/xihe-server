@@ -90,6 +90,11 @@ type projectItem struct {
 	LikeCount     int `bson:"like_count"        json:"-"`
 	ForkCount     int `bson:"fork_count"        json:"-"`
 	DownloadCount int `bson:"download_count"    json:"-"`
+
+	BaseImage         string `bson:"base_image"    json:"-"`
+	HardwareType      string `bson:"hardware_type"    json:"-"`
+	CommitId          string `bson:"commit_id"           json:"-"`
+	NoApplicationFile bool   `bson:"no_application_file" json:"-"`
 }
 
 type ProjectPropertyItem struct {

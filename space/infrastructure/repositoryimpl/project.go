@@ -172,23 +172,25 @@ func (impl project) GetSummaryByName(owner domain.Account, name domain.ResourceN
 
 func (impl project) toProjectDO(p *spacedomain.Project) ProjectDO {
 	do := ProjectDO{
-		Id:        p.Id,
-		Owner:     p.Owner.Account(),
-		Name:      p.Name.ResourceName(),
-		FL:        p.Name.FirstLetterOfName(),
-		Type:      p.Type.ProjType(),
-		CoverId:   p.CoverId.CoverId(),
-		RepoType:  p.RepoType.RepoType(),
-		Protocol:  p.Protocol.ProtocolName(),
-		Training:  p.Training.TrainingPlatform(),
-		Tags:      p.Tags,
-		TagKinds:  p.TagKinds,
-		RepoId:    p.RepoId,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
-		Version:   p.Version,
-		Hardware:  p.Hardware.Hardware(),
-		BaseImage: p.BaseImage.BaseImage(),
+		Id:                p.Id,
+		Owner:             p.Owner.Account(),
+		Name:              p.Name.ResourceName(),
+		FL:                p.Name.FirstLetterOfName(),
+		Type:              p.Type.ProjType(),
+		CoverId:           p.CoverId.CoverId(),
+		RepoType:          p.RepoType.RepoType(),
+		Protocol:          p.Protocol.ProtocolName(),
+		Training:          p.Training.TrainingPlatform(),
+		Tags:              p.Tags,
+		TagKinds:          p.TagKinds,
+		RepoId:            p.RepoId,
+		CreatedAt:         p.CreatedAt,
+		UpdatedAt:         p.UpdatedAt,
+		Version:           p.Version,
+		Hardware:          p.Hardware.Hardware(),
+		BaseImage:         p.BaseImage.BaseImage(),
+		CommitId:          p.CommitId,
+		NoApplicationFile: p.NoApplicationFile,
 	}
 
 	if p.Desc != nil {
@@ -202,28 +204,29 @@ func (impl project) toProjectDO(p *spacedomain.Project) ProjectDO {
 }
 
 type ProjectDO struct {
-	Id            string
-	Owner         string
-	Name          string
-	FL            byte
-	Desc          string
-	Title         string
-	Type          string
-	Level         int
-	CoverId       string
-	Protocol      string
-	Training      string
-	RepoType      string
-	RepoId        string
-	Tags          []string
-	TagKinds      []string
-	CreatedAt     int64
-	UpdatedAt     int64
-	Version       int
-	LikeCount     int
-	ForkCount     int
-	DownloadCount int
-	CommitId      string
+	Id                string
+	Owner             string
+	Name              string
+	FL                byte
+	Desc              string
+	Title             string
+	Type              string
+	Level             int
+	CoverId           string
+	Protocol          string
+	Training          string
+	RepoType          string
+	RepoId            string
+	Tags              []string
+	TagKinds          []string
+	CreatedAt         int64
+	UpdatedAt         int64
+	Version           int
+	LikeCount         int
+	ForkCount         int
+	DownloadCount     int
+	CommitId          string
+	NoApplicationFile bool
 
 	Hardware  string
 	BaseImage string
