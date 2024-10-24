@@ -284,7 +284,7 @@ func (s projectService) GetByName(
 func (s projectService) GetById(id domain.Identity) (sdk.SpaceMetaDTO, error) {
 	v, err := s.repo.GetById(id)
 
-	fmt.Printf("====================v: %+v\n", v)
+	fmt.Printf("sdk result ====================v: %+v\n", v)
 	if err != nil {
 		return sdk.SpaceMetaDTO{}, err
 	}
@@ -299,7 +299,7 @@ func (s projectService) GetById(id domain.Identity) (sdk.SpaceMetaDTO, error) {
 		Visibility:   v.RepoType.RepoType(),
 		Disable:      false,
 		HardwareType: v.Hardware.Hardware(),
-		CommitId:     "",
+		CommitId:     v.CommitId,
 	}, err
 }
 
@@ -434,6 +434,10 @@ func (s projectService) toProjectDTO(p *spacedomain.Project, dto *ProjectDTO) {
 		LikeCount:     p.LikeCount,
 		ForkCount:     p.ForkCount,
 		DownloadCount: p.DownloadCount,
+	}
+
+	if p.CommitId != "" {
+		dto.CommitId = p.CommitId
 	}
 
 	if p.Desc != nil {
