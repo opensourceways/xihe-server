@@ -140,6 +140,7 @@ func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	// var v []projectItem
 	type Project struct {
 		Id    primitive.ObjectID `bson:"_id"`
+		Owner string             `bson:"owner"`
 		Items []projectItem      `bson:"items"`
 	}
 
@@ -149,20 +150,20 @@ func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	}
 	fmt.Printf("mongodb out =============================v: %+v\n", v)
 
-	type ProjectOwner struct {
-		Id    primitive.ObjectID `bson:"_id"`
-		Owner string             `bson:"owner"`
-		Items projectItem        `bson:"items"`
-	}
+	// type ProjectOwner struct {
+	// 	Id    primitive.ObjectID `bson:"_id"`
+	// 	Owner string             `bson:"owner"`
+	// 	Items projectItem        `bson:"items"`
+	// }
 
-	var owner []ProjectOwner
-	if err = getOwnerByIdOnly(col.collectionName, id, &owner); err != nil {
-		return
-	}
+	// var owner []ProjectOwner
+	// if err = getOwnerByIdOnly(col.collectionName, id, &owner); err != nil {
+	// 	return
+	// }
 
-	fmt.Printf("owner:==================================== %+v\n", owner)
+	// fmt.Printf("owner:==================================== %+v\n", owner)
 
-	col.toProjectDO(owner[0].Owner, &v[0].Items[0], &do)
+	col.toProjectDO(v[0].Owner, &v[0].Items[0], &do)
 
 	return
 }
