@@ -96,6 +96,7 @@ func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) er
 		RepoType: p.RepoType.RepoType(),
 		Tags:     p.Tags,
 		TagKinds: p.TagKinds,
+		CommitId: p.CommitId,
 	}
 
 	if p.Desc != nil {
@@ -120,15 +121,17 @@ func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) er
 type ProjectPropertyDO struct {
 	repositories.ResourceToUpdateDO
 
-	FL       byte
-	Name     string
-	Desc     string
-	Title    string
-	Level    int
-	CoverId  string
-	RepoType string
-	Tags     []string
-	TagKinds []string
+	FL                byte
+	Name              string
+	Desc              string
+	Title             string
+	Level             int
+	CoverId           string
+	RepoType          string
+	Tags              []string
+	TagKinds          []string
+	CommitId          string
+	NoApplicationFile bool
 }
 
 func (impl project) ListAndSortByUpdateTime(

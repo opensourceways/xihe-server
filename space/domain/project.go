@@ -123,14 +123,16 @@ func (s *Project) SetNoApplicationFile(noApplicationFile bool) {
 }
 
 type ProjectModifiableProperty struct {
-	Name     domain.ResourceName
-	Desc     domain.ResourceDesc
-	Title    domain.ResourceTitle
-	CoverId  domain.CoverId
-	RepoType domain.RepoType
-	Tags     []string
-	TagKinds []string
-	Level    domain.ResourceLevel
+	Name              domain.ResourceName
+	Desc              domain.ResourceDesc
+	Title             domain.ResourceTitle
+	CoverId           domain.CoverId
+	RepoType          domain.RepoType
+	Tags              []string
+	TagKinds          []string
+	Level             domain.ResourceLevel
+	CommitId          string
+	NoApplicationFile bool
 }
 
 type ProjectSummary struct {

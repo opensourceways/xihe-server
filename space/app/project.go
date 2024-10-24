@@ -392,9 +392,18 @@ func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUp
 		return err
 	}
 
-	space.SetSpaceCommitId(cmd.CommitId)
-	space.SetNoApplicationFile(cmd.NoApplicationFile)
-	space, err = s.repo.Save(&space)
+	// space.SetSpaceCommitId(cmd.CommitId)
+	// space.SetNoApplicationFile(cmd.NoApplicationFile)
+
+	space.ProjectModifiableProperty.CommitId = cmd.CommitId
+	space.ProjectModifiableProperty.NoApplicationFile = cmd.NoApplicationFile
+
+	// step2
+	info := spacerepo.ProjectPropertyUpdateInfo{
+		ResourceToUpdate: s.toResourceToUpdate(&space),
+		Property:         space.ProjectModifiableProperty,
+	}
+	err = s.repo.UpdateProperty(&info)
 
 	if err != nil {
 		err = xerrors.Errorf("save space failed, err: %w", err)

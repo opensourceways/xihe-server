@@ -162,8 +162,9 @@ func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	// }
 
 	// fmt.Printf("owner:==================================== %+v\n", owner)
-
+	fmt.Printf("================================v[0].Owner: %+v\n", v[0].Owner)
 	col.toProjectDO(v[0].Owner, &v[0].Items[0], &do)
+	fmt.Printf("==============================do: %+v\n", do)
 
 	return
 }
@@ -276,26 +277,28 @@ func (col project) toProjectDoc(do *repositoryimpl.ProjectDO) (bson.M, error) {
 
 func (col project) toProjectDO(owner string, item *projectItem, do *repositoryimpl.ProjectDO) {
 	*do = repositoryimpl.ProjectDO{
-		Id:            item.Id,
-		Owner:         owner,
-		Name:          item.Name,
-		Desc:          item.Desc,
-		Title:         item.Title,
-		Type:          item.Type,
-		Level:         item.Level,
-		CoverId:       item.CoverId,
-		Protocol:      item.Protocol,
-		Training:      item.Training,
-		RepoType:      item.RepoType,
-		RepoId:        item.RepoId,
-		Tags:          item.Tags,
-		TagKinds:      item.TagKinds,
-		CreatedAt:     item.CreatedAt,
-		UpdatedAt:     item.UpdatedAt,
-		Version:       item.Version,
-		LikeCount:     item.LikeCount,
-		ForkCount:     item.ForkCount,
-		DownloadCount: item.DownloadCount,
+		Id:                item.Id,
+		Owner:             owner,
+		Name:              item.Name,
+		Desc:              item.Desc,
+		Title:             item.Title,
+		Type:              item.Type,
+		Level:             item.Level,
+		CoverId:           item.CoverId,
+		Protocol:          item.Protocol,
+		Training:          item.Training,
+		RepoType:          item.RepoType,
+		RepoId:            item.RepoId,
+		Tags:              item.Tags,
+		TagKinds:          item.TagKinds,
+		CreatedAt:         item.CreatedAt,
+		UpdatedAt:         item.UpdatedAt,
+		Version:           item.Version,
+		LikeCount:         item.LikeCount,
+		ForkCount:         item.ForkCount,
+		DownloadCount:     item.DownloadCount,
+		CommitId:          item.CommitId,
+		NoApplicationFile: item.NoApplicationFile,
 
 		RelatedModels:   toResourceIndexDO(item.RelatedModels),
 		RelatedDatasets: toResourceIndexDO(item.RelatedDatasets),
