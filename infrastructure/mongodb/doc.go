@@ -91,10 +91,8 @@ type projectItem struct {
 	ForkCount     int `bson:"fork_count"        json:"-"`
 	DownloadCount int `bson:"download_count"    json:"-"`
 
-	BaseImage         string `bson:"base_image"    json:"-"`
-	HardwareType      string `bson:"hardware_type"    json:"-"`
-	CommitId          string `bson:"commit_id"           json:"-"`
-	NoApplicationFile bool   `bson:"no_application_file" json:"-"`
+	BaseImage    string `bson:"base_image"       json:"base_image"`
+	HardwareType string `bson:"hardware_type"    json:"hardware_type"`
 }
 
 type ProjectPropertyItem struct {
@@ -109,6 +107,9 @@ type ProjectPropertyItem struct {
 	// don't depend on the magic to guarantee the correctness.
 	Tags     []string `bson:"tags"     json:"tags"`
 	TagKinds []string `bson:"kinds"    json:"kinds"`
+
+	CommitId          string `bson:"commit_id"           json:"commit_id"`
+	NoApplicationFile bool   `bson:"no_application_file" json:"no_application_file"`
 }
 
 func (doc *ProjectPropertyItem) setDefault() {

@@ -31,10 +31,6 @@ type Project struct {
 
 	Hardware  domain.Hardware
 	BaseImage domain.BaseImage
-
-	CommitId          string
-	NoApplicationFile bool
-	Exception         string
 }
 
 func (p *Project) MaxRelatedResourceNum() int {

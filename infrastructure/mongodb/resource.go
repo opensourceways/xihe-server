@@ -151,35 +151,6 @@ func getResourceByIdOnly(collection, rid string, result interface{}) error {
 	return withContext(f)
 }
 
-func getOwnerByIdOnly(collection, rid string, result interface{}) error {
-	pipeline := []bson.M{
-		{
-			"$match": bson.M{"items.repo_id": rid}, // 替换为你想要筛选的repo_id
-		},
-		{
-			"$unwind": "$items",
-		},
-		{
-			"$match": bson.M{"items.repo_id": rid}, // 确保筛选条件仍然有效
-		},
-	}
-	col := cli.collection(collection)
-
-	// 执行聚合查询
-	cur, err := col.Aggregate(context.TODO(), pipeline)
-	if err != nil {
-		return err
-	}
-
-	// 迭代结果
-	// var results []bson.M
-	if err = cur.All(context.TODO(), &result); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func getResourceSummary(collection, owner, rId string, result interface{}) error {
 	f := func(ctx context.Context) error {
 		return cli.getArrayElem(
