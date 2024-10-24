@@ -137,11 +137,11 @@ func (col project) GetByName(owner, name string) (do repositoryimpl.ProjectDO, e
 
 func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	// var v []projectItem
-	var v []struct {
+	type Project struct {
 		Items []projectItem `bson:"items"`
 	}
 
-	fmt.Printf("======================empty v: %+v\n", v)
+	var v []Project
 	if err = getResourceByIdOnly(col.collectionName, id, &v); err != nil {
 		return
 	}

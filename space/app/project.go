@@ -289,18 +289,8 @@ func (s projectService) GetById(id domain.Identity) (sdk.SpaceMetaDTO, error) {
 		return sdk.SpaceMetaDTO{}, err
 	}
 
-	return sdk.SpaceMetaDTO{
-		Id:           v.Id,
-		SDK:          v.Type.ProjType(),
-		Name:         v.Name.ResourceName(),
-		Owner:        v.Owner.Account(),
-		Hardware:     v.Hardware.Hardware(),
-		BaseImage:    v.BaseImage.BaseImage(),
-		Visibility:   v.RepoType.RepoType(),
-		Disable:      false,
-		HardwareType: v.Hardware.Hardware(),
-		CommitId:     v.CommitId,
-	}, err
+	res := s.toSpaceMetaDTO(&v)
+	return res, err
 }
 
 func (s projectService) ListGlobal(cmd *app.GlobalResourceListCmd) (
@@ -473,5 +463,20 @@ func (s projectService) toProjectSummaryDTO(p *spacedomain.ProjectSummary, dto *
 
 	if p.Level != nil {
 		dto.Level = p.Level.ResourceLevel()
+	}
+}
+
+func (s projectService) toSpaceMetaDTO(v *spacedomain.Project) sdk.SpaceMetaDTO {
+	return sdk.SpaceMetaDTO{
+		Id:           v.RepoId,
+		SDK:          v.Type.ProjType(),
+		Name:         v.Name.ResourceName(),
+		Owner:        v.Owner.Account(),
+		Hardware:     v.Hardware.Hardware(),
+		BaseImage:    v.BaseImage.BaseImage(),
+		Visibility:   v.RepoType.RepoType(),
+		Disable:      false,
+		HardwareType: v.Hardware.Hardware(),
+		CommitId:     v.CommitId,
 	}
 }
