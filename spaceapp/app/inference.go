@@ -1,34 +1,39 @@
 package app
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
 	"github.com/opensourceways/xihe-server/app"
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
+	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
-	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/inference"
 	spacemesage "github.com/opensourceways/xihe-server/spaceapp/domain/message"
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
 )
 
-type InferenceIndex = spaceappdomain.InferenceIndex
-type InferenceDetail = spaceappdomain.InferenceDetail
+type InferenceIndex = domain.InferenceIndex
+type InferenceDetail = domain.InferenceDetail
 
 type InferenceCreateCmd struct {
 	ProjectId     string
-	ProjectName   domain.ResourceName
-	ProjectOwner  domain.Account
+	ProjectName   types.ResourceName
+	ProjectOwner  types.Account
 	ResourceLevel string
 
-	InferenceDir domain.Directory
-	BootFile     domain.FilePath
+	InferenceDir types.Directory
+	BootFile     types.FilePath
 }
 
 func (cmd *InferenceCreateCmd) Validate() error {
@@ -45,7 +50,7 @@ func (cmd *InferenceCreateCmd) Validate() error {
 	return nil
 }
 
-func (cmd *InferenceCreateCmd) toInference(v *spaceappdomain.Inference, lastCommit, requester string) {
+func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit, requester string) {
 	v.Project.Id = cmd.ProjectId
 	v.LastCommit = lastCommit
 	v.ProjectName = cmd.ProjectName
@@ -58,6 +63,11 @@ type InferenceService interface {
 	Create(string, *app.UserInfo, *InferenceCreateCmd) (InferenceDTO, string, error)
 	Get(info *InferenceIndex) (InferenceDTO, error)
 	CreateSpaceApp(CmdToCreateApp) error
+	NotifyIsServing(ctx context.Context, cmd *CmdToNotifyServiceIsStarted) error
+	NotifyIsBuilding(ctx context.Context, cmd *CmdToNotifyBuildIsStarted) error
+	NotifyStarting(ctx context.Context, cmd *CmdToNotifyStarting) error
+	NotifyIsBuildFailed(ctx context.Context, cmd *CmdToNotifyFailedStatus) error
+	NotifyIsStartFailed(ctx context.Context, cmd *CmdToNotifyFailedStatus) error
 }
 
 func NewInferenceService(
@@ -66,6 +76,8 @@ func NewInferenceService(
 	sender message.Sender,
 	minSurvivalTime int,
 	spacesender spacemesage.SpaceAppMessageProducer,
+	spaceappRepo spaceapprepo.SpaceAppRepository,
+	spaceRepo spacerepo.Project,
 ) InferenceService {
 	return inferenceService{
 		p:               p,
@@ -73,6 +85,8 @@ func NewInferenceService(
 		sender:          sender,
 		spacesender:     spacesender,
 		minSurvivalTime: int64(minSurvivalTime),
+		spaceappRepo:    spaceappRepo,
+		spaceRepo:       spaceRepo,
 	}
 }
 
@@ -82,6 +96,8 @@ type inferenceService struct {
 	sender          message.Sender
 	spacesender     spacemesage.SpaceAppMessageProducer
 	minSurvivalTime int64
+	spaceappRepo    spaceapprepo.SpaceAppRepository
+	spaceRepo       spacerepo.Project
 }
 
 func (s inferenceService) Create(user string, owner *app.UserInfo, cmd *InferenceCreateCmd) (
@@ -104,7 +120,7 @@ func (s inferenceService) Create(user string, owner *app.UserInfo, cmd *Inferenc
 		return
 	}
 
-	instance := new(spaceappdomain.Inference)
+	instance := new(domain.Inference)
 	cmd.toInference(instance, sha, user)
 	dto, version, err := s.check(instance)
 	if err != nil {
@@ -156,7 +172,7 @@ func (s inferenceService) Get(index *InferenceIndex) (dto InferenceDTO, err erro
 	return
 }
 
-func (s inferenceService) check(instance *spaceappdomain.Inference) (
+func (s inferenceService) check(instance *domain.Inference) (
 	dto InferenceDTO, version int, err error,
 ) {
 	v, version, err := s.repo.FindInstances(&instance.Project, instance.LastCommit)
@@ -196,7 +212,7 @@ func (s inferenceService) check(instance *spaceappdomain.Inference) (
 }
 
 func (s inferenceService) CreateSpaceApp(cmd CmdToCreateApp) error {
-	if err := s.spacesender.SendSpaceAppCreateMsg(&spaceappdomain.SpaceAppCreateEvent{
+	if err := s.spacesender.SendSpaceAppCreateMsg(&domain.SpaceAppCreateEvent{
 		Id:       cmd.SpaceId.Identity(),
 		CommitId: cmd.CommitId,
 	}); err != nil {
@@ -227,7 +243,7 @@ func (s inferenceInternalService) UpdateDetail(index *InferenceIndex, detail *In
 }
 
 type InferenceMessageService interface {
-	CreateInferenceInstance(*spaceappdomain.InferenceInfo) error
+	CreateInferenceInstance(*domain.InferenceInfo) error
 	ExtendSurvivalTime(*message.InferenceExtendInfo) error
 }
 
@@ -249,7 +265,7 @@ type inferenceMessageService struct {
 	manager inference.Inference
 }
 
-func (s inferenceMessageService) CreateInferenceInstance(info *spaceappdomain.InferenceInfo) error {
+func (s inferenceMessageService) CreateInferenceInstance(info *domain.InferenceInfo) error {
 	v, err := s.user.GetByAccount(info.Project.Owner)
 	if err != nil {
 		return err
@@ -265,7 +281,7 @@ func (s inferenceMessageService) CreateInferenceInstance(info *spaceappdomain.In
 
 	return s.repo.UpdateDetail(
 		&info.InferenceIndex,
-		&spaceappdomain.InferenceDetail{Expiry: utils.Now() + int64(survivaltime)},
+		&domain.InferenceDetail{Expiry: utils.Now() + int64(survivaltime)},
 	)
 }
 
@@ -296,5 +312,151 @@ func (s inferenceMessageService) ExtendSurvivalTime(info *message.InferenceExten
 		return err
 	}
 
-	return s.repo.UpdateDetail(&info.InferenceIndex, &spaceappdomain.InferenceDetail{Expiry: n})
+	return s.repo.UpdateDetail(&info.InferenceIndex, &domain.InferenceDetail{Expiry: n})
+}
+
+// NotifyIsServing notifies that a service of a SpaceApp has serving.
+func (s inferenceService) NotifyIsServing(ctx context.Context, cmd *CmdToNotifyServiceIsStarted) error {
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
+	if err != nil {
+		return err
+	}
+
+	if err := v.StartServing(cmd.AppURL, cmd.LogURL); err != nil {
+		logrus.Errorf("spaceId:%s set space app serving failed, err:%s", cmd.SpaceId.Identity(), err)
+		return err
+	}
+
+	if err := s.spaceappRepo.Save(&v); err != nil {
+		logrus.Errorf("spaceId:%s save db failed", cmd.SpaceId.Identity())
+		return err
+	}
+	logrus.Infof("spaceId:%s notify serving successful", cmd.SpaceId.Identity())
+
+	return nil
+}
+
+// NotifyIsBuilding notifies that the build process of a SpaceApp has started.
+func (s inferenceService) NotifyIsBuilding(ctx context.Context, cmd *CmdToNotifyBuildIsStarted) error {
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
+	if err != nil {
+		return err
+	}
+
+	if err := v.StartBuilding(cmd.LogURL); err != nil {
+		logrus.Errorf("spaceId:%s set space app building failed, err:%s", cmd.SpaceId.Identity(), err)
+		return err
+	}
+	if err := s.spaceappRepo.Save(&v); err != nil {
+		logrus.Errorf("spaceId:%s save db failed", cmd.SpaceId.Identity())
+		return err
+	}
+	logrus.Infof("spaceId:%s notify building successful", cmd.SpaceId.Identity())
+	return nil
+}
+
+// NotifyStarting notifies that the build process of a SpaceApp has finished.
+func (s inferenceService) NotifyStarting(ctx context.Context, cmd *CmdToNotifyStarting) error {
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
+	if err != nil {
+		return err
+	}
+
+	if err := v.SetStarting(); err != nil {
+		logrus.Errorf("spaceId:%s set space app starting failed, err:%s", cmd.SpaceId.Identity(), err)
+		return err
+	}
+
+	if err := s.spaceappRepo.SaveWithBuildLog(&v, &domain.SpaceAppBuildLog{
+		Logs: cmd.Logs,
+	}); err != nil {
+		logrus.Errorf("spaceId:%s save with build log db failed, err:%s", cmd.SpaceId.Identity(), err)
+		return err
+	}
+
+	logrus.Infof("spaceId:%s notify starting successful, save build logs:%d",
+		cmd.SpaceId.Identity(), len(cmd.Logs))
+	return nil
+}
+
+// NotifyIsBuildFailed notifies change SpaceApp status.
+func (s inferenceService) NotifyIsBuildFailed(ctx context.Context, cmd *CmdToNotifyFailedStatus) error {
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
+	if err != nil {
+		return err
+	}
+
+	if err := v.SetBuildFailed(cmd.Status, cmd.Reason); err != nil {
+		logrus.Errorf("spaceId:%s set space app %s failed, err:%s",
+			cmd.SpaceId.Identity(), cmd.Status.AppStatus(), err)
+		return err
+	}
+
+	if err := s.spaceappRepo.SaveWithBuildLog(&v, &domain.SpaceAppBuildLog{
+		Logs: cmd.Logs,
+	}); err != nil {
+		logrus.Errorf("spaceId:%s save with build log db failed, err:%s", cmd.SpaceId.Identity(), err)
+		return err
+	}
+
+	logrus.Infof("spaceId:%s notify build failed successful, save build logs:%d",
+		cmd.SpaceId.Identity(), len(cmd.Logs))
+	return nil
+}
+
+// NotifyIsBuildFailed notifies change SpaceApp status.
+func (s inferenceService) NotifyIsStartFailed(ctx context.Context, cmd *CmdToNotifyFailedStatus) error {
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
+	if err != nil {
+		return err
+	}
+	if err := v.SetStartFailed(cmd.Status, cmd.Reason); err != nil {
+		logrus.Errorf("spaceId:%s set space app %s failed, err:%s",
+			cmd.SpaceId.Identity(), cmd.Status.AppStatus(), err)
+		return err
+	}
+
+	if err := s.spaceappRepo.Save(&v); err != nil {
+		logrus.Errorf("spaceId:%s save db failed", cmd.SpaceId.Identity())
+		return err
+	}
+	logrus.Infof("spaceId:%s notify start failed successful", cmd.SpaceId.Identity())
+	return nil
+}
+
+func (s inferenceService) getSpaceApp(cmd CmdToCreateApp) (domain.SpaceApp, error) {
+	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
+	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			err = allerror.NewNotFound(allerror.ErrorCodeSpaceNotFound, "space not found", err)
+		} else {
+			err = xerrors.Errorf("failed to get space, err:%w", err)
+		}
+		logrus.Errorf("spaceId:%s get space failed, err:%s", cmd.SpaceId.Identity(), err)
+		return domain.SpaceApp{}, err
+	}
+
+	// FIXME:
+	// if space.CommitId != cmd.CommitId {
+	// 	err = allerror.New(allerror.ErrorCodeSpaceCommitConflict, "commit conflict",
+	// 		xerrors.Errorf("spaceId:%s commit conflict", space.Id.Identity()))
+	// 	logrus.Errorf("spaceId:%s latest commitId:%s, old commitId:%s, err:%s",
+	// 		cmd.SpaceId.Identity(), space.CommitId, cmd.CommitId, err)
+	// 	return domain.SpaceApp{}, err
+	// }
+
+	spaceId, err := types.NewIdentity(space.RepoId)
+	if err != nil {
+		return domain.SpaceApp{}, err
+	}
+
+	v, err := s.spaceappRepo.FindBySpaceId(spaceId)
+	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)
+		}
+		logrus.Errorf("spaceId:%s get space app failed, err:%s", space.RepoId, err)
+		return domain.SpaceApp{}, err
+	}
+	return v, nil
 }

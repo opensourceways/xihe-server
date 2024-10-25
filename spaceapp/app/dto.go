@@ -1,6 +1,10 @@
 package app
 
-import "github.com/opensourceways/xihe-server/domain"
+import (
+	commondomain "github.com/opensourceways/xihe-server/common/domain"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
+)
 
 type InferenceDTO struct {
 	expiry     int64
@@ -17,7 +21,53 @@ func (dto *InferenceDTO) canReuseCurrent() bool {
 	return dto.AccessURL != ""
 }
 
-type CmdToCreateApp struct {
-	SpaceId  domain.Identity
-	CommitId string
+// CmdToNotifyServiceIsStarted is a command to notify that the service has started.
+type CmdToNotifyServiceIsStarted struct {
+	CmdToNotifyBuildIsStarted
+
+	AppURL domain.AppURL
+}
+
+// CmdToNotifyBuildIsStarted is a command to notify that the build has started.
+type CmdToNotifyBuildIsStarted struct {
+	domain.SpaceAppIndex
+
+	LogURL commondomain.URL
+}
+
+// CmdToCreateApp is a command to create an app.
+type CmdToCreateApp = domain.SpaceAppIndex
+
+// CmdToNotifyFailedStatus is a command to notify that status has update.
+type CmdToNotifyFailedStatus struct {
+	domain.SpaceAppIndex
+
+	Reason string
+	Status domain.AppStatus
+
+	Logs string
+}
+
+// CmdToNotifyStarting is a command to notify that the build has finished.
+type CmdToNotifyStarting struct {
+	domain.SpaceAppIndex
+
+	Logs string
+}
+
+// SpaceAppDTO is a data transfer object for space app.
+type SpaceAppDTO struct {
+	Id          string `json:"id"`
+	Status      string `json:"status"`
+	Reason      string `json:"reason"`
+	AppURL      string `json:"app_url"`
+	AppLogURL   string `json:"-"`
+	BuildLogURL string `json:"-"`
+}
+
+type GetSpaceAppCmd = spacedomain.SpaceIndex
+
+// BuildLogsDTO
+type BuildLogsDTO struct {
+	Logs string `json:"logs"`
 }

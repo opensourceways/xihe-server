@@ -61,8 +61,10 @@ import (
 	promotionuseradapter "github.com/opensourceways/xihe-server/promotion/infrastructure/useradapter"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
+	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
 	spaceappmsg "github.com/opensourceways/xihe-server/spaceapp/infrastructure/messageimpl"
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/sseadapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
@@ -316,6 +318,15 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		whitelist,
 	)
 
+	spaceappRepository, err := spaceapprepo.NewSpaceAppRepository()
+	if err != nil {
+		return err
+	}
+
+	spaceappAppService := spaceappApp.NewSpaceappAppService(
+		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller),
+	)
+
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
@@ -381,11 +392,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender,
+			v1, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender, spaceappAppService,
+			spaceappRepository,
 		)
 
 		controller.AddRouterForInferenceInternalController(
-			internal, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender,
+			internal, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender, spaceappRepository,
 		)
 
 		controller.AddRouterForSearchController(

@@ -177,3 +177,10 @@ type ReleasePodMsg struct {
 	PodId     string `json:"pod_id"`
 	CloudType string `json:"cloud_type"`
 }
+
+type UpdateSpaceAppDetailMsg struct {
+	SpaceId  string `json:"space_id"`
+	CommitId string `json:"commit_id"`
+	LogURL   string `json:"log_url"`
+	AppURL   string `json:"app_url"`
+}

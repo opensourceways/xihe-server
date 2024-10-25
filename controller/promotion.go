@@ -40,15 +40,15 @@ type PromotionController struct {
 	ps   app.PointsService
 }
 
-// @Summary		Apply
-// @Description	apply the Promotion
-// @Tags			Promotion
-// @Param			id		path	string						true	"promotion id"
-// @Param			body	body	pc.PromotionApplyReq	true	"body of applying"
-// @Accept			json
-// @Success		201
-// @Failure		500	system_error	system	error
-// @Router			/v1/promotion/{id}/apply [post]
+//	@Summary		Apply
+//	@Description	apply the Promotion
+//	@Tags			Promotion
+//	@Param			id		path	string					true	"promotion id"
+//	@Param			body	body	pc.PromotionApplyReq	true	"body of applying"
+//	@Accept			json
+//	@Success		201
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/promotion/{id}/apply [post]
 func (ctl *PromotionController) Apply(ctx *gin.Context) {
 	req := pc.PromotionApplyReq{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -78,14 +78,14 @@ func (ctl *PromotionController) Apply(ctx *gin.Context) {
 	}
 }
 
-// @Summary		GetUserRegistration
-// @Description	get user registrater promotion
-// @Tags			Promotion
-// @Param			account		path	string						true	"username"
-// @Accept			json
-// @Success		201
-// @Failure		500	system_error	system	error
-// @Router			/v1/promotion/user/{account} [get]
+//	@Summary		GetUserRegistration
+//	@Description	get user registrater promotion
+//	@Tags			Promotion
+//	@Param			account	path	string	true	"username"
+//	@Accept			json
+//	@Success		201
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/promotion/user/{account} [get]
 func (ctl *PromotionController) GetUserRegistration(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -106,14 +106,14 @@ func (ctl *PromotionController) GetUserRegistration(ctx *gin.Context) {
 	}
 }
 
-// @Summary		GetUserPoints
-// @Description	get user points in promotion
-// @Tags			Promotion
-// @Param			account		path	string						true	"username"
-// @Accept			json
-// @Success		201
-// @Failure		500	system_error	system	error
-// @Router			/v1/promotion/{promotion}/points/{account} [get]
+//	@Summary		GetUserPoints
+//	@Description	get user points in promotion
+//	@Tags			Promotion
+//	@Param			account	path	string	true	"username"
+//	@Accept			json
+//	@Success		201
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/promotion/{promotion}/points/{account} [get]
 func (ctl *PromotionController) GetUserPoints(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
@@ -146,13 +146,13 @@ func (ctl *PromotionController) GetUserPoints(ctx *gin.Context) {
 	}
 }
 
-// @Summary		GetUserRanking
-// @Description	get user points ranking in promotion
-// @Tags			Promotion
-// @Accept			json
-// @Success		201
-// @Failure		500	system_error	system	error
-// @Router			/v1/promotion/{promotion}/ranking [get]
+//	@Summary		GetUserRanking
+//	@Description	get user points ranking in promotion
+//	@Tags			Promotion
+//	@Accept			json
+//	@Success		201
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/promotion/{promotion}/ranking [get]
 func (ctl *PromotionController) GetUserRanking(ctx *gin.Context) {
 	if dto, err := ctl.ps.GetPointsRank(ctx.Param("id")); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -193,14 +193,14 @@ func (req listPromotionsReq) toCmd(user types.Account) (*app.ListPromotionsCmd, 
 	return cmd, nil
 }
 
-// @Summary		List
-// @Description	list promotions
-// @Tags		Promotion
-// @Accept		json
-// @Success		200  {object}  app.PromotionsDTO
-// @Failure		400	 {object}  controller.responseData
-// @Failure		500	 {object}  controller.responseData
-// @Router		/v1/promotions [get]
+//	@Summary		List
+//	@Description	list promotions
+//	@Tags			Promotion
+//	@Accept			json
+//	@Success		200	{object}	app.PromotionsDTO
+//	@Failure		400	{object}	controller.responseData
+//	@Failure		500	{object}	controller.responseData
+//	@Router			/v1/promotions [get]
 func (ctl *PromotionController) List(ctx *gin.Context) {
 	req := listPromotionsReq{}
 	if err := ctx.ShouldBindQuery(&req); err != nil {
@@ -238,15 +238,15 @@ func (ctl *PromotionController) List(ctx *gin.Context) {
 	}
 }
 
-// @Summary		Get
-// @Description	get promotion
-// @Tags		Promotion
-// @Accept		json
-// @Success		200  {object}  app.PromotionDTO
-// @Failure		400	 {object}  controller.responseData
-// @Failure		404	 {object}  controller.responseData
-// @Failure		500	 {object}  controller.responseData
-// @Router		/v1/promotion/{id} [get]
+//	@Summary		Get
+//	@Description	get promotion
+//	@Tags			Promotion
+//	@Accept			json
+//	@Success		200	{object}	app.PromotionDTO
+//	@Failure		400	{object}	controller.responseData
+//	@Failure		404	{object}	controller.responseData
+//	@Failure		500	{object}	controller.responseData
+//	@Router			/v1/promotion/{id} [get]
 func (ctl *PromotionController) Get(ctx *gin.Context) {
 	pl, vistor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {

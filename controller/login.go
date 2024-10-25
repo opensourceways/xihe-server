@@ -76,16 +76,16 @@ type LoginController struct {
 	password domain.Password
 }
 
-// @Title			Login
-// @Description	callback of authentication by authing
-// @Tags			Login
-// @Param			code			query	string	true	"authing code"
-// @Param			redirect_uri	query	string	true	"redirect uri"
-// @Accept			json
-// @Success		200	{object}			app.UserDTO
-// @Failure		500	system_error		system	error
-// @Failure		501	duplicate_creating	create	user	repeatedly	which	should	not	happen
-// @Router			/v1/login [get]
+//	@Title			Login
+//	@Description	callback of authentication by authing
+//	@Tags			Login
+//	@Param			code			query	string	true	"authing code"
+//	@Param			redirect_uri	query	string	true	"redirect uri"
+//	@Accept			json
+//	@Success		200	{object}			app.UserDTO
+//	@Failure		500	system_error		system	error
+//	@Failure		501	duplicate_creating	create	user	repeatedly	which	should	not	happen
+//	@Router			/v1/login [get]
 func (ctl *LoginController) Login(ctx *gin.Context) {
 	info, err := ctl.auth.GetByCode(
 		ctl.getQueryParameter(ctx, "code"),
@@ -221,16 +221,16 @@ func (ctl *LoginController) newPlateformAccount(cmd *userapp.UserCreateCmd) (err
 	return
 }
 
-// @Title			Logout
-// @Description	get info of login
-// @Tags			Login
-// @Param			account	path	string	true	"account"
-// @Accept			json
-// @Success		200	{object}			app.LoginDTO
-// @Failure		400	bad_request_param	account	is	invalid
-// @Failure		401	not_allowed			can't	get	login	info	of	other	user
-// @Failure		500	system_error		system	error
-// @Router			/v1/login/{account} [get]
+//	@Title			Logout
+//	@Description	get info of login
+//	@Tags			Login
+//	@Param			account	path	string	true	"account"
+//	@Accept			json
+//	@Success		200	{object}			app.LoginDTO
+//	@Failure		400	bad_request_param	account	is	invalid
+//	@Failure		401	not_allowed			can't	get	login	info	of	other	user
+//	@Failure		500	system_error		system	error
+//	@Router			/v1/login/{account} [get]
 func (ctl *LoginController) Logout(ctx *gin.Context) {
 	account, err := domain.NewAccount(ctx.Param("account"))
 	if err != nil {
@@ -283,13 +283,13 @@ func (ctl *LoginController) Logout(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, newResponseData(info))
 }
 
-// @Title			SignIn
-// @Description		user sign in
-// @Tags			Login
-// @Accept			json
-// @Success		202
-// @Failure		500	system_error		system	error
-// @Router			/v1/signin [put]
+//	@Title			SignIn
+//	@Description	user sign in
+//	@Tags			Login
+//	@Accept			json
+//	@Success		202
+//	@Failure		500	system_error	system	error
+//	@Router			/v1/signin [put]
 func (ctl *LoginController) SignIn(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiTokenNoRefresh(ctx, false)
 	if !ok {

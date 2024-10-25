@@ -34,6 +34,18 @@ const (
 
 	// ErrorCodeAccessTokenInvalid This error code is for restful api
 	ErrorCodeAccessTokenInvalid = "access_token_invalid"
+
+	// ErrorCodeSpaceAppUnmatchedStatus is const
+	ErrorCodeSpaceAppUnmatchedStatus = "space_app_unmatched_status"
+
+	// ErrorCodeSpaceAppNotFound space app
+	ErrorCodeSpaceAppNotFound = "space_app_not_found"
+
+	// ErrorCodeSpaceNotFound is const
+	ErrorCodeSpaceNotFound = "space_not_found"
+
+	// ErrorCodeSpaceCommitConflict is const
+	ErrorCodeSpaceCommitConflict = "space_commit_conflict"
 )
 
 // errorImpl
