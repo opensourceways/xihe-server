@@ -436,6 +436,7 @@ func (s inferenceService) getSpaceApp(cmd CmdToCreateApp) (domain.SpaceApp, erro
 		return domain.SpaceApp{}, err
 	}
 
+	// FIXME:
 	// if space.CommitId != cmd.CommitId {
 	// 	err = allerror.New(allerror.ErrorCodeSpaceCommitConflict, "commit conflict",
 	// 		xerrors.Errorf("spaceId:%s commit conflict", space.Id.Identity()))
