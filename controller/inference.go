@@ -51,6 +51,7 @@ func AddRouterForInferenceController(
 	rg.GET("/v1/inference/:owner/:name/buildlog/complete", ctl.GetBuildLogs)
 	rg.GET("/v1/inference/:owner/:name/buildlog/realtime", ctl.GetRealTimeBuildLog)
 	rg.GET("/v1/inference/:owner/:name/spacelog/realtime", ctl.GetRealTimeSpaceLog)
+	rg.GET("/v1/space-app/:owner/:name/read", ctl.CanRead)
 }
 
 type InferenceController struct {
@@ -447,5 +448,32 @@ func (ctl *InferenceController) GetRealTimeSpaceLog(ctx *gin.Context) {
 
 	if err := ctl.appService.GetRequestDataStream(cmd); err != nil {
 		ctx.SSEvent("error", err.Error())
+	}
+}
+
+// @Summary  CanRead
+// @Description  check permission for read space app
+// @Tags     SpaceAppWeb
+// @Param    owner  path  string  true  "owner of space" MaxLength(40)
+// @Param    name   path  string  true  "name of space" MaxLength(100)
+// @Accept   json
+// @Success  200  {object}  commonctl.ResponseData
+// @x-example {"data": "successfully"}
+// @Router   /v1/space-app/{owner}/{name}/read [get]
+func (ctl *InferenceController) CanRead(ctx *gin.Context) {
+	index, err := ctl.parseIndex(ctx)
+	if err != nil {
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	if err := ctl.appService.CheckPermissionRead(ctx.Request.Context(), pl.DomainAccount(), &index); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, "successfully")
 	}
 }

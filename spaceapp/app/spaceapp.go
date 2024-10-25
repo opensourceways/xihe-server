@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
@@ -20,6 +21,7 @@ type SpaceappAppService interface {
 	GetBuildLogs(context.Context, domain.Account, *spacedomain.SpaceIndex) (BuildLogsDTO, error)
 	GetRequestDataStream(*spaceappdomain.SeverSentStream) error
 	GetSpaceLog(context.Context, domain.Account, *spacedomain.SpaceIndex) (string, error)
+	CheckPermissionRead(context.Context, domain.Account, *spacedomain.SpaceIndex) error
 }
 
 // NewSpaceappAppService creates a new instance of the space app service.
@@ -200,4 +202,19 @@ func toSpaceAppDTO(app *spaceappdomain.SpaceApp) SpaceAppDTO {
 	}
 
 	return dto
+}
+
+// CheckPermissionRead  check user permission for read space app.
+func (s *spaceappAppService) CheckPermissionRead(
+	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex) error {
+	space, err := s.spaceRepo.GetByName(index.Owner, index.Name)
+	if err != nil {
+		return err
+	}
+
+	if space.IsPrivate() && user != index.Owner {
+		return errors.New("space app read permission denied")
+	}
+
+	return nil
 }
