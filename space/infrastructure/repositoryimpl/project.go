@@ -16,7 +16,7 @@ type ProjectMapper interface {
 	Delete(*repositories.ResourceIndexDO) error
 	Get(string, string) (ProjectDO, error)
 	GetByName(string, string) (ProjectDO, error)
-	GetById(string) (ProjectDO, error)
+	GetByRepoId(string) (ProjectDO, error)
 	GetSummary(string, string) (ProjectResourceSummaryDO, error)
 	GetSummaryByName(string, string) (repositories.ResourceSummaryDO, error)
 
@@ -109,10 +109,10 @@ func (impl project) GetByName(owner domain.Account, name domain.ResourceName) (
 	return
 }
 
-func (impl project) GetById(id domain.Identity) (
+func (impl project) GetByRepoId(id domain.Identity) (
 	r spacedomain.Project, err error,
 ) {
-	v, err := impl.mapper.GetById(id.Identity())
+	v, err := impl.mapper.GetByRepoId(id.Identity())
 	if err != nil {
 		err = repositories.ConvertError(err)
 	} else {

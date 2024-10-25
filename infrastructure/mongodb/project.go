@@ -136,7 +136,7 @@ func (col project) GetByName(owner, name string) (do repositoryimpl.ProjectDO, e
 	return
 }
 
-func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
+func (col project) GetByRepoId(id string) (do repositoryimpl.ProjectDO, err error) {
 	// var v []projectItem
 	type Project struct {
 		Id    primitive.ObjectID `bson:"_id"`
@@ -148,24 +148,16 @@ func (col project) GetById(id string) (do repositoryimpl.ProjectDO, err error) {
 	if err = getResourceByIdOnly(col.collectionName, id, &v); err != nil {
 		return
 	}
-	fmt.Printf("mongodb out BaseImage CommitId=============================v: %+v\n", v[0].Items[0].CommitId)
-	fmt.Printf("mongodb out BaseImage HardwareType=============================v: %+v\n", v[0].Items[0].HardwareType)
-
-	// type ProjectOwner struct {
-	// 	Id    primitive.ObjectID `bson:"_id"`
-	// 	Owner string             `bson:"owner"`
-	// 	Items projectItem        `bson:"items"`
-	// }
-
-	// var owner []ProjectOwner
-	// if err = getOwnerByIdOnly(col.collectionName, id, &owner); err != nil {
-	// 	return
-	// }
+	fmt.Printf("mongodb out CommitId=============================v: %+v\n", v[0].Items[0].CommitId)
+	fmt.Printf("mongodb out HardwareType=============================v: %+v\n", v[0].Items[0].HardwareType)
+	fmt.Printf("mongodb out BaseImage=============================v: %+v\n", v[0].Items[0].BaseImage)
+	fmt.Printf("mongodb out Name=============================v: %+v\n", v[0].Items[0].Name)
+	fmt.Printf("len(v[0].Items): %+v\n", len(v[0].Items))
 
 	// fmt.Printf("owner:==================================== %+v\n", owner)
 	fmt.Printf("v[0].Owner:================================ %+v\n", v[0].Owner)
 	col.toProjectDO(v[0].Owner, &v[0].Items[0], &do)
-	fmt.Printf("==============================do: %+v\n", do.CommitId)
+	fmt.Printf("do BaseImage==============================do: %+v\n", do.BaseImage)
 
 	return
 }

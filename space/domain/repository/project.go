@@ -27,7 +27,7 @@ type Project interface {
 	Delete(*domain.ResourceIndex) error
 	Get(domain.Account, string) (spacedomain.Project, error)
 	GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
-	GetById(domain.Identity) (spacedomain.Project, error)
+	GetByRepoId(domain.Identity) (spacedomain.Project, error)
 	GetSummary(domain.Account, string) (ProjectSummary, error)
 	GetSummaryByName(domain.Account, domain.ResourceName) (domain.ResourceSummary, error)
 

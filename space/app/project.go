@@ -105,7 +105,7 @@ type ProjectService interface {
 	Create(*ProjectCreateCmd, platform.Repository) (ProjectDTO, error)
 	Delete(*spacedomain.Project, platform.Repository) error
 	GetByName(domain.Account, domain.ResourceName, bool) (ProjectDetailDTO, error)
-	GetById(domain.Identity) (sdk.SpaceMetaDTO, error)
+	GetByRepoId(domain.Identity) (sdk.SpaceMetaDTO, error)
 	List(domain.Account, *app.ResourceListCmd) (ProjectsDTO, error)
 	ListGlobal(*app.GlobalResourceListCmd) (GlobalProjectsDTO, error)
 	Update(*spacedomain.Project, *ProjectUpdateCmd, platform.Repository) (ProjectDTO, error)
@@ -305,15 +305,15 @@ func (s projectService) GetByName(
 	return
 }
 
-func (s projectService) GetById(id domain.Identity) (sdk.SpaceMetaDTO, error) {
-	v, err := s.repo.GetById(id)
+func (s projectService) GetByRepoId(id domain.Identity) (sdk.SpaceMetaDTO, error) {
+	v, err := s.repo.GetByRepoId(id)
 
 	fmt.Printf("sdk result ====================v: %+v\n", v)
 	if err != nil {
 		return sdk.SpaceMetaDTO{}, err
 	}
 
-	res := s.toSpaceMetaDTO(&v)
+	res := s.toSpaceMetaDTO(v)
 	return res, err
 }
 
@@ -411,7 +411,7 @@ func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUpdateCode) (
 	err error,
 ) {
-	space, err := s.repo.GetById(id)
+	space, err := s.repo.GetByRepoId(id)
 	if err != nil {
 		return err
 	}
@@ -499,7 +499,7 @@ func (s projectService) toProjectSummaryDTO(p *spacedomain.ProjectSummary, dto *
 	}
 }
 
-func (s projectService) toSpaceMetaDTO(v *spacedomain.Project) sdk.SpaceMetaDTO {
+func (s projectService) toSpaceMetaDTO(v spacedomain.Project) sdk.SpaceMetaDTO {
 	return sdk.SpaceMetaDTO{
 		Id:           v.RepoId,
 		SDK:          v.Type.ProjType(),

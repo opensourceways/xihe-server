@@ -130,15 +130,8 @@ func getResourceById(collection, owner, rid string, result interface{}) error {
 }
 
 func getResourceByIdOnly(collection, rid string, result interface{}) error {
-	// f := func(ctx context.Context) error {
-	// 	return cli.getArrayElem(
-	// 		ctx, collection, fieldItems,
-	// 		bson.M{}, resourceIdFilter(rid),
-	// 		nil, result,
-	// 	)
-	// }
 	filter := bson.M{
-		"items.repo_id": rid, // 假设你的数组元素中有一个名为 "id" 的字段
+		"items.repo_id": rid, // 假设你的数组元素中有一个名为 "repo_id" 的字段
 	}
 	opts := options.Find()
 	opts.SetProjection(bson.M{"items": 1, "owner": 1}) // 只返回匹配的数组元素
