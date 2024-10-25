@@ -8,17 +8,17 @@ import (
 )
 
 const (
-	tableSpaceApp = "space_app"
-
 	fieldAllBuildLog = "all_build_log"
 )
 
 func NewSpaceAppRepository() (repository.SpaceAppRepository, error) {
-	if err := pgsql.AutoMigrate(&spaceappDO{}); err != nil {
+	do := spaceappDO{}
+
+	if err := pgsql.AutoMigrate(&do); err != nil {
 		return nil, err
 	}
 
-	return spaceAppRepoImpl{dao: pgsql.NewDBTable(tableSpaceApp)}, nil
+	return spaceAppRepoImpl{dao: pgsql.NewDBTable(do.TableName())}, nil
 }
 
 type spaceAppRepoImpl struct {

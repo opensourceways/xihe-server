@@ -6,6 +6,8 @@ import (
 	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
+const tableSpaceApp = "space_app"
+
 func toSpaceAppDO(m *spaceappdomain.SpaceApp) spaceappDO {
 	do := spaceappDO{
 		Status:      m.Status.AppStatus(),
@@ -55,6 +57,10 @@ type spaceappDO struct {
 	BuildLogURL string `gorm:"column:build_log_url"`
 
 	Version int `gorm:"column:version"`
+}
+
+func (spaceappDO) TableName() string {
+	return tableSpaceApp
 }
 
 func (do *spaceappDO) toSpaceApp() spaceappdomain.SpaceApp {
