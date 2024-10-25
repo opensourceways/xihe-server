@@ -79,7 +79,7 @@ func (ctl *ProjectInternalController) GetSpaceById(ctx *gin.Context) {
 
 		return
 	}
-	proj, err := ctl.s.GetById(id)
+	proj, err := ctl.s.GetByRepoId(id)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
