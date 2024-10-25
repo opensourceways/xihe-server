@@ -95,7 +95,7 @@ func (cmd *ProjectCreateCmd) toProject(r *spacedomain.Project) {
 			Tags:              append(cmd.Tags, normTags...),
 			TagKinds:          cmd.genTagKinds(cmd.Tags),
 			CommitId:          "",
-			NoApplicationFile: false,
+			NoApplicationFile: true,
 		},
 	}
 }
@@ -161,7 +161,6 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
 	v := new(spacedomain.Project)
-	fmt.Printf("create cmd ===============================================: %+v\n", cmd)
 	cmd.toProject(v)
 	count := v.GetQuotaCount()
 	hdType := v.GetComputeType()

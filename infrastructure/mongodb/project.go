@@ -84,15 +84,17 @@ func (col project) Delete(do *repositories.ResourceIndexDO) error {
 
 func (col project) UpdateProperty(do *repositoryimpl.ProjectPropertyDO) error {
 	p := &ProjectPropertyItem{
-		Level:    do.Level,
-		Name:     do.Name,
-		FL:       do.FL,
-		Desc:     do.Desc,
-		Title:    do.Title,
-		CoverId:  do.CoverId,
-		RepoType: do.RepoType,
-		Tags:     do.Tags,
-		TagKinds: do.TagKinds,
+		Level:             do.Level,
+		Name:              do.Name,
+		FL:                do.FL,
+		Desc:              do.Desc,
+		Title:             do.Title,
+		CoverId:           do.CoverId,
+		RepoType:          do.RepoType,
+		Tags:              do.Tags,
+		TagKinds:          do.TagKinds,
+		CommitId:          do.CommitId,
+		NoApplicationFile: do.NoApplicationFile,
 	}
 
 	p.setDefault()
