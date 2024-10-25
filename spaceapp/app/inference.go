@@ -317,7 +317,7 @@ func (s inferenceMessageService) ExtendSurvivalTime(info *message.InferenceExten
 
 // NotifyIsServing notifies that a service of a SpaceApp has serving.
 func (s inferenceService) NotifyIsServing(ctx context.Context, cmd *CmdToNotifyServiceIsStarted) error {
-	v, err := s.getSpaceApp(ctx, cmd.SpaceAppIndex)
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
 	if err != nil {
 		return err
 	}
@@ -338,7 +338,7 @@ func (s inferenceService) NotifyIsServing(ctx context.Context, cmd *CmdToNotifyS
 
 // NotifyIsBuilding notifies that the build process of a SpaceApp has started.
 func (s inferenceService) NotifyIsBuilding(ctx context.Context, cmd *CmdToNotifyBuildIsStarted) error {
-	v, err := s.getSpaceApp(ctx, cmd.SpaceAppIndex)
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
 	if err != nil {
 		return err
 	}
@@ -357,7 +357,7 @@ func (s inferenceService) NotifyIsBuilding(ctx context.Context, cmd *CmdToNotify
 
 // NotifyStarting notifies that the build process of a SpaceApp has finished.
 func (s inferenceService) NotifyStarting(ctx context.Context, cmd *CmdToNotifyStarting) error {
-	v, err := s.getSpaceApp(ctx, cmd.SpaceAppIndex)
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
 	if err != nil {
 		return err
 	}
@@ -381,7 +381,7 @@ func (s inferenceService) NotifyStarting(ctx context.Context, cmd *CmdToNotifySt
 
 // NotifyIsBuildFailed notifies change SpaceApp status.
 func (s inferenceService) NotifyIsBuildFailed(ctx context.Context, cmd *CmdToNotifyFailedStatus) error {
-	v, err := s.getSpaceApp(ctx, cmd.SpaceAppIndex)
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
 	if err != nil {
 		return err
 	}
@@ -406,7 +406,7 @@ func (s inferenceService) NotifyIsBuildFailed(ctx context.Context, cmd *CmdToNot
 
 // NotifyIsBuildFailed notifies change SpaceApp status.
 func (s inferenceService) NotifyIsStartFailed(ctx context.Context, cmd *CmdToNotifyFailedStatus) error {
-	v, err := s.getSpaceApp(ctx, cmd.SpaceAppIndex)
+	v, err := s.getSpaceApp(cmd.SpaceAppIndex)
 	if err != nil {
 		return err
 	}
@@ -424,7 +424,7 @@ func (s inferenceService) NotifyIsStartFailed(ctx context.Context, cmd *CmdToNot
 	return nil
 }
 
-func (s inferenceService) getSpaceApp(ctx context.Context, cmd CmdToCreateApp) (domain.SpaceApp, error) {
+func (s inferenceService) getSpaceApp(cmd CmdToCreateApp) (domain.SpaceApp, error) {
 	space, err := s.spaceRepo.GetById(cmd.SpaceId)
 	if err != nil {
 		if commonrepo.IsErrorResourceNotExists(err) {

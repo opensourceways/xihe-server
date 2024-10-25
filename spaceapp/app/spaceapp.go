@@ -67,9 +67,9 @@ func (s *spaceappAppService) GetByName(
 		return toSpaceAppDTO(&app), nil
 	}
 
-	if space.Hardware.IsNpu() && false {
-		return toSpaceNoCompQuotaDTO(&space), nil
-	}
+	// if space.Hardware.IsNpu() && !space.CompPowerAllocated {
+	// 	return toSpaceNoCompQuotaDTO(&space), nil
+	// }
 
 	if commonrepo.IsErrorResourceNotExists(err) {
 		err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)
@@ -83,7 +83,7 @@ func (s *spaceappAppService) GetByName(
 func (s *spaceappAppService) GetBuildLogs(ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex) (
 	dto BuildLogsDTO, err error,
 ) {
-	app, err := s.getPrivateReadSpaceApp(ctx, user, index)
+	app, err := s.getPrivateReadSpaceApp(user, index)
 	if err != nil {
 		err = xerrors.Errorf("failed to get space app, err:%w", err)
 		return
@@ -109,7 +109,7 @@ func (s *spaceappAppService) GetBuildLogs(ctx context.Context, user domain.Accou
 func (s *spaceappAppService) GetBuildLog(
 	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex,
 ) (string, error) {
-	app, err := s.getPrivateReadSpaceApp(ctx, user, index)
+	app, err := s.getPrivateReadSpaceApp(user, index)
 	if err != nil {
 		return "", xerrors.Errorf("failed to get space app:%w", err)
 	}
@@ -125,7 +125,7 @@ func (s *spaceappAppService) GetBuildLog(
 }
 
 func (s *spaceappAppService) getPrivateReadSpaceApp(
-	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex,
+	user domain.Account, index *spacedomain.SpaceIndex,
 ) (spaceappdomain.SpaceApp, error) {
 	var spaceApp spaceappdomain.SpaceApp
 
@@ -164,7 +164,7 @@ func (s *spaceappAppService) GetRequestDataStream(cmd *spaceappdomain.SeverSentS
 func (s *spaceappAppService) GetSpaceLog(
 	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex,
 ) (string, error) {
-	app, err := s.getPrivateReadSpaceApp(ctx, user, index)
+	app, err := s.getPrivateReadSpaceApp(user, index)
 	if err != nil {
 		return "", xerrors.Errorf("failed to get space app:%w", err)
 	}
@@ -198,14 +198,5 @@ func toSpaceAppDTO(app *spaceappdomain.SpaceApp) SpaceAppDTO {
 		dto.BuildLogURL = app.BuildLogURL.URL()
 	}
 
-	return dto
-}
-
-func toSpaceNoCompQuotaDTO(space *spacedomain.Project) SpaceAppDTO {
-	dto := SpaceAppDTO{
-		Id:     space.RepoId,
-		Status: spaceappdomain.NoCompQuotaException,
-		Reason: spaceappdomain.ExceptionMap[spaceappdomain.NoCompQuotaException],
-	}
 	return dto
 }
