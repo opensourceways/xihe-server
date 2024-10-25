@@ -235,27 +235,27 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 		}
 	}
 
-	if r.Hardware.IsNpu() {
-		logrus.Infof("release quota after user:%s npu space:%s delete", r.Owner.Account(), r.Id)
+	// if r.Hardware.IsNpu() {
+	// 	logrus.Infof("release quota after user:%s npu space:%s delete", r.Owner.Account(), r.Id)
 
-		// id, err := domain.NewIdentity(r.RepoId)
-		// c := computilityapp.CmdToUserQuotaUpdate{
-		// 	Index: computilitydomain.ComputilityAccountRecordIndex{
-		// 		UserName:    r.Owner,
-		// 		ComputeType: r.GetComputeType(),
-		// 		SpaceId:     id,
-		// 	},
-		// 	QuotaCount: r.GetQuotaCount(),
-		// }
+	// 	id, err := domain.NewIdentity(r.RepoId)
+	// 	c := computilityapp.CmdToUserQuotaUpdate{
+	// 		Index: computilitydomain.ComputilityAccountRecordIndex{
+	// 			UserName:    r.Owner,
+	// 			ComputeType: r.GetComputeType(),
+	// 			SpaceId:     id,
+	// 		},
+	// 		QuotaCount: r.GetQuotaCount(),
+	// 	}
 
-		// err = s.computilityApp.UserQuotaRelease(c)
-		// if err != nil {
-		// 	logrus.Errorf("failed to release user:%s quota after space:%s delete: %s",
-		// 		user.Account(), spaceId.Identity(), err)
+	// 	err = s.computilityApp.UserQuotaRelease(c)
+	// 	if err != nil {
+	// 		logrus.Errorf("failed to release user:%s quota after space:%s delete: %s",
+	// 			user.Account(), spaceId.Identity(), err)
 
-		// 	return "", nil
-		// }
-	}
+	// 		return "", nil
+	// 	}
+	// }
 
 	// step3: delete
 	if err = s.repo.Delete(&obj.ResourceIndex); err != nil {
