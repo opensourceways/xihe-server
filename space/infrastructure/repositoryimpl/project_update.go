@@ -1,6 +1,8 @@
 package repositoryimpl
 
 import (
+	"fmt"
+
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
@@ -86,6 +88,8 @@ func (impl project) RemoveRelatedDataset(info *repository.RelatedResourceInfo) e
 
 func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) error {
 	p := &info.Property
+	fmt.Printf("===========================================info: %+v\n", info)
+	fmt.Printf("==============================================p: %+v\n", p)
 
 	do := ProjectPropertyDO{
 		ResourceToUpdateDO: repositories.ToResourceToUpdateDO(&info.ResourceToUpdate),
