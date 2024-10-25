@@ -147,14 +147,16 @@ func getResourceByIdOnly(collection, rid string, result interface{}) error {
 			"$match": bson.M{"items.repo_id": rid},
 		},
 		{
-			"$addFields": bson.M{"items.$": "$items"},
-		},
-		{
-			"$project": bson.M{"items": bson.M{"$filter": bson.M{
-				"input": "$items",
-				"as":    "item",
-				"cond":  bson.M{"$eq": []interface{}{"$$item.repo_id", rid}},
-			}}, "owner": 1},
+			"$project": bson.M{
+				"items": bson.M{
+					"$filter": bson.M{
+						"input": "$items",
+						"as":    "item",
+						"cond":  bson.M{"$eq": []interface{}{"$$item.repo_id", rid}},
+					},
+				},
+				"owner": 1,
+			},
 		},
 	}
 	col := cli.collection(collection)
