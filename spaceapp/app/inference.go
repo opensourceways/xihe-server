@@ -425,7 +425,7 @@ func (s inferenceService) NotifyIsStartFailed(ctx context.Context, cmd *CmdToNot
 }
 
 func (s inferenceService) getSpaceApp(cmd CmdToCreateApp) (domain.SpaceApp, error) {
-	space, err := s.spaceRepo.GetById(cmd.SpaceId)
+	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
 	if err != nil {
 		if commonrepo.IsErrorResourceNotExists(err) {
 			err = allerror.NewNotFound(allerror.ErrorCodeSpaceNotFound, "space not found", err)
