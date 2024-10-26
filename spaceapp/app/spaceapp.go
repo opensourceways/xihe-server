@@ -68,7 +68,6 @@ func (s *spaceappAppService) GetByName(
 
 	app, err := s.repo.FindBySpaceId(spaceId)
 	if err == nil {
-		logrus.WithField("space_id", spaceId).Errorf("fail to get space app, err: %s", err.Error())
 		return toSpaceAppDTO(&app), nil
 	}
 
