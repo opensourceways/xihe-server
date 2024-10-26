@@ -51,14 +51,14 @@ func (s *spaceappAppService) GetByName(
 ) (SpaceAppDTO, error) {
 	var dto SpaceAppDTO
 
-	space, err := s.spaceRepo.GetByName(user, index.Name)
+	space, err := s.spaceRepo.GetByName(index.Owner, index.Name)
 	if err != nil {
 		logrus.WithField("space_index", index).Errorf("fail to get space, err: %s", err.Error())
 		return dto, err
 	}
 
 	if space.IsPrivate() && space.Owner.Account() != index.Owner.Account() {
-		return dto, commonrepo.NewErrorResourceNotExists(xerrors.New("not found"))
+		return dto, commonrepo.NewNotAccessedError(xerrors.New("no permission to access the space"))
 	}
 
 	spaceId, err := domain.NewIdentity(space.RepoId)
