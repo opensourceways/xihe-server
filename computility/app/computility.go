@@ -9,6 +9,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
+	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/computility/domain"
 	"github.com/opensourceways/xihe-server/computility/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
@@ -17,6 +18,7 @@ import (
 // ComputilityInternalAppService is an interface for computility internal application service
 type ComputilityInternalAppService interface {
 	UserQuotaConsume(CmdToUserQuotaUpdate) error
+	UserQuotaRelease(CmdToUserQuotaUpdate) error
 }
 
 // NewComputilityInternalAppService creates a new instance of ComputilityInternalAppService
@@ -101,6 +103,63 @@ func (s *computilityInternalAppService) UserQuotaConsume(cmd CmdToUserQuotaUpdat
 		Version:                       0,
 	})
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *computilityInternalAppService) UserQuotaRelease(cmd CmdToUserQuotaUpdate) error {
+	if cmd.Index.ComputeType.IsCpu() {
+		return nil
+	}
+
+	record, err := s.accountRecordAtapter.FindByRecordIndex(cmd.Index)
+	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			logrus.Errorf("user:%s has not cosume record to release", cmd.Index.UserName.Account())
+
+			return nil
+		}
+
+		return err
+	}
+
+	accountIndex := domain.ComputilityAccountIndex{
+		UserName:    cmd.Index.UserName,
+		ComputeType: cmd.Index.ComputeType,
+	}
+
+	account, err := s.accountAdapter.FindByAccountIndex(accountIndex)
+	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			logrus.Errorf("user:%s is not a computility account, can not release quota", cmd.Index.UserName.Account())
+			return nil
+		}
+		return err
+	}
+
+	if account.UsedQuota == 0 {
+		logrus.Errorf("user:%s has no quota to release", cmd.Index.UserName.Account())
+		return nil
+	}
+
+	err = s.accountAdapter.ReleaseQuota(account, cmd.QuotaCount)
+	if err != nil {
+		return err
+	}
+
+	err = s.accountRecordAtapter.Delete(record.Id)
+	if err != nil {
+		logrus.Errorf("delete user:%s account record failed, %s", cmd.Index.UserName.Account(), err)
+
+		return err
+	}
+
+	err = s.accountAdapter.CancelAccount(accountIndex)
+	if err != nil {
+		logrus.Errorf("cancel user:%s account failed, %s", cmd.Index.UserName.Account(), err)
+
 		return err
 	}
 
