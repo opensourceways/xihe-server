@@ -11,6 +11,7 @@ import (
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/repository"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
 )
 
@@ -52,6 +53,7 @@ func (s *spaceappAppService) GetByName(
 
 	space, err := s.spaceRepo.GetByName(user, index.Name)
 	if err != nil {
+		logrus.WithField("space_index", index).Errorf("fail to get space, err: %s", err.Error())
 		return dto, err
 	}
 
@@ -66,6 +68,7 @@ func (s *spaceappAppService) GetByName(
 
 	app, err := s.repo.FindBySpaceId(spaceId)
 	if err == nil {
+		logrus.WithField("space_id", spaceId).Errorf("fail to get space app, err: %s", err.Error())
 		return toSpaceAppDTO(&app), nil
 	}
 
