@@ -6,11 +6,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
+	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
 	spacemesage "github.com/opensourceways/xihe-server/spaceapp/domain/message"
 	spaceappApprepo "github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
@@ -34,11 +36,14 @@ func AddRouterForInferenceInternalController(
 		whitelist: whitelist,
 	}
 
-	ctl.inferenceDir, _ = domain.NewDirectory(apiConfig.InferenceDir)
-	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
+	ctl.inferenceDir, _ = types.NewDirectory(apiConfig.InferenceDir)
+	ctl.inferenceBootFile, _ = types.NewFilePath(apiConfig.InferenceBootFile)
 
 	rg.POST("/v1/inference", internalApiCheckMiddleware(&ctl.baseController), ctl.Create)
-	rg.PUT("/v1/inference/serving", internalApiCheckMiddleware(&ctl.baseController), ctl.NotifySpaceAppServing)
+	rg.PUT("/v1/inference/serving", ctl.NotifySpaceAppServing)
+	rg.PUT("/v1/inference/building", ctl.NotifySpaceAppBuilding)
+	rg.PUT("/v1/inference/starting", ctl.NotifySpaceAppStarting)
+	rg.PUT("/v1/inference/failed_status", ctl.NotifySpaceAppFailedStatus)
 }
 
 type InferenceInternalController struct {
@@ -48,8 +53,8 @@ type InferenceInternalController struct {
 
 	project spacerepo.Project
 
-	inferenceDir      domain.Directory
-	inferenceBootFile domain.FilePath
+	inferenceDir      types.Directory
+	inferenceBootFile types.FilePath
 	whitelist         userapp.WhiteListService
 
 	spacesender spacemesage.SpaceAppMessageProducer
@@ -97,7 +102,7 @@ func (ctl *InferenceInternalController) Create(ctx *gin.Context) {
 // @Accept   json
 // @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
 // @Security Internal
-// @Router   /v1/space-app/serving [put]
+// @Router   /v1/inference/serving [put]
 func (ctl *InferenceInternalController) NotifySpaceAppServing(ctx *gin.Context) {
 	req := reqToUpdateServiceInfo{}
 
@@ -119,4 +124,110 @@ func (ctl *InferenceInternalController) NotifySpaceAppServing(ctx *gin.Context) 
 	} else {
 		ctl.sendRespOfPut(ctx, nil)
 	}
+}
+
+// @Summary  NotifySpaceAppBuilding
+// @Description  notify space app building is started
+// @Tags     SpaceApp
+// @Param    body  body  reqToUpdateBuildInfo  true  "body"
+// @Accept   json
+// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Security Internal
+// @Router   /v1/infernce/building [put]
+func (ctl *InferenceInternalController) NotifySpaceAppBuilding(ctx *gin.Context) {
+	req := reqToUpdateBuildInfo{}
+
+	if err := ctx.BindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if err := ctl.s.NotifyIsBuilding(ctx.Request.Context(), &cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfPut(ctx, nil)
+	}
+}
+
+// @Summary  NotifySpaceAppStarting
+// @Description  notify space app build is starting
+// @Tags     SpaceApp
+// @Param    body  body  reqToNotifyStarting  true  "body"
+// @Accept   json
+// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Security Internal
+// @Router   /v1/inference/starting [put]
+func (ctl *InferenceInternalController) NotifySpaceAppStarting(ctx *gin.Context) {
+	req := reqToNotifyStarting{}
+
+	if err := ctx.BindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	if err := ctl.s.NotifyStarting(ctx.Request.Context(), &cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfPut(ctx, nil)
+	}
+}
+
+// @Summary  NotifySpaceAppFailedStatus
+// @Description  notify space app failed status
+// @Tags     SpaceApp
+// @Param    body  body  reqToFailedStatus  true  "body"
+// @Accept   json
+// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Security Internal
+// @Router   /v1/inference/failed_status [put]
+func (ctl *InferenceInternalController) NotifySpaceAppFailedStatus(ctx *gin.Context) {
+	req := reqToFailedStatus{}
+
+	if err := ctx.BindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestParam(ctx, err)
+
+		return
+	}
+
+	switch cmd.Status {
+	case domain.AppStatusBuildFailed:
+		if err := ctl.s.NotifyIsBuildFailed(ctx.Request.Context(), &cmd); err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+			return
+		}
+	case domain.AppStatusStartFailed:
+		if err := ctl.s.NotifyIsStartFailed(ctx.Request.Context(), &cmd); err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+			return
+		}
+	default:
+		e := fmt.Errorf("old status not %s, can not set", cmd.Status.AppStatus())
+		err = allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+	ctl.sendRespOfPut(ctx, nil)
 }

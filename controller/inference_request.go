@@ -7,9 +7,9 @@ package controller
 
 import (
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
-	"github.com/opensourceways/xihe-server/domain"
+	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/app"
-	appdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
+	"github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
 // reqToCreateSpaceApp
@@ -19,7 +19,7 @@ type reqToCreateSpaceApp struct {
 }
 
 func (req *reqToCreateSpaceApp) toCmd() (cmd app.CmdToCreateApp, err error) {
-	cmd.SpaceId, err = domain.NewIdentity(req.SpaceId)
+	cmd.SpaceId, err = types.NewIdentity(req.SpaceId)
 	if err != nil {
 		return
 	}
@@ -41,7 +41,7 @@ func (req *reqToUpdateServiceInfo) toCmd() (cmd app.CmdToNotifyServiceIsStarted,
 		return
 	}
 
-	cmd.AppURL, err = appdomain.NewAppURL(req.AppURL)
+	cmd.AppURL, err = domain.NewAppURL(req.AppURL)
 
 	return
 }
@@ -59,6 +59,47 @@ func (req *reqToUpdateBuildInfo) toCmd() (cmd app.CmdToNotifyBuildIsStarted, err
 	}
 
 	cmd.LogURL, err = commondomain.NewURL(req.LogURL)
+
+	return
+}
+
+// reqToNotifyStarting
+type reqToNotifyStarting struct {
+	reqToCreateSpaceApp
+
+	AllBuildLog string `json:"all_build_log"`
+}
+
+func (req *reqToNotifyStarting) toCmd() (cmd app.CmdToNotifyStarting, err error) {
+	if cmd.SpaceAppIndex, err = req.reqToCreateSpaceApp.toCmd(); err != nil {
+		return
+	}
+
+	cmd.Logs = req.AllBuildLog
+
+	return
+}
+
+// reqToFailedStatus
+type reqToFailedStatus struct {
+	reqToCreateSpaceApp
+
+	Status string `json:"status"`
+	Reason string `json:"reason"`
+
+	AllBuildLog string `json:"all_build_log"`
+}
+
+func (req *reqToFailedStatus) toCmd() (cmd app.CmdToNotifyFailedStatus, err error) {
+	if cmd.SpaceAppIndex, err = req.reqToCreateSpaceApp.toCmd(); err != nil {
+		return
+	}
+
+	cmd.Reason = req.Reason
+	cmd.Status, err = domain.NewAppStatus(req.Status)
+	if cmd.Status == domain.AppStatusBuildFailed {
+		cmd.Logs = req.AllBuildLog
+	}
 
 	return
 }
