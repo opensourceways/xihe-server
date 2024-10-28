@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -88,11 +87,11 @@ func (ctl *InferenceInternalController) Create(ctx *gin.Context) {
 
 	fmt.Printf("=====================cmd: %+v\n", cmd)
 
-	if err := ctl.s.CreateSpaceApp(cmd); err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-	} else {
-		ctx.JSON(http.StatusCreated, newResponseData("string"))
-	}
+	// if err := ctl.s.Create(cmd); err != nil {
+	// 	ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	// } else {
+	// 	ctx.JSON(http.StatusCreated, newResponseData("string"))
+	// }
 }
 
 // @Summary  NotifySpaceAppServing

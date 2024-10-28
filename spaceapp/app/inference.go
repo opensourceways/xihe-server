@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
@@ -62,7 +61,7 @@ func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit, requ
 type InferenceService interface {
 	Create(string, *app.UserInfo, *InferenceCreateCmd) (InferenceDTO, string, error)
 	Get(info *InferenceIndex) (InferenceDTO, error)
-	CreateSpaceApp(CmdToCreateApp) error
+	// CreateSpaceApp(CmdToCreateApp) error
 	NotifyIsServing(ctx context.Context, cmd *CmdToNotifyServiceIsStarted) error
 	NotifyIsBuilding(ctx context.Context, cmd *CmdToNotifyBuildIsStarted) error
 	NotifyStarting(ctx context.Context, cmd *CmdToNotifyStarting) error
@@ -211,18 +210,37 @@ func (s inferenceService) check(instance *domain.Inference) (
 	return
 }
 
-func (s inferenceService) CreateSpaceApp(cmd CmdToCreateApp) error {
-	if err := s.spacesender.SendSpaceAppCreateMsg(&domain.SpaceAppCreateEvent{
-		Id:       cmd.SpaceId.Identity(),
-		CommitId: cmd.CommitId,
-	}); err != nil {
-		return err
-	}
+// func (s inferenceService) CreateSpaceApp(cmd CmdToCreateApp) error {
+// 	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	fmt.Println("success ====================================== send ======================= space ================================ create")
+// 	app, err := s.repo.FindBySpaceId(ctx, space.Id)
+// 	if err == nil {
+// 		if app.IsAppNotAllowToInit() {
+// 			e := fmt.Errorf("spaceId:%s, not allow to init", space.Id.Identity())
+// 			logrus.Errorf("create space app failed, err:%s", e)
+// 			return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
+// 		}
 
-	return nil
-}
+// 		if err := s.repo.Remove(space.Id); err != nil {
+// 			logrus.Errorf("spaceId:%s remove space app db failed, err:%s", space.Id.Identity(), err)
+// 			return err
+// 		}
+// 	}
+
+// 	if err := s.spacesender.SendSpaceAppCreateMsg(&domain.SpaceAppCreateEvent{
+// 		Id:       cmd.SpaceId.Identity(),
+// 		CommitId: cmd.CommitId,
+// 	}); err != nil {
+// 		return err
+// 	}
+
+// 	fmt.Println("success ====================================== send ======================= space ================================ create")
+
+// 	return nil
+// }
 
 type InferenceInternalService interface {
 	UpdateDetail(*InferenceIndex, *InferenceDetail) error

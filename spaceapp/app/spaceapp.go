@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
@@ -10,6 +11,7 @@ import (
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
+	spacemesage "github.com/opensourceways/xihe-server/spaceapp/domain/message"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
@@ -17,6 +19,7 @@ import (
 
 // SpaceappAppService is the interface for the space app service.
 type SpaceappAppService interface {
+	Create(context.Context, CmdToCreateApp) error
 	GetByName(context.Context, domain.Account, *spacedomain.SpaceIndex) (SpaceAppDTO, error)
 	GetBuildLog(context.Context, domain.Account, *spacedomain.SpaceIndex) (string, error)
 	GetBuildLogs(context.Context, domain.Account, *spacedomain.SpaceIndex) (BuildLogsDTO, error)
@@ -30,19 +33,67 @@ func NewSpaceappAppService(
 	repo repository.SpaceAppRepository,
 	spaceRepo spacerepo.Project,
 	sse spaceappdomain.SeverSentEvent,
+	spacesender spacemesage.SpaceAppMessageProducer,
 ) *spaceappAppService {
 	return &spaceappAppService{
-		repo:      repo,
-		spaceRepo: spaceRepo,
-		sse:       sse,
+		repo:        repo,
+		spaceRepo:   spaceRepo,
+		sse:         sse,
+		spacesender: spacesender,
 	}
 }
 
 // spaceappAppService
 type spaceappAppService struct {
-	repo      repository.SpaceAppRepository
-	spaceRepo spacerepo.Project
-	sse       spaceappdomain.SeverSentEvent
+	repo        repository.SpaceAppRepository
+	spaceRepo   spacerepo.Project
+	sse         spaceappdomain.SeverSentEvent
+	spacesender spacemesage.SpaceAppMessageProducer
+}
+
+func (s *spaceappAppService) Create(ctx context.Context, cmd CmdToCreateApp) error {
+	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
+	if err != nil {
+		return err
+	}
+	repoId, err := domain.NewIdentity(space.RepoId)
+	if err != nil {
+		return err
+	}
+	app, err := s.repo.FindBySpaceId(repoId)
+	if err == nil {
+		if app.IsAppNotAllowToInit() {
+			e := fmt.Errorf("spaceId:%s, not allow to init", space.Id)
+			logrus.Errorf("create space app failed, err:%s", e)
+
+			return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
+		}
+
+		if err := s.repo.Remove(repoId); err != nil {
+			logrus.Errorf("spaceId:%s remove space app db failed, err:%s", space.Id, err)
+			return err
+		}
+	}
+
+	v := spaceappdomain.SpaceApp{
+		Status:        spaceappdomain.AppStatusInit,
+		SpaceAppIndex: cmd,
+	}
+	if err := s.repo.Add(&v); err != nil {
+		logrus.Errorf("spaceId:%s create space app db failed, err:%s", space.Id, err)
+		return err
+	}
+
+	if err := s.spacesender.SendSpaceAppCreateMsg(&spaceappdomain.SpaceAppCreateEvent{
+		Id:       cmd.SpaceId.Identity(),
+		CommitId: cmd.CommitId,
+	}); err != nil {
+		return err
+	}
+
+	fmt.Println("success ====================================== send ======================= space ================================ create")
+
+	return nil
 }
 
 // GetByName retrieves the space app by name.
