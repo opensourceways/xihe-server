@@ -39,10 +39,12 @@ func AddRouterForInferenceInternalController(
 	ctl.inferenceBootFile, _ = types.NewFilePath(apiConfig.InferenceBootFile)
 
 	rg.POST("/v1/inference", internalApiCheckMiddleware(&ctl.baseController), ctl.Create)
-	rg.PUT("/v1/inference/serving", ctl.NotifySpaceAppServing)
-	rg.PUT("/v1/inference/building", ctl.NotifySpaceAppBuilding)
-	rg.PUT("/v1/inference/starting", ctl.NotifySpaceAppStarting)
-	rg.PUT("/v1/inference/failed_status", ctl.NotifySpaceAppFailedStatus)
+	rg.PUT("/v1/inference/serving", internalApiCheckMiddleware(&ctl.baseController), ctl.NotifySpaceAppServing)
+	rg.PUT("/v1/inference/building", internalApiCheckMiddleware(&ctl.baseController), ctl.NotifySpaceAppBuilding)
+	rg.PUT("/v1/inference/starting", internalApiCheckMiddleware(&ctl.baseController), ctl.NotifySpaceAppStarting)
+	rg.PUT("/v1/inference/failed_status", internalApiCheckMiddleware(&ctl.baseController),
+		ctl.NotifySpaceAppFailedStatus)
+
 }
 
 type InferenceInternalController struct {
