@@ -1,9 +1,7 @@
 package controller
 
 import (
-	"fmt"
 	"io"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -43,7 +41,6 @@ func AddRouterForInferenceController(
 	ctl.inferenceDir, _ = domain.NewDirectory(apiConfig.InferenceDir)
 	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
 
-	rg.POST("/v1/inference", internalApiCheckMiddleware(&ctl.baseController), ctl.Create)
 	rg.GET("/v1/inference/:owner/:name", internalApiCheckMiddleware(&ctl.baseController), ctl.Get)
 	rg.GET("/v1/inference/:owner/:name/buildlog/complete", internalApiCheckMiddleware(&ctl.baseController), ctl.GetBuildLogs)
 	rg.GET("/v1/inference/:owner/:name/buildlog/realtime", internalApiCheckMiddleware(&ctl.baseController), ctl.GetRealTimeBuildLog)
@@ -64,41 +61,6 @@ type InferenceController struct {
 	whitelist         userapp.WhiteListService
 
 	spacesender spacemesage.SpaceAppMessageProducer
-}
-
-// @Summary		Create
-// @Description	create inference
-// @Tags			Inference
-// @Param			owner	path	string	true	"project owner"
-// @Param			pid		path	string	true	"project id"
-// @Accept			json
-// @Success		201	{object}			app.InferenceDTO
-// @Failure		400	bad_request_body	can't	parse		request	body
-// @Failure		401	bad_request_param	some	parameter	of		body	is	invalid
-// @Failure		500	system_error		system	error
-// @Router			/v1/inference/project/{owner}/{pid} [get]
-func (ctl *InferenceController) Create(ctx *gin.Context) {
-	req := reqToCreateSpaceApp{}
-	if err := ctx.BindJSON(&req); err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-
-		return
-	}
-
-	cmd, err := req.toCmd()
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-
-		return
-	}
-
-	fmt.Printf("=====================cmd: %+v\n", cmd)
-
-	if err := ctl.appService.Create(ctx, cmd); err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-	} else {
-		ctx.JSON(http.StatusCreated, newResponseData("success"))
-	}
 }
 
 func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid string) (level string, err error) {

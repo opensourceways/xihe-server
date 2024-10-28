@@ -3,14 +3,13 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 
-	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
-	"github.com/opensourceways/xihe-server/domain/repository"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	"github.com/opensourceways/xihe-server/spaceapp/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/inference"
@@ -59,9 +58,8 @@ func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit, requ
 }
 
 type InferenceService interface {
-	Create(string, *app.UserInfo, *InferenceCreateCmd) (InferenceDTO, string, error)
+	Create(context.Context, CmdToCreateApp) error
 	Get(info *InferenceIndex) (InferenceDTO, error)
-	// CreateSpaceApp(CmdToCreateApp) error
 	NotifyIsServing(ctx context.Context, cmd *CmdToNotifyServiceIsStarted) error
 	NotifyIsBuilding(ctx context.Context, cmd *CmdToNotifyBuildIsStarted) error
 	NotifyStarting(ctx context.Context, cmd *CmdToNotifyStarting) error
@@ -99,66 +97,50 @@ type inferenceService struct {
 	spaceRepo       spacerepo.Project
 }
 
-func (s inferenceService) Create(user string, owner *app.UserInfo, cmd *InferenceCreateCmd) (
-	dto InferenceDTO, sha string, err error,
-) {
-	sha, b, err := s.p.GetDirFileInfo(owner, &platform.RepoDirFile{
-		RepoName: cmd.ProjectName,
-		Dir:      cmd.InferenceDir,
-		File:     cmd.BootFile,
-	})
+func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error {
+	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
 	if err != nil {
-		return
+		return err
 	}
+	repoId, err := types.NewIdentity(space.RepoId)
+	if err != nil {
+		return err
+	}
+	app, err := s.spaceappRepo.FindBySpaceId(repoId)
+	if err == nil {
+		if app.IsAppNotAllowToInit() {
+			e := fmt.Errorf("spaceId:%s, not allow to init", space.Id)
+			logrus.Errorf("create space app failed, err:%s", e)
 
-	if !b {
-		err = UnavailableRepoFileError{
-			errors.New("no boot file"),
+			return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
 		}
 
-		return
-	}
-
-	instance := new(domain.Inference)
-	cmd.toInference(instance, sha, user)
-	dto, version, err := s.check(instance)
-	if err != nil {
-		return
-	}
-
-	if dto.hasResult() {
-		if dto.canReuseCurrent() {
-			instance.Id = dto.InstanceId
-			logrus.Debugf("will reuse the inference instance(%s)", dto.InstanceId)
-
-			err1 := s.sender.ExtendInferenceSurvivalTime(&message.InferenceExtendInfo{
-				InferenceInfo: instance.InferenceInfo,
-				Expiry:        dto.expiry,
-			})
-			if err1 != nil {
-				logrus.Errorf(
-					"extend instance(%s) failed, err:%s",
-					dto.InstanceId, err1.Error(),
-				)
-			}
+		if err := s.spaceappRepo.Remove(repoId); err != nil {
+			logrus.Errorf("spaceId:%s remove space app db failed, err:%s", space.Id, err)
+			return err
 		}
-
-		return
 	}
 
-	if dto.InstanceId, err = s.repo.Save(instance, version); err == nil {
-		instance.Id = dto.InstanceId
+	v := domain.SpaceApp{
+		Status:        domain.AppStatusInit,
+		SpaceAppIndex: cmd,
+	}
+	if err := s.spaceappRepo.Add(&v); err != nil {
+		logrus.Errorf("spaceId:%s create space app db failed, err:%s", space.Id, err)
+		return err
+	}
+	fmt.Println("success ====================================== add ======================= space ================================ app")
 
-		err = s.sender.CreateInference(&instance.InferenceInfo)
-
-		return
+	if err := s.spacesender.SendSpaceAppCreateMsg(&domain.SpaceAppCreateEvent{
+		Id:       cmd.SpaceId.Identity(),
+		CommitId: cmd.CommitId,
+	}); err != nil {
+		return err
 	}
 
-	if repository.IsErrorDuplicateCreating(err) {
-		dto, _, err = s.check(instance)
-	}
+	fmt.Println("success ====================================== send ======================= space ================================ create")
 
-	return
+	return nil
 }
 
 func (s inferenceService) Get(index *InferenceIndex) (dto InferenceDTO, err error) {
@@ -170,77 +152,6 @@ func (s inferenceService) Get(index *InferenceIndex) (dto InferenceDTO, err erro
 
 	return
 }
-
-func (s inferenceService) check(instance *domain.Inference) (
-	dto InferenceDTO, version int, err error,
-) {
-	v, version, err := s.repo.FindInstances(&instance.Project, instance.LastCommit)
-	if err != nil || len(v) == 0 {
-		return
-	}
-
-	var target *spaceapprepo.InferenceSummary
-
-	for i := range v {
-		item := &v[i]
-
-		if item.Error != "" {
-			dto.Error = item.Error
-			dto.InstanceId = item.Id
-
-			return
-		}
-
-		if target == nil || item.Expiry > target.Expiry {
-			target = item
-		}
-	}
-
-	if target == nil {
-		return
-	}
-
-	e, n := target.Expiry, utils.Now()
-	if n < e && n+s.minSurvivalTime <= e {
-		dto.expiry = target.Expiry
-		dto.AccessURL = target.AccessURL
-		dto.InstanceId = target.Id
-	}
-
-	return
-}
-
-// func (s inferenceService) CreateSpaceApp(cmd CmdToCreateApp) error {
-// 	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	app, err := s.repo.FindBySpaceId(ctx, space.Id)
-// 	if err == nil {
-// 		if app.IsAppNotAllowToInit() {
-// 			e := fmt.Errorf("spaceId:%s, not allow to init", space.Id.Identity())
-// 			logrus.Errorf("create space app failed, err:%s", e)
-// 			return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
-// 		}
-
-// 		if err := s.repo.Remove(space.Id); err != nil {
-// 			logrus.Errorf("spaceId:%s remove space app db failed, err:%s", space.Id.Identity(), err)
-// 			return err
-// 		}
-// 	}
-
-// 	if err := s.spacesender.SendSpaceAppCreateMsg(&domain.SpaceAppCreateEvent{
-// 		Id:       cmd.SpaceId.Identity(),
-// 		CommitId: cmd.CommitId,
-// 	}); err != nil {
-// 		return err
-// 	}
-
-// 	fmt.Println("success ====================================== send ======================= space ================================ create")
-
-// 	return nil
-// }
 
 type InferenceInternalService interface {
 	UpdateDetail(*InferenceIndex, *InferenceDetail) error

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -55,8 +56,6 @@ type InferenceInternalController struct {
 	inferenceDir      types.Directory
 	inferenceBootFile types.FilePath
 	whitelist         userapp.WhiteListService
-
-	spacesender spacemesage.SpaceAppMessageProducer
 }
 
 // @Summary		Create
@@ -87,11 +86,11 @@ func (ctl *InferenceInternalController) Create(ctx *gin.Context) {
 
 	fmt.Printf("=====================cmd: %+v\n", cmd)
 
-	// if err := ctl.s.Create(cmd); err != nil {
-	// 	ctl.sendRespWithInternalError(ctx, newResponseError(err))
-	// } else {
-	// 	ctx.JSON(http.StatusCreated, newResponseData("string"))
-	// }
+	if err := ctl.s.Create(ctx, cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctx.JSON(http.StatusCreated, newResponseData("success"))
+	}
 }
 
 // @Summary  NotifySpaceAppServing
