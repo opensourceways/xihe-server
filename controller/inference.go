@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/gin-gonic/gin"
@@ -288,9 +289,10 @@ func (ctl *InferenceController) CanRead(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-
+	fmt.Printf("====================================index: %+v\n", index)
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		fmt.Printf("not ok====================================")
 		return
 	}
 
