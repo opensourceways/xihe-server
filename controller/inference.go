@@ -42,7 +42,7 @@ func AddRouterForInferenceController(
 	ctl.inferenceDir, _ = domain.NewDirectory(apiConfig.InferenceDir)
 	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
 
-	rg.GET("/v1/inference/:owner/:name", internalApiCheckMiddleware(&ctl.baseController), ctl.Get)
+	rg.GET("/v1/inference/:owner/:name", ctl.Get)
 	rg.GET("/v1/inference/:owner/:name/buildlog/complete", ctl.GetBuildLogs)
 	rg.GET("/v1/inference/:owner/:name/buildlog/realtime", ctl.GetRealTimeBuildLog)
 	rg.GET("/v1/inference/:owner/:name/spacelog/realtime", ctl.GetRealTimeSpaceLog)
