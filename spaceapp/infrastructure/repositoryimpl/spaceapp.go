@@ -31,7 +31,7 @@ func (impl spaceAppRepoImpl) Save(app *domain.SpaceApp) error {
 	do.Version += 1
 
 	return impl.dao.UpdateWithOmittingSpecificFields(
-		&spaceappDO{Id: do.Id, Version: do.Version}, &do, fieldAllBuildLog,
+		&spaceappDO{Id: app.Id.Integer(), Version: app.Version}, &do, fieldAllBuildLog,
 	)
 }
 
@@ -65,5 +65,5 @@ func (impl spaceAppRepoImpl) SaveWithBuildLog(m *domain.SpaceApp, log *domain.Sp
 	do.Version += 1
 	do.AllBuildLog = log.Logs
 
-	return impl.dao.Update(&spaceappDO{Id: do.Id, Version: m.Version}, &do)
+	return impl.dao.Update(&spaceappDO{Id: m.Id.Integer(), Version: m.Version}, &do)
 }
