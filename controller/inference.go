@@ -43,9 +43,9 @@ func AddRouterForInferenceController(
 	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
 
 	rg.GET("/v1/inference/:owner/:name", internalApiCheckMiddleware(&ctl.baseController), ctl.Get)
-	rg.GET("/v1/inference/:owner/:name/buildlog/complete", internalApiCheckMiddleware(&ctl.baseController), ctl.GetBuildLogs)
-	rg.GET("/v1/inference/:owner/:name/buildlog/realtime", internalApiCheckMiddleware(&ctl.baseController), ctl.GetRealTimeBuildLog)
-	rg.GET("/v1/inference/:owner/:name/spacelog/realtime", internalApiCheckMiddleware(&ctl.baseController), ctl.GetRealTimeSpaceLog)
+	rg.GET("/v1/inference/:owner/:name/buildlog/complete", ctl.GetBuildLogs)
+	rg.GET("/v1/inference/:owner/:name/buildlog/realtime", ctl.GetRealTimeBuildLog)
+	rg.GET("/v1/inference/:owner/:name/spacelog/realtime", ctl.GetRealTimeSpaceLog)
 	rg.GET("/v1/space-app/:owner/:name/read", ctl.CanRead)
 }
 
@@ -285,16 +285,17 @@ func (ctl *InferenceController) GetRealTimeSpaceLog(ctx *gin.Context) {
 // @x-example {"data": "successfully"}
 // @Router   /v1/space-app/{owner}/{name}/read [get]
 func (ctl *InferenceController) CanRead(ctx *gin.Context) {
+	pl, _, ok := ctl.checkUserApiToken(ctx, true)
+	if !ok {
+		fmt.Printf("not ok====================================")
+		return
+	}
+
 	index, err := ctl.parseIndex(ctx)
 	if err != nil {
 		return
 	}
 	fmt.Printf("====================================index: %+v\n", index)
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
-	if !ok {
-		fmt.Printf("not ok====================================")
-		return
-	}
 
 	if err := ctl.appService.CheckPermissionRead(ctx.Request.Context(), pl.DomainAccount(), &index); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
