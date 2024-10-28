@@ -111,3 +111,12 @@ type SpaceAppBuildLog struct {
 	AppId domain.Identity
 	Logs  string
 }
+
+// IsAppNotAllowToInit app can be init if return false
+func (app *SpaceApp) IsAppNotAllowToInit() bool {
+	if app.Status.IsPaused() || app.Status.IsResuming() || app.Status.IsResumeFailed() || app.Status.IsRestarting() {
+		return true
+	}
+
+	return false
+}

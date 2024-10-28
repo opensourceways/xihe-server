@@ -2,8 +2,10 @@ package pgsql
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
+	"github.com/jackc/pgconn"
 	"github.com/opensourceways/xihe-server/common/domain/repository"
 	"gorm.io/gorm"
 )
@@ -11,6 +13,8 @@ import (
 var (
 	errRowExists   = errors.New("row exists")
 	errRowNotFound = errors.New("row not found")
+
+	errorCodes errorCode
 )
 
 type SortByColumn struct {
@@ -186,4 +190,20 @@ func (t dbTable) Update(filter, values any) error {
 	}
 
 	return nil
+}
+
+// EqualQuery generates a query string for an "equal" filter condition.
+func (dao dbTable) EqualQuery(field string) string {
+	return fmt.Sprintf(`%s = ?`, field)
+}
+
+// IsRecordExists checks if the given error indicates that a unique constraint violation occurred.
+func (dao dbTable) IsRecordExists(err error) bool {
+	var pgError *pgconn.PgError
+	ok := errors.As(err, &pgError)
+	if !ok {
+		return false
+	}
+
+	return pgError != nil && pgError.Code == errorCodes.UniqueConstraint
 }

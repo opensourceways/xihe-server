@@ -324,7 +324,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	}
 
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
-		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller),
+		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
 	)
 
 	{

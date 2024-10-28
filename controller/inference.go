@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/domain"
@@ -20,7 +18,6 @@ import (
 	spacemesage "github.com/opensourceways/xihe-server/spaceapp/domain/message"
 	spaceappApprepo "github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	userapp "github.com/opensourceways/xihe-server/user/app"
-	"github.com/opensourceways/xihe-server/utils"
 )
 
 func AddRouterForInferenceController(
@@ -46,11 +43,11 @@ func AddRouterForInferenceController(
 	ctl.inferenceDir, _ = domain.NewDirectory(apiConfig.InferenceDir)
 	ctl.inferenceBootFile, _ = domain.NewFilePath(apiConfig.InferenceBootFile)
 
-	rg.GET("/v1/inference/project/:owner/:pid", ctl.Create)
-	rg.GET("/v1/inference/:owner/:name", ctl.Get)
-	rg.GET("/v1/inference/:owner/:name/buildlog/complete", ctl.GetBuildLogs)
-	rg.GET("/v1/inference/:owner/:name/buildlog/realtime", ctl.GetRealTimeBuildLog)
-	rg.GET("/v1/inference/:owner/:name/spacelog/realtime", ctl.GetRealTimeSpaceLog)
+	rg.POST("/v1/inference", internalApiCheckMiddleware(&ctl.baseController), ctl.Create)
+	rg.GET("/v1/inference/:owner/:name", internalApiCheckMiddleware(&ctl.baseController), ctl.Get)
+	rg.GET("/v1/inference/:owner/:name/buildlog/complete", internalApiCheckMiddleware(&ctl.baseController), ctl.GetBuildLogs)
+	rg.GET("/v1/inference/:owner/:name/buildlog/realtime", internalApiCheckMiddleware(&ctl.baseController), ctl.GetRealTimeBuildLog)
+	rg.GET("/v1/inference/:owner/:name/spacelog/realtime", internalApiCheckMiddleware(&ctl.baseController), ctl.GetRealTimeSpaceLog)
 	rg.GET("/v1/space-app/:owner/:name/read", ctl.CanRead)
 }
 
@@ -81,162 +78,26 @@ type InferenceController struct {
 // @Failure		500	system_error		system	error
 // @Router			/v1/inference/project/{owner}/{pid} [get]
 func (ctl *InferenceController) Create(ctx *gin.Context) {
-	pl, csrftoken, _, ok := ctl.checkTokenForWebsocket(ctx, false)
-	if !ok {
-		return
-	}
-
-	// setup websocket
-	upgrader := websocket.Upgrader{
-		Subprotocols: []string{csrftoken},
-		CheckOrigin: func(r *http.Request) bool {
-			return r.Header.Get(headerSecWebsocket) == csrftoken
-		},
-	}
-
-	ws, err := upgrader.Upgrade(ctx.Writer, ctx.Request, nil)
-	if err != nil {
-		//TODO delete
-		log.Errorf("update ws failed, err:%s", err.Error())
-
+	req := reqToCreateSpaceApp{}
+	if err := ctx.BindJSON(&req); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
 		return
 	}
 
-	defer ws.Close()
-
-	// start
-	owner, err := domain.NewAccount(ctx.Param("owner"))
+	cmd, err := req.toCmd()
 	if err != nil {
-		if wsErr := ws.WriteJSON(newResponseCodeError(errorBadRequestParam, err)); wsErr != nil {
-			log.Errorf("inference failed: web socket write err:%s", wsErr.Error())
-		}
-
-		log.Errorf("inference failed: new account, err:%s", err.Error())
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
 		return
 	}
 
-	projectId := ctx.Param("pid")
-	v, err := ctl.project.GetSummary(owner, projectId)
-	if err != nil {
-		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
-			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
-		}
+	fmt.Printf("=====================cmd: %+v\n", cmd)
 
-		log.Errorf("inference failed: get summary, err:%s", err.Error())
-
-		return
-	}
-
-	viewOther := pl.isNotMe(owner)
-
-	if v.IsPrivate() {
-		wsErr := ws.WriteJSON(
-			newResponseCodeMsg(
-				errorNotAllowed,
-				"project is not found",
-			),
-		)
-		if wsErr != nil {
-			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
-		}
-
-		log.Debug("inference failed: project is private")
-
-		return
-	}
-
-	var level string
-	if level, err = ctl.getResourceLevel(owner, projectId); err != nil {
-		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
-			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
-		}
-
-		log.Errorf("inference failed: get resource, err:%s", err.Error())
-
-		return
-	}
-
-	u := platform.UserInfo{}
-	if viewOther {
-		u.User = owner
+	if err := ctl.appService.Create(ctx, cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
-		u = pl.PlatformUserInfo()
-	}
-
-	cmd := spaceappApp.InferenceCreateCmd{
-		ProjectId:     v.Id,
-		ProjectName:   v.Name,
-		ProjectOwner:  owner,
-		ResourceLevel: level,
-		InferenceDir:  ctl.inferenceDir,
-		BootFile:      ctl.inferenceBootFile,
-	}
-
-	dto, lastCommit, err := ctl.s.Create(pl.Account, &u, &cmd)
-	if err != nil {
-		if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
-			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
-		}
-
-		log.Errorf("inference failed: create, err:%s", err.Error())
-
-		return
-	}
-
-	utils.DoLog("", pl.Account, "create gradio",
-		fmt.Sprintf("projectid: %s", v.Id), "success")
-
-	if dto.Error != "" || dto.AccessURL != "" {
-		if wsErr := ws.WriteJSON(newResponseData(dto)); wsErr != nil {
-			log.Errorf("inference get | web socket write err:%s", wsErr.Error())
-		}
-
-		return
-	}
-
-	time.Sleep(10 * time.Second)
-
-	info := spaceappApp.InferenceIndex{
-		Id:         dto.InstanceId,
-		LastCommit: lastCommit,
-	}
-	info.Project.Id = projectId
-	info.Project.Owner = owner
-
-	for i := 0; i < apiConfig.InferenceTimeout; i++ {
-		dto, err = ctl.s.Get(&info)
-		if err != nil {
-			if wsErr := ws.WriteJSON(newResponseError(err)); wsErr != nil {
-				log.Errorf("inference create | web socket write err:%s", wsErr.Error())
-			}
-
-			log.Errorf("inference failed: get status, err:%s", err.Error())
-
-			return
-		}
-
-		log.Debugf("info dto:%v", dto)
-
-		if dto.Error != "" || dto.AccessURL != "" {
-			if wsErr := ws.WriteJSON(newResponseData(dto)); wsErr != nil {
-				log.Errorf("inference create | web socket write err:%s", wsErr.Error())
-			}
-
-			log.Debug("inference done")
-
-			return
-		}
-
-		time.Sleep(time.Second)
-	}
-
-	log.Error("inference timeout")
-
-	if wsErr := ws.WriteJSON(newResponseCodeMsg(errorSystemError, "timeout")); wsErr != nil {
-		logrus.Errorf("inference | web socket write error: %s", wsErr.Error())
+		ctx.JSON(http.StatusCreated, newResponseData("success"))
 	}
 }
 

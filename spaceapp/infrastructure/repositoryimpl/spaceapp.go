@@ -1,6 +1,8 @@
 package repositoryimpl
 
 import (
+	"errors"
+
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	types "github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain"
@@ -11,6 +13,7 @@ const (
 	tableSpaceApp = "space_app"
 
 	fieldAllBuildLog = "all_build_log"
+	fieldSpaceId     = "space_id"
 )
 
 func NewSpaceAppRepository() (repository.SpaceAppRepository, error) {
@@ -23,6 +26,20 @@ func NewSpaceAppRepository() (repository.SpaceAppRepository, error) {
 
 type spaceAppRepoImpl struct {
 	dao SpaceAppDAO
+}
+
+// Add adds a space application to the repository.
+func (adapter spaceAppRepoImpl) Add(m *domain.SpaceApp) error {
+	do := toSpaceAppDO(m)
+
+	err := adapter.dao.DB().Create(&do).Error
+
+	if err != nil && adapter.dao.IsRecordExists(err) {
+		return errors.New("space app exists")
+
+	}
+
+	return err
 }
 
 // Save saves space application into repository without all build log
@@ -66,4 +83,12 @@ func (impl spaceAppRepoImpl) SaveWithBuildLog(m *domain.SpaceApp, log *domain.Sp
 	do.AllBuildLog = log.Logs
 
 	return impl.dao.Update(&spaceappDO{Id: do.Id, Version: m.Version}, &do)
+}
+
+func (adapter spaceAppRepoImpl) Remove(spaceId types.Identity) error {
+	return adapter.dao.DB().Where(
+		adapter.dao.EqualQuery(fieldSpaceId), spaceId.Identity(),
+	).Delete(
+		spaceappDO{},
+	).Error
 }

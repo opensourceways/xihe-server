@@ -2,7 +2,6 @@ package domain
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 
 	"github.com/bwmarrin/snowflake"
@@ -25,27 +24,21 @@ func Init(cfg *Config) (err error) {
 		for i, hardware := range sdkobj.Hardware {
 			sdkobj.Hardware[i] = strings.ToLower(hardware)
 		}
+
 		sdkObjects[sdkType] = sets.New[string]()
 		sdkObjects[sdkType].Insert(sdkobj.Hardware...)
 	}
 
-	fmt.Printf("====================cfg.BaseImages: %+v\n", cfg.BaseImages)
 	baseImages = make(map[string]sets.Set[string])
-	fmt.Printf("===============len(cfg.BaseImages): %+v\n", len(cfg.BaseImages))
 	for _, img := range cfg.BaseImages {
-		fmt.Printf("===========img: %v\n", img)
 		hardwareType := strings.ToLower(img.HardwareType)
 		for i, baseImage := range img.BaseImage {
 			img.BaseImage[i] = strings.ToLower(baseImage)
 		}
-		fmt.Printf("===== img.BaseImage: %v\n", img.BaseImage)
+
 		baseImages[hardwareType] = sets.New[string]()
 		baseImages[hardwareType].Insert(img.BaseImage...)
-
-		fmt.Printf("===================+++baseImages: %v\n", baseImages)
 	}
-
-	fmt.Printf("===============baseImages: %+v\n", baseImages)
 
 	node, err = snowflake.NewNode(1)
 
