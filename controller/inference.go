@@ -22,7 +22,6 @@ import (
 func AddRouterForInferenceController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
-	repo spaceappApprepo.Inference,
 	project spacerepo.Project,
 	sender message.Sender,
 	whitelist userapp.WhiteListService,
@@ -32,7 +31,7 @@ func AddRouterForInferenceController(
 ) {
 	ctl := InferenceController{
 		s: spaceappApp.NewInferenceService(
-			p, repo, sender, apiConfig.MinSurvivalTimeOfInference, spacesender, spaceappRepo, project,
+			p, sender, apiConfig.MinSurvivalTimeOfInference, spacesender, spaceappRepo, project,
 		),
 		project:    project,
 		whitelist:  whitelist,
@@ -60,8 +59,6 @@ type InferenceController struct {
 	inferenceDir      domain.Directory
 	inferenceBootFile domain.FilePath
 	whitelist         userapp.WhiteListService
-
-	spacesender spacemesage.SpaceAppMessageProducer
 }
 
 func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid string) (level string, err error) {

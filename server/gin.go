@@ -154,12 +154,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
-	inference := spaceapprepo.NewInferenceRepository(
-		mongodb.NewInferenceMapper(
-			collections.Inference,
-		),
-	)
-
 	tags := repositories.NewTagsRepository(
 		mongodb.NewTagsMapper(collections.Tag),
 	)
@@ -392,12 +386,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender, spaceappAppService,
-			spaceappRepository,
+			v1, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
 		)
 
 		controller.AddRouterForInferenceInternalController(
-			internal, gitlabRepo, inference, proj, sender, userWhiteListService, spaceappSender, spaceappRepository,
+			internal, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappRepository,
 		)
 
 		controller.AddRouterForSearchController(

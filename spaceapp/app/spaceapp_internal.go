@@ -69,7 +69,6 @@ type InferenceService interface {
 
 func NewInferenceService(
 	p platform.RepoFile,
-	repo spaceapprepo.Inference,
 	sender message.Sender,
 	minSurvivalTime int,
 	spacesender spacemesage.SpaceAppMessageProducer,
@@ -78,7 +77,6 @@ func NewInferenceService(
 ) InferenceService {
 	return inferenceService{
 		p:               p,
-		repo:            repo,
 		sender:          sender,
 		spacesender:     spacesender,
 		minSurvivalTime: int64(minSurvivalTime),
