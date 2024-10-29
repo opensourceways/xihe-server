@@ -71,3 +71,13 @@ type GetSpaceAppCmd = spacedomain.SpaceIndex
 type BuildLogsDTO struct {
 	Logs string `json:"logs"`
 }
+
+func toSpaceDTO(space *spacedomain.Project) SpaceAppDTO {
+	dto := SpaceAppDTO{
+		Id:     space.Id,
+		Status: space.Exception.Exception(),
+		Reason: domain.ExceptionMap[space.Exception.Exception()],
+	}
+
+	return dto
+}

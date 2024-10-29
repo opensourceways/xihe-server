@@ -96,10 +96,16 @@ type inferenceService struct {
 }
 
 func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error {
+	fmt.Printf("====================================cmd: %+v\n", cmd)
 	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
 	if err != nil {
 		return err
 	}
+	err = space.PreCheck()
+	if err != nil {
+		return err
+	}
+
 	repoId, err := types.NewIdentity(space.RepoId)
 	if err != nil {
 		return err

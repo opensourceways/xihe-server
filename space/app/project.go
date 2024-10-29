@@ -178,7 +178,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	if err != nil {
 		logrus.Errorf("space create error | call api for quota consume failed | user:%s ,err: %s", cmd.Owner, err)
 
-		// return ProjectDTO{}, err
+		return ProjectDTO{}, err
 	}
 
 	// step1: create repo on gitlab
@@ -190,12 +190,47 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 		return
 	}
 
+	repoId, err := domain.NewIdentity(pid)
+	if err != nil {
+		return
+	}
+
 	// step2: save
 	v.RepoId = pid
 
 	p, err := s.repo.Save(v)
 	if err != nil {
 		return
+	}
+
+	if err = s.computilityApp.SpaceCreateSupply(computilityapp.CmdToSupplyRecord{
+		Index: computilitydomain.ComputilityAccountRecordIndex{
+			UserName:    cmd.Owner,
+			ComputeType: hdType,
+			SpaceId:     id,
+		},
+		QuotaCount: count,
+		NewSpaceId: repoId,
+	}); err != nil {
+		logrus.Errorf("add space id supplyment failed | user: %s, err: %s", cmd.Owner, err)
+
+		err = s.Delete(v, pr)
+		if err != nil {
+			logrus.Errorf("delete space after add space id supplyment failed | user: %s, err: %s",
+				cmd.Owner.Account(), err)
+
+			return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
+		}
+
+		err = s.computilityApp.UserQuotaRelease(compCmd)
+		if err != nil {
+			logrus.Errorf("release quota after add space id supplyment failed | user: %s, err: %s",
+				cmd.Owner.Account(), err)
+
+			return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
+		}
+
+		return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
 	}
 
 	s.toProjectDTO(&p, &dto)
@@ -238,12 +273,12 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 		if r.Hardware.IsNpu() {
 			logrus.Infof("release quota after user:%s npu space:%s delete", r.Owner.Account(), r.Id)
 
-			id, err := domain.NewIdentity(r.RepoId)
+			rid, err := domain.NewIdentity(r.RepoId)
 			c := computilityapp.CmdToUserQuotaUpdate{
 				Index: computilitydomain.ComputilityAccountRecordIndex{
 					UserName:    r.Owner,
 					ComputeType: r.GetComputeType(),
-					SpaceId:     id,
+					SpaceId:     rid,
 				},
 				QuotaCount: r.GetQuotaCount(),
 			}

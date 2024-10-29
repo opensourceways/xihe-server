@@ -46,6 +46,9 @@ const (
 
 	// ErrorCodeSpaceCommitConflict is const
 	ErrorCodeSpaceCommitConflict = "space_commit_conflict"
+
+	// ErrorCodeSpaceAppCreateFailed
+	ErrorCodeSpaceAppCreateFailed = "space_app_create_failed"
 )
 
 // errorImpl

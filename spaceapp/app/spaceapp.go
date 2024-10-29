@@ -75,6 +75,10 @@ func (s *spaceappAppService) GetByName(
 		return toSpaceAppDTO(&app), nil
 	}
 
+	if space.Exception.Exception() != "" {
+		return toSpaceDTO(&space), nil
+	}
+
 	// FIXME:
 	// if space.Hardware.IsNpu() && !space.CompPowerAllocated {
 	// 	return toSpaceNoCompQuotaDTO(&space), nil

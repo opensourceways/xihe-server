@@ -1,6 +1,9 @@
 package app
 
-import "github.com/opensourceways/xihe-server/computility/domain"
+import (
+	"github.com/opensourceways/xihe-server/computility/domain"
+	commondomain "github.com/opensourceways/xihe-server/domain"
+)
 
 // CmdToUserQuotaUpdate is a struct used for user quota update.
 type CmdToUserQuotaUpdate struct {
@@ -26,4 +29,11 @@ func toAccountQuotaDetailDTO(a *domain.ComputilityAccount) AccountQuotaDetailDTO
 		QuotaBalance: a.QuotaCount - a.UsedQuota,
 		ComputeType:  a.ComputeType.ComputilityType(),
 	}
+}
+
+// CmdToSupplyRecord is a struct used for supply record.
+type CmdToSupplyRecord struct {
+	Index      domain.ComputilityAccountRecordIndex
+	QuotaCount int
+	NewSpaceId commondomain.Identity
 }
