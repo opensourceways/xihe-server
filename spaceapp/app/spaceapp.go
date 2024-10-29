@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
@@ -74,6 +75,8 @@ func (s *spaceappAppService) GetByName(
 	if err == nil {
 		return toSpaceAppDTO(&app), nil
 	}
+
+	fmt.Printf("space.Exception.Exception()=====================================: %v\n", space.Exception.Exception())
 
 	if space.Exception.Exception() != "" {
 		return toSpaceDTO(&space), nil
