@@ -207,29 +207,31 @@ func (impl project) toProjectDO(p *spacedomain.Project) ProjectDO {
 }
 
 type ProjectDO struct {
-	Id                string
-	Owner             string
-	Name              string
-	FL                byte
-	Desc              string
-	Title             string
-	Type              string
-	Level             int
-	CoverId           string
-	Protocol          string
-	Training          string
-	RepoType          string
-	RepoId            string
-	Tags              []string
-	TagKinds          []string
-	CreatedAt         int64
-	UpdatedAt         int64
-	Version           int
-	LikeCount         int
-	ForkCount         int
-	DownloadCount     int
+	Id            string
+	Owner         string
+	Name          string
+	FL            byte
+	Desc          string
+	Title         string
+	Type          string
+	Level         int
+	CoverId       string
+	Protocol      string
+	Training      string
+	RepoType      string
+	RepoId        string
+	Tags          []string
+	TagKinds      []string
+	CreatedAt     int64
+	UpdatedAt     int64
+	Version       int
+	LikeCount     int
+	ForkCount     int
+	DownloadCount int
+
 	CommitId          string
 	NoApplicationFile bool
+	Exception         string
 
 	Hardware  string
 	BaseImage string
@@ -295,6 +297,10 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 		if r.BaseImage, err = domain.NewBaseImage(do.BaseImage, do.Hardware); err != nil {
 			return
 		}
+	}
+
+	if r.Exception, err = domain.NewException(do.Exception); err != nil {
+		return
 	}
 
 	r.Level = domain.NewResourceLevelByNum(do.Level)

@@ -102,6 +102,7 @@ func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) er
 		TagKinds:          p.TagKinds,
 		CommitId:          p.CommitId,
 		NoApplicationFile: p.NoApplicationFile,
+		Exception:         p.Exception.Exception(),
 	}
 
 	if p.Desc != nil {
@@ -137,6 +138,7 @@ type ProjectPropertyDO struct {
 	TagKinds          []string
 	CommitId          string
 	NoApplicationFile bool
+	Exception         string
 }
 
 func (impl project) ListAndSortByUpdateTime(

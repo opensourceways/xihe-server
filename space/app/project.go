@@ -453,11 +453,8 @@ func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUp
 		return err
 	}
 
-	// space.SetSpaceCommitId(cmd.CommitId)
-	// space.SetNoApplicationFile(cmd.NoApplicationFile)
-
-	space.ProjectModifiableProperty.CommitId = cmd.CommitId
-	space.ProjectModifiableProperty.NoApplicationFile = cmd.NoApplicationFile
+	space.SetSpaceCommitId(cmd.CommitId)
+	space.SetNoApplicationFile(cmd.NoApplicationFile)
 
 	// step2
 	info := spacerepo.ProjectPropertyUpdateInfo{

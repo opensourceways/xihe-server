@@ -110,6 +110,7 @@ type ProjectPropertyItem struct {
 
 	CommitId          string `bson:"commit_id"           json:"commit_id"`
 	NoApplicationFile bool   `bson:"no_application_file" json:"no_application_file"`
+	Exception         string `bson:"exception"           json:"exception"`
 }
 
 func (doc *ProjectPropertyItem) setDefault() {

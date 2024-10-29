@@ -95,6 +95,7 @@ func (col project) UpdateProperty(do *repositoryimpl.ProjectPropertyDO) error {
 		TagKinds:          do.TagKinds,
 		CommitId:          do.CommitId,
 		NoApplicationFile: do.NoApplicationFile,
+		Exception:         do.Exception,
 	}
 
 	p.setDefault()
