@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"io"
 
 	"github.com/gin-gonic/gin"
@@ -284,7 +283,6 @@ func (ctl *InferenceController) GetRealTimeSpaceLog(ctx *gin.Context) {
 func (ctl *InferenceController) CanRead(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
-		fmt.Printf("not ok====================================")
 		return
 	}
 
@@ -292,7 +290,6 @@ func (ctl *InferenceController) CanRead(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("====================================index: %+v\n", index)
 
 	if err := ctl.appService.CheckPermissionRead(ctx.Request.Context(), pl.DomainAccount(), &index); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

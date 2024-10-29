@@ -71,15 +71,15 @@ func (s *spaceappAppService) GetByName(
 		return dto, err
 	}
 
-	app, err := s.repo.FindBySpaceId(spaceId)
-	if err == nil {
-		return toSpaceAppDTO(&app), nil
-	}
-
 	fmt.Printf("space.Exception.Exception()=====================================: %v\n", space.Exception.Exception())
 
 	if space.Exception.Exception() != "" {
 		return toSpaceDTO(&space), nil
+	}
+
+	app, err := s.repo.FindBySpaceId(spaceId)
+	if err == nil {
+		return toSpaceAppDTO(&app), nil
 	}
 
 	// FIXME:

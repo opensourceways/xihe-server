@@ -62,7 +62,7 @@ func (impl project) Save(p *spacedomain.Project) (r spacedomain.Project, err err
 		return
 	}
 	n := impl.toProjectDO(p)
-	fmt.Printf("new space -==================================================: %+v\n", n)
+
 	fmt.Printf("n.Hardware: %+v\n", n.Hardware)
 	v, err := impl.mapper.Insert(impl.toProjectDO(p))
 	if err != nil {

@@ -232,7 +232,6 @@ func (ctl baseController) checkUserApiTokenBase(
 	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
 	token, err := ctl.getCookieToken(ctx)
-	fmt.Printf("===========================token: %+v\n", token)
 	if err != nil {
 		return
 	}
@@ -241,7 +240,6 @@ func (ctl baseController) checkUserApiTokenBase(
 	if err != nil {
 		return
 	}
-	fmt.Printf("csrftoken:========================================== %+v\n", csrftoken)
 
 	pl = new(oldUserTokenPayload)
 
@@ -399,8 +397,6 @@ func (ctl *baseController) getCookieToken(ctx *gin.Context) (token string, err e
 		logrus.Warnf("failed to get cookie token %s", err)
 		return "", nil
 	}
-
-	fmt.Printf("private token ==================================u: %+v\n", u)
 
 	// insert encode username to context
 	ctx.Set(encodeUsername, u)
