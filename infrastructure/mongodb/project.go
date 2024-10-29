@@ -301,6 +301,7 @@ func (col project) toProjectDO(owner string, item *projectItem, do *repositoryim
 		BaseImage:         item.BaseImage,
 		CommitId:          item.CommitId,
 		NoApplicationFile: item.NoApplicationFile,
+		Exception:         item.Exception,
 
 		RelatedModels:   toResourceIndexDO(item.RelatedModels),
 		RelatedDatasets: toResourceIndexDO(item.RelatedDatasets),
