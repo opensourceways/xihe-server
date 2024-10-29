@@ -116,7 +116,9 @@ func (s *spaceappAppService) GetBuildLogs(ctx context.Context, user domain.Accou
 		return
 	}
 
-	dto.Logs = spaceApp.AppLogURL.URL()
+	if spaceApp.AppLogURL != nil {
+		dto.Logs = spaceApp.AppLogURL.URL()
+	}
 
 	return
 }
