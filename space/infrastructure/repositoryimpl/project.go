@@ -299,9 +299,7 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 		}
 	}
 
-	if r.Exception, err = domain.NewException(do.Exception); err != nil {
-		return
-	}
+	r.Exception = domain.CreateException(do.Exception)
 
 	r.Level = domain.NewResourceLevelByNum(do.Level)
 	r.RepoId = do.RepoId
