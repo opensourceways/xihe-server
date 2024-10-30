@@ -138,17 +138,18 @@ func (m *Project) PreCheck() error {
 }
 
 type ProjectModifiableProperty struct {
-	Name              domain.ResourceName
-	Desc              domain.ResourceDesc
-	Title             domain.ResourceTitle
-	CoverId           domain.CoverId
-	RepoType          domain.RepoType
-	Tags              []string
-	TagKinds          []string
-	Level             domain.ResourceLevel
-	CommitId          string
-	NoApplicationFile bool
-	Exception         domain.Exception
+	Name               domain.ResourceName
+	Desc               domain.ResourceDesc
+	Title              domain.ResourceTitle
+	CoverId            domain.CoverId
+	RepoType           domain.RepoType
+	Tags               []string
+	TagKinds           []string
+	Level              domain.ResourceLevel
+	CommitId           string
+	NoApplicationFile  bool
+	Exception          domain.Exception
+	CompPowerAllocated bool
 }
 
 type ProjectSummary struct {

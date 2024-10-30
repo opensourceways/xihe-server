@@ -175,25 +175,26 @@ func (impl project) GetSummaryByName(owner domain.Account, name domain.ResourceN
 
 func (impl project) toProjectDO(p *spacedomain.Project) ProjectDO {
 	do := ProjectDO{
-		Id:                p.Id,
-		Owner:             p.Owner.Account(),
-		Name:              p.Name.ResourceName(),
-		FL:                p.Name.FirstLetterOfName(),
-		Type:              p.Type.ProjType(),
-		CoverId:           p.CoverId.CoverId(),
-		RepoType:          p.RepoType.RepoType(),
-		Protocol:          p.Protocol.ProtocolName(),
-		Training:          p.Training.TrainingPlatform(),
-		Tags:              p.Tags,
-		TagKinds:          p.TagKinds,
-		RepoId:            p.RepoId,
-		CreatedAt:         p.CreatedAt,
-		UpdatedAt:         p.UpdatedAt,
-		Version:           p.Version,
-		Hardware:          p.Hardware.Hardware(),
-		BaseImage:         p.BaseImage.BaseImage(),
-		CommitId:          p.CommitId,
-		NoApplicationFile: p.NoApplicationFile,
+		Id:                 p.Id,
+		Owner:              p.Owner.Account(),
+		Name:               p.Name.ResourceName(),
+		FL:                 p.Name.FirstLetterOfName(),
+		Type:               p.Type.ProjType(),
+		CoverId:            p.CoverId.CoverId(),
+		RepoType:           p.RepoType.RepoType(),
+		Protocol:           p.Protocol.ProtocolName(),
+		Training:           p.Training.TrainingPlatform(),
+		Tags:               p.Tags,
+		TagKinds:           p.TagKinds,
+		RepoId:             p.RepoId,
+		CreatedAt:          p.CreatedAt,
+		UpdatedAt:          p.UpdatedAt,
+		Version:            p.Version,
+		Hardware:           p.Hardware.Hardware(),
+		BaseImage:          p.BaseImage.BaseImage(),
+		CommitId:           p.CommitId,
+		NoApplicationFile:  p.NoApplicationFile,
+		CompPowerAllocated: p.CompPowerAllocated,
 	}
 
 	if p.Desc != nil {
@@ -229,9 +230,10 @@ type ProjectDO struct {
 	ForkCount     int
 	DownloadCount int
 
-	CommitId          string
-	NoApplicationFile bool
-	Exception         string
+	CommitId           string
+	NoApplicationFile  bool
+	Exception          string
+	CompPowerAllocated bool
 
 	Hardware  string
 	BaseImage string
