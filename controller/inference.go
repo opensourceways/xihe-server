@@ -2,10 +2,12 @@ package controller
 
 import (
 	"io"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -103,6 +105,10 @@ func (ctl *InferenceController) Get(ctx *gin.Context) {
 	}
 
 	if dto, err := ctl.appService.GetByName(ctx.Request.Context(), pl.DomainAccount(), &cmd); err != nil {
+		if err, ok := allerror.IsNotFound(err); ok {
+			ctx.JSON(http.StatusNotFound, newResponseCodeError(err.ErrorCode(), err))
+			return
+		}
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, &dto)
@@ -145,6 +151,10 @@ func (ctl *InferenceController) GetBuildLogs(ctx *gin.Context) {
 	}
 
 	if dto, err := ctl.appService.GetBuildLogs(ctx.Request.Context(), pl.DomainAccount(), &index); err != nil {
+		if err, ok := allerror.IsNotFound(err); ok {
+			ctx.JSON(http.StatusNotFound, newResponseCodeError(err.ErrorCode(), err))
+			return
+		}
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, &dto)
