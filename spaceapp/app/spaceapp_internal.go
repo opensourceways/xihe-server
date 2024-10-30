@@ -365,14 +365,13 @@ func (s inferenceService) getSpaceApp(cmd CmdToCreateApp) (domain.SpaceApp, erro
 		return domain.SpaceApp{}, err
 	}
 
-	// FIXME:
-	// if space.CommitId != cmd.CommitId {
-	// 	err = allerror.New(allerror.ErrorCodeSpaceCommitConflict, "commit conflict",
-	// 		xerrors.Errorf("spaceId:%s commit conflict", space.Id.Identity()))
-	// 	logrus.Errorf("spaceId:%s latest commitId:%s, old commitId:%s, err:%s",
-	// 		cmd.SpaceId.Identity(), space.CommitId, cmd.CommitId, err)
-	// 	return domain.SpaceApp{}, err
-	// }
+	if space.CommitId != cmd.CommitId {
+		err = allerror.New(allerror.ErrorCodeSpaceCommitConflict, "commit conflict",
+			xerrors.Errorf("spaceId:%s commit conflict", space.RepoId))
+		logrus.Errorf("spaceId:%s latest commitId:%s, old commitId:%s, err:%s",
+			cmd.SpaceId.Identity(), space.CommitId, cmd.CommitId, err)
+		return domain.SpaceApp{}, err
+	}
 
 	spaceId, err := types.NewIdentity(space.RepoId)
 	if err != nil {
