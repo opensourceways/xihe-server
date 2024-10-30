@@ -81,10 +81,9 @@ func (s *spaceappAppService) GetByName(
 
 	logrus.Errorf("find by space id, err: %+v", err)
 
-	// FIXME:
-	// if space.Hardware.IsNpu() && !space.CompPowerAllocated {
-	// 	return toSpaceNoCompQuotaDTO(&space), nil
-	// }
+	if space.Hardware.IsNpu() && !space.CompPowerAllocated {
+		return toSpaceNoCompQuotaDTO(&space), nil
+	}
 
 	if commonrepo.IsErrorResourceNotExists(err) {
 		err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)

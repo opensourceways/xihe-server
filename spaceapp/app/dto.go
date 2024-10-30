@@ -2,6 +2,7 @@ package app
 
 import (
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
+	types "github.com/opensourceways/xihe-server/domain"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain"
 )
@@ -76,8 +77,17 @@ func toSpaceDTO(space *spacedomain.Project) SpaceAppDTO {
 	dto := SpaceAppDTO{
 		Id:     space.Id,
 		Status: space.Exception.Exception(),
-		Reason: domain.ExceptionMap[space.Exception.Exception()],
+		Reason: types.ExceptionMap[space.Exception.Exception()],
 	}
 
+	return dto
+}
+
+func toSpaceNoCompQuotaDTO(space *spacedomain.Project) SpaceAppDTO {
+	dto := SpaceAppDTO{
+		Id:     space.Id,
+		Status: types.NoCompQuotaException,
+		Reason: types.ExceptionMap[types.NoCompQuotaException],
+	}
 	return dto
 }
