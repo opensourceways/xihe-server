@@ -491,6 +491,8 @@ func (s projectService) toProjectDTO(p *spacedomain.Project, dto *ProjectDTO) {
 		LikeCount:     p.LikeCount,
 		ForkCount:     p.ForkCount,
 		DownloadCount: p.DownloadCount,
+		BaseImage:     p.BaseImage.BaseImage(),
+		Hardware:      p.Hardware.Hardware(),
 	}
 
 	if p.CommitId != "" {

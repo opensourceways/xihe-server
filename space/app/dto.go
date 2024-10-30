@@ -52,6 +52,8 @@ type ProjectDTO struct {
 	ForkCount     int      `json:"fork_count"`
 	DownloadCount int      `json:"download_count"`
 	CommitId      string   `json:"commit_id"`
+	BaseImage     string   `json:"base_image"`
+	Hardware      string   `json:"hardware"`
 }
 
 type ProjectDetailDTO struct {
