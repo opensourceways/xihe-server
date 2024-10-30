@@ -2,7 +2,6 @@ package repositoryimpl
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -61,9 +60,7 @@ func (impl project) Save(p *spacedomain.Project) (r spacedomain.Project, err err
 
 		return
 	}
-	n := impl.toProjectDO(p)
 
-	fmt.Printf("n.Hardware: %+v\n", n.Hardware)
 	v, err := impl.mapper.Insert(impl.toProjectDO(p))
 	if err != nil {
 		err = repositories.ConvertError(err)

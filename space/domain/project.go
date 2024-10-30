@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"fmt"
-
 	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
 
@@ -131,7 +129,7 @@ func (m *Project) PreCheck() error {
 
 		err := allerror.New(allerror.ErrorCodeSpaceAppCreateFailed, e.Error(), e)
 		logrus.Errorf("spaceId：%s create space failed, err:%s", m.RepoId, err)
-		fmt.Printf("pre check====================================err: %v\n", err)
+
 		return err
 	}
 	return nil

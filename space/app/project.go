@@ -2,7 +2,6 @@ package app
 
 import (
 	"errors"
-	"fmt"
 
 	sdk "github.com/opensourceways/xihe-sdk/space"
 	"github.com/sirupsen/logrus"
@@ -349,7 +348,6 @@ func (s projectService) GetByName(
 func (s projectService) GetByRepoId(id domain.Identity) (sdk.SpaceMetaDTO, error) {
 	v, err := s.repo.GetByRepoId(id)
 
-	fmt.Printf("sdk result ====================v: %+v\n", v)
 	if err != nil {
 		return sdk.SpaceMetaDTO{}, err
 	}

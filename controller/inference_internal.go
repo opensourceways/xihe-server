@@ -85,8 +85,6 @@ func (ctl *InferenceInternalController) Create(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Printf("=====================cmd: %+v\n", cmd)
-
 	if err := ctl.s.Create(ctx, cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {

@@ -96,7 +96,6 @@ type inferenceService struct {
 }
 
 func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error {
-	fmt.Printf("====================================cmd: %+v\n", cmd)
 	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
 	if err != nil {
 		return err
@@ -133,7 +132,6 @@ func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error 
 		logrus.Errorf("spaceId:%s create space app db failed, err:%s", space.Id, err)
 		return err
 	}
-	fmt.Println("success ====================================== add ======================= space ================================ app")
 
 	if err := s.spacesender.SendSpaceAppCreateMsg(&domain.SpaceAppCreateEvent{
 		Id:       cmd.SpaceId.Identity(),
@@ -141,8 +139,6 @@ func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error 
 	}); err != nil {
 		return err
 	}
-
-	fmt.Println("success ====================================== send ======================= space ================================ create")
 
 	return nil
 }

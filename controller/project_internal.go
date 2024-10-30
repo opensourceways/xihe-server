@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -85,9 +84,6 @@ func (ctl *ProjectInternalController) GetSpaceById(ctx *gin.Context) {
 
 		return
 	}
-
-	fmt.Printf("id: %v\n", id)
-	fmt.Printf("err: %v\n", err)
 
 	ctx.JSON(http.StatusOK, newResponseData(proj))
 }

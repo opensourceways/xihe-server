@@ -3,7 +3,6 @@ package controller
 import (
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"strconv"
@@ -247,7 +246,6 @@ func (ctl baseController) checkUserApiTokenBase(
 		// try best to grab userinfo
 		if token != "" {
 			_, _, _ = ctl.checkToken(ctx, token, pl)
-			fmt.Printf("pl: %+v\n", pl)
 		}
 		if allowVistor {
 			visitor = true

@@ -5,7 +5,6 @@ Copyright (c) Huawei Technologies Co., Ltd. 2023. All rights reserved
 package domain
 
 import (
-	"fmt"
 	"strings"
 
 	"golang.org/x/xerrors"
@@ -28,16 +27,11 @@ type BaseImage interface {
 func NewBaseImage(v string, hardware string) (BaseImage, error) {
 	v = strings.ToLower(strings.TrimSpace(v))
 	hardware = strings.ToLower(strings.TrimSpace(hardware))
-	fmt.Printf("hardware: %+v\n", hardware)
-	fmt.Printf("baseImages: %+v\n", baseImages)
-	fmt.Printf("baseImages[hardware]: %+v\n", baseImages[hardware])
 
 	if _, ok := baseImages[hardware]; hardware == "" || !ok {
-		fmt.Printf("ok: %+v\n", ok)
 		return nil, xerrors.Errorf("unsupported hardware: %s", hardware)
 	}
 
-	fmt.Printf("baseImages[hardware].Has(v): %v\n", baseImages[hardware].Has(v))
 	if v == "" || !baseImages[hardware].Has(v) {
 		return nil, xerrors.Errorf("%s unsupported base image: %s", hardware, v)
 	}
