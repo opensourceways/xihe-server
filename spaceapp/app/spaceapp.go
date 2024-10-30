@@ -107,7 +107,7 @@ func (s *spaceappAppService) GetBuildLogs(ctx context.Context, user domain.Accou
 		return
 	}
 
-	spaceApp, err := s.repo.FindById(app.Id)
+	dto.Logs, err = s.repo.FindAllBuildLogById(app.Id)
 	if err != nil {
 		if commonrepo.IsErrorResourceNotExists(err) {
 			err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)
@@ -116,10 +116,6 @@ func (s *spaceappAppService) GetBuildLogs(ctx context.Context, user domain.Accou
 		}
 
 		return
-	}
-
-	if spaceApp.AppLogURL != nil {
-		dto.Logs = spaceApp.AppLogURL.URL()
 	}
 
 	return
