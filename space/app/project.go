@@ -495,7 +495,7 @@ func (s projectService) toProjectDTO(p *spacedomain.Project, dto *ProjectDTO) {
 		DownloadCount: p.DownloadCount,
 		BaseImage:     p.BaseImage.BaseImage(),
 		Hardware:      p.Hardware.Hardware(),
-		IsNPU:         p.Hardware.IsCpu(),
+		IsNpu:         p.Hardware.IsCpu(),
 	}
 
 	if p.CommitId != "" {
@@ -523,6 +523,7 @@ func (s projectService) toProjectSummaryDTO(p *spacedomain.ProjectSummary, dto *
 		LikeCount:     p.LikeCount,
 		ForkCount:     p.ForkCount,
 		DownloadCount: p.DownloadCount,
+		IsNpu:         p.Hardware.IsCpu(),
 	}
 
 	if p.Desc != nil {

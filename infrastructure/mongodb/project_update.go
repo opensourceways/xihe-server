@@ -191,5 +191,7 @@ func (col project) toProjectSummaryDO(owner string, item *projectItem, do *repos
 		LikeCount:     item.LikeCount,
 		ForkCount:     item.ForkCount,
 		DownloadCount: item.DownloadCount,
+		Hardware:      item.HardwareType,
+		Type:          item.Type,
 	}
 }

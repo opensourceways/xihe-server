@@ -158,6 +158,7 @@ type ProjectSummary struct {
 	Title         domain.ResourceTitle
 	Level         domain.ResourceLevel
 	CoverId       domain.CoverId
+	Hardware      domain.Hardware
 	Tags          []string
 	UpdatedAt     int64
 	LikeCount     int

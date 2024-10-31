@@ -225,6 +225,8 @@ type ProjectSummaryDO struct {
 	LikeCount     int
 	ForkCount     int
 	DownloadCount int
+	Hardware      string
+	Type          string
 }
 
 func (do *ProjectSummaryDO) toProjectSummary(r *spacedomain.ProjectSummary) (err error) {
@@ -247,6 +249,10 @@ func (do *ProjectSummaryDO) toProjectSummary(r *spacedomain.ProjectSummary) (err
 	}
 
 	if r.CoverId, err = domain.NewCoverId(do.CoverId); err != nil {
+		return
+	}
+
+	if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
 		return
 	}
 

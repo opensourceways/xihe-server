@@ -31,6 +31,7 @@ type ProjectSummaryDTO struct {
 	LikeCount     int      `json:"like_count"`
 	ForkCount     int      `json:"fork_count"`
 	DownloadCount int      `json:"download_count"`
+	IsNpu         bool     `json:"is_npu"`
 }
 
 type ProjectDTO struct {
@@ -54,7 +55,7 @@ type ProjectDTO struct {
 	CommitId      string   `json:"commit_id"`
 	BaseImage     string   `json:"base_image"`
 	Hardware      string   `json:"hardware"`
-	IsNPU         bool     `json:"is_npu"`
+	IsNpu         bool     `json:"is_npu"`
 }
 
 type ProjectDetailDTO struct {
