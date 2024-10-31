@@ -54,6 +54,7 @@ type ProjectDTO struct {
 	CommitId      string   `json:"commit_id"`
 	BaseImage     string   `json:"base_image"`
 	Hardware      string   `json:"hardware"`
+	IsNPU         bool     `json:"is_npu"`
 }
 
 type ProjectDetailDTO struct {
