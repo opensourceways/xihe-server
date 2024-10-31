@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
+
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/domain"
@@ -12,8 +15,6 @@ import (
 	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 	spacemesage "github.com/opensourceways/xihe-server/spaceapp/domain/message"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/repository"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/xerrors"
 )
 
 // SpaceappAppService is the interface for the space app service.

@@ -8,18 +8,9 @@ import (
 )
 
 type InferenceDTO struct {
-	expiry     int64
 	Error      string `json:"error"`
 	AccessURL  string `json:"access_url"`
 	InstanceId string `json:"inference_id"`
-}
-
-func (dto *InferenceDTO) hasResult() bool {
-	return dto.InstanceId != ""
-}
-
-func (dto *InferenceDTO) canReuseCurrent() bool {
-	return dto.AccessURL != ""
 }
 
 // CmdToNotifyServiceIsStarted is a command to notify that the service has started.

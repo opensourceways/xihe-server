@@ -11,7 +11,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
-	"github.com/opensourceways/xihe-server/domain/repository"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
 	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
@@ -60,29 +59,6 @@ type InferenceController struct {
 	inferenceDir      domain.Directory
 	inferenceBootFile domain.FilePath
 	whitelist         userapp.WhiteListService
-}
-
-func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid string) (level string, err error) {
-	resources, err := ctl.project.FindUserProjects(
-		[]repository.UserResourceListOption{
-			{
-				Owner: owner,
-				Ids: []string{
-					pid,
-				},
-			},
-		},
-	)
-
-	if err != nil || len(resources) < 1 {
-		return
-	}
-
-	if resources[0].Level != nil {
-		level = resources[0].Level.ResourceLevel()
-	}
-
-	return
 }
 
 // @Summary  Get
