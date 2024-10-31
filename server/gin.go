@@ -270,8 +270,13 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityAccountAdapter(),
 	)
 
+	err = spacerepo.Init(pgsql.DB(), &cfg.Space.Tables)
+	if err != nil {
+		return err
+	}
+
 	projectService := spaceapp.NewProjectService(
-		user, proj, model, dataset, activity, nil, resProducer, computilityService,
+		user, proj, spacerepo.ProjectAdapter(), model, dataset, activity, nil, resProducer, computilityService,
 	)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
@@ -324,11 +329,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService,
+			newPlatformRepository, computilityService, spacerepo.ProjectAdapter(),
 		)
 		controller.AddRouterForProjectInternalController(
 			internal, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService,
+			newPlatformRepository, computilityService, spacerepo.ProjectAdapter(),
 		)
 
 		controller.AddRouterForModelController(

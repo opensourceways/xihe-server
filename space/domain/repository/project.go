@@ -57,3 +57,6 @@ type Project interface {
 	IncreaseFork(*domain.ResourceIndex) error
 	IncreaseDownload(*domain.ResourceIndex) error
 }
+type ProjectPg interface {
+	Save(*spacedomain.Project) (spacedomain.Project, error)
+}

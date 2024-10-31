@@ -125,6 +125,7 @@ type ProjectService interface {
 func NewProjectService(
 	user userrepo.User,
 	repo spacerepo.Project,
+	repoPg spacerepo.ProjectPg,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -134,6 +135,7 @@ func NewProjectService(
 ) ProjectService {
 	return projectService{
 		repo:     repo,
+		repoPg:   repoPg,
 		activity: activity,
 		sender:   sender,
 		rs: app.ResourceService{
@@ -147,7 +149,8 @@ func NewProjectService(
 }
 
 type projectService struct {
-	repo spacerepo.Project
+	repo   spacerepo.Project
+	repoPg spacerepo.ProjectPg
 	//pr       platform.Repository
 	activity       repository.Activity
 	sender         message.ResourceProducer
@@ -193,7 +196,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	// step2: save
 	v.RepoId = pid
 
-	p, err := s.repo.Save(v)
+	p, err := s.repoPg.Save(v)
 	if err != nil {
 		return
 	}
