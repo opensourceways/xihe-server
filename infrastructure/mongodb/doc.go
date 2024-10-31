@@ -61,6 +61,7 @@ const (
 	fieldPictures       = "pictures"
 	fieldChoices        = "choices"
 	fieldCompletions    = "completions"
+	fieldHardwareType   = "hardware_type"
 )
 
 type dProject struct {

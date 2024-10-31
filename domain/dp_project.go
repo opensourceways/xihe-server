@@ -2,7 +2,6 @@ package domain
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 )
 
@@ -118,9 +117,6 @@ type Hardware interface {
 func NewHardware(v string, sdk string) (Hardware, error) {
 	v = strings.ToLower(strings.TrimSpace(v))
 	sdk = strings.ToLower(strings.TrimSpace(sdk))
-
-	fmt.Printf("==========================v: %+v\n", v)
-	fmt.Printf("===============================sdk: %v\n", sdk)
 
 	if _, ok := sdkObjects[sdk]; sdk == "" || !ok {
 		return nil, errors.New("unsupported sdk")

@@ -1,8 +1,6 @@
 package mongodb
 
 import (
-	"fmt"
-
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
 )
@@ -175,13 +173,11 @@ func (col project) listResource(
 func (col project) summaryFields() []string {
 	return []string{
 		fieldId, fieldName, fieldDesc, fieldTitle, fieldCoverId, fieldTags, fieldFirstLetter,
-		fieldUpdatedAt, fieldLikeCount, fieldForkCount, fieldDownloadCount, fieldLevel,
+		fieldUpdatedAt, fieldLikeCount, fieldForkCount, fieldDownloadCount, fieldLevel, fieldType, fieldHardwareType,
 	}
 }
 
 func (col project) toProjectSummaryDO(owner string, item *projectItem, do *repositoryimpl.ProjectSummaryDO) {
-	fmt.Printf("item.Type========================: %+v\n", item.Type)
-	fmt.Printf("item.HardwareType==================: %v\n", item.HardwareType)
 	*do = repositoryimpl.ProjectSummaryDO{
 		Id:            item.Id,
 		Owner:         owner,
