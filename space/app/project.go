@@ -277,6 +277,10 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 			logrus.Infof("release quota after user:%s npu space:%s delete", r.Owner.Account(), r.Id)
 
 			rid, err := domain.NewIdentity(r.RepoId)
+			if err != nil {
+				return err
+			}
+
 			c := computilityapp.CmdToUserQuotaUpdate{
 				Index: computilitydomain.ComputilityAccountRecordIndex{
 					UserName:    r.Owner,

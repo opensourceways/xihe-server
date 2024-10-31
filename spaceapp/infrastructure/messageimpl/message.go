@@ -19,6 +19,6 @@ func (impl *messageAdapter) SendSpaceAppCreateMsg(v *domain.SpaceAppCreateEvent)
 }
 
 type Topics struct {
-	// aicc finetune create
+	// space app create
 	SpaceAppCreated string `json:"spaceapp_created"`
 }

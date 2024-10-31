@@ -129,19 +129,6 @@ func getResourceById(collection, owner, rid string, result interface{}) error {
 }
 
 func getResourceByIdOnly(collection, rid string, result interface{}) error {
-	// filter := bson.M{
-	// 	"items.repo_id": rid, // 假设你的数组元素中有一个名为 "repo_id" 的字段
-	// }
-	// opts := options.Find()
-	// opts.SetProjection(bson.M{"items": 1, "owner": 1}) // 只返回匹配的数组元素
-
-	// // 假设 cli 是 *mongo.Collection 类型的实例
-	// f := func(ctx context.Context) error {
-	// 	return cli.getDocs(ctx, collection, filter, opts, result)
-	// }
-
-	// return withContext(f)
-
 	pipeline := []bson.M{
 		{
 			"$match": bson.M{"items.repo_id": rid},
@@ -165,13 +152,7 @@ func getResourceByIdOnly(collection, rid string, result interface{}) error {
 		return err
 	}
 
-	// 迭代结果
-	if err = cur.All(context.TODO(), result); err != nil {
-		return err
-
-	}
-
-	return nil
+	return cur.All(context.TODO(), result)
 }
 
 func getResourceSummary(collection, owner, rId string, result interface{}) error {
