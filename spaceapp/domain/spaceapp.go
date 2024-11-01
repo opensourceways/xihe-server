@@ -44,6 +44,7 @@ func (app *SpaceApp) StartServing(appURL AppURL, logURL domain.URL) error {
 	}
 
 	e := fmt.Errorf("old status is %s, can not set", app.Status.AppStatus())
+
 	return allerror.New(allerror.ErrorCodeSpaceAppUnmatchedStatus, e.Error(), e)
 }
 
@@ -52,6 +53,7 @@ func (app *SpaceApp) GetFailedReason() string {
 	if !app.Status.IsUpdateStatusAccept() {
 		return ""
 	}
+
 	return app.Reason
 }
 

@@ -39,6 +39,7 @@ func (impl *streamTransfer) readAndWriteOnce() ([]byte, error) {
 	if len(event.Data) == 0 {
 		return nil, nil
 	}
+
 	return event.Data, nil
 }
 
