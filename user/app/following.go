@@ -41,7 +41,7 @@ func (s userService) ListFollowing(cmd *FollowsListCmd) (
 
 	dtos := make([]FollowDTO, len(items))
 	for i := range items {
-		s.toFollowDTO(&items[i], &dtos[i])
+		toFollowDTO(&items[i], &dtos[i])
 	}
 
 	dto.Total = v.Total

@@ -74,12 +74,6 @@ func (s loginService) Get(account domain.Account) (dto LoginDTO, err error) {
 	return
 }
 
-func (s loginService) toLoginDTO(u *domain.Login, dto *LoginDTO) {
-	dto.Info = u.Info
-	dto.Email = u.Email.Email()
-	dto.UserId = u.UserId
-}
-
 func (s loginService) SignIn(account domain.Account) error {
 	return s.sender.SendUserSignedIn(&domain.UserSignedInEvent{Account: account})
 }
