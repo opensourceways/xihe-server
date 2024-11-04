@@ -151,7 +151,9 @@ func main() {
 	app.Init(&cfg.Agreement)
 
 	// cfg
-	cfg.InitDomainConfig()
+	if err := cfg.InitDomainConfig(); err != nil {
+		logrus.Fatalf("init domain config failed, err:%s", err.Error())
+	}
 	cfg.InitAppConfig()
 
 	// run

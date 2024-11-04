@@ -15,6 +15,7 @@ type ProjectMapper interface {
 	Delete(*repositories.ResourceIndexDO) error
 	Get(string, string) (ProjectDO, error)
 	GetByName(string, string) (ProjectDO, error)
+	GetByRepoId(string) (ProjectDO, error)
 	GetSummary(string, string) (ProjectResourceSummaryDO, error)
 	GetSummaryByName(string, string) (repositories.ResourceSummaryDO, error)
 
@@ -105,6 +106,19 @@ func (impl project) GetByName(owner domain.Account, name domain.ResourceName) (
 	return
 }
 
+func (impl project) GetByRepoId(id domain.Identity) (
+	r spacedomain.Project, err error,
+) {
+	v, err := impl.mapper.GetByRepoId(id.Identity())
+	if err != nil {
+		err = repositories.ConvertError(err)
+	} else {
+		err = v.toProject(&r)
+	}
+
+	return
+}
+
 func (impl project) FindUserProjects(opts []repository.UserResourceListOption) (
 	[]spacedomain.ProjectSummary, error,
 ) {
@@ -158,21 +172,26 @@ func (impl project) GetSummaryByName(owner domain.Account, name domain.ResourceN
 
 func (impl project) toProjectDO(p *spacedomain.Project) ProjectDO {
 	do := ProjectDO{
-		Id:        p.Id,
-		Owner:     p.Owner.Account(),
-		Name:      p.Name.ResourceName(),
-		FL:        p.Name.FirstLetterOfName(),
-		Type:      p.Type.ProjType(),
-		CoverId:   p.CoverId.CoverId(),
-		RepoType:  p.RepoType.RepoType(),
-		Protocol:  p.Protocol.ProtocolName(),
-		Training:  p.Training.TrainingPlatform(),
-		Tags:      p.Tags,
-		TagKinds:  p.TagKinds,
-		RepoId:    p.RepoId,
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
-		Version:   p.Version,
+		Id:                 p.Id,
+		Owner:              p.Owner.Account(),
+		Name:               p.Name.ResourceName(),
+		FL:                 p.Name.FirstLetterOfName(),
+		Type:               p.Type.ProjType(),
+		CoverId:            p.CoverId.CoverId(),
+		RepoType:           p.RepoType.RepoType(),
+		Protocol:           p.Protocol.ProtocolName(),
+		Training:           p.Training.TrainingPlatform(),
+		Tags:               p.Tags,
+		TagKinds:           p.TagKinds,
+		RepoId:             p.RepoId,
+		CreatedAt:          p.CreatedAt,
+		UpdatedAt:          p.UpdatedAt,
+		Version:            p.Version,
+		Hardware:           p.Hardware.Hardware(),
+		BaseImage:          p.BaseImage.BaseImage(),
+		CommitId:           p.CommitId,
+		NoApplicationFile:  p.NoApplicationFile,
+		CompPowerAllocated: p.CompPowerAllocated,
 	}
 
 	if p.Desc != nil {
@@ -207,6 +226,14 @@ type ProjectDO struct {
 	LikeCount     int
 	ForkCount     int
 	DownloadCount int
+
+	CommitId           string
+	NoApplicationFile  bool
+	Exception          string
+	CompPowerAllocated bool
+
+	Hardware  string
+	BaseImage string
 
 	RelatedModels   []repositories.ResourceIndexDO
 	RelatedDatasets []repositories.ResourceIndexDO
@@ -259,6 +286,16 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 		return
 	}
 
+	if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
+		return
+	}
+
+	if r.BaseImage, err = domain.NewBaseImage(do.BaseImage, do.Hardware); err != nil {
+		return
+	}
+
+	r.Exception = domain.CreateException(do.Exception)
+
 	r.Level = domain.NewResourceLevelByNum(do.Level)
 	r.RepoId = do.RepoId
 	r.Tags = do.Tags
@@ -269,6 +306,9 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 	r.LikeCount = do.LikeCount
 	r.ForkCount = do.ForkCount
 	r.DownloadCount = do.DownloadCount
+	r.CommitId = do.CommitId
+	r.NoApplicationFile = do.NoApplicationFile
+	r.CompPowerAllocated = do.CompPowerAllocated
 
 	return
 }

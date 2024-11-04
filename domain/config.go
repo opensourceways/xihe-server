@@ -2,14 +2,47 @@ package domain
 
 import (
 	"errors"
+	"strings"
 
+	"github.com/bwmarrin/snowflake"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 var DomainConfig Config
+var (
+	sdkObjects map[string]sets.Set[string]
+	baseImages map[string]sets.Set[string]
+	node       *snowflake.Node
+)
 
-func Init(cfg *Config) {
+func Init(cfg *Config) (err error) {
 	DomainConfig = *cfg
+
+	sdkObjects = make(map[string]sets.Set[string])
+	for _, sdkobj := range cfg.SDKObjects {
+		sdkType := strings.ToLower(sdkobj.SdkType)
+		for i, hardware := range sdkobj.Hardware {
+			sdkobj.Hardware[i] = strings.ToLower(hardware)
+		}
+
+		sdkObjects[sdkType] = sets.New[string]()
+		sdkObjects[sdkType].Insert(sdkobj.Hardware...)
+	}
+
+	baseImages = make(map[string]sets.Set[string])
+	for _, img := range cfg.BaseImages {
+		hardwareType := strings.ToLower(img.HardwareType)
+		for i, baseImage := range img.BaseImage {
+			img.BaseImage[i] = strings.ToLower(baseImage)
+		}
+
+		baseImages[hardwareType] = sets.New[string]()
+		baseImages[hardwareType].Insert(img.BaseImage...)
+	}
+
+	node, err = snowflake.NewNode(1)
+
+	return
 }
 
 type Config struct {
@@ -45,6 +78,19 @@ type Config struct {
 
 	// Key is the finetue model name
 	Finetunes map[string]FinetuneParameterConfig `json:"finetunes"`
+
+	SDKObjects []SDKObject     `json:"sdk"`
+	BaseImages []baseImageConf `json:"base_image"   required:"true"`
+}
+
+type baseImageConf struct {
+	HardwareType string   `json:"type"        required:"true"`
+	BaseImage    []string `json:"base_image"    required:"true"`
+}
+
+type SDKObject struct {
+	SdkType  string   `json:"type"        required:"true"`
+	Hardware []string `json:"hardware"    required:"true"`
 }
 
 func (cfg *Config) SetDefault() {

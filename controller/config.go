@@ -76,6 +76,10 @@ type APIConfig struct {
 	MaxTagKindsNumToSearchResource int    `json:"max_tag_kinds_num_to_search_resource"`
 	MaxFinetuneSubmmitFileSize     int64  `json:"max_finetune_submmit_file_size"`
 	LocalDomainCookie              bool   `json:"local_domain_cookie"`
+
+	InternalTokenHash string `json:"internal_token_hash" required:"true"`
+	InternalTokeSalt  string `json:"internal_token_salt" required:"true"`
+	InternalHeader    string `json:"internal_token_header" required:"true"`
 }
 
 func (cfg *APIConfig) SetDefault() {

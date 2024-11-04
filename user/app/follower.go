@@ -21,26 +21,11 @@ func (s userService) ListFollower(cmd *FollowsListCmd) (
 
 	dtos := make([]FollowDTO, len(items))
 	for i := range items {
-		s.toFollowDTO(&items[i], &dtos[i])
+		toFollowDTO(&items[i], &dtos[i])
 	}
 
 	dto.Total = len(dtos)
 	dto.Data = dtos
 
 	return
-}
-
-func (s userService) toFollowDTO(f *domain.FollowerUserInfo, dto *FollowDTO) {
-	*dto = FollowDTO{
-		Account:    f.Account.Account(),
-		IsFollower: f.IsFollower,
-	}
-
-	if f.Bio != nil {
-		dto.Bio = f.Bio.Bio()
-	}
-
-	if f.AvatarId != nil {
-		dto.AvatarId = f.AvatarId.AvatarId()
-	}
 }

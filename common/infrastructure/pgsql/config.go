@@ -7,15 +7,16 @@ import (
 
 // DbLife: the unit is minute
 type Config struct {
-	Host    string `json:"host"     required:"true"`
-	User    string `json:"user"     required:"true"`
-	Pwd     string `json:"pwd"      required:"true"`
-	Name    string `json:"name"     required:"true"`
-	Port    int    `json:"port"     required:"true"`
-	Life    int    `json:"life"     required:"true"`
-	MaxConn int    `json:"max_conn" required:"true"`
-	MaxIdle int    `json:"max_idle" required:"true"`
-	DBCert  string `json:"db_cert"  required:"true"`
+	Host    string    `json:"host"     required:"true"`
+	User    string    `json:"user"     required:"true"`
+	Pwd     string    `json:"pwd"      required:"true"`
+	Name    string    `json:"name"     required:"true"`
+	Port    int       `json:"port"     required:"true"`
+	Life    int       `json:"life"     required:"true"`
+	MaxConn int       `json:"max_conn" required:"true"`
+	MaxIdle int       `json:"max_idle" required:"true"`
+	DBCert  string    `json:"db_cert"  required:"true"`
+	Code    errorCode `json:"error_code"`
 }
 
 func (p *Config) SetDefault() {
@@ -41,4 +42,15 @@ func (p *Config) dsn() string {
 		"host=%v user=%v password=%v dbname=%v port=%v sslmode=verify-ca TimeZone=Asia/Shanghai sslrootcert=%s",
 		p.Host, p.User, p.Pwd, p.Name, p.Port, p.DBCert,
 	)
+}
+
+type errorCode struct {
+	UniqueConstraint string `json:"unique_constraint"`
+}
+
+// SetDefault sets the default values for the errorCode.
+func (cfg *errorCode) SetDefault() {
+	if cfg.UniqueConstraint == "" {
+		cfg.UniqueConstraint = "23505"
+	}
 }

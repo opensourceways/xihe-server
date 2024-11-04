@@ -69,7 +69,10 @@ func (r *repository) Delete(repoId string) error {
 		return err
 	}
 
-	v, err := cli.Projects.DeleteProject(repoId)
+	opts := &sdk.DeleteProjectOptions{
+		// 设置任何你需要的选项
+	}
+	v, err := cli.Projects.DeleteProject(repoId, opts)
 	if err != nil {
 		if v.StatusCode == 404 {
 			err = nil

@@ -3,7 +3,13 @@ package app
 import (
 	"errors"
 
+	sdk "github.com/opensourceways/xihe-sdk/space"
+	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
+
 	"github.com/opensourceways/xihe-server/app"
+	computilityapp "github.com/opensourceways/xihe-server/computility/app"
+	computilitydomain "github.com/opensourceways/xihe-server/computility/domain"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -16,18 +22,20 @@ import (
 )
 
 type ProjectCreateCmd struct {
-	Owner    domain.Account
-	Name     domain.ResourceName
-	Desc     domain.ResourceDesc
-	Title    domain.ResourceTitle
-	Type     domain.ProjType
-	CoverId  domain.CoverId
-	RepoType domain.RepoType
-	Protocol domain.ProtocolName
-	Training domain.TrainingPlatform
-	Tags     []string
-	TagKinds []string
-	All      []domain.DomainTags
+	Owner     domain.Account
+	Name      domain.ResourceName
+	Desc      domain.ResourceDesc
+	Title     domain.ResourceTitle
+	Type      domain.ProjType
+	CoverId   domain.CoverId
+	RepoType  domain.RepoType
+	Protocol  domain.ProtocolName
+	Training  domain.TrainingPlatform
+	Tags      []string
+	TagKinds  []string
+	All       []domain.DomainTags
+	Hardware  domain.Hardware
+	BaseImage domain.BaseImage
 }
 
 func (cmd *ProjectCreateCmd) Validate() error {
@@ -75,14 +83,18 @@ func (cmd *ProjectCreateCmd) toProject(r *spacedomain.Project) {
 		Training:  cmd.Training,
 		CreatedAt: now,
 		UpdatedAt: now,
+		Hardware:  cmd.Hardware,
+		BaseImage: cmd.BaseImage,
 		ProjectModifiableProperty: spacedomain.ProjectModifiableProperty{
-			Name:     cmd.Name,
-			Desc:     cmd.Desc,
-			Title:    cmd.Title,
-			CoverId:  cmd.CoverId,
-			RepoType: cmd.RepoType,
-			Tags:     append(cmd.Tags, normTags...),
-			TagKinds: cmd.genTagKinds(cmd.Tags),
+			Name:              cmd.Name,
+			Desc:              cmd.Desc,
+			Title:             cmd.Title,
+			CoverId:           cmd.CoverId,
+			RepoType:          cmd.RepoType,
+			Tags:              append(cmd.Tags, normTags...),
+			TagKinds:          cmd.genTagKinds(cmd.Tags),
+			CommitId:          "",
+			NoApplicationFile: true,
 		},
 	}
 }
@@ -92,6 +104,7 @@ type ProjectService interface {
 	Create(*ProjectCreateCmd, platform.Repository) (ProjectDTO, error)
 	Delete(*spacedomain.Project, platform.Repository) error
 	GetByName(domain.Account, domain.ResourceName, bool) (ProjectDetailDTO, error)
+	GetByRepoId(domain.Identity) (sdk.SpaceMetaDTO, error)
 	List(domain.Account, *app.ResourceListCmd) (ProjectsDTO, error)
 	ListGlobal(*app.GlobalResourceListCmd) (GlobalProjectsDTO, error)
 	Update(*spacedomain.Project, *ProjectUpdateCmd, platform.Repository) (ProjectDTO, error)
@@ -104,6 +117,8 @@ type ProjectService interface {
 	RemoveRelatedDataset(*spacedomain.Project, *domain.ResourceIndex) error
 
 	SetTags(*spacedomain.Project, *app.ResourceTagsUpdateCmd) error
+
+	NotifyUpdateCodes(domain.Identity, *CmdToNotifyUpdateCode) error
 }
 
 func NewProjectService(
@@ -114,6 +129,7 @@ func NewProjectService(
 	activity repository.Activity,
 	pr platform.Repository,
 	sender message.ResourceProducer,
+	computilityApp computilityapp.ComputilityInternalAppService,
 ) ProjectService {
 	return projectService{
 		repo:     repo,
@@ -125,15 +141,17 @@ func NewProjectService(
 			Project: repo,
 			Dataset: dataset,
 		},
+		computilityApp: computilityApp,
 	}
 }
 
 type projectService struct {
 	repo spacerepo.Project
 	//pr       platform.Repository
-	activity repository.Activity
-	sender   message.ResourceProducer
-	rs       app.ResourceService
+	activity       repository.Activity
+	sender         message.ResourceProducer
+	rs             app.ResourceService
+	computilityApp computilityapp.ComputilityInternalAppService
 }
 
 func (s projectService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -141,6 +159,27 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 }
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
+	v := new(spacedomain.Project)
+	cmd.toProject(v)
+	count := v.GetQuotaCount()
+	hdType := v.GetComputeType()
+	id := domain.CreateIdentity(domain.GetId())
+	compCmd := computilityapp.CmdToUserQuotaUpdate{
+		Index: computilitydomain.ComputilityAccountRecordIndex{
+			UserName:    cmd.Owner,
+			ComputeType: hdType,
+			SpaceId:     id,
+		},
+		QuotaCount: count,
+	}
+
+	err = s.computilityApp.UserQuotaConsume(compCmd)
+	if err != nil {
+		logrus.Errorf("space create error | call api for quota consume failed | user:%s ,err: %s", cmd.Owner, err)
+
+		return ProjectDTO{}, err
+	}
+
 	// step1: create repo on gitlab
 	pid, err := pr.New(&platform.RepoOption{
 		Name:     cmd.Name,
@@ -150,14 +189,51 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 		return
 	}
 
+	repoId, err := domain.NewIdentity(pid)
+	if err != nil {
+		return
+	}
+
 	// step2: save
-	v := new(spacedomain.Project)
-	cmd.toProject(v)
 	v.RepoId = pid
+
+	if v.Hardware.IsNpu() {
+		v.CompPowerAllocated = true
+	}
 
 	p, err := s.repo.Save(v)
 	if err != nil {
 		return
+	}
+
+	if err = s.computilityApp.SpaceCreateSupply(computilityapp.CmdToSupplyRecord{
+		Index: computilitydomain.ComputilityAccountRecordIndex{
+			UserName:    cmd.Owner,
+			ComputeType: hdType,
+			SpaceId:     id,
+		},
+		QuotaCount: count,
+		NewSpaceId: repoId,
+	}); err != nil {
+		logrus.Errorf("add space id supplyment failed | user: %s, err: %s", cmd.Owner, err)
+
+		err = s.Delete(v, pr)
+		if err != nil {
+			logrus.Errorf("delete space after add space id supplyment failed | user: %s, err: %s",
+				cmd.Owner.Account(), err)
+
+			return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
+		}
+
+		err = s.computilityApp.UserQuotaRelease(compCmd)
+		if err != nil {
+			logrus.Errorf("release quota after add space id supplyment failed | user: %s, err: %s",
+				cmd.Owner.Account(), err)
+
+			return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
+		}
+
+		return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
 	}
 
 	s.toProjectDTO(&p, &dto)
@@ -194,6 +270,35 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 		if err != nil {
 			return
 		}
+	}
+
+	if r.Hardware != nil {
+		if r.Hardware.IsNpu() {
+			logrus.Infof("release quota after user:%s npu space:%s delete", r.Owner.Account(), r.Id)
+
+			rid, err := domain.NewIdentity(r.RepoId)
+			if err != nil {
+				return err
+			}
+
+			c := computilityapp.CmdToUserQuotaUpdate{
+				Index: computilitydomain.ComputilityAccountRecordIndex{
+					UserName:    r.Owner,
+					ComputeType: r.GetComputeType(),
+					SpaceId:     rid,
+				},
+				QuotaCount: r.GetQuotaCount(),
+			}
+
+			err = s.computilityApp.UserQuotaRelease(c)
+			if err != nil {
+				logrus.Errorf("failed to release user:%s quota after space:%s delete: %s",
+					r.Owner.Account(), r.RepoId, err)
+
+				return nil
+			}
+		}
+
 	}
 
 	// step3: delete
@@ -242,6 +347,17 @@ func (s projectService) GetByName(
 	s.toProjectDTO(&v, &dto.ProjectDTO)
 
 	return
+}
+
+func (s projectService) GetByRepoId(id domain.Identity) (sdk.SpaceMetaDTO, error) {
+	v, err := s.repo.GetByRepoId(id)
+
+	if err != nil {
+		return sdk.SpaceMetaDTO{}, err
+	}
+
+	res := s.toSpaceMetaDTO(v)
+	return res, err
 }
 
 func (s projectService) ListGlobal(cmd *app.GlobalResourceListCmd) (
@@ -335,57 +451,31 @@ func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 	return
 }
 
-func (s projectService) toProjectDTO(p *spacedomain.Project, dto *ProjectDTO) {
-	*dto = ProjectDTO{
-		Id:            p.Id,
-		Owner:         p.Owner.Account(),
-		Name:          p.Name.ResourceName(),
-		Type:          p.Type.ProjType(),
-		CoverId:       p.CoverId.CoverId(),
-		Protocol:      p.Protocol.ProtocolName(),
-		Training:      p.Training.TrainingPlatform(),
-		RepoType:      p.RepoType.RepoType(),
-		RepoId:        p.RepoId,
-		Tags:          p.Tags,
-		CreatedAt:     utils.ToDate(p.CreatedAt),
-		UpdatedAt:     utils.ToDate(p.UpdatedAt),
-		LikeCount:     p.LikeCount,
-		ForkCount:     p.ForkCount,
-		DownloadCount: p.DownloadCount,
+func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUpdateCode) (
+	err error,
+) {
+	space, err := s.repo.GetByRepoId(id)
+	if err != nil {
+		return err
 	}
 
-	if p.Desc != nil {
-		dto.Desc = p.Desc.ResourceDesc()
-	}
+	space.SetSpaceCommitId(cmd.CommitId)
+	space.SetNoApplicationFile(cmd.NoApplicationFile)
 
-	if p.Title != nil {
-		dto.Title = p.Title.ResourceTitle()
+	// step2
+	info := spacerepo.ProjectPropertyUpdateInfo{
+		ResourceToUpdate: s.toResourceToUpdate(&space),
+		Property:         space.ProjectModifiableProperty,
 	}
+	err = s.repo.UpdateProperty(&info)
 
-}
+	if err != nil {
+		err = xerrors.Errorf("save space failed, err: %w", err)
 
-func (s projectService) toProjectSummaryDTO(p *spacedomain.ProjectSummary, dto *ProjectSummaryDTO) {
-	*dto = ProjectSummaryDTO{
-		Id:            p.Id,
-		Owner:         p.Owner.Account(),
-		Name:          p.Name.ResourceName(),
-		CoverId:       p.CoverId.CoverId(),
-		Tags:          p.Tags,
-		UpdatedAt:     utils.ToDate(p.UpdatedAt),
-		LikeCount:     p.LikeCount,
-		ForkCount:     p.ForkCount,
-		DownloadCount: p.DownloadCount,
+		return err
 	}
+	logrus.Infof("spaceId:%s set notify commitId:%s, req:%v success",
+		id, cmd.CommitId, cmd)
 
-	if p.Desc != nil {
-		dto.Desc = p.Desc.ResourceDesc()
-	}
-
-	if p.Title != nil {
-		dto.Title = p.Title.ResourceTitle()
-	}
-
-	if p.Level != nil {
-		dto.Level = p.Level.ResourceLevel()
-	}
+	return nil
 }

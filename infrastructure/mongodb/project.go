@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
@@ -82,15 +83,18 @@ func (col project) Delete(do *repositories.ResourceIndexDO) error {
 
 func (col project) UpdateProperty(do *repositoryimpl.ProjectPropertyDO) error {
 	p := &ProjectPropertyItem{
-		Level:    do.Level,
-		Name:     do.Name,
-		FL:       do.FL,
-		Desc:     do.Desc,
-		Title:    do.Title,
-		CoverId:  do.CoverId,
-		RepoType: do.RepoType,
-		Tags:     do.Tags,
-		TagKinds: do.TagKinds,
+		Level:             do.Level,
+		Name:              do.Name,
+		FL:                do.FL,
+		Desc:              do.Desc,
+		Title:             do.Title,
+		CoverId:           do.CoverId,
+		RepoType:          do.RepoType,
+		Tags:              do.Tags,
+		TagKinds:          do.TagKinds,
+		CommitId:          do.CommitId,
+		NoApplicationFile: do.NoApplicationFile,
+		Exception:         do.Exception,
 	}
 
 	p.setDefault()
@@ -130,6 +134,23 @@ func (col project) GetByName(owner, name string) (do repositoryimpl.ProjectDO, e
 	}
 
 	col.toProjectDO(owner, &v[0].Items[0], &do)
+
+	return
+}
+
+func (col project) GetByRepoId(id string) (do repositoryimpl.ProjectDO, err error) {
+	type Project struct {
+		Id    primitive.ObjectID `bson:"_id"`
+		Owner string             `bson:"owner"`
+		Items []projectItem      `bson:"items"`
+	}
+
+	var v []Project
+	if err = getResourceByIdOnly(col.collectionName, id, &v); err != nil {
+		return
+	}
+
+	col.toProjectDO(v[0].Owner, &v[0].Items[0], &do)
 
 	return
 }
@@ -224,15 +245,20 @@ func (col project) toProjectDoc(do *repositoryimpl.ProjectDO) (bson.M, error) {
 		CreatedAt: do.CreatedAt,
 		UpdatedAt: do.UpdatedAt,
 		ProjectPropertyItem: ProjectPropertyItem{
-			FL:       do.FL,
-			Name:     do.Name,
-			Desc:     do.Desc,
-			Title:    do.Title,
-			CoverId:  do.CoverId,
-			RepoType: do.RepoType,
-			Tags:     do.Tags,
-			TagKinds: do.TagKinds,
+			FL:                 do.FL,
+			Name:               do.Name,
+			Desc:               do.Desc,
+			Title:              do.Title,
+			CoverId:            do.CoverId,
+			RepoType:           do.RepoType,
+			Tags:               do.Tags,
+			TagKinds:           do.TagKinds,
+			CommitId:           do.CommitId,
+			NoApplicationFile:  do.NoApplicationFile,
+			CompPowerAllocated: do.CompPowerAllocated,
 		},
+		HardwareType: do.Hardware,
+		BaseImage:    do.BaseImage,
 	}
 
 	docObj.ProjectPropertyItem.setDefault()
@@ -242,26 +268,32 @@ func (col project) toProjectDoc(do *repositoryimpl.ProjectDO) (bson.M, error) {
 
 func (col project) toProjectDO(owner string, item *projectItem, do *repositoryimpl.ProjectDO) {
 	*do = repositoryimpl.ProjectDO{
-		Id:            item.Id,
-		Owner:         owner,
-		Name:          item.Name,
-		Desc:          item.Desc,
-		Title:         item.Title,
-		Type:          item.Type,
-		Level:         item.Level,
-		CoverId:       item.CoverId,
-		Protocol:      item.Protocol,
-		Training:      item.Training,
-		RepoType:      item.RepoType,
-		RepoId:        item.RepoId,
-		Tags:          item.Tags,
-		TagKinds:      item.TagKinds,
-		CreatedAt:     item.CreatedAt,
-		UpdatedAt:     item.UpdatedAt,
-		Version:       item.Version,
-		LikeCount:     item.LikeCount,
-		ForkCount:     item.ForkCount,
-		DownloadCount: item.DownloadCount,
+		Id:                 item.Id,
+		Owner:              owner,
+		Name:               item.Name,
+		Desc:               item.Desc,
+		Title:              item.Title,
+		Type:               item.Type,
+		Level:              item.Level,
+		CoverId:            item.CoverId,
+		Protocol:           item.Protocol,
+		Training:           item.Training,
+		RepoType:           item.RepoType,
+		RepoId:             item.RepoId,
+		Tags:               item.Tags,
+		TagKinds:           item.TagKinds,
+		CreatedAt:          item.CreatedAt,
+		UpdatedAt:          item.UpdatedAt,
+		Version:            item.Version,
+		LikeCount:          item.LikeCount,
+		ForkCount:          item.ForkCount,
+		DownloadCount:      item.DownloadCount,
+		Hardware:           item.HardwareType,
+		BaseImage:          item.BaseImage,
+		CommitId:           item.CommitId,
+		NoApplicationFile:  item.NoApplicationFile,
+		Exception:          item.Exception,
+		CompPowerAllocated: item.CompPowerAllocated,
 
 		RelatedModels:   toResourceIndexDO(item.RelatedModels),
 		RelatedDatasets: toResourceIndexDO(item.RelatedDatasets),

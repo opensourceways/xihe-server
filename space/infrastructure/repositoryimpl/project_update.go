@@ -90,12 +90,15 @@ func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) er
 	do := ProjectPropertyDO{
 		ResourceToUpdateDO: repositories.ToResourceToUpdateDO(&info.ResourceToUpdate),
 
-		FL:       p.Name.FirstLetterOfName(),
-		Name:     p.Name.ResourceName(),
-		CoverId:  p.CoverId.CoverId(),
-		RepoType: p.RepoType.RepoType(),
-		Tags:     p.Tags,
-		TagKinds: p.TagKinds,
+		FL:                p.Name.FirstLetterOfName(),
+		Name:              p.Name.ResourceName(),
+		CoverId:           p.CoverId.CoverId(),
+		RepoType:          p.RepoType.RepoType(),
+		Tags:              p.Tags,
+		TagKinds:          p.TagKinds,
+		CommitId:          p.CommitId,
+		NoApplicationFile: p.NoApplicationFile,
+		Exception:         p.Exception.Exception(),
 	}
 
 	if p.Desc != nil {
@@ -120,15 +123,18 @@ func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) er
 type ProjectPropertyDO struct {
 	repositories.ResourceToUpdateDO
 
-	FL       byte
-	Name     string
-	Desc     string
-	Title    string
-	Level    int
-	CoverId  string
-	RepoType string
-	Tags     []string
-	TagKinds []string
+	FL                byte
+	Name              string
+	Desc              string
+	Title             string
+	Level             int
+	CoverId           string
+	RepoType          string
+	Tags              []string
+	TagKinds          []string
+	CommitId          string
+	NoApplicationFile bool
+	Exception         string
 }
 
 func (impl project) ListAndSortByUpdateTime(
@@ -219,6 +225,8 @@ type ProjectSummaryDO struct {
 	LikeCount     int
 	ForkCount     int
 	DownloadCount int
+	Hardware      string
+	Type          string
 }
 
 func (do *ProjectSummaryDO) toProjectSummary(r *spacedomain.ProjectSummary) (err error) {
@@ -241,6 +249,10 @@ func (do *ProjectSummaryDO) toProjectSummary(r *spacedomain.ProjectSummary) (err
 	}
 
 	if r.CoverId, err = domain.NewCoverId(do.CoverId); err != nil {
+		return
+	}
+
+	if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
 		return
 	}
 

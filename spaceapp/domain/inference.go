@@ -35,3 +35,8 @@ type InferenceIndex struct {
 	Id         string
 	LastCommit string
 }
+
+type SpaceAppCreateEvent struct {
+	Id       string `json:"space_id"`
+	CommitId string `json:"commit_id"`
+}

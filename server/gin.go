@@ -27,10 +27,13 @@ import (
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
+	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
 	competitionmsg "github.com/opensourceways/xihe-server/competition/infrastructure/messageadapter"
 	competitionrepo "github.com/opensourceways/xihe-server/competition/infrastructure/repositoryimpl"
 	competitionusercli "github.com/opensourceways/xihe-server/competition/infrastructure/usercli"
+	computilityapp "github.com/opensourceways/xihe-server/computility/app"
+	comprepositoryadapter "github.com/opensourceways/xihe-server/computility/infrastructure/repositoryadapter"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
@@ -58,7 +61,10 @@ import (
 	promotionuseradapter "github.com/opensourceways/xihe-server/promotion/infrastructure/useradapter"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
+	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
+	spaceappmsg "github.com/opensourceways/xihe-server/spaceapp/infrastructure/messageimpl"
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/sseadapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
@@ -148,12 +154,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		),
 	)
 
-	inference := spaceapprepo.NewInferenceRepository(
-		mongodb.NewInferenceMapper(
-			collections.Inference,
-		),
-	)
-
 	tags := repositories.NewTagsRepository(
 		mongodb.NewTagsMapper(collections.Tag),
 	)
@@ -194,6 +194,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	// sender
 	sender := messages.NewMessageSender(&cfg.MQTopics, publisher)
+
+	spaceappSender := spaceappmsg.NewMessageAdapter(&cfg.SpaceApp.Message, publisher)
 	// resource producer
 	resProducer := messages.NewResourceMessageAdapter(&cfg.Resource, publisher, operator)
 
@@ -253,13 +255,31 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		userRegService,
 	)
 
-	projectService := spaceapp.NewProjectService(user, proj, model, dataset, activity, nil, resProducer)
+	err = comprepositoryadapter.Init(pgsql.DB(), &cfg.Computility.Tables)
+	if err != nil {
+		return err
+	}
+	computilityService := computilityapp.NewComputilityInternalAppService(
+		comprepositoryadapter.ComputilityDetailAdapter(),
+		comprepositoryadapter.ComputilityAccountAdapter(),
+		comprepositoryadapter.ComputilityAccountRecordAdapter(),
+	)
+	computilityWebService := computilityapp.NewComputilityAppService(
+		comprepositoryadapter.ComputilityOrgAdapter(),
+		comprepositoryadapter.ComputilityDetailAdapter(),
+		comprepositoryadapter.ComputilityAccountAdapter(),
+	)
+
+	projectService := spaceapp.NewProjectService(
+		user, proj, model, dataset, activity, nil, resProducer, computilityService,
+	)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
 
 	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, resProducer)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
+	internal := engine.Group("internal")
 
 	pointsAppService, err := addRouterForUserPointsController(v1, cfg)
 	if err != nil {
@@ -292,10 +312,23 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		whitelist,
 	)
 
+	spaceappRepository, err := spaceapprepo.NewSpaceAppRepository()
+	if err != nil {
+		return err
+	}
+
+	spaceappAppService := spaceappApp.NewSpaceappAppService(
+		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
+	)
+
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository,
+			newPlatformRepository, computilityService,
+		)
+		controller.AddRouterForProjectInternalController(
+			internal, user, proj, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService,
 		)
 
 		controller.AddRouterForModelController(
@@ -353,7 +386,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, inference, proj, sender, userWhiteListService,
+			v1, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
+		)
+
+		controller.AddRouterForInferenceInternalController(
+			internal, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappRepository,
 		)
 
 		controller.AddRouterForSearchController(
@@ -382,6 +419,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForCloudController(
 			v1, cloudAppService, userWhiteListService,
+		)
+
+		controller.AddRouterForComputilityWebController(
+			v1, computilityWebService,
 		)
 	}
 

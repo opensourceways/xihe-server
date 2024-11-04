@@ -29,6 +29,14 @@ func NewErrorConcurrentUpdating(err error) ErrorConcurrentUpdating {
 	return ErrorConcurrentUpdating{err}
 }
 
+type NotAccessedError struct {
+	error
+}
+
+func NewNotAccessedError(err error) NotAccessedError {
+	return NotAccessedError{err}
+}
+
 // helper
 
 func IsErrorResourceNotExists(err error) bool {

@@ -128,6 +128,33 @@ func getResourceById(collection, owner, rid string, result interface{}) error {
 	return withContext(f)
 }
 
+func getResourceByIdOnly(collection, rid string, result interface{}) error {
+	pipeline := []bson.M{
+		{
+			"$match": bson.M{"items.repo_id": rid},
+		},
+		{
+			"$project": bson.M{
+				"items": bson.M{
+					"$filter": bson.M{
+						"input": "$items",
+						"as":    "item",
+						"cond":  bson.M{"$eq": []interface{}{"$$item.repo_id", rid}},
+					},
+				},
+				"owner": 1,
+			},
+		},
+	}
+	col := cli.collection(collection)
+	cur, err := col.Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		return err
+	}
+
+	return cur.All(context.TODO(), result)
+}
+
 func getResourceSummary(collection, owner, rId string, result interface{}) error {
 	f := func(ctx context.Context) error {
 		return cli.getArrayElem(
