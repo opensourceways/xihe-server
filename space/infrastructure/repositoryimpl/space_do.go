@@ -2,7 +2,6 @@ package repositoryimpl
 
 import (
 	"github.com/opensourceways/xihe-server/domain"
-	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 )
 
@@ -28,8 +27,6 @@ type projectDO struct {
 	Training          string
 	RepoType          string
 	RepoId            string
-	Tags              []string
-	TagKinds          []string
 	CreatedAt         int64
 	UpdatedAt         int64
 	Version           int
@@ -41,9 +38,6 @@ type projectDO struct {
 
 	Hardware  string
 	BaseImage string
-
-	RelatedModels   []repositories.ResourceIndexDO
-	RelatedDatasets []repositories.ResourceIndexDO
 }
 
 func toProjectDO(p *spacedomain.Project) projectDO {
@@ -57,8 +51,6 @@ func toProjectDO(p *spacedomain.Project) projectDO {
 		RepoType:          p.RepoType.RepoType(),
 		Protocol:          p.Protocol.ProtocolName(),
 		Training:          p.Training.TrainingPlatform(),
-		Tags:              p.Tags,
-		TagKinds:          p.TagKinds,
 		RepoId:            p.RepoId,
 		CreatedAt:         p.CreatedAt,
 		UpdatedAt:         p.UpdatedAt,
@@ -118,14 +110,6 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 		return
 	}
 
-	if r.RelatedModels, err = repositories.ConvertToResourceIndex(do.RelatedModels); err != nil {
-		return
-	}
-
-	if r.RelatedDatasets, err = repositories.ConvertToResourceIndex(do.RelatedDatasets); err != nil {
-		return
-	}
-
 	if do.Hardware != "" {
 		if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
 			return
@@ -140,8 +124,6 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 
 	r.Level = domain.NewResourceLevelByNum(do.Level)
 	r.RepoId = do.RepoId
-	r.Tags = do.Tags
-	r.TagKinds = do.TagKinds
 	r.Version = do.Version
 	r.CreatedAt = do.CreatedAt
 	r.UpdatedAt = do.UpdatedAt
