@@ -80,9 +80,10 @@ func (s *spaceappAppService) GetByName(
 		return toSpaceAppDTO(&app), nil
 	}
 
-	if space.Hardware.IsNpu() && !space.CompPowerAllocated {
-		return toSpaceNoCompQuotaDTO(&space), nil
-	}
+	// HACK: don't effect logic
+	// if space.Hardware.IsNpu() && !space.CompPowerAllocated {
+	// 	return toSpaceNoCompQuotaDTO(&space), nil
+	// }
 
 	if commonrepo.IsErrorResourceNotExists(err) {
 		err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)
