@@ -80,8 +80,6 @@ func (s *spaceappAppService) GetByName(
 		return toSpaceAppDTO(&app), nil
 	}
 
-	logrus.Errorf("find by space id, err: %+v", err)
-
 	if space.Hardware.IsNpu() && !space.CompPowerAllocated {
 		return toSpaceNoCompQuotaDTO(&space), nil
 	}
