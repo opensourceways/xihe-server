@@ -61,6 +61,7 @@ const (
 	fieldPictures       = "pictures"
 	fieldChoices        = "choices"
 	fieldCompletions    = "completions"
+	fieldHardwareType   = "hardware_type"
 )
 
 type dProject struct {
@@ -100,7 +101,7 @@ type ProjectPropertyItem struct {
 	Name     string `bson:"name"       json:"name"`
 	FL       byte   `bson:"fl"         json:"fl"`
 	Desc     string `bson:"desc"       json:"desc"`
-	Title    string `bson:"title"       json:"title"`
+	Title    string `bson:"title"      json:"title"`
 	CoverId  string `bson:"cover_id"   json:"cover_id"`
 	RepoType string `bson:"repo_type"  json:"repo_type"`
 	// set omitempty to avoid set it to null occasionally.
@@ -108,8 +109,10 @@ type ProjectPropertyItem struct {
 	Tags     []string `bson:"tags"     json:"tags"`
 	TagKinds []string `bson:"kinds"    json:"kinds"`
 
-	CommitId          string `bson:"commit_id"           json:"commit_id"`
-	NoApplicationFile bool   `bson:"no_application_file" json:"no_application_file"`
+	CommitId           string `bson:"commit_id"                      json:"commit_id"`
+	NoApplicationFile  bool   `bson:"no_application_file"            json:"no_application_file"`
+	Exception          string `bson:"exception"                      json:"exception"`
+	CompPowerAllocated bool   `bson:"comp_power_allocated"           json:"comp_power_allocated"`
 }
 
 func (doc *ProjectPropertyItem) setDefault() {

@@ -1,6 +1,10 @@
 package domain
 
 import (
+	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
+
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 )
 
@@ -109,26 +113,41 @@ func (s *Project) SetSpaceCommitId(commitId string) {
 // SetNoApplicationFile for set NoApplicationFile and Exception.
 func (s *Project) SetNoApplicationFile(noApplicationFile bool) {
 	s.NoApplicationFile = noApplicationFile
-	// if noApplicationFile {
-	// 	s.Exception = primitive.CreateException(primitive.NoApplicationFile)
-	// 	return
-	// }
-	// if !noApplicationFile && s.Exception == primitive.ExceptionNoApplicationFile {
-	// 	s.Exception = primitive.CreateException("")
-	// }
+	if noApplicationFile {
+		s.Exception = domain.CreateException(domain.NoApplicationFile)
+		return
+	}
+	if !noApplicationFile && s.Exception == domain.ExceptionNoApplicationFile {
+		s.Exception = domain.CreateException("")
+	}
+}
+
+func (m *Project) PreCheck() error {
+	if m.Exception.Exception() != "" {
+		e := xerrors.Errorf("spaceId:%s failed to create space failed, space has exception reason :%s",
+			m.RepoId, m.Exception.Exception())
+
+		err := allerror.New(allerror.ErrorCodeSpaceAppCreateFailed, e.Error(), e)
+		logrus.Errorf("spaceId：%s create space failed, err:%s", m.RepoId, err)
+
+		return err
+	}
+	return nil
 }
 
 type ProjectModifiableProperty struct {
-	Name              domain.ResourceName
-	Desc              domain.ResourceDesc
-	Title             domain.ResourceTitle
-	CoverId           domain.CoverId
-	RepoType          domain.RepoType
-	Tags              []string
-	TagKinds          []string
-	Level             domain.ResourceLevel
-	CommitId          string
-	NoApplicationFile bool
+	Name               domain.ResourceName
+	Desc               domain.ResourceDesc
+	Title              domain.ResourceTitle
+	CoverId            domain.CoverId
+	RepoType           domain.RepoType
+	Tags               []string
+	TagKinds           []string
+	Level              domain.ResourceLevel
+	CommitId           string
+	NoApplicationFile  bool
+	Exception          domain.Exception
+	CompPowerAllocated bool
 }
 
 type ProjectSummary struct {
@@ -139,6 +158,7 @@ type ProjectSummary struct {
 	Title         domain.ResourceTitle
 	Level         domain.ResourceLevel
 	CoverId       domain.CoverId
+	Hardware      domain.Hardware
 	Tags          []string
 	UpdatedAt     int64
 	LikeCount     int

@@ -202,3 +202,45 @@ func (w *WhitelistDTO) toWhitelistDTO(info *domain.WhiteListInfo) {
 	w.Item = info.Type.WhiteListType()
 	w.Allowed = info.Enable()
 }
+
+func toFollowDTO(f *domain.FollowerUserInfo, dto *FollowDTO) {
+	*dto = FollowDTO{
+		Account:    f.Account.Account(),
+		IsFollower: f.IsFollower,
+	}
+
+	if f.Bio != nil {
+		dto.Bio = f.Bio.Bio()
+	}
+
+	if f.AvatarId != nil {
+		dto.AvatarId = f.AvatarId.AvatarId()
+	}
+}
+
+func toUserDTO(u *domain.User, dto *UserDTO) {
+	*dto = UserDTO{
+		Id:      u.Id,
+		Email:   u.Email.Email(),
+		Account: u.Account.Account(),
+	}
+
+	if u.Bio != nil {
+		dto.Bio = u.Bio.Bio()
+	}
+
+	if u.AvatarId != nil {
+		dto.AvatarId = u.AvatarId.AvatarId()
+	}
+
+	dto.FollowerCount = u.FollowerCount
+	dto.FollowingCount = u.FollowingCount
+
+	dto.Platform.Token = u.PlatformToken.Token
+	dto.Platform.CreateAt = u.PlatformToken.CreateAt
+	dto.Platform.UserId = u.PlatformUser.Id
+	dto.Platform.NamespaceId = u.PlatformUser.NamespaceId
+	dto.CourseAgreement = u.CourseAgreement
+	dto.UserAgreement = u.UserAgreement
+	dto.FinetuneAgreement = u.FinetuneAgreement
+}

@@ -2,7 +2,6 @@ package app
 
 import (
 	"errors"
-	"fmt"
 
 	sdk "github.com/opensourceways/xihe-sdk/space"
 	"github.com/sirupsen/logrus"
@@ -125,7 +124,6 @@ type ProjectService interface {
 func NewProjectService(
 	user userrepo.User,
 	repo spacerepo.Project,
-	repoPg spacerepo.ProjectPg,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -135,7 +133,6 @@ func NewProjectService(
 ) ProjectService {
 	return projectService{
 		repo:     repo,
-		repoPg:   repoPg,
 		activity: activity,
 		sender:   sender,
 		rs: app.ResourceService{
@@ -149,8 +146,7 @@ func NewProjectService(
 }
 
 type projectService struct {
-	repo   spacerepo.Project
-	repoPg spacerepo.ProjectPg
+	repo spacerepo.Project
 	//pr       platform.Repository
 	activity       repository.Activity
 	sender         message.ResourceProducer
@@ -181,7 +177,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	if err != nil {
 		logrus.Errorf("space create error | call api for quota consume failed | user:%s ,err: %s", cmd.Owner, err)
 
-		// return ProjectDTO{}, err
+		return ProjectDTO{}, err
 	}
 
 	// step1: create repo on gitlab
@@ -193,12 +189,51 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 		return
 	}
 
+	repoId, err := domain.NewIdentity(pid)
+	if err != nil {
+		return
+	}
+
 	// step2: save
 	v.RepoId = pid
 
-	p, err := s.repoPg.Save(v)
+	if v.Hardware.IsNpu() {
+		v.CompPowerAllocated = true
+	}
+
+	p, err := s.repo.Save(v)
 	if err != nil {
 		return
+	}
+
+	if err = s.computilityApp.SpaceCreateSupply(computilityapp.CmdToSupplyRecord{
+		Index: computilitydomain.ComputilityAccountRecordIndex{
+			UserName:    cmd.Owner,
+			ComputeType: hdType,
+			SpaceId:     id,
+		},
+		QuotaCount: count,
+		NewSpaceId: repoId,
+	}); err != nil {
+		logrus.Errorf("add space id supplyment failed | user: %s, err: %s", cmd.Owner, err)
+
+		err = s.Delete(v, pr)
+		if err != nil {
+			logrus.Errorf("delete space after add space id supplyment failed | user: %s, err: %s",
+				cmd.Owner.Account(), err)
+
+			return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
+		}
+
+		err = s.computilityApp.UserQuotaRelease(compCmd)
+		if err != nil {
+			logrus.Errorf("release quota after add space id supplyment failed | user: %s, err: %s",
+				cmd.Owner.Account(), err)
+
+			return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
+		}
+
+		return ProjectDTO{}, xerrors.Errorf("add space id supplyment failed: %w", err)
 	}
 
 	s.toProjectDTO(&p, &dto)
@@ -241,12 +276,16 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 		if r.Hardware.IsNpu() {
 			logrus.Infof("release quota after user:%s npu space:%s delete", r.Owner.Account(), r.Id)
 
-			id, err := domain.NewIdentity(r.RepoId)
+			rid, err := domain.NewIdentity(r.RepoId)
+			if err != nil {
+				return err
+			}
+
 			c := computilityapp.CmdToUserQuotaUpdate{
 				Index: computilitydomain.ComputilityAccountRecordIndex{
 					UserName:    r.Owner,
 					ComputeType: r.GetComputeType(),
-					SpaceId:     id,
+					SpaceId:     rid,
 				},
 				QuotaCount: r.GetQuotaCount(),
 			}
@@ -313,7 +352,6 @@ func (s projectService) GetByName(
 func (s projectService) GetByRepoId(id domain.Identity) (sdk.SpaceMetaDTO, error) {
 	v, err := s.repo.GetByRepoId(id)
 
-	fmt.Printf("sdk result ====================v: %+v\n", v)
 	if err != nil {
 		return sdk.SpaceMetaDTO{}, err
 	}
@@ -421,11 +459,8 @@ func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUp
 		return err
 	}
 
-	// space.SetSpaceCommitId(cmd.CommitId)
-	// space.SetNoApplicationFile(cmd.NoApplicationFile)
-
-	space.ProjectModifiableProperty.CommitId = cmd.CommitId
-	space.ProjectModifiableProperty.NoApplicationFile = cmd.NoApplicationFile
+	space.SetSpaceCommitId(cmd.CommitId)
+	space.SetNoApplicationFile(cmd.NoApplicationFile)
 
 	// step2
 	info := spacerepo.ProjectPropertyUpdateInfo{
@@ -443,78 +478,4 @@ func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUp
 		id, cmd.CommitId, cmd)
 
 	return nil
-}
-
-func (s projectService) toProjectDTO(p *spacedomain.Project, dto *ProjectDTO) {
-	*dto = ProjectDTO{
-		Id:            p.Id,
-		Owner:         p.Owner.Account(),
-		Name:          p.Name.ResourceName(),
-		Type:          p.Type.ProjType(),
-		CoverId:       p.CoverId.CoverId(),
-		Protocol:      p.Protocol.ProtocolName(),
-		Training:      p.Training.TrainingPlatform(),
-		RepoType:      p.RepoType.RepoType(),
-		RepoId:        p.RepoId,
-		Tags:          p.Tags,
-		CreatedAt:     utils.ToDate(p.CreatedAt),
-		UpdatedAt:     utils.ToDate(p.UpdatedAt),
-		LikeCount:     p.LikeCount,
-		ForkCount:     p.ForkCount,
-		DownloadCount: p.DownloadCount,
-	}
-
-	if p.CommitId != "" {
-		dto.CommitId = p.CommitId
-	}
-
-	if p.Desc != nil {
-		dto.Desc = p.Desc.ResourceDesc()
-	}
-
-	if p.Title != nil {
-		dto.Title = p.Title.ResourceTitle()
-	}
-
-}
-
-func (s projectService) toProjectSummaryDTO(p *spacedomain.ProjectSummary, dto *ProjectSummaryDTO) {
-	*dto = ProjectSummaryDTO{
-		Id:            p.Id,
-		Owner:         p.Owner.Account(),
-		Name:          p.Name.ResourceName(),
-		CoverId:       p.CoverId.CoverId(),
-		Tags:          p.Tags,
-		UpdatedAt:     utils.ToDate(p.UpdatedAt),
-		LikeCount:     p.LikeCount,
-		ForkCount:     p.ForkCount,
-		DownloadCount: p.DownloadCount,
-	}
-
-	if p.Desc != nil {
-		dto.Desc = p.Desc.ResourceDesc()
-	}
-
-	if p.Title != nil {
-		dto.Title = p.Title.ResourceTitle()
-	}
-
-	if p.Level != nil {
-		dto.Level = p.Level.ResourceLevel()
-	}
-}
-
-func (s projectService) toSpaceMetaDTO(v spacedomain.Project) sdk.SpaceMetaDTO {
-	return sdk.SpaceMetaDTO{
-		Id:           v.RepoId,
-		SDK:          v.Type.ProjType(),
-		Name:         v.Name.ResourceName(),
-		Owner:        v.Owner.Account(),
-		Hardware:     v.Hardware.Hardware(),
-		BaseImage:    v.BaseImage.BaseImage(),
-		Visibility:   v.RepoType.RepoType(),
-		Disable:      false,
-		HardwareType: v.Hardware.Hardware(),
-		CommitId:     v.CommitId,
-	}
 }

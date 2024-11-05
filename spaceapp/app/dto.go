@@ -2,23 +2,15 @@ package app
 
 import (
 	commondomain "github.com/opensourceways/xihe-server/common/domain"
+	types "github.com/opensourceways/xihe-server/domain"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	"github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
 type InferenceDTO struct {
-	expiry     int64
 	Error      string `json:"error"`
 	AccessURL  string `json:"access_url"`
 	InstanceId string `json:"inference_id"`
-}
-
-func (dto *InferenceDTO) hasResult() bool {
-	return dto.InstanceId != ""
-}
-
-func (dto *InferenceDTO) canReuseCurrent() bool {
-	return dto.AccessURL != ""
 }
 
 // CmdToNotifyServiceIsStarted is a command to notify that the service has started.
@@ -71,3 +63,22 @@ type GetSpaceAppCmd = spacedomain.SpaceIndex
 type BuildLogsDTO struct {
 	Logs string `json:"logs"`
 }
+
+func toSpaceDTO(space *spacedomain.Project) SpaceAppDTO {
+	dto := SpaceAppDTO{
+		Id:     space.Id,
+		Status: space.Exception.Exception(),
+		Reason: types.ExceptionMap[space.Exception.Exception()],
+	}
+
+	return dto
+}
+
+// func toSpaceNoCompQuotaDTO(space *spacedomain.Project) SpaceAppDTO {
+// 	dto := SpaceAppDTO{
+// 		Id:     space.Id,
+// 		Status: types.NoCompQuotaException,
+// 		Reason: types.ExceptionMap[types.NoCompQuotaException],
+// 	}
+// 	return dto
+// }

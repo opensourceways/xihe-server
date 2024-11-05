@@ -125,7 +125,7 @@ func (t dbTable) GetOrderOneRecord(filter, order, result interface{}) error {
 func (t dbTable) GetRecord(filter, result interface{}) error {
 	err := db.Table(t.name).Where(filter).First(result).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return errRowNotFound
+		return repository.NewErrorResourceNotExists(errRowNotFound)
 	}
 
 	return err

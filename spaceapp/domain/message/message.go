@@ -5,10 +5,6 @@ import (
 	"github.com/opensourceways/xihe-server/spaceapp/domain"
 )
 
-const (
-	MsgTypeAICCFinetuneCreate = "msg_type_aicc_finetune_create"
-)
-
 type MsgTask comsg.MsgNormal
 
 type SpaceAppMessageProducer interface {

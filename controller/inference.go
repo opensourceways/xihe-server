@@ -1,16 +1,16 @@
 package controller
 
 import (
-	"fmt"
 	"io"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
-	"github.com/opensourceways/xihe-server/domain/repository"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
 	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
@@ -61,29 +61,6 @@ type InferenceController struct {
 	whitelist         userapp.WhiteListService
 }
 
-func (ctl *InferenceController) getResourceLevel(owner domain.Account, pid string) (level string, err error) {
-	resources, err := ctl.project.FindUserProjects(
-		[]repository.UserResourceListOption{
-			{
-				Owner: owner,
-				Ids: []string{
-					pid,
-				},
-			},
-		},
-	)
-
-	if err != nil || len(resources) < 1 {
-		return
-	}
-
-	if resources[0].Level != nil {
-		level = resources[0].Level.ResourceLevel()
-	}
-
-	return
-}
-
 // @Summary  Get
 // @Description  get space app
 // @Tags     SpaceApp
@@ -104,6 +81,10 @@ func (ctl *InferenceController) Get(ctx *gin.Context) {
 	}
 
 	if dto, err := ctl.appService.GetByName(ctx.Request.Context(), pl.DomainAccount(), &cmd); err != nil {
+		if err, ok := allerror.IsNotFound(err); ok {
+			ctx.JSON(http.StatusNotFound, newResponseCodeError(err.ErrorCode(), err))
+			return
+		}
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, &dto)
@@ -146,6 +127,10 @@ func (ctl *InferenceController) GetBuildLogs(ctx *gin.Context) {
 	}
 
 	if dto, err := ctl.appService.GetBuildLogs(ctx.Request.Context(), pl.DomainAccount(), &index); err != nil {
+		if err, ok := allerror.IsNotFound(err); ok {
+			ctx.JSON(http.StatusNotFound, newResponseCodeError(err.ErrorCode(), err))
+			return
+		}
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.sendRespOfGet(ctx, &dto)
@@ -284,7 +269,6 @@ func (ctl *InferenceController) GetRealTimeSpaceLog(ctx *gin.Context) {
 func (ctl *InferenceController) CanRead(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
-		fmt.Printf("not ok====================================")
 		return
 	}
 
@@ -292,7 +276,6 @@ func (ctl *InferenceController) CanRead(ctx *gin.Context) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("====================================index: %+v\n", index)
 
 	if err := ctl.appService.CheckPermissionRead(ctx.Request.Context(), pl.DomainAccount(), &index); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))

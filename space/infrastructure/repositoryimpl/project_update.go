@@ -1,8 +1,6 @@
 package repositoryimpl
 
 import (
-	"fmt"
-
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
@@ -88,8 +86,6 @@ func (impl project) RemoveRelatedDataset(info *repository.RelatedResourceInfo) e
 
 func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) error {
 	p := &info.Property
-	fmt.Printf("===========================================info: %+v\n", info)
-	fmt.Printf("==============================================p: %+v\n", p)
 
 	do := ProjectPropertyDO{
 		ResourceToUpdateDO: repositories.ToResourceToUpdateDO(&info.ResourceToUpdate),
@@ -102,6 +98,7 @@ func (impl project) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) er
 		TagKinds:          p.TagKinds,
 		CommitId:          p.CommitId,
 		NoApplicationFile: p.NoApplicationFile,
+		Exception:         p.Exception.Exception(),
 	}
 
 	if p.Desc != nil {
@@ -137,6 +134,7 @@ type ProjectPropertyDO struct {
 	TagKinds          []string
 	CommitId          string
 	NoApplicationFile bool
+	Exception         string
 }
 
 func (impl project) ListAndSortByUpdateTime(
@@ -227,6 +225,8 @@ type ProjectSummaryDO struct {
 	LikeCount     int
 	ForkCount     int
 	DownloadCount int
+	Hardware      string
+	Type          string
 }
 
 func (do *ProjectSummaryDO) toProjectSummary(r *spacedomain.ProjectSummary) (err error) {
@@ -249,6 +249,10 @@ func (do *ProjectSummaryDO) toProjectSummary(r *spacedomain.ProjectSummary) (err
 	}
 
 	if r.CoverId, err = domain.NewCoverId(do.CoverId); err != nil {
+		return
+	}
+
+	if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
 		return
 	}
 

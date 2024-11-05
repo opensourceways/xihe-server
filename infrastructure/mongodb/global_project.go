@@ -121,7 +121,6 @@ func (col project) listGlobalResource(
 	err = listGlobalResourceWithoutSort(
 		col.collectionName, do, col.summaryFields(), &v,
 	)
-
 	if err != nil || len(v) == 0 {
 		return
 	}

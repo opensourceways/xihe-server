@@ -92,3 +92,14 @@ func (adapter spaceAppRepoImpl) Remove(spaceId types.Identity) error {
 		spaceappDO{},
 	).Error
 }
+
+// FindAllBuildLog finds all built log by id in the repository
+func (impl spaceAppRepoImpl) FindAllBuildLogById(id types.Identity) (string, error) {
+	do := spaceappDO{Id: id.Integer()}
+
+	if err := impl.dao.GetByPrimaryKey(&do); err != nil {
+		return "", err
+	}
+
+	return do.AllBuildLog, nil
+}

@@ -2,7 +2,6 @@ package repositoryimpl
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -61,9 +60,7 @@ func (impl project) Save(p *spacedomain.Project) (r spacedomain.Project, err err
 
 		return
 	}
-	n := impl.toProjectDO(p)
-	fmt.Printf("new space -==================================================: %+v\n", n)
-	fmt.Printf("n.Hardware: %+v\n", n.Hardware)
+
 	v, err := impl.mapper.Insert(impl.toProjectDO(p))
 	if err != nil {
 		err = repositories.ConvertError(err)
@@ -175,25 +172,26 @@ func (impl project) GetSummaryByName(owner domain.Account, name domain.ResourceN
 
 func (impl project) toProjectDO(p *spacedomain.Project) ProjectDO {
 	do := ProjectDO{
-		Id:                p.Id,
-		Owner:             p.Owner.Account(),
-		Name:              p.Name.ResourceName(),
-		FL:                p.Name.FirstLetterOfName(),
-		Type:              p.Type.ProjType(),
-		CoverId:           p.CoverId.CoverId(),
-		RepoType:          p.RepoType.RepoType(),
-		Protocol:          p.Protocol.ProtocolName(),
-		Training:          p.Training.TrainingPlatform(),
-		Tags:              p.Tags,
-		TagKinds:          p.TagKinds,
-		RepoId:            p.RepoId,
-		CreatedAt:         p.CreatedAt,
-		UpdatedAt:         p.UpdatedAt,
-		Version:           p.Version,
-		Hardware:          p.Hardware.Hardware(),
-		BaseImage:         p.BaseImage.BaseImage(),
-		CommitId:          p.CommitId,
-		NoApplicationFile: p.NoApplicationFile,
+		Id:                 p.Id,
+		Owner:              p.Owner.Account(),
+		Name:               p.Name.ResourceName(),
+		FL:                 p.Name.FirstLetterOfName(),
+		Type:               p.Type.ProjType(),
+		CoverId:            p.CoverId.CoverId(),
+		RepoType:           p.RepoType.RepoType(),
+		Protocol:           p.Protocol.ProtocolName(),
+		Training:           p.Training.TrainingPlatform(),
+		Tags:               p.Tags,
+		TagKinds:           p.TagKinds,
+		RepoId:             p.RepoId,
+		CreatedAt:          p.CreatedAt,
+		UpdatedAt:          p.UpdatedAt,
+		Version:            p.Version,
+		Hardware:           p.Hardware.Hardware(),
+		BaseImage:          p.BaseImage.BaseImage(),
+		CommitId:           p.CommitId,
+		NoApplicationFile:  p.NoApplicationFile,
+		CompPowerAllocated: p.CompPowerAllocated,
 	}
 
 	if p.Desc != nil {
@@ -207,29 +205,32 @@ func (impl project) toProjectDO(p *spacedomain.Project) ProjectDO {
 }
 
 type ProjectDO struct {
-	Id                string
-	Owner             string
-	Name              string
-	FL                byte
-	Desc              string
-	Title             string
-	Type              string
-	Level             int
-	CoverId           string
-	Protocol          string
-	Training          string
-	RepoType          string
-	RepoId            string
-	Tags              []string
-	TagKinds          []string
-	CreatedAt         int64
-	UpdatedAt         int64
-	Version           int
-	LikeCount         int
-	ForkCount         int
-	DownloadCount     int
-	CommitId          string
-	NoApplicationFile bool
+	Id            string
+	Owner         string
+	Name          string
+	FL            byte
+	Desc          string
+	Title         string
+	Type          string
+	Level         int
+	CoverId       string
+	Protocol      string
+	Training      string
+	RepoType      string
+	RepoId        string
+	Tags          []string
+	TagKinds      []string
+	CreatedAt     int64
+	UpdatedAt     int64
+	Version       int
+	LikeCount     int
+	ForkCount     int
+	DownloadCount int
+
+	CommitId           string
+	NoApplicationFile  bool
+	Exception          string
+	CompPowerAllocated bool
 
 	Hardware  string
 	BaseImage string
@@ -285,17 +286,15 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 		return
 	}
 
-	if do.Hardware != "" {
-		if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
-			return
-		}
+	if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
+		return
+	}
 
+	if r.BaseImage, err = domain.NewBaseImage(do.BaseImage, do.Hardware); err != nil {
+		return
 	}
-	if do.BaseImage != "" {
-		if r.BaseImage, err = domain.NewBaseImage(do.BaseImage, do.Hardware); err != nil {
-			return
-		}
-	}
+
+	r.Exception = domain.CreateException(do.Exception)
 
 	r.Level = domain.NewResourceLevelByNum(do.Level)
 	r.RepoId = do.RepoId
@@ -309,6 +308,7 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 	r.DownloadCount = do.DownloadCount
 	r.CommitId = do.CommitId
 	r.NoApplicationFile = do.NoApplicationFile
+	r.CompPowerAllocated = do.CompPowerAllocated
 
 	return
 }

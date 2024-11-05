@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -74,16 +73,14 @@ func internalApiCheckMiddleware(ctl *baseController) gin.HandlerFunc {
 
 func checkToken(ctx *gin.Context) error {
 	rawToken := ctx.GetHeader(apiConfig.InternalHeader)
-	fmt.Printf("=====================rawToken: %v\n", rawToken)
 
 	calcTokenHash, err := utils.EncodeToken(rawToken, apiConfig.InternalTokeSalt)
-	fmt.Printf("======================calcTokenHash: %v\n", calcTokenHash)
 	if err != nil {
 		return allerror.New(
 			allerror.ErrorCodeAccessTokenInvalid, "check token failed", err,
 		)
 	}
-	fmt.Printf("apiConfig.InternalTokenHash: %v\n", apiConfig.InternalTokenHash)
+
 	if calcTokenHash != apiConfig.InternalTokenHash {
 		return allerror.New(
 			allerror.ErrorCodeAccessTokenInvalid, "invalid token", errors.New("token mismatch"),

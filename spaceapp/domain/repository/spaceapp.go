@@ -12,4 +12,5 @@ type SpaceAppRepository interface {
 	FindBySpaceId(types.Identity) (domain.SpaceApp, error)
 	FindById(types.Identity) (domain.SpaceApp, error)
 	SaveWithBuildLog(*domain.SpaceApp, *domain.SpaceAppBuildLog) error
+	FindAllBuildLogById(types.Identity) (string, error)
 }

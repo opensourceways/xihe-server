@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
+
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	"github.com/opensourceways/xihe-server/domain"
@@ -12,8 +15,6 @@ import (
 	spaceappdomain "github.com/opensourceways/xihe-server/spaceapp/domain"
 	spacemesage "github.com/opensourceways/xihe-server/spaceapp/domain/message"
 	"github.com/opensourceways/xihe-server/spaceapp/domain/repository"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/xerrors"
 )
 
 // SpaceappAppService is the interface for the space app service.
@@ -70,12 +71,16 @@ func (s *spaceappAppService) GetByName(
 		return dto, err
 	}
 
+	if space.Exception.Exception() != "" {
+		return toSpaceDTO(&space), nil
+	}
+
 	app, err := s.repo.FindBySpaceId(spaceId)
 	if err == nil {
 		return toSpaceAppDTO(&app), nil
 	}
 
-	// FIXME:
+	// HACK: don't effect logic
 	// if space.Hardware.IsNpu() && !space.CompPowerAllocated {
 	// 	return toSpaceNoCompQuotaDTO(&space), nil
 	// }
@@ -98,7 +103,7 @@ func (s *spaceappAppService) GetBuildLogs(ctx context.Context, user domain.Accou
 		return
 	}
 
-	spaceApp, err := s.repo.FindById(app.Id)
+	dto.Logs, err = s.repo.FindAllBuildLogById(app.Id)
 	if err != nil {
 		if commonrepo.IsErrorResourceNotExists(err) {
 			err = allerror.NewNotFound(allerror.ErrorCodeSpaceAppNotFound, "space app not found", err)
@@ -108,8 +113,6 @@ func (s *spaceappAppService) GetBuildLogs(ctx context.Context, user domain.Accou
 
 		return
 	}
-
-	dto.Logs = spaceApp.AppLogURL.URL()
 
 	return
 }

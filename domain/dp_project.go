@@ -156,5 +156,5 @@ func (r hardware) IsNpu() bool {
 }
 
 func (r hardware) IsCpu() bool {
-	return strings.Contains(strings.ToLower(string(r)), "cpu")
+	return !r.IsNpu() && strings.Contains(strings.ToLower(string(r)), "cpu")
 }

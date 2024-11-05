@@ -19,6 +19,8 @@ import (
 type ComputilityInternalAppService interface {
 	UserQuotaConsume(CmdToUserQuotaUpdate) error
 	UserQuotaRelease(CmdToUserQuotaUpdate) error
+
+	SpaceCreateSupply(CmdToSupplyRecord) error
 }
 
 // NewComputilityInternalAppService creates a new instance of ComputilityInternalAppService
@@ -161,6 +163,42 @@ func (s *computilityInternalAppService) UserQuotaRelease(cmd CmdToUserQuotaUpdat
 		logrus.Errorf("cancel user:%s account failed, %s", cmd.Index.UserName.Account(), err)
 
 		return err
+	}
+
+	return nil
+}
+
+func (s *computilityInternalAppService) SpaceCreateSupply(cmd CmdToSupplyRecord) error {
+	if cmd.Index.ComputeType.IsCpu() {
+		return nil
+	}
+
+	b, err := s.accountAdapter.CheckAccountExist(cmd.Index.UserName)
+	if err != nil {
+		return err
+	}
+	if !b {
+		e := xerrors.Errorf("user %s no permission for npu space", cmd.Index.UserName)
+
+		return allerror.New(
+			allerror.ErrorCodeNoNpuPermission,
+			"no permission for npu space", e)
+	}
+
+	record, err := s.accountRecordAtapter.FindByRecordIndex(cmd.Index)
+	if err != nil {
+		if commonrepo.IsErrorResourceNotExists(err) {
+			logrus.Errorf("user %s has not cosume record to release", cmd.Index.UserName.Account())
+			return nil
+		}
+		return err
+	}
+
+	record.SpaceId = cmd.NewSpaceId
+
+	err = s.accountRecordAtapter.Save(&record)
+	if err != nil {
+		logrus.Errorf("user %s no permission for %s space", cmd.Index.UserName, cmd.Index.ComputeType.ComputilityType())
 	}
 
 	return nil

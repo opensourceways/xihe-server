@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
+
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
 	types "github.com/opensourceways/xihe-server/domain"
@@ -17,8 +20,6 @@ import (
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/xerrors"
 )
 
 type InferenceIndex = domain.InferenceIndex
@@ -46,15 +47,6 @@ func (cmd *InferenceCreateCmd) Validate() error {
 	}
 
 	return nil
-}
-
-func (cmd *InferenceCreateCmd) toInference(v *domain.Inference, lastCommit, requester string) {
-	v.Project.Id = cmd.ProjectId
-	v.LastCommit = lastCommit
-	v.ProjectName = cmd.ProjectName
-	v.ResourceLevel = cmd.ResourceLevel
-	v.Project.Owner = cmd.ProjectOwner
-	v.Requester = requester
 }
 
 type InferenceService interface {
@@ -100,6 +92,11 @@ func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error 
 	if err != nil {
 		return err
 	}
+	err = space.PreCheck()
+	if err != nil {
+		return err
+	}
+
 	repoId, err := types.NewIdentity(space.RepoId)
 	if err != nil {
 		return err
@@ -127,7 +124,6 @@ func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error 
 		logrus.Errorf("spaceId:%s create space app db failed, err:%s", space.Id, err)
 		return err
 	}
-	fmt.Println("success ====================================== add ======================= space ================================ app")
 
 	if err := s.spacesender.SendSpaceAppCreateMsg(&domain.SpaceAppCreateEvent{
 		Id:       cmd.SpaceId.Identity(),
@@ -135,8 +131,6 @@ func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error 
 	}); err != nil {
 		return err
 	}
-
-	fmt.Println("success ====================================== send ======================= space ================================ create")
 
 	return nil
 }
@@ -363,14 +357,13 @@ func (s inferenceService) getSpaceApp(cmd CmdToCreateApp) (domain.SpaceApp, erro
 		return domain.SpaceApp{}, err
 	}
 
-	// FIXME:
-	// if space.CommitId != cmd.CommitId {
-	// 	err = allerror.New(allerror.ErrorCodeSpaceCommitConflict, "commit conflict",
-	// 		xerrors.Errorf("spaceId:%s commit conflict", space.Id.Identity()))
-	// 	logrus.Errorf("spaceId:%s latest commitId:%s, old commitId:%s, err:%s",
-	// 		cmd.SpaceId.Identity(), space.CommitId, cmd.CommitId, err)
-	// 	return domain.SpaceApp{}, err
-	// }
+	if space.CommitId != cmd.CommitId {
+		err = allerror.New(allerror.ErrorCodeSpaceCommitConflict, "commit conflict",
+			xerrors.Errorf("spaceId:%s commit conflict", space.RepoId))
+		logrus.Errorf("spaceId:%s latest commitId:%s, old commitId:%s, err:%s",
+			cmd.SpaceId.Identity(), space.CommitId, cmd.CommitId, err)
+		return domain.SpaceApp{}, err
+	}
 
 	spaceId, err := types.NewIdentity(space.RepoId)
 	if err != nil {

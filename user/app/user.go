@@ -78,7 +78,7 @@ func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
 		return
 	}
 
-	s.toUserDTO(&u, &dto)
+	toUserDTO(&u, &dto)
 
 	_ = s.sender.AddOperateLogForNewUser(u.Account)
 
@@ -165,7 +165,7 @@ func (s userService) GetByAccount(account domain.Account) (dto UserDTO, err erro
 		}
 	}
 
-	s.toUserDTO(&v, &dto)
+	toUserDTO(&v, &dto)
 
 	return
 }
@@ -178,7 +178,7 @@ func (s userService) GetByFollower(owner, follower domain.Account) (
 		return
 	}
 
-	s.toUserDTO(&v, &dto)
+	toUserDTO(&v, &dto)
 
 	return
 }
@@ -278,33 +278,6 @@ func (s userService) UpdatePlateformToken(cmd *UpdatePlateformTokenCmd) (err err
 	}
 
 	return
-}
-
-func (s userService) toUserDTO(u *domain.User, dto *UserDTO) {
-	*dto = UserDTO{
-		Id:      u.Id,
-		Email:   u.Email.Email(),
-		Account: u.Account.Account(),
-	}
-
-	if u.Bio != nil {
-		dto.Bio = u.Bio.Bio()
-	}
-
-	if u.AvatarId != nil {
-		dto.AvatarId = u.AvatarId.AvatarId()
-	}
-
-	dto.FollowerCount = u.FollowerCount
-	dto.FollowingCount = u.FollowingCount
-
-	dto.Platform.Token = u.PlatformToken.Token
-	dto.Platform.CreateAt = u.PlatformToken.CreateAt
-	dto.Platform.UserId = u.PlatformUser.Id
-	dto.Platform.NamespaceId = u.PlatformUser.NamespaceId
-	dto.CourseAgreement = u.CourseAgreement
-	dto.UserAgreement = u.UserAgreement
-	dto.FinetuneAgreement = u.FinetuneAgreement
 }
 
 func (s userService) encryptToken(d string) (string, error) {
