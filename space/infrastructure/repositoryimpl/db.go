@@ -11,6 +11,7 @@ func Init(db *gorm.DB, tables *Tables) error {
 	// must set TableName before migrating
 
 	projectTableName = tables.Project
+	tagsTableName = tables.Tags
 
 	// if err := db.AutoMigrate(&projectDO{}); err != nil {
 	// 	return err
@@ -18,7 +19,7 @@ func Init(db *gorm.DB, tables *Tables) error {
 
 	dbInstance = db
 
-	projectDao := daoImpl{table: projectTableName}
+	projectDao := daoImpl{table: projectTableName, tableTag: tagsTableName}
 
 	projectAdapterInstance = &projectAdapter{
 		daoImpl: projectDao,

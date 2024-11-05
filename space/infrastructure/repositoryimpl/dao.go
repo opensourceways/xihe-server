@@ -12,7 +12,8 @@ import (
 var dbInstance *gorm.DB
 
 type daoImpl struct {
-	table string
+	table    string
+	tableTag string
 }
 
 // Each operation must generate a new gorm.DB instance.
@@ -25,9 +26,17 @@ func (dao *daoImpl) db() *gorm.DB {
 	return dbInstance.Table(dao.table)
 }
 
+func (dao *daoImpl) dbTag() *gorm.DB {
+	if dbInstance == nil {
+		return nil
+	}
+
+	return dbInstance.Table(dao.tableTag)
+}
+
 // GetRecord retrieves a single record from the database based on the provided filter
 // and stores it in the result parameter.
-func (dao *daoImpl) GetRecord(filter, result interface{}) error {
+func (dao *daoImpl) GetProjectRecord(filter, result interface{}) error {
 	err := dao.db().Where(filter).First(result).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {

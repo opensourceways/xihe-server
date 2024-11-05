@@ -7,6 +7,7 @@ import (
 
 var (
 	projectTableName = ""
+	tagsTableName    = ""
 )
 
 func (do *projectDO) TableName() string {
@@ -40,6 +41,12 @@ type projectDO struct {
 	BaseImage string
 }
 
+type projectTagsDO struct {
+	Id        int
+	projectId string
+	tagName   string
+}
+
 func toProjectDO(p *spacedomain.Project) projectDO {
 	do := projectDO{
 		Id:                p.RepoId,
@@ -69,6 +76,19 @@ func toProjectDO(p *spacedomain.Project) projectDO {
 		do.Title = p.Title.ResourceTitle()
 	}
 	return do
+}
+
+func toProjectTagsDO(p *spacedomain.Project) []projectTagsDO {
+	var tags []projectTagsDO
+
+	for _, v := range p.Tags {
+		tags = append(tags, projectTagsDO{
+			projectId: p.RepoId,
+			tagName:   v,
+		})
+	}
+
+	return tags
 }
 
 func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
@@ -135,3 +155,7 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 
 	return
 }
+
+// func (do *projectTagsDO) toProject(r *spacedomain.Project) (err error) {
+
+// }
