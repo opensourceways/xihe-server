@@ -19,7 +19,7 @@ type projectDO struct {
 	Owner             string
 	Name              string
 	FL                byte
-	Desc              string
+	Description       string
 	Title             string
 	Type              string
 	Level             int
@@ -69,7 +69,7 @@ func toProjectDO(p *spacedomain.Project) projectDO {
 	}
 
 	if p.Desc != nil {
-		do.Desc = p.Desc.ResourceDesc()
+		do.Description = p.Desc.ResourceDesc()
 	}
 
 	if p.Title != nil {
@@ -102,7 +102,7 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 		return
 	}
 
-	if r.Desc, err = domain.NewResourceDesc(do.Desc); err != nil {
+	if r.Desc, err = domain.NewResourceDesc(do.Description); err != nil {
 		return
 	}
 
