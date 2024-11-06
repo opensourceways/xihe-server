@@ -59,5 +59,5 @@ type Project interface {
 }
 type ProjectPg interface {
 	Save(*spacedomain.Project) (spacedomain.Project, error)
-	GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
+	// GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
 }

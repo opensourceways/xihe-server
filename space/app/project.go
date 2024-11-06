@@ -124,6 +124,7 @@ type ProjectService interface {
 func NewProjectService(
 	user userrepo.User,
 	repo spacerepo.Project,
+	repoPg spacerepo.ProjectPg,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -133,6 +134,7 @@ func NewProjectService(
 ) ProjectService {
 	return projectService{
 		repo:     repo,
+		repoPg:   repoPg,
 		activity: activity,
 		sender:   sender,
 		rs: app.ResourceService{
@@ -148,6 +150,7 @@ func NewProjectService(
 type projectService struct {
 	repo spacerepo.Project
 	//pr       platform.Repository
+	repoPg         spacerepo.ProjectPg
 	activity       repository.Activity
 	sender         message.ResourceProducer
 	rs             app.ResourceService
