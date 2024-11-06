@@ -26,6 +26,7 @@ import (
 	"github.com/opensourceways/xihe-server/infrastructure/gitlab"
 	"github.com/opensourceways/xihe-server/infrastructure/messages"
 	pointsdomain "github.com/opensourceways/xihe-server/points/domain"
+	"github.com/opensourceways/xihe-server/space"
 	"github.com/opensourceways/xihe-server/spaceapp"
 	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/inferenceimpl"
 	"github.com/opensourceways/xihe-server/utils"
@@ -74,6 +75,7 @@ type Config struct {
 	AICCFinetune aiccconfig.Config               `json:"aicc_finetune"`
 	Computility  computility.Config              `json:"computility"`
 	SpaceApp     spaceapp.Config                 `json:"space_app"`
+	Space        space.Config                    `json:"space"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
