@@ -314,6 +314,7 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 		Owner:     r.Owner.Account(),
 		SpaceName: r.Name.ResourceName(),
 		DeletedBy: r.Owner.Account(),
+		SpaceId:   r.RepoId,
 	}); err != nil {
 		return
 	}
