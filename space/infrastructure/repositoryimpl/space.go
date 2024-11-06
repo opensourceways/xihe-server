@@ -26,8 +26,8 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 	}
 
 	doTags := toProjectTagsDO(v)
-	fmt.Printf("============================doTags: %+v\n", doTags)
 	for _, doTag := range doTags {
+		fmt.Printf("=========================doTag: %+v\n", doTag)
 		if err := adapter.dbTag().Clauses(clause.Returning{}).Create(&doTag).Error; err != nil {
 			return spacedomain.Project{}, err
 		}

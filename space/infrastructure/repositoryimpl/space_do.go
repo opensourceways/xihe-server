@@ -43,8 +43,8 @@ type projectDO struct {
 
 type projectTagsDO struct {
 	Id        int
-	projectId string
-	tagName   string
+	ProjectId string
+	TagName   string
 }
 
 func toProjectDO(p *spacedomain.Project) projectDO {
@@ -83,8 +83,8 @@ func toProjectTagsDO(p *spacedomain.Project) []projectTagsDO {
 
 	for _, v := range p.Tags {
 		tags = append(tags, projectTagsDO{
-			projectId: p.RepoId,
-			tagName:   v,
+			ProjectId: p.RepoId,
+			TagName:   v,
 		})
 	}
 
