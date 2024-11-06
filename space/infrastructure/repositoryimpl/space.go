@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"errors"
+	"fmt"
 
 	// "github.com/opensourceways/xihe-server/domain"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
@@ -25,8 +26,9 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 	}
 
 	doTags := toProjectTagsDO(v)
+	fmt.Printf("============================doTags: %+v\n", doTags)
 	for _, doTag := range doTags {
-		if err := adapter.db().Clauses(clause.Returning{}).Create(&doTag).Error; err != nil {
+		if err := adapter.dbTag().Clauses(clause.Returning{}).Create(&doTag).Error; err != nil {
 			return spacedomain.Project{}, err
 		}
 	}
