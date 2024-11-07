@@ -127,7 +127,6 @@ func NewProjectService(
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
-	pr platform.Repository,
 	sender message.ResourceProducer,
 	computilityApp computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
@@ -148,8 +147,7 @@ func NewProjectService(
 }
 
 type projectService struct {
-	repo spacerepo.Project
-	//pr       platform.Repository
+	repo           spacerepo.Project
 	activity       repository.Activity
 	sender         message.ResourceProducer
 	rs             app.ResourceService

@@ -271,8 +271,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityAccountAdapter(),
 	)
 
+	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
+
 	projectService := spaceapp.NewProjectService(
-		user, proj, model, dataset, activity, nil, resProducer, computilityService, nil,
+		user, proj, model, dataset, activity, resProducer, computilityService, spaceProducer,
 	)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
@@ -322,8 +324,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
 	)
 
-	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
-
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
@@ -331,7 +331,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 		controller.AddRouterForProjectInternalController(
 			internal, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService,
+			newPlatformRepository, computilityService, spaceProducer,
 		)
 
 		controller.AddRouterForModelController(
