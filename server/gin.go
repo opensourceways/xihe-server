@@ -60,6 +60,7 @@ import (
 	promotionadapter "github.com/opensourceways/xihe-server/promotion/infrastructure/repositoryadapter"
 	promotionuseradapter "github.com/opensourceways/xihe-server/promotion/infrastructure/useradapter"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
+	spaceinfra "github.com/opensourceways/xihe-server/space/infrastructure"
 	spacerepo "github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
 	spaceappApp "github.com/opensourceways/xihe-server/spaceapp/app"
 	spaceappmsg "github.com/opensourceways/xihe-server/spaceapp/infrastructure/messageimpl"
@@ -270,8 +271,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityAccountAdapter(),
 	)
 
+	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
+
 	projectService := spaceapp.NewProjectService(
-		user, proj, model, dataset, activity, nil, resProducer, computilityService,
+		user, proj, model, dataset, activity, resProducer, computilityService, spaceProducer,
 	)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
@@ -324,11 +327,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService,
+			newPlatformRepository, computilityService, spaceProducer,
 		)
 		controller.AddRouterForProjectInternalController(
 			internal, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService,
+			newPlatformRepository, computilityService, spaceProducer,
 		)
 
 		controller.AddRouterForModelController(

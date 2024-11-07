@@ -127,9 +127,9 @@ func NewProjectService(
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
-	pr platform.Repository,
 	sender message.ResourceProducer,
 	computilityApp computilityapp.ComputilityInternalAppService,
+	spaceProducer spacedomain.SpaceEventProducer,
 ) ProjectService {
 	return projectService{
 		repo:     repo,
@@ -142,16 +142,17 @@ func NewProjectService(
 			Dataset: dataset,
 		},
 		computilityApp: computilityApp,
+		spaceProducer:  spaceProducer,
 	}
 }
 
 type projectService struct {
-	repo spacerepo.Project
-	//pr       platform.Repository
+	repo           spacerepo.Project
 	activity       repository.Activity
 	sender         message.ResourceProducer
 	rs             app.ResourceService
 	computilityApp computilityapp.ComputilityInternalAppService
+	spaceProducer  spacedomain.SpaceEventProducer
 }
 
 func (s projectService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -303,6 +304,16 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 
 	// step3: delete
 	if err = s.repo.Delete(&obj.ResourceIndex); err != nil {
+		return
+	}
+
+	if err = s.spaceProducer.SendDeletedEvent(&spacedomain.DeleteSpaceEvent{
+		Time:      utils.Now(),
+		Owner:     r.Owner.Account(),
+		SpaceName: r.Name.ResourceName(),
+		DeletedBy: r.Owner.Account(),
+		SpaceId:   r.RepoId,
+	}); err != nil {
 		return
 	}
 

@@ -11,6 +11,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
+	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 )
@@ -27,6 +28,7 @@ func AddRouterForProjectInternalController(
 	sender message.ResourceProducer,
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
+	spaceProducer spacedomain.SpaceEventProducer,
 ) {
 	ctl := ProjectInternalController{
 		user:    user,
@@ -36,7 +38,7 @@ func AddRouterForProjectInternalController(
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repo, model, dataset, activity, nil, sender, computility,
+			user, repo, model, dataset, activity, sender, computility, spaceProducer,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
