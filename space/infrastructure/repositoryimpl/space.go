@@ -38,6 +38,7 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 // func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.ResourceName) (
 // 	r spacedomain.Project, err error,
 // ) {
+// 	//filter
 // 	do := projectDO{
 // 		Owner: owner.Account(),
 // 		Name:  name.ResourceName(),
@@ -51,12 +52,26 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 
 // 	id := result.RepoId
 
-// 	tagdo := projectTagsDO{
-// 		projectId: id,
+// 	var tagResults []projectTagsDO
+
+// 	query := adapter.daoImpl.dbTag().Where("project_id", id)
+// 	//find tags
+// 	errTag := query.Find(&tagResults).Error
+
+// 	if errTag != nil || len(tagResults) == 0 {
+// 		return spacedomain.Project{}, err
 // 	}
 
-// 	tagResults := []projectTagsDO{}
-
 // 	err = result.toProject(&r)
-// 	return
+// 	adapter.getProjectTags(&r, tagResults)
+
+// 	return r, nil
+// }
+
+// func (adapter *projectAdapter) getProjectTags(p *spacedomain.Project, tagResults []projectTagsDO) {
+// 	p.Tags = make([]string, 0, len(tagResults))
+
+// 	for _, tagDO := range tagResults {
+// 		p.Tags = append(p.Tags, tagDO.TagName)
+// 	}
 // }

@@ -15,27 +15,30 @@ func (do *projectDO) TableName() string {
 }
 
 type projectDO struct {
-	Id                string
-	Owner             string
-	Name              string
-	FL                byte
-	Description       string
-	Title             string
-	Type              string
-	Level             int
-	CoverId           string
-	Protocol          string
-	Training          string
-	RepoType          string
-	RepoId            string
-	CreatedAt         int64
-	UpdatedAt         int64
-	Version           int
-	LikeCount         int
-	ForkCount         int
-	DownloadCount     int
-	CommitId          string
-	NoApplicationFile bool
+	Id            string
+	Owner         string
+	Name          string
+	FL            byte
+	Description   string
+	Title         string
+	Type          string
+	Level         int
+	CoverId       string
+	Protocol      string
+	Training      string
+	RepoType      string
+	RepoId        string
+	CreatedAt     int64
+	UpdatedAt     int64
+	Version       int
+	LikeCount     int
+	ForkCount     int
+	DownloadCount int
+
+	CommitId           string
+	NoApplicationFile  bool
+	CompPowerAllocated bool
+	Exception          string
 
 	Hardware  string
 	BaseImage string
@@ -49,23 +52,24 @@ type projectTagsDO struct {
 
 func toProjectDO(p *spacedomain.Project) projectDO {
 	do := projectDO{
-		Id:                p.RepoId,
-		Owner:             p.Owner.Account(),
-		Name:              p.Name.ResourceName(),
-		FL:                p.Name.FirstLetterOfName(),
-		Type:              p.Type.ProjType(),
-		CoverId:           p.CoverId.CoverId(),
-		RepoType:          p.RepoType.RepoType(),
-		Protocol:          p.Protocol.ProtocolName(),
-		Training:          p.Training.TrainingPlatform(),
-		RepoId:            p.RepoId,
-		CreatedAt:         p.CreatedAt,
-		UpdatedAt:         p.UpdatedAt,
-		Version:           p.Version,
-		Hardware:          p.Hardware.Hardware(),
-		BaseImage:         p.BaseImage.BaseImage(),
-		CommitId:          p.CommitId,
-		NoApplicationFile: p.NoApplicationFile,
+		Id:                 p.RepoId,
+		Owner:              p.Owner.Account(),
+		Name:               p.Name.ResourceName(),
+		FL:                 p.Name.FirstLetterOfName(),
+		Type:               p.Type.ProjType(),
+		CoverId:            p.CoverId.CoverId(),
+		RepoType:           p.RepoType.RepoType(),
+		Protocol:           p.Protocol.ProtocolName(),
+		Training:           p.Training.TrainingPlatform(),
+		RepoId:             p.RepoId,
+		CreatedAt:          p.CreatedAt,
+		UpdatedAt:          p.UpdatedAt,
+		Version:            p.Version,
+		Hardware:           p.Hardware.Hardware(),
+		BaseImage:          p.BaseImage.BaseImage(),
+		CommitId:           p.CommitId,
+		NoApplicationFile:  p.NoApplicationFile,
+		CompPowerAllocated: p.CompPowerAllocated,
 	}
 
 	if p.Desc != nil {
@@ -152,6 +156,8 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 	r.DownloadCount = do.DownloadCount
 	r.CommitId = do.CommitId
 	r.NoApplicationFile = do.NoApplicationFile
+	r.Exception = domain.CreateException(do.Exception)
+	r.CompPowerAllocated = do.CompPowerAllocated
 
 	return
 }
