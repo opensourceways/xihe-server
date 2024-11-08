@@ -32,7 +32,7 @@ type userPointsAppMessageService struct {
 func (s *userPointsAppMessageService) AddPointsItem(cmd *CmdToAddPointsItem) error {
 	task, err := s.tr.Find(cmd.TaskId)
 	if err != nil {
-		logrus.Errorf("No task found for task id: %s", cmd.TaskId)
+		logrus.Warnf("No task found for task id: %s", cmd.TaskId)
 
 		if repoerr.IsErrorResourceNotExists(err) {
 			return nil
