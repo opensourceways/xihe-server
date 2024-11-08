@@ -15,6 +15,9 @@ type daoImpl struct {
 	table    string
 	tableTag string
 }
+type relatedDaoImpl struct {
+	table string
+}
 
 // Each operation must generate a new gorm.DB instance.
 // If using the same gorm.DB instance by different operations, they will share the same error.
@@ -32,6 +35,14 @@ func (dao *daoImpl) dbTag() *gorm.DB {
 	}
 
 	return dbInstance.Table(dao.tableTag)
+}
+
+func (dao *relatedDaoImpl) db() *gorm.DB {
+	if dbInstance == nil {
+		return nil
+	}
+
+	return dbInstance.Table(dao.table)
 }
 
 // GetRecord retrieves a single record from the database based on the provided filter

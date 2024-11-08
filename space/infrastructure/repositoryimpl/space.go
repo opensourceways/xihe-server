@@ -13,6 +13,10 @@ type projectAdapter struct {
 	daoImpl
 }
 
+type datasetAdapter struct {
+	relatedDaoImpl
+}
+
 func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project, error) {
 	if v.Id != "" {
 		err := errors.New("must be a new project")
@@ -27,11 +31,11 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 
 	doTags := toProjectTagsDO(v)
 	for _, doTag := range doTags {
-		fmt.Printf("=========================doTag: %+v\n", doTag)
 		if err := adapter.dbTag().Clauses(clause.Returning{}).Create(&doTag).Error; err != nil {
 			return spacedomain.Project{}, err
 		}
 	}
+	fmt.Printf("==================================v: %+v\n", *v)
 	return *v, nil
 }
 
@@ -45,17 +49,17 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 // 	}
 
 // 	// It must new a new DO, otherwise the sql statement will include duplicate conditions.
+// 	//find project
 // 	result := projectDO{}
 // 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
 // 		return spacedomain.Project{}, err
 // 	}
 
 // 	id := result.RepoId
+// 	query := projectAdapter.daoImpl.dbTag().Where("project_id", id)
 
-// 	var tagResults []projectTagsDO
-
-// 	query := adapter.daoImpl.dbTag().Where("project_id", id)
 // 	//find tags
+// 	var tagResults []projectTagsDO
 // 	errTag := query.Find(&tagResults).Error
 
 // 	if errTag != nil || len(tagResults) == 0 {
@@ -64,6 +68,14 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 
 // 	err = result.toProject(&r)
 // 	adapter.getProjectTags(&r, tagResults)
+
+// 	errDataset := b.relatedDaoImpl.
+
+// 		// .db().Where("project_id", id).Find(&datasetResults).Error
+// 		// if errDataset != nil || len(tagResults) == 0 {
+// 		// 	return spacedomain.Project{}, err
+// 		// }
+// 		datasetAdapter.getdataset(&r, tagResults)
 
 // 	return r, nil
 // }

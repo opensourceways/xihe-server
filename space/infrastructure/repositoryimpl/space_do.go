@@ -8,6 +8,8 @@ import (
 var (
 	projectTableName = ""
 	tagsTableName    = ""
+	datasetTableName = ""
+	modelTableName   = ""
 )
 
 func (do *projectDO) TableName() string {
@@ -48,6 +50,20 @@ type projectTagsDO struct {
 	Id        int
 	ProjectId string
 	TagName   string
+}
+
+type datasetDO struct {
+	Id        int
+	ProjectId string
+	Name      string
+	Owner     string
+}
+
+type modelDO struct {
+	Id        int
+	ProjectId string
+	Name      string
+	Owner     string
 }
 
 func toProjectDO(p *spacedomain.Project) projectDO {
