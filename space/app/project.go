@@ -324,7 +324,7 @@ func (s projectService) GetByName(
 	owner domain.Account, name domain.ResourceName,
 	allowPrivacy bool,
 ) (dto ProjectDetailDTO, err error) {
-	v, err := s.repo.GetByName(owner, name)
+	v, err := s.repoPg.GetByName(owner, name)
 	if err != nil {
 		return
 	}
