@@ -4,17 +4,13 @@ import (
 	"errors"
 	"fmt"
 
-	// "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/domain"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	"gorm.io/gorm/clause"
 )
 
 type projectAdapter struct {
 	daoImpl
-}
-
-type datasetAdapter struct {
-	relatedDaoImpl
 }
 
 func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project, error) {
@@ -39,51 +35,90 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 	return *v, nil
 }
 
-// func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.ResourceName) (
-// 	r spacedomain.Project, err error,
-// ) {
-// 	//filter
-// 	do := projectDO{
-// 		Owner: owner.Account(),
-// 		Name:  name.ResourceName(),
-// 	}
+func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.ResourceName) (
+	r spacedomain.Project, err error,
+) {
+	//filter
+	do := projectDO{
+		Owner: owner.Account(),
+		Name:  name.ResourceName(),
+	}
 
-// 	// It must new a new DO, otherwise the sql statement will include duplicate conditions.
-// 	//find project
-// 	result := projectDO{}
-// 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
-// 		return spacedomain.Project{}, err
-// 	}
+	// find project
+	result := projectDO{}
+	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
+		return spacedomain.Project{}, err
+	}
 
-// 	id := result.RepoId
-// 	query := projectAdapter.daoImpl.dbTag().Where("project_id", id)
+	id := result.RepoId
+	if err = result.toProject(&r); err != nil {
+		return spacedomain.Project{}, err
+	}
 
-// 	//find tags
-// 	var tagResults []projectTagsDO
-// 	errTag := query.Find(&tagResults).Error
+	// find tags
+	var tagResults []projectTagsDO
+	if errTag := adapter.daoImpl.dbTag().Where("project_id", id).Find(&tagResults).Error; errTag != nil {
+		return spacedomain.Project{}, errTag
+	}
+	adapter.getProjectTags(&r, tagResults)
 
-// 	if errTag != nil || len(tagResults) == 0 {
-// 		return spacedomain.Project{}, err
-// 	}
+	// get datasets
+	var datasetResults []datasetDO
+	if errDataset := adapter.daoImpl.dbDataset().Where("project_id", id).Find(&datasetResults).Error; errDataset != nil {
+		return spacedomain.Project{}, errDataset
+	}
+	adapter.getDataset(&r, datasetResults)
 
-// 	err = result.toProject(&r)
-// 	adapter.getProjectTags(&r, tagResults)
+	// get models
+	var modelResults []modelDO
+	if errModel := adapter.daoImpl.dbModel().Where("project_id", id).Find(&datasetResults).Error; errModel != nil {
+		return spacedomain.Project{}, errModel
+	}
+	adapter.getModel(&r, modelResults)
 
-// 	errDataset := b.relatedDaoImpl.
+	return r, nil
+}
 
-// 		// .db().Where("project_id", id).Find(&datasetResults).Error
-// 		// if errDataset != nil || len(tagResults) == 0 {
-// 		// 	return spacedomain.Project{}, err
-// 		// }
-// 		datasetAdapter.getdataset(&r, tagResults)
+func (adapter *projectAdapter) getProjectTags(p *spacedomain.Project, tagResults []projectTagsDO) {
+	p.Tags = make([]string, 0, len(tagResults))
 
-// 	return r, nil
-// }
+	for _, tagDO := range tagResults {
+		p.Tags = append(p.Tags, tagDO.TagName)
+	}
+}
 
-// func (adapter *projectAdapter) getProjectTags(p *spacedomain.Project, tagResults []projectTagsDO) {
-// 	p.Tags = make([]string, 0, len(tagResults))
+func (adapter *projectAdapter) getDataset(p *spacedomain.Project, datasetResult []datasetDO) {
+	if len(datasetResult) == 0 {
+		return
+	}
 
-// 	for _, tagDO := range tagResults {
-// 		p.Tags = append(p.Tags, tagDO.TagName)
-// 	}
-// }
+	relatedDatasets := make(domain.RelatedResources, len(datasetResult))
+
+	for i, dataset := range datasetResult {
+		relatedDatasets[i] = domain.ResourceIndex{
+			Owner: domain.CreateAccount(dataset.Owner),
+			Id:    dataset.DatasetId,
+		}
+	}
+
+	p.RelatedDatasets = relatedDatasets
+
+}
+
+func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []modelDO) {
+	if len(modelResult) == 0 {
+		return
+	}
+
+	relatedModels := make(domain.RelatedResources, len(modelResult))
+
+	for i, model := range modelResult {
+		relatedModels[i] = domain.ResourceIndex{
+			Owner: domain.CreateAccount(model.Owner),
+			Id:    model.ModelId,
+		}
+	}
+
+	p.RelatedDatasets = relatedModels
+
+}

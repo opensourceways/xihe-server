@@ -126,8 +126,6 @@ func NewProjectService(
 	user userrepo.User,
 	repo spacerepo.Project,
 	repoPg spacerepo.ProjectPg,
-	modelAdapter spacerepo.ModelAdapter,
-	datasetAdapter spacerepo.DatasetAdapter,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -136,12 +134,10 @@ func NewProjectService(
 	computilityApp computilityapp.ComputilityInternalAppService,
 ) ProjectService {
 	return projectService{
-		repo:           repo,
-		repoPg:         repoPg,
-		modelAdapter:   modelAdapter,
-		datasetAdapter: datasetAdapter,
-		activity:       activity,
-		sender:         sender,
+		repo:     repo,
+		repoPg:   repoPg,
+		activity: activity,
+		sender:   sender,
 		rs: app.ResourceService{
 			User:    user,
 			Model:   model,
@@ -156,8 +152,6 @@ type projectService struct {
 	repo spacerepo.Project
 	//pr       platform.Repository
 	repoPg         spacerepo.ProjectPg
-	modelAdapter   spacerepo.ModelAdapter
-	datasetAdapter spacerepo.DatasetAdapter
 	activity       repository.Activity
 	sender         message.ResourceProducer
 	rs             app.ResourceService

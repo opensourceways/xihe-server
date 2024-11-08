@@ -12,11 +12,10 @@ import (
 var dbInstance *gorm.DB
 
 type daoImpl struct {
-	table    string
-	tableTag string
-}
-type relatedDaoImpl struct {
-	table string
+	table        string
+	tableTag     string
+	tableDataset string
+	tableModel   string
 }
 
 // Each operation must generate a new gorm.DB instance.
@@ -37,12 +36,20 @@ func (dao *daoImpl) dbTag() *gorm.DB {
 	return dbInstance.Table(dao.tableTag)
 }
 
-func (dao *relatedDaoImpl) db() *gorm.DB {
+func (dao *daoImpl) dbDataset() *gorm.DB {
 	if dbInstance == nil {
 		return nil
 	}
 
-	return dbInstance.Table(dao.table)
+	return dbInstance.Table(dao.tableDataset)
+}
+
+func (dao *daoImpl) dbModel() *gorm.DB {
+	if dbInstance == nil {
+		return nil
+	}
+
+	return dbInstance.Table(dao.tableModel)
 }
 
 // GetRecord retrieves a single record from the database based on the provided filter

@@ -53,14 +53,14 @@ type projectTagsDO struct {
 }
 
 type datasetDO struct {
-	Id        int
+	DatasetId string
 	ProjectId string
 	Name      string
 	Owner     string
 }
 
 type modelDO struct {
-	Id        int
+	ModelId   string
 	ProjectId string
 	Name      string
 	Owner     string

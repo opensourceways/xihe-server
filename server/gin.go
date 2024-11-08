@@ -276,7 +276,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	}
 
 	projectService := spaceapp.NewProjectService(
-		user, proj, spacerepo.ProjectAdapter(), spacerepo.ModelAdapter(), spacerepo.DatasetAdapter(), model, dataset, activity, nil, resProducer, computilityService,
+		user, proj, spacerepo.ProjectAdapter(), model, dataset, activity, nil, resProducer, computilityService,
 	)
 
 	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
@@ -329,11 +329,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spacerepo.ProjectAdapter(), spacerepo.DatasetAdapter(), spacerepo.ModelAdapter(),
+			newPlatformRepository, computilityService, spacerepo.ProjectAdapter(),
 		)
 		controller.AddRouterForProjectInternalController(
 			internal, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spacerepo.ProjectAdapter(), spacerepo.DatasetAdapter(), spacerepo.ModelAdapter(),
+			newPlatformRepository, computilityService, spacerepo.ProjectAdapter(),
 		)
 
 		controller.AddRouterForModelController(

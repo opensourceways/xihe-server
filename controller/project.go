@@ -31,8 +31,6 @@ func AddRouterForProjectController(
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
 	repoPg spacerepo.ProjectPg,
-	datasetAdapter spacerepo.DatasetAdapter,
-	modelAdapter spacerepo.ModelAdapter,
 ) {
 	ctl := ProjectController{
 		user:    user,
@@ -42,7 +40,7 @@ func AddRouterForProjectController(
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repo, repoPg, modelAdapter, datasetAdapter, model, dataset, activity, nil, sender, computility,
+			user, repo, repoPg, model, dataset, activity, nil, sender, computility,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
