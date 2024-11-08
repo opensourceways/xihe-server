@@ -59,11 +59,5 @@ type Project interface {
 }
 type ProjectPg interface {
 	Save(*spacedomain.Project) (spacedomain.Project, error)
-	// GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
-}
-
-type DatasetAdapter interface {
-}
-
-type ModelAdapter interface {
+	GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
 }
