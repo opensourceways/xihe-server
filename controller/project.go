@@ -793,6 +793,7 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 	}
 
 	pl, proj, ok := ctl.checkPermission(ctx)
+	fmt.Printf("=============================pl: %+v\n", pl)
 	if !ok {
 		return
 	}
