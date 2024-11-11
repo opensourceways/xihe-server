@@ -129,3 +129,16 @@ func (adapter *projectAdapter) AddRelatedDataset(info *repository.RelatedResourc
 	fmt.Printf("================================do: %+v\n", do)
 	return adapter.dbDataset().Clauses(clause.Returning{}).Create(&do).Error
 }
+
+func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
+	do := projectDO{Owner: owner.Account(), RepoId: identity}
+	result := projectDO{}
+
+	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
+		return spacedomain.Project{}, err
+	}
+
+	err = result.toProject(&r)
+	return
+
+}

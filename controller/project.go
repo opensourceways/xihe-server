@@ -71,9 +71,11 @@ func AddRouterForProjectController(
 type ProjectController struct {
 	baseController
 
-	user userrepo.User
-	repo spacerepo.Project
-	s    spaceapp.ProjectService
+	user   userrepo.User
+	repo   spacerepo.Project
+	repoPg spacerepo.ProjectPg
+
+	s spaceapp.ProjectService
 
 	model   repository.Model
 	dataset repository.Dataset
@@ -951,7 +953,7 @@ func (ctl *ProjectController) checkPermission(ctx *gin.Context) (
 		return
 	}
 
-	proj, err = ctl.repo.Get(owner, ctx.Param("id"))
+	proj, err = ctl.repoPg.Get(owner, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 
