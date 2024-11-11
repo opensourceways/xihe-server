@@ -35,6 +35,7 @@ func AddRouterForProjectController(
 	ctl := ProjectController{
 		user:    user,
 		repo:    repo,
+		repoPg:  repoPg,
 		model:   model,
 		dataset: dataset,
 		tags:    tags,
@@ -954,6 +955,7 @@ func (ctl *ProjectController) checkPermission(ctx *gin.Context) (
 	}
 
 	proj, err = ctl.repoPg.Get(owner, ctx.Param("id"))
+	fmt.Printf("=============================proj: %+v\n", proj)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 
