@@ -117,7 +117,7 @@ func (s projectService) AddRelatedModel(
 ) error {
 	return s.addRelatedResource(
 		p, p.RelatedModels, index, domain.ResourceTypeModel,
-		s.repo.AddRelatedModel,
+		s.repoPg.AddRelatedModel,
 	)
 }
 

@@ -126,12 +126,17 @@ func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []mo
 
 func (adapter *projectAdapter) AddRelatedDataset(info *repository.RelatedResourceInfo) error {
 	do := toDatasetDO(info)
-	fmt.Printf("================================do: %+v\n", do)
 	return adapter.dbDataset().Clauses(clause.Returning{}).Create(&do).Error
+}
+
+func (adapter *projectAdapter) AddRelatedModel(info *repository.RelatedResourceInfo) error {
+	do := toModelDO(info)
+	return adapter.dbModel().Clauses(clause.Returning{}).Create(&do).Error
 }
 
 func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
 	do := projectDO{Owner: owner.Account(), RepoId: identity}
+	fmt.Printf("do: %v\n", do)
 	result := projectDO{}
 
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
