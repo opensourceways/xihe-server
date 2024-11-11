@@ -676,7 +676,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	pl, proj, ok := ctl.checkPermission(ctx)
+	pl, proj, ok := ctl.checkPermissionPg(ctx)
 	if !ok {
 		return
 	}
@@ -786,7 +786,6 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 	}
 
 	data, err := ctl.dataset.GetByName(owner, name)
-	fmt.Printf("=============================data: %+v\n", data)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
@@ -795,8 +794,7 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 		return
 	}
 
-	pl, proj, ok := ctl.checkPermission(ctx)
-	fmt.Printf("=============================pl: %+v\n", pl)
+	pl, proj, ok := ctl.checkPermissionPg(ctx)
 	if !ok {
 		return
 	}
@@ -816,7 +814,6 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 		Owner: owner,
 		Id:    data.Id,
 	}
-	fmt.Printf("=============================index: %+v\n", index)
 	if err = ctl.s.AddRelatedDataset(&proj, &index); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
@@ -954,8 +951,45 @@ func (ctl *ProjectController) checkPermission(ctx *gin.Context) (
 		return
 	}
 
+	proj, err = ctl.repo.Get(owner, ctx.Param("id"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseError(err))
+
+		return
+	}
+
+	info = pl
+	ok = true
+
+	return
+}
+
+func (ctl *ProjectController) checkPermissionPg(ctx *gin.Context) (
+	info *oldUserTokenPayload, proj spacedomain.Project, ok bool,
+) {
+	owner, err := domain.NewAccount(ctx.Param("owner"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		return
+	}
+
+	if pl.isNotMe(owner) {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorNotAllowed, "not allowed",
+		))
+
+		return
+	}
+
 	proj, err = ctl.repoPg.Get(owner, ctx.Param("id"))
-	fmt.Printf("=============================proj: %+v\n", proj)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 

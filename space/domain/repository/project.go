@@ -62,4 +62,5 @@ type ProjectPg interface {
 	GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
 	Get(domain.Account, string) (spacedomain.Project, error)
 	AddRelatedDataset(*repository.RelatedResourceInfo) error
+	AddRelatedModel(*spacedomain.Project, *domain.ResourceIndex) error
 }

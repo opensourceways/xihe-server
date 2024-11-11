@@ -232,7 +232,6 @@ func (ctl baseController) checkUserApiTokenBase(
 	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
 	token, err := ctl.getCookieToken(ctx)
-	fmt.Printf("===========================token: %+v\n", token)
 	if err != nil {
 		return
 	}
@@ -241,7 +240,6 @@ func (ctl baseController) checkUserApiTokenBase(
 	if err != nil {
 		return
 	}
-	fmt.Printf("csrftoken:========================================== %+v\n", csrftoken)
 
 	pl = new(oldUserTokenPayload)
 

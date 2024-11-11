@@ -56,15 +56,11 @@ type projectTagsDO struct {
 type datasetDO struct {
 	DatasetId string
 	ProjectId string
-	Name      string
-	Owner     string
 }
 
 type modelDO struct {
 	ModelId   string
 	ProjectId string
-	Name      string
-	Owner     string
 }
 
 func toProjectDO(p *spacedomain.Project) projectDO {
@@ -183,7 +179,14 @@ func toDatasetDO(r *repository.RelatedResourceInfo) datasetDO {
 	do := datasetDO{
 		ProjectId: r.ResourceToUpdate.Id,
 		DatasetId: r.RelatedResource.Id,
-		Owner:     r.RelatedResource.Owner.Account(),
+	}
+	return do
+}
+
+func toModelDO(r *repository.RelatedResourceInfo) modelDO {
+	do := modelDO{
+		ProjectId: r.ResourceToUpdate.Id,
+		ModelId:   r.RelatedResource.Id,
 	}
 	return do
 }
