@@ -783,6 +783,7 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 	}
 
 	data, err := ctl.dataset.GetByName(owner, name)
+	fmt.Printf("=============================data: %+v\n", data)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
@@ -811,6 +812,7 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 		Owner: owner,
 		Id:    data.Id,
 	}
+	fmt.Printf("=============================index: %+v\n", index)
 	if err = ctl.s.AddRelatedDataset(&proj, &index); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 

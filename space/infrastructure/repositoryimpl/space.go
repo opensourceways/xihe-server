@@ -126,5 +126,6 @@ func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []mo
 
 func (adapter *projectAdapter) AddRelatedDataset(info *repository.RelatedResourceInfo) error {
 	do := toDatasetDO(info)
+	fmt.Printf("================================do: %+v\n", do)
 	return adapter.dbDataset().Clauses(clause.Returning{}).Create(&do).Error
 }
