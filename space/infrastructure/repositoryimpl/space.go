@@ -97,8 +97,7 @@ func (adapter *projectAdapter) getDataset(p *spacedomain.Project, datasetResult 
 
 	for i, dataset := range datasetResult {
 		relatedDatasets[i] = domain.ResourceIndex{
-			Owner: domain.CreateAccount(dataset.Owner),
-			Id:    dataset.DatasetId,
+			Id: dataset.DatasetId,
 		}
 	}
 
@@ -115,8 +114,7 @@ func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []mo
 
 	for i, model := range modelResult {
 		relatedModels[i] = domain.ResourceIndex{
-			Owner: domain.CreateAccount(model.Owner),
-			Id:    model.ModelId,
+			Id: model.ModelId,
 		}
 	}
 
