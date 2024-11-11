@@ -126,7 +126,7 @@ func (s projectService) AddRelatedDataset(
 ) error {
 	return s.addRelatedResource(
 		p, p.RelatedDatasets, index, domain.ResourceTypeDataset,
-		s.repo.AddRelatedDataset,
+		s.repoPg.AddRelatedDataset,
 	)
 }
 
@@ -146,7 +146,7 @@ func (s projectService) addRelatedResource(
 	}
 
 	info := repository.RelatedResourceInfo{
-		ResourceToUpdate: s.toResourceToUpdate(p),
+		ResourceToUpdate: s.toResourceToUpdatePg(p),
 		RelatedResource:  *index,
 	}
 
@@ -228,6 +228,15 @@ func (s projectService) toResourceToUpdate(p *spacedomain.Project) repository.Re
 	return repository.ResourceToUpdate{
 		Owner:     p.Owner,
 		Id:        p.Id,
+		Version:   p.Version,
+		UpdatedAt: utils.Now(),
+	}
+}
+
+func (s projectService) toResourceToUpdatePg(p *spacedomain.Project) repository.ResourceToUpdate {
+	return repository.ResourceToUpdate{
+		Owner:     p.Owner,
+		Id:        p.RepoId,
 		Version:   p.Version,
 		UpdatedAt: utils.Now(),
 	}

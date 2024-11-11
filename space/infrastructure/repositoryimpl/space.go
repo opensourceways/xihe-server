@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/domain/repository"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	"gorm.io/gorm/clause"
 )
@@ -121,4 +122,9 @@ func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []mo
 
 	p.RelatedDatasets = relatedModels
 
+}
+
+func (adapter *projectAdapter) AddRelatedDataset(info *repository.RelatedResourceInfo) error {
+	do := toDatasetDO(info)
+	return adapter.dbDataset().Clauses(clause.Returning{}).Create(&do).Error
 }

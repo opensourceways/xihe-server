@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/domain/repository"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 )
 
@@ -178,6 +179,11 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 	return
 }
 
-// func (do *projectTagsDO) toProject(r *spacedomain.Project) (err error) {
-
-// }
+func toDatasetDO(r *repository.RelatedResourceInfo) datasetDO {
+	do := datasetDO{
+		ProjectId: r.ResourceToUpdate.Id,
+		DatasetId: r.RelatedResource.Id,
+		Owner:     r.RelatedResource.Owner.Account(),
+	}
+	return do
+}
