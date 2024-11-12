@@ -59,24 +59,24 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 
 	// find tags
 	var tagResults []projectTagsDO
-	if errTag := adapter.daoImpl.dbTag().Where("project_id", id).Find(&tagResults).Error; errTag != nil {
-		return spacedomain.Project{}, errTag
+	if err := adapter.daoImpl.dbTag().Where("project_id", id).Find(&tagResults).Error; err != nil {
+		return spacedomain.Project{}, err
 	}
 	adapter.getProjectTags(&r, tagResults)
 	fmt.Printf("=============================r2: %+v\n", r)
 
 	// get datasets
 	var datasetResults []datasetDO
-	if errDataset := adapter.daoImpl.dbDataset().Where("project_id", id).Find(&datasetResults).Error; errDataset != nil {
-		return spacedomain.Project{}, errDataset
+	if err := adapter.daoImpl.dbDataset().Where("project_id", id).Find(&datasetResults).Error; err != nil {
+		return spacedomain.Project{}, err
 	}
 	adapter.getDataset(&r, datasetResults)
 	fmt.Printf("=============================r3: %+v\n", r)
 
 	// get models
 	var modelResults []modelDO
-	if errModel := adapter.daoImpl.dbModel().Where("project_id", id).Find(&modelResults).Error; errModel != nil {
-		return spacedomain.Project{}, errModel
+	if err := adapter.daoImpl.dbModel().Where("project_id", id).Find(&modelResults).Error; err != nil {
+		return spacedomain.Project{}, err
 	}
 	adapter.getModel(&r, modelResults)
 	fmt.Printf("=============================r4: %+v\n", r)
