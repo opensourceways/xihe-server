@@ -31,12 +31,14 @@ type SpaceappAppService interface {
 func NewSpaceappAppService(
 	repo repository.SpaceAppRepository,
 	spaceRepo spacerepo.Project,
+	spaceRepoPg spacerepo.ProjectPg,
 	sse spaceappdomain.SeverSentEvent,
 	spacesender spacemesage.SpaceAppMessageProducer,
 ) *spaceappAppService {
 	return &spaceappAppService{
 		repo:        repo,
 		spaceRepo:   spaceRepo,
+		spaceRepoPg: spaceRepoPg,
 		sse:         sse,
 		spacesender: spacesender,
 	}
