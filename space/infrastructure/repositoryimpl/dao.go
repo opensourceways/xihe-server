@@ -2,7 +2,6 @@ package repositoryimpl
 
 import (
 	"errors"
-	"fmt"
 
 	"gorm.io/gorm"
 
@@ -56,7 +55,6 @@ func (dao *daoImpl) dbModel() *gorm.DB {
 // and stores it in the result parameter.
 func (dao *daoImpl) GetProjectRecord(filter, result interface{}) error {
 	err := dao.db().Where(filter).First(result).Error
-	fmt.Printf("=================================GetprojectRecord result: %+v\n", err)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return repository.NewErrorResourceNotExists(errors.New("not found"))
 	}

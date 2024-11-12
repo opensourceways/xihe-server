@@ -49,11 +49,13 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
 		return spacedomain.Project{}, err
 	}
+
 	fmt.Printf("==========================GetByName result: %+v\n", result)
 	id := result.RepoId
 	if err = result.toProject(&r); err != nil {
 		return spacedomain.Project{}, err
 	}
+	fmt.Printf("=============================r1: %+v\n", r)
 
 	// find tags
 	var tagResults []projectTagsDO
@@ -61,6 +63,7 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 		return spacedomain.Project{}, errTag
 	}
 	adapter.getProjectTags(&r, tagResults)
+	fmt.Printf("=============================r2: %+v\n", r)
 
 	// get datasets
 	var datasetResults []datasetDO
@@ -68,6 +71,7 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 		return spacedomain.Project{}, errDataset
 	}
 	adapter.getDataset(&r, datasetResults)
+	fmt.Printf("=============================r3: %+v\n", r)
 
 	// get models
 	var modelResults []modelDO
@@ -75,6 +79,7 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 		return spacedomain.Project{}, errModel
 	}
 	adapter.getModel(&r, modelResults)
+	fmt.Printf("=============================r4: %+v\n", r)
 
 	return r, nil
 }
