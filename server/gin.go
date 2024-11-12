@@ -115,6 +115,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		mongodb.NewProjectMapper(collections.Project),
 	)
 
+	projPg := spacerepo.ProjectAdapter()
+
 	model := repositories.NewModelRepository(
 		mongodb.NewModelMapper(collections.Model),
 	)
@@ -323,7 +325,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	}
 
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
-		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
+		spaceappRepository, proj, projPg, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
 	)
 
 	{
