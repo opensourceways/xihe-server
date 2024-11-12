@@ -72,7 +72,7 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 
 	// get models
 	var modelResults []modelDO
-	if errModel := adapter.daoImpl.dbModel().Where("project_id", id).Find(&datasetResults).Error; errModel != nil {
+	if errModel := adapter.daoImpl.dbModel().Where("project_id", id).Find(&modelResults).Error; errModel != nil {
 		return spacedomain.Project{}, errModel
 	}
 	adapter.getModel(&r, modelResults)

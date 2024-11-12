@@ -668,7 +668,6 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 	}
 
 	model, err := ctl.model.GetByName(owner, name)
-	fmt.Printf("=======================================model: %+v\n", model)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
@@ -703,8 +702,6 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 
 		return
 	}
-
-	fmt.Printf("=======================================model: %+v\n", model)
 
 	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(model)))
 }
