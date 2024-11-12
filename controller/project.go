@@ -992,7 +992,7 @@ func (ctl *ProjectController) checkPermissionPg(ctx *gin.Context) (
 		return
 	}
 
-	proj, err = ctl.repoPg.Get(owner, ctx.Param("repo_id"))
+	proj, err = ctl.repoPg.Get(owner, ctx.Param("id"))
 	fmt.Printf("==============================proj: %+v\n", proj)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
