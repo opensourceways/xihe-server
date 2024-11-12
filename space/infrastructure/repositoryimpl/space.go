@@ -124,7 +124,7 @@ func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []mo
 		}
 	}
 
-	p.RelatedDatasets = relatedModels
+	p.RelatedModels = relatedModels
 
 }
 
