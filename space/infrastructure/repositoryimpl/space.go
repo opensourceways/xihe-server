@@ -43,14 +43,13 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 		Owner: owner.Account(),
 		Name:  name.ResourceName(),
 	}
-	fmt.Printf("==================================GetByname do: %+v\n", do)
 
 	// find project
 	result := projectDO{}
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
 		return spacedomain.Project{}, err
 	}
-
+	fmt.Printf("==========================GetByName result: %+v\n", result)
 	id := result.RepoId
 	if err = result.toProject(&r); err != nil {
 		return spacedomain.Project{}, err
