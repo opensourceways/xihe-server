@@ -32,7 +32,6 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 			return spacedomain.Project{}, err
 		}
 	}
-	fmt.Printf("==================================v: %+v\n", *v)
 	return *v, nil
 }
 
@@ -44,6 +43,7 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 		Owner: owner.Account(),
 		Name:  name.ResourceName(),
 	}
+	fmt.Printf("==================================GetByname do: %+v\n", do)
 
 	// find project
 	result := projectDO{}
@@ -136,7 +136,6 @@ func (adapter *projectAdapter) AddRelatedModel(info *repository.RelatedResourceI
 
 func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
 	do := projectDO{Owner: owner.Account(), RepoId: identity}
-	fmt.Printf("==================================do: %+v\n", do)
 	result := projectDO{}
 
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
