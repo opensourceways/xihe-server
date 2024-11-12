@@ -696,7 +696,9 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		Owner: owner,
 		Id:    data.Id,
 	}
+
 	if err = ctl.s.AddRelatedModel(&proj, &index); err != nil {
+		fmt.Printf("=======================err: %+v\n", err)
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
 		return
