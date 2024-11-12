@@ -667,7 +667,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	data, err := ctl.model.GetByName(owner, name)
+	model, err := ctl.model.GetByName(owner, name)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
@@ -681,7 +681,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	if pl.isNotMe(owner) && data.IsPrivate() {
+	if pl.isNotMe(owner) && model.IsPrivate() {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
 			errorResourceNotExists,
 			"can't access private project",
@@ -694,17 +694,18 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 
 	index := domain.ResourceIndex{
 		Owner: owner,
-		Id:    data.Id,
+		Id:    model.Id,
 	}
 
 	if err = ctl.s.AddRelatedModel(&proj, &index); err != nil {
-		fmt.Printf("=======================err: %+v\n", err)
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
 		return
 	}
 
-	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(data)))
+	fmt.Printf("================================err: %+v\n", err)
+
+	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(model)))
 }
 
 // @Summary		RemoveRelatedModel
@@ -992,6 +993,7 @@ func (ctl *ProjectController) checkPermissionPg(ctx *gin.Context) (
 	}
 
 	proj, err = ctl.repoPg.Get(owner, ctx.Param("id"))
+	fmt.Printf("==============================proj: %+v\n", proj)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 
