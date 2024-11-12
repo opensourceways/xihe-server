@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	types "github.com/opensourceways/xihe-server/domain"
@@ -55,11 +56,12 @@ func (impl spaceAppRepoImpl) Save(app *domain.SpaceApp) error {
 // FindBySpaceId finds a space application in the repository based on the space ID.
 func (impl spaceAppRepoImpl) FindBySpaceId(id types.Identity) (domain.SpaceApp, error) {
 	do := spaceappDO{SpaceId: id.Integer()}
-
+	fmt.Printf("==========================do: %+v\n", do)
 	// It must new a new DO, otherwise the sql statement will include duplicate conditions.
 	result := spaceappDO{}
 
 	if err := impl.dao.GetRecord(&do, &result); err != nil {
+		fmt.Printf("==========================GetRecord err: %+v\n", err)
 		return domain.SpaceApp{}, err
 	}
 
