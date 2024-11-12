@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -83,7 +84,7 @@ func convertToRelatedResource(data interface{}) (r app.ResourceDTO) {
 	default:
 
 	}
-
+	fmt.Printf("==============================r: %+v\n", r)
 	return
 }
 

@@ -704,7 +704,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	fmt.Printf("================================err: %+v\n", err)
+	fmt.Printf("=======================================model: %+v\n", model)
 
 	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(model)))
 }
