@@ -136,7 +136,7 @@ func (adapter *projectAdapter) AddRelatedModel(info *repository.RelatedResourceI
 
 func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
 	do := projectDO{Owner: owner.Account(), RepoId: identity}
-	fmt.Printf("do: %v\n", do)
+	fmt.Printf("==================================do: %+v\n", do)
 	result := projectDO{}
 
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
