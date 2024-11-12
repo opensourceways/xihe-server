@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
@@ -60,6 +61,8 @@ func (s *spaceappAppService) GetByName(
 	var dto SpaceAppDTO
 
 	space, err := s.spaceRepoPg.GetByName(index.Owner, index.Name)
+	fmt.Printf("=======================================space: %+v\n", space)
+	fmt.Printf("=======================================space err: %+v\n", err)
 	if err != nil {
 		logrus.WithField("space_index", index).Errorf("fail to get space, err: %s", err.Error())
 		return dto, err
