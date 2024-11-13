@@ -42,6 +42,7 @@ import (
 	courseusercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
+	"github.com/opensourceways/xihe-server/infrastructure"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
@@ -323,6 +324,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
 		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
 	)
+
+	// TODO: new a repository to initialize app layer
+	_, _ = infrastructure.NewFileScanRepository()
+
+	// TODO: new a repository to initialize app layer
+	_, _ = infrastructure.NewLargeFileScanRepository()
 
 	{
 		controller.AddRouterForProjectController(
