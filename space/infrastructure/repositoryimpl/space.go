@@ -2,7 +2,6 @@ package repositoryimpl
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"

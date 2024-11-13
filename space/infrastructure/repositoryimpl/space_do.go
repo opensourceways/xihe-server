@@ -190,7 +190,7 @@ func toModelDO(r *repository.RelatedResourceInfo) modelDO {
 	do := modelDO{
 		ProjectId: r.ResourceToUpdate.Id,
 		ModelId:   r.RelatedResource.Id,
-		Owner:     r.ResourceToUpdate.Owner.Account(),
+		Owner:     r.RelatedResource.Owner.Account(),
 	}
 	return do
 }
