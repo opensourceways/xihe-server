@@ -325,7 +325,6 @@ func (s projectService) GetByName(
 	allowPrivacy bool,
 ) (dto ProjectDetailDTO, err error) {
 	v, err := s.repoPg.GetByName(owner, name)
-	fmt.Printf("==============================GetByName v: %+v\n", v)
 	if err != nil {
 		return
 	}

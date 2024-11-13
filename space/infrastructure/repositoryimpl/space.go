@@ -75,7 +75,6 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 		return spacedomain.Project{}, err
 	}
 	adapter.getModel(&r, modelResults)
-	fmt.Printf("=========================r: %+v\n", r)
 
 	return r, nil
 }
