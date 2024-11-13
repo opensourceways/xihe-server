@@ -2,7 +2,6 @@ package repositoryimpl
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	types "github.com/opensourceways/xihe-server/domain"
@@ -60,7 +59,6 @@ func (impl spaceAppRepoImpl) FindBySpaceId(id types.Identity) (domain.SpaceApp, 
 	result := spaceappDO{}
 
 	if err := impl.dao.GetRecord(&do, &result); err != nil {
-		fmt.Printf("==========================GetRecord err: %+v\n", err)
 		return domain.SpaceApp{}, err
 	}
 

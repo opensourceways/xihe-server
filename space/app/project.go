@@ -325,6 +325,7 @@ func (s projectService) GetByName(
 	allowPrivacy bool,
 ) (dto ProjectDetailDTO, err error) {
 	v, err := s.repoPg.GetByName(owner, name)
+	fmt.Printf("==============================GetByName v: %+v\n", v)
 	if err != nil {
 		return
 	}
@@ -342,12 +343,14 @@ func (s projectService) GetByName(
 		return
 	}
 	dto.RelatedModels = m
+	fmt.Printf("=========================dto1: %+v\n", dto)
 
 	d, err := s.rs.ListDatasets(v.RelatedDatasets)
 	if err != nil {
 		return
 	}
 	dto.RelatedDatasets = d
+	fmt.Printf("=========================dto2: %+v\n", dto)
 
 	s.toProjectDTO(&v, &dto.ProjectDTO)
 
