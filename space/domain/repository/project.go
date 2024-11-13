@@ -63,4 +63,5 @@ type ProjectPg interface {
 	Get(domain.Account, string) (spacedomain.Project, error)
 	AddRelatedDataset(*repository.RelatedResourceInfo) error
 	AddRelatedModel(*repository.RelatedResourceInfo) error
+	ListAndSortByUpdateTime(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
 }

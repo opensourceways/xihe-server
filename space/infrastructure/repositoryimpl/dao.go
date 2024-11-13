@@ -6,6 +6,8 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/opensourceways/xihe-server/common/domain/repository"
+
+	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 )
 
 var dbInstance *gorm.DB
@@ -71,4 +73,61 @@ func (dao *daoImpl) DeleteByPrimaryKey(row interface{}) error {
 	}
 
 	return err
+}
+
+func (dao *daoImpl) ListAndSortByUpdateTime(
+	owner string, do *repositories.ResourceListDO,
+) ([]ProjectSummaryDO, int, error) {
+
+	var items []projectDO
+	var count int64
+
+	// 构建查询
+	query := dao.db().Where("owner = ?", owner).Order("updated_at DESC")
+
+	// 应用分页
+	if do.PageNum > 0 && do.CountPerPage > 0 {
+		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
+	}
+	// 查询总数
+	query.Count(&count)
+	// 查询项目
+	err := query.Find(&items).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 转换为 ProjectSummaryDO
+	var projectSummaries []ProjectSummaryDO
+	for _, item := range items {
+		summary := ProjectSummaryDO{
+			Id:            item.Id,
+			Owner:         item.Owner,
+			Name:          item.Name,
+			Desc:          item.Description,
+			Title:         item.Title,
+			Level:         item.Level,
+			CoverId:       item.CoverId,
+			UpdatedAt:     item.UpdatedAt,
+			LikeCount:     item.LikeCount,
+			ForkCount:     item.ForkCount,
+			DownloadCount: item.DownloadCount,
+			Hardware:      item.Hardware,
+			Type:          item.Type,
+		}
+		// 查询标签
+		var tagResults []projectTagsDO
+		if err := dao.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+			return nil, 0, err
+		}
+		tags := make([]string, len(tagResults))
+		for i, tag := range tagResults {
+			tags[i] = tag.TagName
+		}
+		summary.Tags = tags
+
+		projectSummaries = append(projectSummaries, summary)
+	}
+
+	return projectSummaries, int(count), nil
 }

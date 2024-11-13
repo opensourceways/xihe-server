@@ -5,6 +5,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	"gorm.io/gorm/clause"
 )
@@ -144,3 +145,58 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 	return
 
 }
+
+// func (col project) ListAndSortByUpdateTime(
+// 	owner string, do *repositories.ResourceListDO,
+// ) ([]repositoryimpl.ProjectSummaryDO, int, error) {
+
+// 	f := func(items []projectItem) []projectItem {
+// 		v := make([]updateAtSortData, len(items))
+
+// 		for i := range items {
+// 			item := &items[i]
+
+// 			v[i] = updateAtSortData{
+// 				id:       item.Id,
+// 				level:    item.Level,
+// 				index:    i,
+// 				updateAt: item.UpdatedAt,
+// 			}
+// 		}
+
+// 		v = updateAtSortAndPaginate(v, do.CountPerPage, do.PageNum)
+// 		if len(v) == 0 {
+// 			return nil
+// 		}
+
+// 		r := make([]projectItem, len(v))
+// 		for i := range v {
+// 			r[i] = items[v[i].index]
+// 		}
+
+// 		return r
+// 	}
+
+// 	return col.listResource(owner, do, f)
+// }
+
+// func (adapter *computilityAccountRecordAdapter) ListByAccountIndex(index domain.ComputilityAccountIndex) (
+// 	[]domain.ComputilityAccountRecord, int, error,
+// ) {
+// 	var result []computilityAccountRecordDO
+
+// 	sql := fmt.Sprintf(`%s = ? and %s = ?`, filedUserName, filedComputeType)
+// 	query := adapter.daoImpl.db().Where(sql, index.UserName, index.ComputeType)
+
+// 	err := query.Find(&result).Error
+// 	if err != nil || len(result) == 0 {
+// 		return nil, 0, err
+// 	}
+
+// 	r := make([]domain.ComputilityAccountRecord, len(result))
+// 	for i := range result {
+// 		r[i] = result[i].toComputilityAccountRecord()
+// 	}
+
+// 	return r, len(r), nil
+// }
