@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
@@ -80,7 +79,6 @@ func (s *spaceappAppService) GetByName(
 	}
 
 	app, err := s.repo.FindBySpaceId(spaceId)
-	fmt.Printf("==================================FindBySpaceId err: %+v\n", err)
 	if err == nil {
 		return toSpaceAppDTO(&app), nil
 	}

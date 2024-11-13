@@ -56,7 +56,6 @@ func (impl spaceAppRepoImpl) Save(app *domain.SpaceApp) error {
 // FindBySpaceId finds a space application in the repository based on the space ID.
 func (impl spaceAppRepoImpl) FindBySpaceId(id types.Identity) (domain.SpaceApp, error) {
 	do := spaceappDO{SpaceId: id.Integer()}
-	fmt.Printf("==========================do: %+v\n", do)
 	// It must new a new DO, otherwise the sql statement will include duplicate conditions.
 	result := spaceappDO{}
 
