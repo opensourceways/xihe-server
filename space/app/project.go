@@ -427,11 +427,11 @@ func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 	var v spacerepo.UserProjectsInfo
 
 	if cmd.SortType == nil {
-		v, err = s.repo.ListAndSortByUpdateTime(owner, &option)
+		v, err = s.repoPg.ListAndSortByUpdateTime(owner, &option)
 	} else {
 		switch cmd.SortType.SortType() {
 		case domain.SortTypeUpdateTime:
-			v, err = s.repo.ListAndSortByUpdateTime(owner, &option)
+			v, err = s.repoPg.ListAndSortByUpdateTime(owner, &option)
 
 		case domain.SortTypeFirstLetter:
 			v, err = s.repo.ListAndSortByFirstLetter(owner, &option)
