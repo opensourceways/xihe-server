@@ -162,11 +162,28 @@ func (impl project) ListAndSortByFirstLetter(
 	)
 }
 
+// ListAndSortByFirstLetter Pg
+func (adapter *projectAdapter) ListAndSortByFirstLetter(
+	owner domain.Account, option *repository.ResourceListOption,
+) (spacerepo.UserProjectsInfo, error) {
+	return adapter.list(
+		owner, option, adapter.daoImpl.ListAndSortByFirstLetter,
+	)
+}
 func (impl project) ListAndSortByDownloadCount(
 	owner domain.Account, option *repository.ResourceListOption,
 ) (spacerepo.UserProjectsInfo, error) {
 	return impl.list(
 		owner, option, impl.mapper.ListAndSortByDownloadCount,
+	)
+}
+
+// // ListAndSortByDownloadCount Pg
+func (adapter *projectAdapter) ListAndSortByDownloadCount(
+	owner domain.Account, option *repository.ResourceListOption,
+) (spacerepo.UserProjectsInfo, error) {
+	return adapter.list(
+		owner, option, adapter.daoImpl.ListAndSortByDownloadCount,
 	)
 }
 

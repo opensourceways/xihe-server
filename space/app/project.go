@@ -434,10 +434,10 @@ func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 			v, err = s.repoPg.ListAndSortByUpdateTime(owner, &option)
 
 		case domain.SortTypeFirstLetter:
-			v, err = s.repo.ListAndSortByFirstLetter(owner, &option)
+			v, err = s.repoPg.ListAndSortByFirstLetter(owner, &option)
 
 		case domain.SortTypeDownloadCount:
-			v, err = s.repo.ListAndSortByDownloadCount(owner, &option)
+			v, err = s.repoPg.ListAndSortByDownloadCount(owner, &option)
 		}
 	}
 

@@ -2,7 +2,6 @@ package repositoryimpl
 
 import (
 	"errors"
-	"log"
 
 	"gorm.io/gorm"
 
@@ -85,17 +84,15 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 	// 基础查询条件
 	baseQuery := dao.db().Where("owner = ?", owner)
 
-	// 先计算总数（不带分页）
+	// 计算总数
 	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
-	log.Printf("======================Total count: %d", count)
 
 	// 构建分页查询
 	query := baseQuery.Order("updated_at DESC")
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
-		log.Printf("=======================Paged Query: %v", query)
 	}
 
 	// 执行分页查询
@@ -103,7 +100,128 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 	if err != nil {
 		return nil, 0, err
 	}
-	log.Printf("=============================Found items: %+v", items)
+
+	// 转换为 ProjectSummaryDO
+	var projectSummaries []ProjectSummaryDO
+	for _, item := range items {
+		summary := ProjectSummaryDO{
+			Id:            item.Id,
+			Owner:         item.Owner,
+			Name:          item.Name,
+			Desc:          item.Description,
+			Title:         item.Title,
+			Level:         item.Level,
+			CoverId:       item.CoverId,
+			UpdatedAt:     item.UpdatedAt,
+			LikeCount:     item.LikeCount,
+			ForkCount:     item.ForkCount,
+			DownloadCount: item.DownloadCount,
+			Hardware:      item.Hardware,
+			Type:          item.Type,
+		}
+		// 查询标签
+		var tagResults []projectTagsDO
+		if err := dao.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+			return nil, 0, err
+		}
+		tags := make([]string, len(tagResults))
+		for i, tag := range tagResults {
+			tags[i] = tag.TagName
+		}
+		summary.Tags = tags
+
+		projectSummaries = append(projectSummaries, summary)
+	}
+
+	return projectSummaries, int(count), nil
+}
+
+func (dao *daoImpl) ListAndSortByFirstLetter(
+	owner string, do *repositories.ResourceListDO,
+) ([]ProjectSummaryDO, int, error) {
+	var items []projectDO
+	var count int64
+
+	// 基础查询条件
+	baseQuery := dao.db().Where("owner = ?", owner)
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 构建分页查询
+	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
+	if do.PageNum > 0 && do.CountPerPage > 0 {
+		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
+	}
+
+	// 执行分页查询
+	err := query.Find(&items).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 转换为 ProjectSummaryDO
+	var projectSummaries []ProjectSummaryDO
+	for _, item := range items {
+		summary := ProjectSummaryDO{
+			Id:            item.Id,
+			Owner:         item.Owner,
+			Name:          item.Name,
+			Desc:          item.Description,
+			Title:         item.Title,
+			Level:         item.Level,
+			CoverId:       item.CoverId,
+			UpdatedAt:     item.UpdatedAt,
+			LikeCount:     item.LikeCount,
+			ForkCount:     item.ForkCount,
+			DownloadCount: item.DownloadCount,
+			Hardware:      item.Hardware,
+			Type:          item.Type,
+		}
+		// 查询标签
+		var tagResults []projectTagsDO
+		if err := dao.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+			return nil, 0, err
+		}
+		tags := make([]string, len(tagResults))
+		for i, tag := range tagResults {
+			tags[i] = tag.TagName
+		}
+		summary.Tags = tags
+
+		projectSummaries = append(projectSummaries, summary)
+	}
+
+	return projectSummaries, int(count), nil
+}
+
+func (dao *daoImpl) ListAndSortByDownloadCount(
+	owner string, do *repositories.ResourceListDO,
+) ([]ProjectSummaryDO, int, error) {
+	var items []projectDO
+	var count int64
+
+	// 基础查询条件
+	baseQuery := dao.db().Where("owner = ?", owner)
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 构建分页查询
+	query := baseQuery.Order("download_count ASC")
+	if do.PageNum > 0 && do.CountPerPage > 0 {
+		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
+	}
+
+	// 执行分页查询
+	err := query.Find(&items).Error
+	if err != nil {
+		return nil, 0, err
+	}
 
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO

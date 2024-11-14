@@ -61,7 +61,11 @@ type ProjectPg interface {
 	Save(*spacedomain.Project) (spacedomain.Project, error)
 	GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
 	Get(domain.Account, string) (spacedomain.Project, error)
+
 	AddRelatedDataset(*repository.RelatedResourceInfo) error
 	AddRelatedModel(*repository.RelatedResourceInfo) error
+
 	ListAndSortByUpdateTime(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
+	ListAndSortByFirstLetter(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
+	ListAndSortByDownloadCount(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
 }
