@@ -79,24 +79,26 @@ func (dao *daoImpl) DeleteByPrimaryKey(row interface{}) error {
 func (dao *daoImpl) ListAndSortByUpdateTime(
 	owner string, do *repositories.ResourceListDO,
 ) ([]ProjectSummaryDO, int, error) {
-
 	var items []projectDO
 	var count int64
 
-	// 构建查询
-	query := dao.db().Where("owner = ?", owner).Order("updated_at DESC")
-	log.Printf("=======================Query: %v", query)
+	// 基础查询条件
+	baseQuery := dao.db().Where("owner = ?", owner)
 
-	// 应用分页
+	// 先计算总数（不带分页）
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+	log.Printf("======================Total count: %d", count)
+
+	// 构建分页查询
+	query := baseQuery.Order("updated_at DESC")
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 		log.Printf("=======================Paged Query: %v", query)
 	}
-	// 查询总数
-	query.Count(&count)
-	log.Printf("======================Total count: %d", count)
 
-	// 查询项目
+	// 执行分页查询
 	err := query.Find(&items).Error
 	if err != nil {
 		return nil, 0, err
