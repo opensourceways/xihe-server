@@ -389,7 +389,7 @@ func (dao *daoImpl) ListGlobalAndSortByFirstLetter(do *repositories.GlobalResour
 	}
 
 	// 构建分页查询
-	query := baseQuery.Order("download_count ASC")
+	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
@@ -420,7 +420,7 @@ func (dao *daoImpl) ListGlobalAndSortByFirstLetter(do *repositories.GlobalResour
 		}
 		// 查询标签
 		var tagResults []projectTagsDO
-		if err := dao.dbTag().Where("LOWER(name) COLLATE \"C\" ASC", item.Id).Find(&tagResults).Error; err != nil {
+		if err := dao.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
 			return nil, 0, err
 		}
 		tags := make([]string, len(tagResults))
