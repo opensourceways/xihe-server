@@ -455,3 +455,42 @@ func (adapter *projectAdapter) getSummary(owner string, projectId string) (
 
 	return do, nil
 }
+
+func (adapter *projectAdapter) GetSummaryByName(owner domain.Account, name domain.ResourceName) (
+	domain.ResourceSummary, error,
+) {
+	v, err := adapter.getSummaryByName(owner.Account(), name.ResourceName())
+	if err != nil {
+		return domain.ResourceSummary{}, repositories.ConvertError(err)
+	}
+
+	return v.ToProject()
+}
+
+func (adapter *projectAdapter) getSummaryByName(owner, name string) (
+	do repositories.ResourceSummaryDO, err error,
+) {
+	//filter
+	filter := projectDO{
+		Owner: owner,
+		Name:  name,
+	}
+
+	// find project
+	project := projectDO{}
+	if err := adapter.daoImpl.GetProjectRecord(&filter, &project); err != nil {
+		return repositories.ResourceSummaryDO{}, err
+	}
+
+	// Convert projectDO to ProjectResourceSummaryDO
+	do = repositories.ResourceSummaryDO{
+		Owner:    project.Owner,
+		Name:     project.Name,
+		Id:       project.Id,
+		RepoId:   project.RepoId,
+		RepoType: project.RepoType,
+	}
+
+	return do, nil
+
+}

@@ -33,7 +33,7 @@ func AddRouterForTrainingController(
 		),
 		model:     model,
 		project:   project,
-		projectPg: project,
+		projectPg: projectPg,
 		dataset:   dataset,
 	}
 

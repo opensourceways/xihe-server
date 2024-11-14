@@ -63,6 +63,7 @@ type ProjectPg interface {
 	Get(domain.Account, string) (spacedomain.Project, error)
 	GetByRepoId(domain.Identity) (spacedomain.Project, error)
 	GetSummary(domain.Account, string) (ProjectSummary, error)
+	GetSummaryByName(domain.Account, domain.ResourceName) (domain.ResourceSummary, error)
 
 	AddRelatedDataset(*repository.RelatedResourceInfo) error
 	AddRelatedModel(*repository.RelatedResourceInfo) error
