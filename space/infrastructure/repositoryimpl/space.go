@@ -5,8 +5,10 @@ import (
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	"gorm.io/gorm/clause"
 )
 
@@ -146,57 +148,23 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 
 }
 
-// func (col project) ListAndSortByUpdateTime(
-// 	owner string, do *repositories.ResourceListDO,
-// ) ([]repositoryimpl.ProjectSummaryDO, int, error) {
+func (adapter *projectAdapter) ListGlobalAndSortByUpdateTime(
+	option *repository.GlobalResourceListOption,
+) (spacerepo.UserProjectsInfo, error) {
+	return adapter.listGlobal(
+		option, adapter.daoImpl.ListGlobalAndSortByUpdateTime,
+	)
+}
 
-// 	f := func(items []projectItem) []projectItem {
-// 		v := make([]updateAtSortData, len(items))
+func (adapter *projectAdapter) listGlobal(
+	option *repository.GlobalResourceListOption,
+	f func(*repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error),
+) (
+	info spacerepo.UserProjectsInfo, err error,
+) {
+	return adapter.doList(func() ([]ProjectSummaryDO, int, error) {
+		do := repositories.ToGlobalResourceListDO(option)
 
-// 		for i := range items {
-// 			item := &items[i]
-
-// 			v[i] = updateAtSortData{
-// 				id:       item.Id,
-// 				level:    item.Level,
-// 				index:    i,
-// 				updateAt: item.UpdatedAt,
-// 			}
-// 		}
-
-// 		v = updateAtSortAndPaginate(v, do.CountPerPage, do.PageNum)
-// 		if len(v) == 0 {
-// 			return nil
-// 		}
-
-// 		r := make([]projectItem, len(v))
-// 		for i := range v {
-// 			r[i] = items[v[i].index]
-// 		}
-
-// 		return r
-// 	}
-
-// 	return col.listResource(owner, do, f)
-// }
-
-// func (adapter *computilityAccountRecordAdapter) ListByAccountIndex(index domain.ComputilityAccountIndex) (
-// 	[]domain.ComputilityAccountRecord, int, error,
-// ) {
-// 	var result []computilityAccountRecordDO
-
-// 	sql := fmt.Sprintf(`%s = ? and %s = ?`, filedUserName, filedComputeType)
-// 	query := adapter.daoImpl.db().Where(sql, index.UserName, index.ComputeType)
-
-// 	err := query.Find(&result).Error
-// 	if err != nil || len(result) == 0 {
-// 		return nil, 0, err
-// 	}
-
-// 	r := make([]domain.ComputilityAccountRecord, len(result))
-// 	for i := range result {
-// 		r[i] = result[i].toComputilityAccountRecord()
-// 	}
-
-// 	return r, len(r), nil
-// }
+		return f(&do)
+	})
+}

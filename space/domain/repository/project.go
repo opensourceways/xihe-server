@@ -68,4 +68,6 @@ type ProjectPg interface {
 	ListAndSortByUpdateTime(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
 	ListAndSortByFirstLetter(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
 	ListAndSortByDownloadCount(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
+
+	ListGlobalAndSortByUpdateTime(*repository.GlobalResourceListOption) (UserProjectsInfo, error)
 }

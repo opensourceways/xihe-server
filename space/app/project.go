@@ -375,11 +375,11 @@ func (s projectService) ListGlobal(cmd *app.GlobalResourceListCmd) (
 	var v spacerepo.UserProjectsInfo
 
 	if cmd.SortType == nil {
-		v, err = s.repo.ListGlobalAndSortByUpdateTime(&option)
+		v, err = s.repoPg.ListGlobalAndSortByUpdateTime(&option)
 	} else {
 		switch cmd.SortType.SortType() {
 		case domain.SortTypeUpdateTime:
-			v, err = s.repo.ListGlobalAndSortByUpdateTime(&option)
+			v, err = s.repoPg.ListGlobalAndSortByUpdateTime(&option)
 
 		case domain.SortTypeFirstLetter:
 			v, err = s.repo.ListGlobalAndSortByFirstLetter(&option)
