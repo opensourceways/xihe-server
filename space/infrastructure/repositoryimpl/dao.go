@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"errors"
+	"log"
 
 	"gorm.io/gorm"
 
@@ -84,18 +85,23 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 
 	// 构建查询
 	query := dao.db().Where("owner = ?", owner).Order("updated_at DESC")
+	log.Printf("=======================Query: %v", query)
 
 	// 应用分页
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
+		log.Printf("=======================Paged Query: %v", query)
 	}
 	// 查询总数
 	query.Count(&count)
+	log.Printf("======================Total count: %d", count)
+
 	// 查询项目
 	err := query.Find(&items).Error
 	if err != nil {
 		return nil, 0, err
 	}
+	log.Printf("=============================Found items: %+v", items)
 
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
