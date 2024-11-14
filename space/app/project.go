@@ -382,10 +382,10 @@ func (s projectService) ListGlobal(cmd *app.GlobalResourceListCmd) (
 			v, err = s.repoPg.ListGlobalAndSortByUpdateTime(&option)
 
 		case domain.SortTypeFirstLetter:
-			v, err = s.repo.ListGlobalAndSortByFirstLetter(&option)
+			v, err = s.repoPg.ListGlobalAndSortByFirstLetter(&option)
 
 		case domain.SortTypeDownloadCount:
-			v, err = s.repo.ListGlobalAndSortByDownloadCount(&option)
+			v, err = s.repoPg.ListGlobalAndSortByDownloadCount(&option)
 		}
 	}
 

@@ -156,6 +156,22 @@ func (adapter *projectAdapter) ListGlobalAndSortByUpdateTime(
 	)
 }
 
+func (adapter *projectAdapter) ListGlobalAndSortByDownloadCount(
+	option *repository.GlobalResourceListOption,
+) (spacerepo.UserProjectsInfo, error) {
+	return adapter.listGlobal(
+		option, adapter.daoImpl.ListGlobalAndSortByDownloadCount,
+	)
+}
+
+func (adapter *projectAdapter) ListGlobalAndSortByFirstLetter(
+	option *repository.GlobalResourceListOption,
+) (spacerepo.UserProjectsInfo, error) {
+	return adapter.listGlobal(
+		option, adapter.daoImpl.ListGlobalAndSortByFirstLetter,
+	)
+}
+
 func (adapter *projectAdapter) listGlobal(
 	option *repository.GlobalResourceListOption,
 	f func(*repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error),
