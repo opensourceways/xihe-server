@@ -342,14 +342,12 @@ func (s projectService) GetByName(
 		return
 	}
 	dto.RelatedModels = m
-	fmt.Printf("=========================dto1: %+v\n", dto)
 
 	d, err := s.rs.ListDatasets(v.RelatedDatasets)
 	if err != nil {
 		return
 	}
 	dto.RelatedDatasets = d
-	fmt.Printf("=========================dto2: %+v\n", dto)
 
 	s.toProjectDTO(&v, &dto.ProjectDTO)
 
@@ -357,7 +355,7 @@ func (s projectService) GetByName(
 }
 
 func (s projectService) GetByRepoId(id domain.Identity) (sdk.SpaceMetaDTO, error) {
-	v, err := s.repo.GetByRepoId(id)
+	v, err := s.repoPg.GetByRepoId(id)
 
 	if err != nil {
 		return sdk.SpaceMetaDTO{}, err

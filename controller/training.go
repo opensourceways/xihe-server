@@ -23,6 +23,7 @@ func AddRouterForTrainingController(
 	repo repository.Training,
 	model repository.Model,
 	project spacerepo.Project,
+	projectPg spacerepo.ProjectPg,
 	dataset repository.Dataset,
 	sender message.MessageProducer,
 ) {
@@ -30,9 +31,10 @@ func AddRouterForTrainingController(
 		ts: app.NewTrainingService(
 			ts, repo, sender, apiConfig.MaxTrainingRecordNum,
 		),
-		model:   model,
-		project: project,
-		dataset: dataset,
+		model:     model,
+		project:   project,
+		projectPg: project,
+		dataset:   dataset,
 	}
 
 	rg.POST("/v1/train/project/:pid/training", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
@@ -54,9 +56,10 @@ type TrainingController struct {
 
 	ts app.TrainingService
 
-	model   repository.Model
-	project spacerepo.Project
-	dataset repository.Dataset
+	model     repository.Model
+	project   spacerepo.Project
+	projectPg spacerepo.ProjectPg
+	dataset   repository.Dataset
 }
 
 // @Summary		Create

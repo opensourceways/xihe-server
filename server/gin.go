@@ -376,7 +376,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForTrainingController(
-			v1, trainingAdapter, training, model, proj, dataset,
+			v1, trainingAdapter, training, model, proj, projPg, dataset,
 			messages.NewTrainingMessageAdapter(
 				&cfg.Training.Message, publisher,
 			),
@@ -391,11 +391,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
+			v1, gitlabRepo, proj, projPg, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
 		)
 
 		controller.AddRouterForInferenceInternalController(
-			internal, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappRepository,
+			internal, gitlabRepo, proj, projPg, sender, userWhiteListService, spaceappSender, spaceappRepository,
 		)
 
 		controller.AddRouterForSearchController(

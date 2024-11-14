@@ -37,6 +37,44 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 	return *v, nil
 }
 
+func (adapter *projectAdapter) GetByRepoId(id domain.Identity) (
+	r spacedomain.Project, err error,
+) {
+	//filter
+	do := projectDO{
+		RepoId: id.Identity(),
+	}
+
+	// find project
+	result := projectDO{}
+	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
+		return spacedomain.Project{}, err
+	}
+
+	// find tags
+	var tagResults []projectTagsDO
+	if err := adapter.daoImpl.dbTag().Where("project_id", id).Find(&tagResults).Error; err != nil {
+		return spacedomain.Project{}, err
+	}
+	adapter.getProjectTags(&r, tagResults)
+
+	// get datasets
+	var datasetResults []datasetDO
+	if err := adapter.daoImpl.dbDataset().Where("project_id", id).Find(&datasetResults).Error; err != nil {
+		return spacedomain.Project{}, err
+	}
+	adapter.getDataset(&r, datasetResults)
+
+	// get models
+	var modelResults []modelDO
+	if err := adapter.daoImpl.dbModel().Where("project_id", id).Find(&modelResults).Error; err != nil {
+		return spacedomain.Project{}, err
+	}
+	adapter.getModel(&r, modelResults)
+
+	return r, nil
+}
+
 func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.ResourceName) (
 	r spacedomain.Project, err error,
 ) {
@@ -152,24 +190,199 @@ func (adapter *projectAdapter) ListGlobalAndSortByUpdateTime(
 	option *repository.GlobalResourceListOption,
 ) (spacerepo.UserProjectsInfo, error) {
 	return adapter.listGlobal(
-		option, adapter.daoImpl.ListGlobalAndSortByUpdateTime,
+		option, adapter.listGlobalAndSortByUpdateTime,
 	)
 }
 
+func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
+	var items []projectDO
+	var count int64
+
+	// 基础查询条件
+	baseQuery := adapter.db()
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 构建分页查询
+	query := baseQuery.Order("updated_at DESC")
+	if do.PageNum > 0 && do.CountPerPage > 0 {
+		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
+	}
+
+	// 执行分页查询
+	err := query.Find(&items).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 转换为 ProjectSummaryDO
+	var projectSummaries []ProjectSummaryDO
+	for _, item := range items {
+		summary := ProjectSummaryDO{
+			Id:            item.Id,
+			Owner:         item.Owner,
+			Name:          item.Name,
+			Desc:          item.Description,
+			Title:         item.Title,
+			Level:         item.Level,
+			CoverId:       item.CoverId,
+			UpdatedAt:     item.UpdatedAt,
+			LikeCount:     item.LikeCount,
+			ForkCount:     item.ForkCount,
+			DownloadCount: item.DownloadCount,
+			Hardware:      item.Hardware,
+			Type:          item.Type,
+		}
+		// 查询标签
+		var tagResults []projectTagsDO
+		if err := adapter.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+			return nil, 0, err
+		}
+		tags := make([]string, len(tagResults))
+		for i, tag := range tagResults {
+			tags[i] = tag.TagName
+		}
+		summary.Tags = tags
+
+		projectSummaries = append(projectSummaries, summary)
+	}
+
+	return projectSummaries, int(count), nil
+}
 func (adapter *projectAdapter) ListGlobalAndSortByDownloadCount(
 	option *repository.GlobalResourceListOption,
 ) (spacerepo.UserProjectsInfo, error) {
 	return adapter.listGlobal(
-		option, adapter.daoImpl.ListGlobalAndSortByDownloadCount,
+		option, adapter.listGlobalAndSortByDownloadCount,
 	)
 }
 
+func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
+	var items []projectDO
+	var count int64
+
+	// 基础查询条件
+	baseQuery := adapter.db()
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 构建分页查询
+	query := baseQuery.Order("download_count ASC")
+	if do.PageNum > 0 && do.CountPerPage > 0 {
+		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
+	}
+
+	// 执行分页查询
+	err := query.Find(&items).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 转换为 ProjectSummaryDO
+	var projectSummaries []ProjectSummaryDO
+	for _, item := range items {
+		summary := ProjectSummaryDO{
+			Id:            item.Id,
+			Owner:         item.Owner,
+			Name:          item.Name,
+			Desc:          item.Description,
+			Title:         item.Title,
+			Level:         item.Level,
+			CoverId:       item.CoverId,
+			UpdatedAt:     item.UpdatedAt,
+			LikeCount:     item.LikeCount,
+			ForkCount:     item.ForkCount,
+			DownloadCount: item.DownloadCount,
+			Hardware:      item.Hardware,
+			Type:          item.Type,
+		}
+		// 查询标签
+		var tagResults []projectTagsDO
+		if err := adapter.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+			return nil, 0, err
+		}
+		tags := make([]string, len(tagResults))
+		for i, tag := range tagResults {
+			tags[i] = tag.TagName
+		}
+		summary.Tags = tags
+
+		projectSummaries = append(projectSummaries, summary)
+	}
+
+	return projectSummaries, int(count), nil
+}
 func (adapter *projectAdapter) ListGlobalAndSortByFirstLetter(
 	option *repository.GlobalResourceListOption,
 ) (spacerepo.UserProjectsInfo, error) {
 	return adapter.listGlobal(
-		option, adapter.daoImpl.ListGlobalAndSortByFirstLetter,
+		option, adapter.listGlobalAndSortByFirstLetter,
 	)
+}
+
+func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
+	var items []projectDO
+	var count int64
+
+	// 基础查询条件
+	baseQuery := adapter.db()
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 构建分页查询
+	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
+	if do.PageNum > 0 && do.CountPerPage > 0 {
+		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
+	}
+
+	// 执行分页查询
+	err := query.Find(&items).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 转换为 ProjectSummaryDO
+	var projectSummaries []ProjectSummaryDO
+	for _, item := range items {
+		summary := ProjectSummaryDO{
+			Id:            item.Id,
+			Owner:         item.Owner,
+			Name:          item.Name,
+			Desc:          item.Description,
+			Title:         item.Title,
+			Level:         item.Level,
+			CoverId:       item.CoverId,
+			UpdatedAt:     item.UpdatedAt,
+			LikeCount:     item.LikeCount,
+			ForkCount:     item.ForkCount,
+			DownloadCount: item.DownloadCount,
+			Hardware:      item.Hardware,
+			Type:          item.Type,
+		}
+		// 查询标签
+		var tagResults []projectTagsDO
+		if err := adapter.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+			return nil, 0, err
+		}
+		tags := make([]string, len(tagResults))
+		for i, tag := range tagResults {
+			tags[i] = tag.TagName
+		}
+		summary.Tags = tags
+
+		projectSummaries = append(projectSummaries, summary)
+	}
+
+	return projectSummaries, int(count), nil
 }
 
 func (adapter *projectAdapter) listGlobal(
@@ -183,4 +396,62 @@ func (adapter *projectAdapter) listGlobal(
 
 		return f(&do)
 	})
+}
+
+func (adapter *projectAdapter) GetSummary(owner domain.Account, projectId string) (
+	r spacerepo.ProjectSummary, err error,
+) {
+	v, err := adapter.getSummary(owner.Account(), projectId)
+	if err != nil {
+		err = repositories.ConvertError(err)
+
+		return
+	}
+
+	if r.ResourceSummary, err = v.ToProject(); err == nil {
+		r.Tags = v.Tags
+	}
+
+	return
+}
+
+func (adapter *projectAdapter) getSummary(owner string, projectId string) (
+	do ProjectResourceSummaryDO, err error,
+) {
+	//filter
+	filter := projectDO{
+		Owner:  owner,
+		RepoId: projectId,
+	}
+
+	// find project
+	project := projectDO{}
+	if err := adapter.daoImpl.GetProjectRecord(&filter, &project); err != nil {
+		return ProjectResourceSummaryDO{}, err
+	}
+
+	// find tags
+	var tagResults []projectTagsDO
+	if err := adapter.daoImpl.dbTag().Where("project_id", projectId).Find(&tagResults).Error; err != nil {
+		return ProjectResourceSummaryDO{}, err
+	}
+	// Convert tags to a slice of strings
+	tags := make([]string, len(tagResults))
+	for i, tag := range tagResults {
+		tags[i] = tag.TagName
+	}
+
+	// Convert projectDO to ProjectResourceSummaryDO
+	do = ProjectResourceSummaryDO{
+		ResourceSummaryDO: repositories.ResourceSummaryDO{
+			Owner:    project.Owner,
+			Name:     project.Name,
+			Id:       project.Id,
+			RepoId:   project.RepoId,
+			RepoType: project.RepoType,
+		},
+		Tags: tags,
+	}
+
+	return do, nil
 }
