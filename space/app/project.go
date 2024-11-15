@@ -459,7 +459,7 @@ func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUpdateCode) (
 	err error,
 ) {
-	space, err := s.repo.GetByRepoId(id)
+	space, err := s.repoPg.GetByRepoId(id)
 	if err != nil {
 		return err
 	}
