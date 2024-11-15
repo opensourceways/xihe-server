@@ -21,7 +21,7 @@ type FileModerationStatus interface {
 	IsSkip() bool
 	IsNone() bool
 	IsBlock() bool
-	IsUnsupport() bool
+	IsUnsupported() bool
 }
 
 // FileModerationStatusValidate returns true if the status is valid.
@@ -86,6 +86,6 @@ func (s fileModerationStatus) IsBlock() bool {
 	return s.Status() == "block"
 }
 
-func (s fileModerationStatus) IsUnsupport() bool {
+func (s fileModerationStatus) IsUnsupported() bool {
 	return s.Status() == moderationUnsupported
 }

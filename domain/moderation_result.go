@@ -19,7 +19,7 @@ type FileModerationResult interface {
 	IsNone() bool
 	IsBlock() bool
 	IsPass() bool
-	IsUnsupport() bool
+	IsUnsupported() bool
 }
 
 // FileModerationResultValidate returns true if the result is valid.
@@ -73,6 +73,6 @@ func (s fileModerationResult) IsPass() bool {
 	return s.Result() == moderationResultPass
 }
 
-func (s fileModerationResult) IsUnsupport() bool {
+func (s fileModerationResult) IsUnsupported() bool {
 	return s.Result() == moderationResultUnsupported
 }
