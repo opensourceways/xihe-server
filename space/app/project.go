@@ -307,7 +307,7 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 	}
 
 	// step3: delete
-	if err = s.repo.Delete(&obj.ResourceIndex); err != nil {
+	if err = s.repoPg.Delete(&obj.ResourceIndex); err != nil {
 		return
 	}
 

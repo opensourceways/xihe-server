@@ -37,6 +37,12 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 	return *v, nil
 }
 
+func (adapter *projectAdapter) Delete(index *domain.ResourceIndex) (err error) {
+	return adapter.DeleteSingleRow(
+		&projectDO{Id: index.Id, Owner: index.Owner.Account()},
+	)
+}
+
 func (adapter *projectAdapter) GetByRepoId(id domain.Identity) (
 	r spacedomain.Project, err error,
 ) {

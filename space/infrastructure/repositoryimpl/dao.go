@@ -65,7 +65,7 @@ func (dao *daoImpl) GetProjectRecord(filter, result interface{}) error {
 }
 
 // DeleteByPrimaryKey deletes a single record from the database based on the primary key of the row parameter.
-func (dao *daoImpl) DeleteByPrimaryKey(row interface{}) error {
+func (dao *daoImpl) DeleteSingleRow(row interface{}) error {
 	err := dao.db().Delete(row).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {

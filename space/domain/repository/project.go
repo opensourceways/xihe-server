@@ -59,14 +59,12 @@ type Project interface {
 }
 type ProjectPg interface {
 	Save(*spacedomain.Project) (spacedomain.Project, error)
+	Delete(*domain.ResourceIndex) error
 	GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
 	Get(domain.Account, string) (spacedomain.Project, error)
 	GetByRepoId(domain.Identity) (spacedomain.Project, error)
 	GetSummary(domain.Account, string) (ProjectSummary, error)
 	GetSummaryByName(domain.Account, domain.ResourceName) (domain.ResourceSummary, error)
-
-	AddRelatedDataset(*repository.RelatedResourceInfo) error
-	AddRelatedModel(*repository.RelatedResourceInfo) error
 
 	ListAndSortByUpdateTime(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
 	ListAndSortByFirstLetter(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
@@ -75,4 +73,7 @@ type ProjectPg interface {
 	ListGlobalAndSortByUpdateTime(*repository.GlobalResourceListOption) (UserProjectsInfo, error)
 	ListGlobalAndSortByFirstLetter(*repository.GlobalResourceListOption) (UserProjectsInfo, error)
 	ListGlobalAndSortByDownloadCount(*repository.GlobalResourceListOption) (UserProjectsInfo, error)
+
+	AddRelatedDataset(*repository.RelatedResourceInfo) error
+	AddRelatedModel(*repository.RelatedResourceInfo) error
 }
