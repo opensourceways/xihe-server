@@ -127,9 +127,9 @@ func NewProjectService(
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
-	pr platform.Repository,
 	sender message.ResourceProducer,
 	computilityApp computilityapp.ComputilityInternalAppService,
+	spaceProducer spacedomain.SpaceEventProducer,
 ) ProjectService {
 	return projectService{
 		repo:     repo,
@@ -142,16 +142,17 @@ func NewProjectService(
 			Dataset: dataset,
 		},
 		computilityApp: computilityApp,
+		spaceProducer:  spaceProducer,
 	}
 }
 
 type projectService struct {
-	repo spacerepo.Project
-	//pr       platform.Repository
+	repo           spacerepo.Project
 	activity       repository.Activity
 	sender         message.ResourceProducer
 	rs             app.ResourceService
 	computilityApp computilityapp.ComputilityInternalAppService
+	spaceProducer  spacedomain.SpaceEventProducer
 }
 
 func (s projectService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -303,6 +304,16 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 
 	// step3: delete
 	if err = s.repo.Delete(&obj.ResourceIndex); err != nil {
+		return
+	}
+
+	if err = s.spaceProducer.SendDeletedEvent(&spacedomain.DeleteSpaceEvent{
+		Time:      utils.Now(),
+		Owner:     r.Owner.Account(),
+		SpaceName: r.Name.ResourceName(),
+		DeletedBy: r.Owner.Account(),
+		SpaceId:   r.RepoId,
+	}); err != nil {
 		return
 	}
 
@@ -478,82 +489,4 @@ func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUp
 		id, cmd.CommitId, cmd)
 
 	return nil
-}
-
-func (s projectService) toProjectDTO(p *spacedomain.Project, dto *ProjectDTO) {
-	*dto = ProjectDTO{
-		Id:            p.Id,
-		Owner:         p.Owner.Account(),
-		Name:          p.Name.ResourceName(),
-		Type:          p.Type.ProjType(),
-		CoverId:       p.CoverId.CoverId(),
-		Protocol:      p.Protocol.ProtocolName(),
-		Training:      p.Training.TrainingPlatform(),
-		RepoType:      p.RepoType.RepoType(),
-		RepoId:        p.RepoId,
-		Tags:          p.Tags,
-		CreatedAt:     utils.ToDate(p.CreatedAt),
-		UpdatedAt:     utils.ToDate(p.UpdatedAt),
-		LikeCount:     p.LikeCount,
-		ForkCount:     p.ForkCount,
-		DownloadCount: p.DownloadCount,
-		BaseImage:     p.BaseImage.BaseImage(),
-		Hardware:      p.Hardware.Hardware(),
-		IsNpu:         p.Hardware.IsNpu(),
-	}
-
-	if p.CommitId != "" {
-		dto.CommitId = p.CommitId
-	}
-
-	if p.Desc != nil {
-		dto.Desc = p.Desc.ResourceDesc()
-	}
-
-	if p.Title != nil {
-		dto.Title = p.Title.ResourceTitle()
-	}
-
-}
-
-func (s projectService) toProjectSummaryDTO(p *spacedomain.ProjectSummary, dto *ProjectSummaryDTO) {
-	*dto = ProjectSummaryDTO{
-		Id:            p.Id,
-		Owner:         p.Owner.Account(),
-		Name:          p.Name.ResourceName(),
-		CoverId:       p.CoverId.CoverId(),
-		Tags:          p.Tags,
-		UpdatedAt:     utils.ToDate(p.UpdatedAt),
-		LikeCount:     p.LikeCount,
-		ForkCount:     p.ForkCount,
-		DownloadCount: p.DownloadCount,
-		IsNpu:         p.Hardware.IsNpu(),
-	}
-
-	if p.Desc != nil {
-		dto.Desc = p.Desc.ResourceDesc()
-	}
-
-	if p.Title != nil {
-		dto.Title = p.Title.ResourceTitle()
-	}
-
-	if p.Level != nil {
-		dto.Level = p.Level.ResourceLevel()
-	}
-}
-
-func (s projectService) toSpaceMetaDTO(v spacedomain.Project) sdk.SpaceMetaDTO {
-	return sdk.SpaceMetaDTO{
-		Id:           v.RepoId,
-		SDK:          v.Type.ProjType(),
-		Name:         v.Name.ResourceName(),
-		Owner:        v.Owner.Account(),
-		Hardware:     v.Hardware.Hardware(),
-		BaseImage:    v.BaseImage.BaseImage(),
-		Visibility:   v.RepoType.RepoType(),
-		Disable:      false,
-		HardwareType: v.Hardware.Hardware(),
-		CommitId:     v.CommitId,
-	}
 }

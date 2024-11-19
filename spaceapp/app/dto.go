@@ -74,11 +74,11 @@ func toSpaceDTO(space *spacedomain.Project) SpaceAppDTO {
 	return dto
 }
 
-func toSpaceNoCompQuotaDTO(space *spacedomain.Project) SpaceAppDTO {
-	dto := SpaceAppDTO{
-		Id:     space.Id,
-		Status: types.NoCompQuotaException,
-		Reason: types.ExceptionMap[types.NoCompQuotaException],
-	}
-	return dto
-}
+// func toSpaceNoCompQuotaDTO(space *spacedomain.Project) SpaceAppDTO {
+// 	dto := SpaceAppDTO{
+// 		Id:     space.Id,
+// 		Status: types.NoCompQuotaException,
+// 		Reason: types.ExceptionMap[types.NoCompQuotaException],
+// 	}
+// 	return dto
+// }

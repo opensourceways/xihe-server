@@ -308,6 +308,7 @@ func (do *ProjectDO) toProject(r *spacedomain.Project) (err error) {
 	r.DownloadCount = do.DownloadCount
 	r.CommitId = do.CommitId
 	r.NoApplicationFile = do.NoApplicationFile
+	r.CompPowerAllocated = do.CompPowerAllocated
 
 	return
 }
