@@ -33,10 +33,8 @@ func (dao *daoImpl) dbLarge() *gorm.DB {
 	return dbInstance.Table(dao.tableLarge)
 }
 
-// GetRecord retrieves a single record from the database based on the provided filter
-// and stores it in the result parameter.
 func (dao *daoImpl) GetRecord(filter, result interface{}) error {
-	err := dao.db().Where(filter).First(result).Error
+	err := dao.db().Where(filter).Find(result).Error
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return repository.NewErrorResourceNotExists(errors.New("not found"))
