@@ -26,7 +26,7 @@ type fileScanService struct {
 
 func (s *fileScanService) Get(isLFSFile bool, owner string, repoName string) ([]filescan.FilescanRes, error) {
 	if isLFSFile {
-		return s.FileScanAdapter.Get(owner, repoName)
+		return s.FileScanAdapter.GetLarge(owner, repoName)
 	}
-	return s.FileScanAdapter.GetLarge(owner, repoName)
+	return s.FileScanAdapter.Get(owner, repoName)
 }
