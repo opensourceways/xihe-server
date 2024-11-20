@@ -32,6 +32,7 @@ type fileScanDO struct {
 
 func (do *fileScanDO) toFilescanRes() domain.FilescanRes {
 	return domain.FilescanRes{
+		Name:             do.File,
 		ModerationStatus: do.ModerationResult,
 		ModerationResult: do.ModerationStatus,
 	}
