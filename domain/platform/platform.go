@@ -82,11 +82,11 @@ type RepoDirFile struct {
 }
 
 type RepoPathItem struct {
-	filescan.FilescanDTO
-	Path      string `json:"path"`
-	Name      string `json:"name"`
-	IsDir     bool   `json:"is_dir"`
-	IsLFSFile bool   `json:"is_lfs_file"`
+	Filescan  filescan.FilescanDTO `json:"filescan"`
+	Path      string               `json:"path"`
+	Name      string               `json:"name"`
+	IsDir     bool                 `json:"is_dir"`
+	IsLFSFile bool                 `json:"is_lfs_file"`
 }
 
 type RepoFile interface {

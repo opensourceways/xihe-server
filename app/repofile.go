@@ -233,7 +233,7 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 		// 添加扫描结果到 LFS 文件
 		for _, file := range lfsFiles {
 			if scan, exists := scanMap[file.Name]; exists {
-				file.FilescanDTO = filescanapp.FilescanDTO{
+				file.Filescan = filescanapp.FilescanDTO{
 					ModerationStatus: scan.ModerationStatus,
 					ModerationResult: scan.ModerationResult,
 				}
@@ -258,7 +258,7 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 		// 添加扫描结果到普通文件
 		for _, file := range normalFiles {
 			if scan, exists := scanMap[file.Name]; exists {
-				file.FilescanDTO = filescanapp.FilescanDTO{
+				file.Filescan = filescanapp.FilescanDTO{
 					ModerationStatus: scan.ModerationStatus,
 					ModerationResult: scan.ModerationResult,
 				}
