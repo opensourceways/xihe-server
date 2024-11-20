@@ -257,8 +257,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		bigmodelrepo.NewApiInfo(mongodb.NewCollection(collections.ApiInfo)),
 		userRegService,
 	)
+
+	fmt.Printf("=======================cfg.Filescan.Tables: %+v\n", cfg.Filescan.Tables)
 	//Init filescan
 	err = filescanrepo.Init(pgsql.DB(), &cfg.Filescan.Tables)
+
 	if err != nil {
 		return err
 	}
