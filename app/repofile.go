@@ -220,7 +220,6 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 	// 处理 LFS 文件
 	if len(lfsFiles) > 0 {
 		if lfsFileScanRes, err := s.f.Get(true, owner, repoName); err == nil {
-
 			// 创建扫描结果映射
 			scanMap := make(map[string]filescan.FilescanRes)
 			for _, scan := range lfsFileScanRes {
@@ -228,24 +227,21 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 			}
 
 			// 添加扫描结果到 LFS 文件
-			for _, file := range lfsFiles {
-				if scan, exists := scanMap[file.Name]; exists {
-					file.Filescan = filescanapp.FilescanDTO{
+			for i := range lfsFiles {
+				if scan, exists := scanMap[lfsFiles[i].Name]; exists {
+					lfsFiles[i].Filescan = filescanapp.FilescanDTO{
 						ModerationStatus: scan.ModerationStatus,
 						ModerationResult: scan.ModerationResult,
 					}
 				}
-				results = append(results, file)
 			}
-		} else {
-			results = append(results, lfsFiles...)
 		}
+		results = append(results, lfsFiles...)
 	}
 
 	// 处理普通文件
 	if len(normalFiles) > 0 {
 		if normalFileScanRes, err := s.f.Get(false, owner, repoName); err == nil {
-
 			// 创建扫描结果映射
 			scanMap := make(map[string]filescan.FilescanRes)
 			for _, scan := range normalFileScanRes {
@@ -253,18 +249,16 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 			}
 
 			// 添加扫描结果到普通文件
-			for _, file := range normalFiles {
-				if scan, exists := scanMap[file.Name]; exists {
-					file.Filescan = filescanapp.FilescanDTO{
+			for i := range normalFiles {
+				if scan, exists := scanMap[normalFiles[i].Name]; exists {
+					normalFiles[i].Filescan = filescanapp.FilescanDTO{
 						ModerationStatus: scan.ModerationStatus,
 						ModerationResult: scan.ModerationResult,
 					}
 				}
-				results = append(results, file)
 			}
-		} else {
-			results = append(results, normalFiles...)
 		}
+		results = append(results, normalFiles...)
 	}
 
 	// 排序结果
