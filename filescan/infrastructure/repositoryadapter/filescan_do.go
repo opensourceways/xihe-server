@@ -29,13 +29,6 @@ type fileScanDO struct {
 	UpdatedAt        time.Time `gorm:"column:updated_at"`
 }
 
-func (do *fileScanDO) toFileScan() domain.FileScan {
-	return domain.FileScan{
-		ModerationStatus: do.ModerationResult,
-		ModerationResult: do.ModerationStatus,
-	}
-}
-
 func (do *fileScanDO) toFilescanRes() domain.FilescanRes {
 	return domain.FilescanRes{
 		ModerationStatus: do.ModerationResult,
