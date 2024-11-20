@@ -2,7 +2,6 @@
 package app
 
 import (
-	// "github.com/opensourceways/xihe-server/domain"
 	filescan "github.com/opensourceways/xihe-server/filescan/domain"
 	repo "github.com/opensourceways/xihe-server/filescan/infrastructure/repositoryadapter"
 )

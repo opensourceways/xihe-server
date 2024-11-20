@@ -262,6 +262,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	if err != nil {
 		return err
 	}
+	fmt.Printf("==========================gin Init err: %v\n", err)
 
 	fileScanAdapter := filescanrepo.NewFileScanAdapter()
 

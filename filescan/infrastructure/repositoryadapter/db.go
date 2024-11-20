@@ -1,6 +1,10 @@
 package repositoryadapter
 
-import "gorm.io/gorm"
+import (
+	"fmt"
+
+	"gorm.io/gorm"
+)
 
 var (
 	fileScanInstance *FileScanAdapter
@@ -13,10 +17,12 @@ func Init(db *gorm.DB, tables *Tables) error {
 	largeFileScanTableName = tables.LargeFileScan
 
 	if err := db.AutoMigrate(&fileScanDO{}); err != nil {
+		fmt.Printf("==========================Init err1: %v\n", err)
 		return err
 	}
 
 	if err := db.AutoMigrate(&largeFileScanDO{}); err != nil {
+		fmt.Printf("==========================Init err2: %v\n", err)
 		return err
 	}
 
