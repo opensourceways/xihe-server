@@ -210,51 +210,51 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 
 	// 处理 LFS 文件
 	if len(lfsFiles) > 0 {
-		lfsFileScanRes, err := s.f.Get(true, owner, repoName)
-		if err != nil {
-			return nil, err
-		}
+		if lfsFileScanRes, err := s.f.Get(true, owner, repoName); err == nil {
 
-		// 创建扫描结果映射
-		scanMap := make(map[string]filescan.FilescanRes)
-		for _, scan := range lfsFileScanRes {
-			scanMap[scan.Name] = scan
-		}
-
-		// 添加扫描结果到 LFS 文件
-		for _, file := range lfsFiles {
-			if scan, exists := scanMap[file.Name]; exists {
-				file.Filescan = filescanapp.FilescanDTO{
-					ModerationStatus: scan.ModerationStatus,
-					ModerationResult: scan.ModerationResult,
-				}
+			// 创建扫描结果映射
+			scanMap := make(map[string]filescan.FilescanRes)
+			for _, scan := range lfsFileScanRes {
+				scanMap[scan.Name] = scan
 			}
-			results = append(results, file)
+
+			// 添加扫描结果到 LFS 文件
+			for _, file := range lfsFiles {
+				if scan, exists := scanMap[file.Name]; exists {
+					file.Filescan = filescanapp.FilescanDTO{
+						ModerationStatus: scan.ModerationStatus,
+						ModerationResult: scan.ModerationResult,
+					}
+				}
+				results = append(results, file)
+			}
+		} else {
+			results = append(results, lfsFiles...)
 		}
 	}
 
 	// 处理普通文件
 	if len(normalFiles) > 0 {
-		normalFileScanRes, err := s.f.Get(false, owner, repoName)
-		if err != nil {
-			return nil, err
-		}
+		if normalFileScanRes, err := s.f.Get(false, owner, repoName); err == nil {
 
-		// 创建扫描结果映射
-		scanMap := make(map[string]filescan.FilescanRes)
-		for _, scan := range normalFileScanRes {
-			scanMap[scan.Name] = scan
-		}
-
-		// 添加扫描结果到普通文件
-		for _, file := range normalFiles {
-			if scan, exists := scanMap[file.Name]; exists {
-				file.Filescan = filescanapp.FilescanDTO{
-					ModerationStatus: scan.ModerationStatus,
-					ModerationResult: scan.ModerationResult,
-				}
+			// 创建扫描结果映射
+			scanMap := make(map[string]filescan.FilescanRes)
+			for _, scan := range normalFileScanRes {
+				scanMap[scan.Name] = scan
 			}
-			results = append(results, file)
+
+			// 添加扫描结果到普通文件
+			for _, file := range normalFiles {
+				if scan, exists := scanMap[file.Name]; exists {
+					file.Filescan = filescanapp.FilescanDTO{
+						ModerationStatus: scan.ModerationStatus,
+						ModerationResult: scan.ModerationResult,
+					}
+				}
+				results = append(results, file)
+			}
+		} else {
+			results = append(results, normalFiles...)
 		}
 	}
 
