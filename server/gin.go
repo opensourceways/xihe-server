@@ -42,6 +42,8 @@ import (
 	courseusercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
+	filescan "github.com/opensourceways/xihe-server/filescan/app"
+	filescanrepo "github.com/opensourceways/xihe-server/filescan/infrastructure/repositoryadapter"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
@@ -255,6 +257,15 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		bigmodelrepo.NewApiInfo(mongodb.NewCollection(collections.ApiInfo)),
 		userRegService,
 	)
+	//Init filescan
+	err = filescanrepo.Init(pgsql.DB(), &cfg.Filescan.Tables)
+	if err != nil {
+		return err
+	}
+
+	fileScanAdapter := filescanrepo.NewFileScanAdapter()
+
+	fileScanService := filescan.NewFileScanService(*fileScanAdapter)
 
 	err = comprepositoryadapter.Init(pgsql.DB(), &cfg.Computility.Tables)
 	if err != nil {
@@ -385,7 +396,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForRepoFileController(
-			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,
+			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService, fileScanService,
 		)
 		controller.AddRouterForRepoFileInternalController(
 			internal, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,

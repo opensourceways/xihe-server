@@ -11,6 +11,8 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
+	filescanapp "github.com/opensourceways/xihe-server/filescan/app"
+	filescan "github.com/opensourceways/xihe-server/filescan/domain"
 )
 
 type RepoDir = platform.RepoDir
@@ -32,16 +34,18 @@ type RepoFileService interface {
 	DownloadRepo(u *UserInfo, obj *domain.RepoDownloadedEvent, handle func(io.Reader, int64)) error
 }
 
-func NewRepoFileService(rf platform.RepoFile, sender message.RepoMessageProducer) RepoFileService {
+func NewRepoFileService(rf platform.RepoFile, sender message.RepoMessageProducer, filescan filescanapp.FileScanService) RepoFileService {
 	return &repoFileService{
 		rf:     rf,
 		sender: sender,
+		f:      filescan,
 	}
 }
 
 type repoFileService struct {
 	rf     platform.RepoFile
 	sender message.RepoMessageProducer
+	f      filescanapp.FileScanService
 }
 
 type RepoFileListCmd = RepoDir
@@ -196,18 +200,82 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 		return nil, err
 	}
 
-	sort.Slice(r, func(i, j int) bool {
-		a := &r[i]
-		b := &r[j]
+	owner := u.User.Account()
+	repoName := d.RepoName.ResourceName()
 
-		if a.IsDir != b.IsDir {
-			return a.IsDir
+	// 将文件按 IsLFSFile 分组
+	lfsFiles := make([]RepoPathItem, 0)
+	normalFiles := make([]RepoPathItem, 0)
+
+	for _, item := range r {
+		if item.IsLFSFile {
+			lfsFiles = append(lfsFiles, item)
+		} else {
+			normalFiles = append(normalFiles, item)
+		}
+	}
+
+	results := make([]RepoPathItem, 0, len(r))
+
+	// 处理 LFS 文件
+	if len(lfsFiles) > 0 {
+		lfsFileScanRes, err := s.f.Get(true, owner, repoName)
+		if err != nil {
+			return nil, err
 		}
 
-		return a.Name < b.Name
+		// 创建扫描结果映射
+		scanMap := make(map[string]filescan.FilescanRes)
+		for _, scan := range lfsFileScanRes {
+			scanMap[scan.Name] = scan
+		}
+
+		// 添加扫描结果到 LFS 文件
+		for _, file := range lfsFiles {
+			if scan, exists := scanMap[file.Name]; exists {
+				file.FilescanDTO = filescanapp.FilescanDTO{
+					ModerationStatus: scan.ModerationStatus,
+					ModerationResult: scan.ModerationResult,
+				}
+			}
+			results = append(results, file)
+		}
+	}
+
+	// 处理普通文件
+	if len(normalFiles) > 0 {
+		normalFileScanRes, err := s.f.Get(false, owner, repoName)
+		if err != nil {
+			return nil, err
+		}
+
+		// 创建扫描结果映射
+		scanMap := make(map[string]filescan.FilescanRes)
+		for _, scan := range normalFileScanRes {
+			scanMap[scan.Name] = scan
+		}
+
+		// 添加扫描结果到普通文件
+		for _, file := range normalFiles {
+			if scan, exists := scanMap[file.Name]; exists {
+				file.FilescanDTO = filescanapp.FilescanDTO{
+					ModerationStatus: scan.ModerationStatus,
+					ModerationResult: scan.ModerationResult,
+				}
+			}
+			results = append(results, file)
+		}
+	}
+
+	// 排序结果
+	sort.Slice(results, func(i, j int) bool {
+		if results[i].IsDir != results[j].IsDir {
+			return results[i].IsDir
+		}
+		return results[i].Name < results[j].Name
 	})
 
-	return r, nil
+	return results, nil
 }
 
 func (s *repoFileService) DownloadRepo(
