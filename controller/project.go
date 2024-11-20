@@ -40,7 +40,7 @@ func AddRouterForProjectController(
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repo, model, dataset, activity, sender, computility, spaceProducer, computility,
+			user, repo, model, dataset, activity, sender, computility, spaceProducer,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
