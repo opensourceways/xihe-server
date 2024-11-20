@@ -7,6 +7,8 @@ import (
 
 	"github.com/opensourceways/xihe-server/domain"
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
+
+	filescan "github.com/opensourceways/xihe-server/filescan/app"
 )
 
 const (
@@ -80,6 +82,7 @@ type RepoDirFile struct {
 }
 
 type RepoPathItem struct {
+	filescan.FilescanDTO
 	Path      string `json:"path"`
 	Name      string `json:"name"`
 	IsDir     bool   `json:"is_dir"`
