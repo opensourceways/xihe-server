@@ -97,7 +97,7 @@ func (ctl *InferenceInternalController) Create(ctx *gin.Context) {
 // @Tags     SpaceApp
 // @Param    body  body  reqToUpdateServiceInfo  true  "body"
 // @Accept   json
-// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Success  202   {object}  responseData{data=nil,code=string,msg=string}
 // @Security Internal
 // @Router   /v1/inference/serving [put]
 func (ctl *InferenceInternalController) NotifySpaceAppServing(ctx *gin.Context) {
@@ -128,7 +128,7 @@ func (ctl *InferenceInternalController) NotifySpaceAppServing(ctx *gin.Context) 
 // @Tags     SpaceApp
 // @Param    body  body  reqToUpdateBuildInfo  true  "body"
 // @Accept   json
-// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Success  202   {object}  responseData{data=nil,msg=string,code=string}
 // @Security Internal
 // @Router   /v1/infernce/building [put]
 func (ctl *InferenceInternalController) NotifySpaceAppBuilding(ctx *gin.Context) {
@@ -159,7 +159,7 @@ func (ctl *InferenceInternalController) NotifySpaceAppBuilding(ctx *gin.Context)
 // @Tags     SpaceApp
 // @Param    body  body  reqToNotifyStarting  true  "body"
 // @Accept   json
-// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Success  202   {object}  responseData{data=nil,msg=string,code=string}
 // @Security Internal
 // @Router   /v1/inference/starting [put]
 func (ctl *InferenceInternalController) NotifySpaceAppStarting(ctx *gin.Context) {
@@ -190,7 +190,7 @@ func (ctl *InferenceInternalController) NotifySpaceAppStarting(ctx *gin.Context)
 // @Tags     SpaceApp
 // @Param    body  body  reqToFailedStatus  true  "body"
 // @Accept   json
-// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Success  202   {object}  responseData{data=nil,msg=string,code=string}
 // @Security Internal
 // @Router   /v1/inference/failed_status [put]
 func (ctl *InferenceInternalController) NotifySpaceAppFailedStatus(ctx *gin.Context) {

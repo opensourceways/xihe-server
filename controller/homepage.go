@@ -75,7 +75,7 @@ func (ctl *HomeController) ListAll(ctx *gin.Context) {
 }
 
 // @Summary		Get
-// @Description	Get the project dataset model courses and competitions
+// @Description	get the project dataset model courses and competitions
 // @Tags			HomePage
 // @Accept			json
 // @Success		200	{object}		IndustryDTO

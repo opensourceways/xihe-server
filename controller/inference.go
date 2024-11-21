@@ -67,7 +67,7 @@ type InferenceController struct {
 // @Param    owner  path  string  true  "owner of space" MaxLength(40)
 // @Param    name   path  string  true  "name of space" MaxLength(100)
 // @Accept   json
-// @Success  200  {object}  commonctl.ResponseData{data=app.SpaceAppDTO,msg=string,code=string}
+// @Success  200  {object}  spaceappApp.SpaceAppDTO
 // @Router   /v1/space-app/{owner}/{name} [get]
 func (ctl *InferenceController) Get(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
@@ -143,7 +143,7 @@ func (ctl *InferenceController) GetBuildLogs(ctx *gin.Context) {
 // @Param    owner  path  string  true  "owner of space" MaxLength(40)
 // @Param    name   path  string  true  "name of space" MaxLength(100)
 // @Accept   json
-// @Success  200  {object}  commonctl.ResponseData{data=app.SpaceAppDTO,msg=string,code=string}
+// @Success  200  {object}  spaceappApp.SpaceAppDTO
 // @Router   /v1/space-app/{owner}/{name}/buildlog/realtime [get]
 func (ctl *InferenceController) GetRealTimeBuildLog(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
@@ -203,7 +203,7 @@ func (ctl *InferenceController) GetRealTimeBuildLog(ctx *gin.Context) {
 // @Param    owner  path  string  true  "owner of space" MaxLength(40)
 // @Param    name   path  string  true  "name of space" MaxLength(100)
 // @Accept   json
-// @Success  200  {object}  commonctl.ResponseData{data=app.SpaceAppDTO,msg=string,code=string}
+// @Success  200  {object}  spaceappApp.SpaceAppDTO
 // @Router   /v1/space-app/:owner/:name/spacelog/realtime [get]
 func (ctl *InferenceController) GetRealTimeSpaceLog(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
@@ -263,7 +263,7 @@ func (ctl *InferenceController) GetRealTimeSpaceLog(ctx *gin.Context) {
 // @Param    owner  path  string  true  "owner of space" MaxLength(40)
 // @Param    name   path  string  true  "name of space" MaxLength(100)
 // @Accept   json
-// @Success  200  {object}  commonctl.ResponseData
+// @Success  200  {object}  responseData{data=string,msg=string,code=string}
 // @x-example {"data": "successfully"}
 // @Router   /v1/space-app/{owner}/{name}/read [get]
 func (ctl *InferenceController) CanRead(ctx *gin.Context) {

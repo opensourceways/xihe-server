@@ -2207,6 +2207,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/computility/account/{type}": {
+            "get": {
+                "description": "get user computility account detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ComputilityWeb"
+                ],
+                "summary": "GetComputilityAccountDetail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "computility type",
+                        "name": "type",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.AccountQuotaDetailDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controller.responseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/v1/course": {
             "get": {
                 "description": "list the course",
@@ -3193,27 +3243,81 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/homepage/electricity": {
+        "/v1/homepage/{industry}": {
             "get": {
-                "description": "list the project dataset model courses and competitions",
+                "description": "get the project dataset model courses and competitions",
                 "consumes": [
                     "application/json"
                 ],
                 "tags": [
                     "HomePage"
                 ],
-                "summary": "ListAllElectricity",
+                "summary": "Get",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/controller.homeElectricityInfo"
+                            "$ref": "#/definitions/controller.IndustryDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/inference/failed_status": {
+            "put": {
+                "security": [
+                    {
+                        "Internal": []
+                    }
+                ],
+                "description": "notify space app failed status",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceApp"
+                ],
+                "summary": "NotifySpaceAppFailedStatus",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.reqToFailedStatus"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controller.responseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -3268,6 +3372,168 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "type": "system_error"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/inference/serving": {
+            "put": {
+                "security": [
+                    {
+                        "Internal": []
+                    }
+                ],
+                "description": "notify space app service is started",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceApp"
+                ],
+                "summary": "NotifySpaceAppServing",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.reqToUpdateServiceInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controller.responseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/inference/starting": {
+            "put": {
+                "security": [
+                    {
+                        "Internal": []
+                    }
+                ],
+                "description": "notify space app build is starting",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceApp"
+                ],
+                "summary": "NotifySpaceAppStarting",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.reqToNotifyStarting"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controller.responseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/infernce/building": {
+            "put": {
+                "security": [
+                    {
+                        "Internal": []
+                    }
+                ],
+                "description": "notify space app building is started",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceApp"
+                ],
+                "summary": "NotifySpaceAppBuilding",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.reqToUpdateBuildInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controller.responseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
                         }
                     }
                 }
@@ -5138,6 +5404,270 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/space-app/:owner/:name/spacelog/realtime": {
+            "get": {
+                "description": "get space app real-time space log",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceApp"
+                ],
+                "summary": "GetSpaceLog",
+                "parameters": [
+                    {
+                        "maxLength": 40,
+                        "type": "string",
+                        "description": "owner of space",
+                        "name": "owner",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 100,
+                        "type": "string",
+                        "description": "name of space",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.SpaceAppDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/space-app/{owner}/{name}": {
+            "get": {
+                "description": "get space app",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceApp"
+                ],
+                "summary": "Get",
+                "parameters": [
+                    {
+                        "maxLength": 40,
+                        "type": "string",
+                        "description": "owner of space",
+                        "name": "owner",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 100,
+                        "type": "string",
+                        "description": "name of space",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.SpaceAppDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/space-app/{owner}/{name}/buildlog/complete": {
+            "get": {
+                "description": "get space app complete build logs",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceApp"
+                ],
+                "summary": "GetBuildLogs",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "space app id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.BuildLogsDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/space-app/{owner}/{name}/buildlog/realtime": {
+            "get": {
+                "description": "get space app real-time build log",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceApp"
+                ],
+                "summary": "GetBuildLog",
+                "parameters": [
+                    {
+                        "maxLength": 40,
+                        "type": "string",
+                        "description": "owner of space",
+                        "name": "owner",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 100,
+                        "type": "string",
+                        "description": "name of space",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/app.SpaceAppDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/space-app/{owner}/{name}/read": {
+            "get": {
+                "description": "check permission for read space app",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceAppWeb"
+                ],
+                "summary": "CanRead",
+                "parameters": [
+                    {
+                        "maxLength": 40,
+                        "type": "string",
+                        "description": "owner of space",
+                        "name": "owner",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "maxLength": 100,
+                        "type": "string",
+                        "description": "name of space",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controller.responseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "x-example": {
+                    "data": "successfully"
+                }
+            }
+        },
+        "/v1/space/{id}/notify_update_code": {
+            "put": {
+                "security": [
+                    {
+                        "Internal": []
+                    }
+                ],
+                "description": "NotifyUpdateCode space",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "SpaceInternal"
+                ],
+                "summary": "NotifyUpdateCode space",
+                "parameters": [
+                    {
+                        "maxLength": 20,
+                        "type": "string",
+                        "description": "id of space",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controller.reqToNotifyUpdateCode"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/controller.responseData"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "code": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "string"
+                                        },
+                                        "msg": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/v1/tags/{type}": {
             "get": {
                 "description": "list tags",
@@ -6406,6 +6936,26 @@ const docTemplate = `{
                 }
             }
         },
+        "app.AccountQuotaDetailDTO": {
+            "type": "object",
+            "properties": {
+                "compute_type": {
+                    "type": "string"
+                },
+                "quota_balance": {
+                    "type": "integer"
+                },
+                "total_quota": {
+                    "type": "integer"
+                },
+                "used_quota": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
         "app.ActivityDTO": {
             "type": "object",
             "properties": {
@@ -6523,6 +7073,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "text": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.BuildLogsDTO": {
+            "type": "object",
+            "properties": {
+                "logs": {
                     "type": "string"
                 }
             }
@@ -7026,6 +7584,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "is_npu": {
+                    "type": "boolean"
+                },
                 "level": {
                     "type": "string"
                 },
@@ -7309,6 +7870,9 @@ const docTemplate = `{
                 "id": {
                     "type": "string"
                 },
+                "is_npu": {
+                    "type": "boolean"
+                },
                 "level": {
                     "type": "string"
                 },
@@ -7571,6 +8135,23 @@ const docTemplate = `{
                     }
                 },
                 "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "app.SpaceAppDTO": {
+            "type": "object",
+            "properties": {
+                "app_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }
@@ -7980,6 +8561,32 @@ const docTemplate = `{
                 },
                 "task": {
                     "type": "string"
+                }
+            }
+        },
+        "controller.IndustryDTO": {
+            "type": "object",
+            "properties": {
+                "comp": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO"
+                    }
+                },
+                "course": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.CourseSummaryDTO"
+                    }
+                },
+                "dataset": {
+                    "$ref": "#/definitions/app.GlobalDatasetsDTO"
+                },
+                "model": {
+                    "$ref": "#/definitions/app.GlobalModelsDTO"
+                },
+                "project": {
+                    "$ref": "#/definitions/app.GlobalProjectsDTO"
                 }
             }
         },
@@ -8656,32 +9263,6 @@ const docTemplate = `{
                 }
             }
         },
-        "controller.homeElectricityInfo": {
-            "type": "object",
-            "properties": {
-                "comp": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO"
-                    }
-                },
-                "course": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/app.CourseSummaryDTO"
-                    }
-                },
-                "dataset": {
-                    "$ref": "#/definitions/app.GlobalDatasetsDTO"
-                },
-                "model": {
-                    "$ref": "#/definitions/app.GlobalModelsDTO"
-                },
-                "project": {
-                    "$ref": "#/definitions/app.GlobalProjectsDTO"
-                }
-            }
-        },
         "controller.homeInfo": {
             "type": "object",
             "properties": {
@@ -8956,10 +9537,16 @@ const docTemplate = `{
         "controller.projectCreateRequest": {
             "type": "object",
             "properties": {
+                "base_image": {
+                    "type": "string"
+                },
                 "cover_id": {
                     "type": "string"
                 },
                 "desc": {
+                    "type": "string"
+                },
+                "hardware": {
                     "type": "string"
                 },
                 "name": {
@@ -8997,6 +9584,12 @@ const docTemplate = `{
                 "avatar_id": {
                     "type": "string"
                 },
+                "base_image": {
+                    "type": "string"
+                },
+                "commit_id": {
+                    "type": "string"
+                },
                 "cover_id": {
                     "type": "string"
                 },
@@ -9012,8 +9605,14 @@ const docTemplate = `{
                 "fork_count": {
                     "type": "integer"
                 },
+                "hardware": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
+                },
+                "is_npu": {
+                    "type": "boolean"
                 },
                 "like_count": {
                     "type": "integer"
@@ -9137,6 +9736,82 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "owner": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.reqToFailedStatus": {
+            "type": "object",
+            "properties": {
+                "all_build_log": {
+                    "type": "string"
+                },
+                "commit_id": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "space_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.reqToNotifyStarting": {
+            "type": "object",
+            "properties": {
+                "all_build_log": {
+                    "type": "string"
+                },
+                "commit_id": {
+                    "type": "string"
+                },
+                "space_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.reqToNotifyUpdateCode": {
+            "type": "object",
+            "properties": {
+                "commit_id": {
+                    "type": "string"
+                },
+                "no_application_file": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "controller.reqToUpdateBuildInfo": {
+            "type": "object",
+            "properties": {
+                "commit_id": {
+                    "type": "string"
+                },
+                "log_url": {
+                    "type": "string"
+                },
+                "space_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.reqToUpdateServiceInfo": {
+            "type": "object",
+            "properties": {
+                "app_url": {
+                    "type": "string"
+                },
+                "commit_id": {
+                    "type": "string"
+                },
+                "log_url": {
+                    "type": "string"
+                },
+                "space_id": {
                     "type": "string"
                 }
             }
