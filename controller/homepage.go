@@ -28,7 +28,7 @@ func AddRouterForHomeController(
 		dataset: dataset,
 	}
 	rg.GET("/v1/homepage", ctl.ListAll)
-	rg.GET("/v1/homepage/electricity", ctl.ListAllElectricity)
+	rg.GET("/v1/homepage/:industry", ctl.Get)
 }
 
 type HomeController struct {
@@ -74,28 +74,30 @@ func (ctl *HomeController) ListAll(ctx *gin.Context) {
 	ctl.sendRespOfGet(ctx, info)
 }
 
-// @Summary		ListAllElectricity
-// @Description	list the project dataset model courses and competitions
+// @Summary		Get
+// @Description	Get the project dataset model courses and competitions
 // @Tags			HomePage
 // @Accept			json
-// @Success		200	{object}		homeElectricityInfo
+// @Success		200	{object}		IndustryDTO
 // @Failure		500	system_error	system	error
-// @Router			/v1/homepage/electricity [get]
-func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
+// @Router			/v1/homepage/{industry} [get]
+func (ctl *HomeController) Get(ctx *gin.Context) {
 	_, _, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
 
+	industry := ctx.Param("industry")
+
 	compCmd := compapp.CompetitionListCMD{}
-	t, _ := compdomain.NewCompetitionTag("electricity")
+	t, _ := compdomain.NewCompetitionTag(industry)
 	compCmd.Tag = t
 	compRes, err := ctl.comp.List(&compCmd)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	}
 
-	ct, _ := coursedomain.NewCourseType("electricity")
+	ct, _ := coursedomain.NewCourseType(industry)
 	courseCmd := courseapp.CourseListCmd{Type: ct}
 	courseRes, err := ctl.course.List(&courseCmd)
 	if err != nil {
@@ -107,7 +109,7 @@ func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	}
 
-	cmd.Tags = append(cmd.Tags, "electricity")
+	cmd.Tags = append(cmd.Tags, industry)
 
 	p, err := ctl.project.ListGlobal(&cmd)
 	if err != nil {
@@ -124,7 +126,7 @@ func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	}
 
-	info := homeElectricityInfo{
+	dto := IndustryDTO{
 		Comp:    compRes,
 		Course:  courseRes,
 		Peoject: p,
@@ -132,5 +134,5 @@ func (ctl *HomeController) ListAllElectricity(ctx *gin.Context) {
 		Dataset: d,
 	}
 
-	ctl.sendRespOfGet(ctx, info)
+	ctl.sendRespOfGet(ctx, dto)
 }

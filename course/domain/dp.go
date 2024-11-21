@@ -17,6 +17,7 @@ const (
 	courseTypeScholar     = "scholar"
 	courseTypeIndustry    = "industry"
 	courseTypeElectricity = "electricity"
+	courseTypeBiology     = "biology"
 	courseTypeScientific  = "scientific_computing"
 
 	studentIdentityStudent   = "student"

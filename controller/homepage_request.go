@@ -12,7 +12,7 @@ type homeInfo struct {
 	Course []courseapp.CourseSummaryDTO    `json:"course"`
 }
 
-type homeElectricityInfo struct {
+type IndustryDTO struct {
 	Comp    []compapp.CompetitionSummaryDTO `json:"comp"`
 	Course  []courseapp.CourseSummaryDTO    `json:"course"`
 	Peoject spaceapp.GlobalProjectsDTO      `json:"project"`
