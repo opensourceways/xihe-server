@@ -123,6 +123,7 @@ type ListPromotionsCmd struct {
 	User     types.Account
 	Type     domain.PromotionType
 	Status   domain.PromotionStatus
+	Tags     []string
 	Way      domain.PromotionWay
 	PageNo   int
 	PageSize int
@@ -141,6 +142,7 @@ func (cmd *ListPromotionsCmd) toPromotionsQuery() *repository.PromotionsQuery {
 	query.Type = cmd.Type
 	query.Status = cmd.Status
 	query.Way = cmd.Way
+	query.Tags = cmd.Tags
 
 	return query
 }

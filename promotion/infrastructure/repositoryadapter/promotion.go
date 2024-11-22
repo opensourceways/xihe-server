@@ -18,6 +18,7 @@ const (
 	fieldWay       = "way"
 	fieldStartTime = "start_time"
 	fieldEndTime   = "end_time"
+	fieldTags      = "tags"
 
 	operatorGreaterThanEq = "$gte"
 	operatorGreaterThan   = "$gt"
@@ -29,6 +30,7 @@ const (
 	operatorSkip          = "$skip"
 	operatorLimit         = "$limit"
 	operatorProject       = "$project"
+	operatorIn            = "$in"
 )
 
 func PromotionAdapter(cli mongodbClient) repository.Promotion {
@@ -151,15 +153,21 @@ func promotionsQueryToFilter(query *repository.PromotionsQuery) primitive.M {
 		filter[fieldWay] = query.Way.PromotionWay()
 	}
 
+	if len(query.Tags) > 0 {
+		filter[fieldTags] = primitive.M{
+			operatorIn: query.Tags,
+		}
+	}
+
 	return filter
 }
 
 func promotionsQueryToPipeline(query *repository.PromotionsQuery) mongo.Pipeline {
 	/*
-		promotionsQueryToPipeline convert a query to mongodb pipeline. There are 5 steps should be executed.
+		promotionsQueryToPipeline convert a query to mongodb pipeline. There are 5 steps will be executed.
 
 		step 1: $match give the conditions which the documents should match
-		step 2: $addFields generate a temporary field `over` to indicate the status of document is over
+		step 2: $addFields generate a temporary field `over` to indicate the status of promotion is over
 		step 3: $sort show the sorting fields and sorting direction
 		step 4: $skip show the number of documents to skip
 		step 5: $limit show the number of documents to return
@@ -168,10 +176,11 @@ func promotionsQueryToPipeline(query *repository.PromotionsQuery) mongo.Pipeline
 		db.collection.aggregate([
 			{
 				$match: {
-					type: "",
+					type: "xxx",
 					start_time: {$lt: 0123456789},
 					end_time: {$gt: 0123456789},
-					way: "",
+					way: "xxx",
+					tags: {$in: ["xxx"]} // optional
 				}
 			},
 			{

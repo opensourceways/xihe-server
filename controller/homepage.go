@@ -7,6 +7,7 @@ import (
 	compdomain "github.com/opensourceways/xihe-server/competition/domain"
 	courseapp "github.com/opensourceways/xihe-server/course/app"
 	coursedomain "github.com/opensourceways/xihe-server/course/domain"
+	promapp "github.com/opensourceways/xihe-server/promotion/app"
 	spaceapp "github.com/opensourceways/xihe-server/space/app"
 )
 
@@ -18,14 +19,16 @@ func AddRouterForHomeController(
 	project spaceapp.ProjectService,
 	model app.ModelService,
 	dataset app.DatasetService,
+	promotion promapp.PromotionService,
 
 ) {
 	ctl := HomeController{
-		course:  course,
-		comp:    comp,
-		project: project,
-		model:   model,
-		dataset: dataset,
+		course:    course,
+		comp:      comp,
+		project:   project,
+		model:     model,
+		dataset:   dataset,
+		promotion: promotion,
 	}
 	rg.GET("/v1/homepage", ctl.ListAll)
 	rg.GET("/v1/homepage/:industry", ctl.Get)
@@ -34,11 +37,12 @@ func AddRouterForHomeController(
 type HomeController struct {
 	baseController
 
-	course  courseapp.CourseService
-	comp    compapp.CompetitionService
-	project spaceapp.ProjectService
-	model   app.ModelService
-	dataset app.DatasetService
+	course    courseapp.CourseService
+	comp      compapp.CompetitionService
+	project   spaceapp.ProjectService
+	model     app.ModelService
+	dataset   app.DatasetService
+	promotion promapp.PromotionService
 }
 
 // @Summary		ListAll
@@ -104,6 +108,17 @@ func (ctl *HomeController) Get(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	}
 
+	promotionsDTO, err := ctl.promotion.List(
+		&promapp.ListPromotionsCmd{
+			Tags:     []string{industry},
+			PageNo:   1,
+			PageSize: 12,
+		},
+	)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	}
+
 	cmd, err := ctl.getListGlobalResourceParameter(ctx)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
@@ -127,11 +142,12 @@ func (ctl *HomeController) Get(ctx *gin.Context) {
 	}
 
 	dto := IndustryDTO{
-		Comp:    compRes,
-		Course:  courseRes,
-		Peoject: p,
-		Model:   m,
-		Dataset: d,
+		Comp:       compRes,
+		Course:     courseRes,
+		Promotions: promotionsDTO.Items,
+		Peoject:    p,
+		Model:      m,
+		Dataset:    d,
 	}
 
 	ctl.sendRespOfGet(ctx, dto)

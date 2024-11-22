@@ -20,6 +20,7 @@ type Promotion struct {
 	Type      PromotionType
 	Desc      PromotionDesc
 	Way       PromotionWay
+	Tags      []string
 	RegUsers  []RegUser
 	StartTime int64
 	EndTime   int64
