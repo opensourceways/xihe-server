@@ -258,18 +258,16 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		userRegService,
 	)
 
-	fmt.Printf("=======================cfg.Filescan.Tables: %+v\n", cfg.Filescan.Tables)
 	//Init filescan
 	err = filescanrepo.Init(pgsql.DB(), &cfg.Filescan.Tables)
 
 	if err != nil {
 		return err
 	}
-	fmt.Printf("==========================gin Init err: %v\n", err)
 
 	fileScanAdapter := filescanrepo.NewFileScanAdapter()
 
-	fileScanService := filescan.NewFileScanService(*fileScanAdapter)
+	fileScanService := filescan.NewFileScanService(fileScanAdapter)
 
 	err = comprepositoryadapter.Init(pgsql.DB(), &cfg.Computility.Tables)
 	if err != nil {
@@ -441,6 +439,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForComputilityWebController(
 			v1, computilityWebService,
+		)
+		controller.AddRouterForFileScanInternalController(
+			internal, fileScanService,
 		)
 	}
 

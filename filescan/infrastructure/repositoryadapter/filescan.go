@@ -2,11 +2,15 @@ package repositoryadapter
 
 import "github.com/opensourceways/xihe-server/filescan/domain"
 
-type FileScanAdapter struct {
+const (
+	fieldId = "id"
+)
+
+type fileScanAdapter struct {
 	daoImpl
 }
 
-func (adapter *FileScanAdapter) Get(owner string, repoName string) ([]domain.FilescanRes, error) {
+func (adapter *fileScanAdapter) Get(owner string, repoName string) ([]domain.FilescanRes, error) {
 
 	do := fileScanDO{
 		Owner:    owner,
@@ -27,7 +31,7 @@ func (adapter *FileScanAdapter) Get(owner string, repoName string) ([]domain.Fil
 	return fileScans, nil
 }
 
-func (adapter *FileScanAdapter) GetLarge(owner string, repoName string) ([]domain.FilescanRes, error) {
+func (adapter *fileScanAdapter) GetLarge(owner string, repoName string) ([]domain.FilescanRes, error) {
 
 	do := fileScanDO{
 		Owner:    owner,
@@ -46,4 +50,24 @@ func (adapter *FileScanAdapter) GetLarge(owner string, repoName string) ([]domai
 	}
 
 	return fileScans, nil
+}
+
+func (adapter *fileScanAdapter) Find(id int64) (domain.FileScan, error) {
+
+	do := fileScanDO{
+		Id: id,
+	}
+	var result fileScanDO
+
+	if err := adapter.daoImpl.GetRecord(&do, &result); err != nil {
+		return domain.FileScan{}, err
+	}
+
+	return result.toFileScan(), nil
+}
+
+func (adapter *fileScanAdapter) Save(file *domain.FileScan) error {
+	do := toFileScanDO(file)
+
+	return adapter.db().Where(adapter.daoImpl.EqualQuery(fieldId), do.Id).Save(&do).Error
 }

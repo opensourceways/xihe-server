@@ -2,6 +2,7 @@ package repositoryadapter
 
 import (
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
@@ -51,4 +52,9 @@ func (dao *daoImpl) GetRecordLarge(filter, result interface{}) error {
 	}
 
 	return err
+}
+
+// EqualQuery generates a query string for an "equal" filter condition.
+func (dao *daoImpl) EqualQuery(field string) string {
+	return fmt.Sprintf(`%s = ?`, field)
 }

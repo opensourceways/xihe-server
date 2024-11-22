@@ -194,62 +194,29 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 	owner := u.User.Account()
 	repoName := d.RepoName.ResourceName()
 
-	// 将文件按 IsLFSFile 分组
-	lfsFiles := make([]RepoPathItem, 0)
-	normalFiles := make([]RepoPathItem, 0)
+	// 直接调用 Get 方法获取所有文件的扫描结果
+	scanRes, err := s.f.Get(owner, repoName) // 假设 false 表示获取所有文件的扫描结果
+	if err != nil {
+		return nil, err
+	}
 
-	for _, item := range r {
-		if item.IsLFSFile {
-			lfsFiles = append(lfsFiles, item)
-		} else {
-			normalFiles = append(normalFiles, item)
-		}
+	// 创建扫描结果映射
+	scanMap := make(map[string]filescan.FilescanRes)
+	for _, scan := range scanRes {
+		scanMap[scan.Name] = scan
 	}
 
 	results := make([]RepoPathItem, 0, len(r))
 
-	// 处理 LFS 文件
-	if len(lfsFiles) > 0 {
-		if lfsFileScanRes, err := s.f.Get(true, owner, repoName); err == nil {
-			// 创建扫描结果映射
-			scanMap := make(map[string]filescan.FilescanRes)
-			for _, scan := range lfsFileScanRes {
-				scanMap[scan.Name] = scan
-			}
-
-			// 添加扫描结果到 LFS 文件
-			for i := range lfsFiles {
-				if scan, exists := scanMap[lfsFiles[i].Name]; exists {
-					lfsFiles[i].Filescan = filescanapp.FilescanDTO{
-						ModerationStatus: scan.ModerationStatus,
-						ModerationResult: scan.ModerationResult,
-					}
-				}
+	// 遍历所有文件，添加扫描结果
+	for _, item := range r {
+		results = append(results, item) // 先添加文件到结果列表
+		if scan, exists := scanMap[item.Name]; exists {
+			results[len(results)-1].Filescan = filescanapp.FilescanDTO{
+				ModerationStatus: scan.ModerationStatus,
+				ModerationResult: scan.ModerationResult,
 			}
 		}
-		results = append(results, lfsFiles...)
-	}
-
-	// 处理普通文件
-	if len(normalFiles) > 0 {
-		if normalFileScanRes, err := s.f.Get(false, owner, repoName); err == nil {
-			// 创建扫描结果映射
-			scanMap := make(map[string]filescan.FilescanRes)
-			for _, scan := range normalFileScanRes {
-				scanMap[scan.Name] = scan
-			}
-
-			// 添加扫描结果到普通文件
-			for i := range normalFiles {
-				if scan, exists := scanMap[normalFiles[i].Name]; exists {
-					normalFiles[i].Filescan = filescanapp.FilescanDTO{
-						ModerationStatus: scan.ModerationStatus,
-						ModerationResult: scan.ModerationResult,
-					}
-				}
-			}
-		}
-		results = append(results, normalFiles...)
 	}
 
 	// 排序结果

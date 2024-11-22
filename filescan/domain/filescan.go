@@ -1,7 +1,8 @@
 package domain
 
 import (
-	primitive "github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/filescan/domain/primitive"
 )
 
 type LargeFileScan struct {
@@ -19,22 +20,39 @@ type FileScan struct {
 	Dir              string
 	File             string
 	Hash             string
-	Owner            primitive.Account
+	Owner            domain.Account
 	RepoId           int64
-	ModerationStatus string
-	ModerationResult string
-	RepoName         primitive.ResourceName
+	ModerationStatus primitive.FileModerationStatus
+	ModerationResult primitive.FileModerationResult
+	RepoName         string
 	Size             int64
 	Name             string
+	SensitiveItem    string
 }
 
-// type FileScanIndex struct {
-// 	UserName primitive.Account
-// 	RepoName primitive.Account
-// }
+type FileScanIndex struct {
+	Owner    domain.Account
+	RepoName domain.Account
+}
 
 type FilescanRes struct {
 	ModerationStatus string
 	ModerationResult string
 	Name             string
+}
+
+func NewFileScan() FileScan {
+	return FileScan{}
+}
+
+// HandleScanDone handles the scan done.
+func (l *FileScan) HandleScanDone(m primitive.FileModerationResult) {
+	if !m.IsNone() {
+		l.ModerationResult = m
+		if m.IsUnsupported() {
+			l.ModerationStatus = primitive.NewUnsupportedModerationStatus()
+		} else {
+			l.ModerationStatus = primitive.NewScannedModerationStatus()
+		}
+	}
 }

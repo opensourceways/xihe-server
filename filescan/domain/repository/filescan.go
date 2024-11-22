@@ -4,6 +4,8 @@ import (
 	"github.com/opensourceways/xihe-server/filescan/domain"
 )
 
-type FileScanService interface {
-	Get(string, string) []domain.FilescanRes
+type FileScanAdapter interface {
+	Get(string, string) ([]domain.FilescanRes, error)
+	Find(int64) (domain.FileScan, error)
+	Save(*domain.FileScan) error
 }
