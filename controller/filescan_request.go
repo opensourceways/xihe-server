@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"errors"
 	"strconv"
 
 	"github.com/opensourceways/xihe-server/filescan/app"
@@ -10,19 +9,16 @@ import (
 
 // ReqToUpdateFileScan is the request of updating a file scan.
 type ReqToUpdateFileScan struct {
-	Status           string `json:"status"            required:"true"`
-	Virus            string `json:"virus"             required:"true"`
-	SensitiveItem    string `json:"sensitive_item"    required:"true"`
+	// SensitiveItem    string `json:"sensitive_item"    required:"true"`
 	ModerationResult string `json:"moderation_result" required:"true"`
-	FileType         string `json:"file_type"         required:"true"`
 }
 
 // ToCmdToUpdateFileScan converts the request to the command.
 func (r *ReqToUpdateFileScan) ToCmdToUpdateFileScan(id string) (cmd app.CmdToUpdateFileScan, err error) {
-	if r.Status == "" && r.ModerationResult == "" {
-		err = errors.New("need status or moderation result parameter")
-		return
-	}
+	// if r.Status == "" && r.ModerationResult == "" {
+	// 	err = errors.New("need status or moderation result parameter")
+	// 	return
+	// }
 
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
@@ -46,6 +42,5 @@ func (r *ReqToUpdateFileScan) ToCmdToUpdateFileScan(id string) (cmd app.CmdToUpd
 	if err != nil {
 		return
 	}
-	cmd.FileType = r.FileType
 	return cmd, nil
 }
