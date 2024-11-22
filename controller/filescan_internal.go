@@ -10,7 +10,7 @@ func AddRouterForFileScanInternalController(
 	rg *gin.RouterGroup,
 	f app.FileScanService,
 ) {
-	ctl := FileScanController{
+	ctl := FileScanInternalController{
 		fileScanService: f,
 	}
 
@@ -18,12 +18,12 @@ func AddRouterForFileScanInternalController(
 }
 
 // FileScanController is the controller of filescan
-type FileScanController struct {
+type FileScanInternalController struct {
 	baseController
 	fileScanService app.FileScanService
 }
 
-func (ctl *FileScanController) Update(ctx *gin.Context) {
+func (ctl *FileScanInternalController) Update(ctx *gin.Context) {
 	req := ReqToUpdateFileScan{}
 	if err := ctx.BindJSON(&req); err != nil {
 		ctl.sendBadRequestBody(ctx)
