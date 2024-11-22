@@ -177,7 +177,8 @@ func NewCourseType(v string) (CourseType, error) {
 		v == courseTypeIndustry ||
 		v == courseTypeScholar ||
 		v == courseTypeElectricity ||
-		v == courseTypeScientific
+		v == courseTypeScientific ||
+		v == courseTypeBiology
 
 	if b {
 		return courseType(v), nil
