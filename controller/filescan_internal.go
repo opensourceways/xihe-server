@@ -14,7 +14,7 @@ func AddRouterForFileScanInternalController(
 		fileScanService: f,
 	}
 
-	rg.PUT("/internal/repo/filescan/:id", ctl.Update)
+	rg.PUT("repo/filescan/:id", ctl.Update)
 }
 
 // FileScanController is the controller of filescan
