@@ -1,6 +1,10 @@
 package repositoryadapter
 
-import "github.com/opensourceways/xihe-server/filescan/domain"
+import (
+	"fmt"
+
+	"github.com/opensourceways/xihe-server/filescan/domain"
+)
 
 const (
 	fieldId = "id"
@@ -68,6 +72,6 @@ func (adapter *fileScanAdapter) Find(id int64) (domain.FileScan, error) {
 
 func (adapter *fileScanAdapter) Save(file *domain.FileScan) error {
 	do := toFileScanDO(file)
-
+	fmt.Printf("===================do: %+v\n", do)
 	return adapter.db().Where(adapter.daoImpl.EqualQuery(fieldId), do.Id).Save(&do).Error
 }
