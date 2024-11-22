@@ -2,13 +2,16 @@
 package app
 
 import (
+	"context"
+
 	filescan "github.com/opensourceways/xihe-server/filescan/domain"
-	repo "github.com/opensourceways/xihe-server/filescan/infrastructure/repositoryadapter"
+	repo "github.com/opensourceways/xihe-server/filescan/domain/repository"
 )
 
 // FileScanAppService is the app service of file scan.
 type FileScanService interface {
-	Get(bool, string, string) ([]filescan.FilescanRes, error)
+	Get(string, string) ([]filescan.FilescanRes, error)
+	Update(context.Context, CmdToUpdateFileScan) error
 }
 
 func NewFileScanService(
@@ -24,9 +27,19 @@ type fileScanService struct {
 	FileScanAdapter repo.FileScanAdapter
 }
 
-func (s *fileScanService) Get(isLFSFile bool, owner string, repoName string) ([]filescan.FilescanRes, error) {
-	if isLFSFile {
-		return s.FileScanAdapter.GetLarge(owner, repoName)
-	}
+func (s *fileScanService) Get(owner string, repoName string) ([]filescan.FilescanRes, error) {
 	return s.FileScanAdapter.Get(owner, repoName)
+}
+
+// Update updates a file scan.
+func (s *fileScanService) Update(ctx context.Context, cmd CmdToUpdateFileScan) error {
+	fileInfo, err := s.FileScanAdapter.Find(cmd.Id)
+
+	if err != nil {
+		return err
+	}
+
+	fileInfo.HandleScanDone(cmd.ModerationResult)
+
+	return s.FileScanAdapter.Save(&fileInfo)
 }

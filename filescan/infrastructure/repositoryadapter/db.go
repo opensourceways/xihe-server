@@ -1,13 +1,11 @@
 package repositoryadapter
 
 import (
-	"fmt"
-
 	"gorm.io/gorm"
 )
 
 var (
-	fileScanInstance *FileScanAdapter
+	fileScanInstance *fileScanAdapter
 )
 
 // Init initializes the database and sets up the necessary adapters.
@@ -17,12 +15,10 @@ func Init(db *gorm.DB, tables *Tables) error {
 	largeFileScanTableName = tables.LargeFileScan
 
 	if err := db.AutoMigrate(&fileScanDO{}); err != nil {
-		fmt.Printf("==========================Init err1: %v\n", err)
 		return err
 	}
 
 	if err := db.AutoMigrate(&largeFileScanDO{}); err != nil {
-		fmt.Printf("==========================Init err2: %v\n", err)
 		return err
 	}
 
@@ -30,7 +26,7 @@ func Init(db *gorm.DB, tables *Tables) error {
 
 	filescanDao := daoImpl{table: fileScanTableName, tableLarge: largeFileScanTableName}
 
-	fileScanInstance = &FileScanAdapter{
+	fileScanInstance = &fileScanAdapter{
 		daoImpl: filescanDao,
 	}
 
@@ -38,6 +34,6 @@ func Init(db *gorm.DB, tables *Tables) error {
 }
 
 // ComputilityOrgAdapter returns the instance of the computilityOrgAdapter.
-func NewFileScanAdapter() *FileScanAdapter {
+func NewFileScanAdapter() *fileScanAdapter {
 	return fileScanInstance
 }
