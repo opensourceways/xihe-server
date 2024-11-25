@@ -50,21 +50,24 @@ func NewSearchService(
 	user userrepo.User,
 	model repository.Model,
 	project spacerepo.Project,
+	projectPg spacerepo.ProjectPg,
 	dataset repository.Dataset,
 ) SearchService {
 	return searchService{
-		user:    user,
-		model:   model,
-		project: project,
-		dataset: dataset,
+		user:      user,
+		model:     model,
+		project:   project,
+		projectPg: projectPg,
+		dataset:   dataset,
 	}
 }
 
 type searchService struct {
-	user    userrepo.User
-	model   repository.Model
-	project spacerepo.Project
-	dataset repository.Dataset
+	user      userrepo.User
+	model     repository.Model
+	project   spacerepo.Project
+	projectPg spacerepo.ProjectPg
+	dataset   repository.Dataset
 }
 
 func (s searchService) Search(name string) (dto SearchDTO) {
@@ -74,7 +77,7 @@ func (s searchService) Search(name string) (dto SearchDTO) {
 		dto.User = u
 	}
 
-	v, err := s.search(&option, s.project.Search)
+	v, err := s.search(&option, s.projectPg.Search)
 	if err == nil {
 		dto.Project = v
 	}

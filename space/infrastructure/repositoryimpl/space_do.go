@@ -6,6 +6,14 @@ import (
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 )
 
+const (
+	fieldOwner     = "owner"
+	fieldName      = "name"
+	fieldID        = "id"
+	fieldLikeCount = "like_count"
+	fieldProjectId = "project_id"
+)
+
 var (
 	projectTableName = ""
 	tagsTableName    = ""

@@ -66,6 +66,8 @@ type ProjectPg interface {
 	GetSummary(domain.Account, string) (ProjectSummary, error)
 	GetSummaryByName(domain.Account, domain.ResourceName) (domain.ResourceSummary, error)
 
+	FindUserProjects([]repository.UserResourceListOption) ([]spacedomain.ProjectSummary, error)
+
 	ListAndSortByUpdateTime(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
 	ListAndSortByFirstLetter(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
 	ListAndSortByDownloadCount(domain.Account, *repository.ResourceListOption) (UserProjectsInfo, error)
@@ -74,6 +76,19 @@ type ProjectPg interface {
 	ListGlobalAndSortByFirstLetter(*repository.GlobalResourceListOption) (UserProjectsInfo, error)
 	ListGlobalAndSortByDownloadCount(*repository.GlobalResourceListOption) (UserProjectsInfo, error)
 
+	Search(*repository.ResourceSearchOption) (repository.ResourceSearchResult, error)
+
+	AddLike(*domain.ResourceIndex) error
+	RemoveLike(*domain.ResourceIndex) error
+
 	AddRelatedDataset(*repository.RelatedResourceInfo) error
+	RemoveRelatedDataset(*repository.RelatedResourceInfo) error
+
 	AddRelatedModel(*repository.RelatedResourceInfo) error
+	RemoveRelatedModel(*repository.RelatedResourceInfo) error
+
+	UpdateProperty(*ProjectPropertyUpdateInfo) error
+
+	IncreaseFork(*domain.ResourceIndex) error
+	IncreaseDownload(*domain.ResourceIndex) error
 }

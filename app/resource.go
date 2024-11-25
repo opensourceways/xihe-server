@@ -49,10 +49,11 @@ func (cmd *ResourceListCmd) ToResourceListOption() repository.ResourceListOption
 }
 
 type ResourceService struct {
-	User    userrepo.User
-	Model   repository.Model
-	Project spacerepo.Project
-	Dataset repository.Dataset
+	User      userrepo.User
+	Model     repository.Model
+	Project   spacerepo.Project
+	ProjectPg spacerepo.ProjectPg
+	Dataset   repository.Dataset
 }
 
 func (s ResourceService) list(resources []*domain.ResourceObject) (
@@ -187,7 +188,7 @@ func (s ResourceService) listResources(
 	r := dtos
 
 	if len(projects) > 0 {
-		all, err := s.Project.FindUserProjects(projects)
+		all, err := s.ProjectPg.FindUserProjects(projects)
 		if err != nil {
 			return nil, err
 		}

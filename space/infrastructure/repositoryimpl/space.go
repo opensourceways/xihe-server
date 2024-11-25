@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"errors"
+	"strings"
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -169,14 +170,107 @@ func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []mo
 
 }
 
+func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceListOption) (
+	[]spacedomain.ProjectSummary, error,
+) {
+	var projectSummaries []spacedomain.ProjectSummary
+
+	for _, opt := range opts {
+		var projects []projectDO
+		query := adapter.db().Where("owner = ? AND id IN (?)", opt.Owner.Account(), opt.Ids).Order("updated_at DESC")
+
+		err := query.Find(&projects).Error
+		if err != nil {
+			return nil, repositories.ConvertError(err)
+		}
+
+		for _, project := range projects {
+			// ResourceName
+			resourceName, err := domain.NewResourceName(project.Name)
+			if err != nil {
+				return nil, err
+			}
+			// ResourceDesc
+			resourceDesc, err := domain.NewResourceDesc(project.Description)
+			if err != nil {
+				return nil, err
+			}
+			// ResourceTitle
+			resourceTitle, err := domain.NewResourceTitle(project.Title)
+			if err != nil {
+				return nil, err
+			}
+			//projectCoverId
+			recourceCoverId, err := domain.NewCoverId(project.CoverId)
+			if err != nil {
+				return nil, err
+			}
+			//projectHardware
+			projectHardware, err := domain.NewHardware(project.Hardware, project.Type)
+			if err != nil {
+				return nil, err
+			}
+			// Tags
+			var tagResults []projectTagsDO
+			if err := adapter.dbTag().Where("project_id = ?", project.Id).Find(&tagResults).Error; err != nil {
+				return nil, err
+			}
+			tags := make([]string, len(tagResults))
+			for i, tag := range tagResults {
+				tags[i] = tag.TagName
+			}
+
+			summary := spacedomain.ProjectSummary{
+				Id:            project.Id,
+				Owner:         domain.CreateAccount(project.Owner),
+				Name:          resourceName,
+				Desc:          resourceDesc,
+				Title:         resourceTitle,
+				Level:         domain.NewResourceLevelByNum(project.Level),
+				CoverId:       recourceCoverId,
+				UpdatedAt:     project.UpdatedAt,
+				LikeCount:     project.LikeCount,
+				ForkCount:     project.ForkCount,
+				DownloadCount: project.DownloadCount,
+				Hardware:      projectHardware,
+				Tags:          tags,
+			}
+
+			projectSummaries = append(projectSummaries, summary)
+		}
+	}
+
+	return projectSummaries, nil
+}
+
 func (adapter *projectAdapter) AddRelatedDataset(info *repository.RelatedResourceInfo) error {
 	do := toDatasetDO(info)
 	return adapter.dbDataset().Clauses(clause.Returning{}).Create(&do).Error
 }
 
+func (adapter *projectAdapter) RemoveRelatedDataset(info *repository.RelatedResourceInfo) error {
+	do := toDatasetDO(info)
+
+	if err := adapter.dbDataset().Where(&do).Delete(&do).Error; err != nil {
+		return repositories.ConvertError(err)
+	}
+
+	return nil
+}
+
 func (adapter *projectAdapter) AddRelatedModel(info *repository.RelatedResourceInfo) error {
 	do := toModelDO(info)
 	return adapter.dbModel().Clauses(clause.Returning{}).Create(&do).Error
+}
+
+func (adapter *projectAdapter) RemoveRelatedModel(info *repository.RelatedResourceInfo) error {
+	do := toModelDO(info)
+
+	if err := adapter.dbModel().Where(&do).Delete(&do).Error; err != nil {
+		return repositories.ConvertError(err)
+	}
+
+	return nil
 }
 
 func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
@@ -499,4 +593,163 @@ func (adapter *projectAdapter) getSummaryByName(owner, name string) (
 
 	return do, nil
 
+}
+
+func (adapter *projectAdapter) AddLike(p *domain.ResourceIndex) error {
+	filter := projectDO{
+		Owner: p.Owner.Account(),
+		Id:    p.Id,
+	}
+
+	err := adapter.daoImpl.IncrementStatistic(&filter, "fieldForkCount", 1)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (adapter *projectAdapter) RemoveLike(p *domain.ResourceIndex) error {
+	filter := projectDO{
+		Owner: p.Owner.Account(),
+		Id:    p.Id,
+	}
+
+	if err := adapter.daoImpl.DecrementProjectLike(&filter); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (r repository.ResourceSearchResult, err error) {
+	var projectDOs []projectDO
+
+	// 构建查询
+	query := adapter.db().Model(&projectDO{})
+
+	// 添加名称搜索条件
+	if option.Name != "" {
+		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(option.Name)+"%")
+	}
+
+	// 添加RepoType搜索条件
+	if len(option.RepoType) > 0 {
+		repoTypes := make([]string, len(option.RepoType))
+		for i, rt := range option.RepoType {
+			repoTypes[i] = rt.RepoType()
+		}
+		query = query.Where("repo_type IN (?)", repoTypes)
+	}
+
+	// 执行查询
+	if err = query.Limit(option.TopNum).Find(&projectDOs).Error; err != nil {
+		return r, err
+	}
+
+	// 计算总数
+	var total int64
+	if err = query.Count(&total).Error; err != nil {
+		return r, err
+	}
+	r.Total = int(total)
+
+	// 转换结果
+	r.Top = make([]domain.ResourceSummary, len(projectDOs))
+	for i, do := range projectDOs {
+		if r.Top[i].Owner, err = domain.NewAccount(do.Owner); err != nil {
+			return r, err
+		}
+
+		if r.Top[i].Name, err = domain.NewResourceName(do.Name); err != nil {
+			return r, err
+		}
+
+		r.Top[i].Id = do.Id
+		r.Top[i].RepoId = do.RepoId
+		if r.Top[i].RepoType, err = domain.NewRepoType(do.Type); err != nil {
+			return r, err
+		}
+	}
+
+	return r, nil
+}
+
+func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) error {
+	p := &info.Property
+
+	do := projectDO{
+		Id:                info.Id,
+		Owner:             info.Owner.Account(),
+		Version:           info.Version,
+		UpdatedAt:         info.UpdatedAt,
+		Name:              p.Name.ResourceName(),
+		FL:                p.Name.FirstLetterOfName(),
+		Description:       p.Desc.ResourceDesc(),
+		Title:             p.Title.ResourceTitle(),
+		Type:              p.RepoType.RepoType(),
+		Level:             p.Level.Int(),
+		CoverId:           p.CoverId.CoverId(),
+		RepoType:          p.RepoType.RepoType(),
+		CommitId:          p.CommitId,
+		NoApplicationFile: p.NoApplicationFile,
+		Exception:         p.Exception.Exception(),
+	}
+
+	result := adapter.db().Model(&projectDO{}).Where("id = ?", do.Id).Updates(do)
+	if result.Error != nil {
+		return repositories.ConvertError(result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return repository.NewErrorResourceNotExists(errors.New("project not found"))
+	}
+
+	// 删除旧的标签关联
+	if err := adapter.db().Where("project_id = ?", do.Id).Delete(&projectTagsDO{}).Error; err != nil {
+		return repositories.ConvertError(err)
+	}
+
+	// 创建新的标签关联
+	var newTagsDOs []projectTagsDO
+	for _, tagName := range p.Tags {
+		newTagsDOs = append(newTagsDOs, projectTagsDO{
+			ProjectId: do.Id,
+			TagName:   tagName,
+		})
+	}
+
+	if err := adapter.db().Create(&newTagsDOs).Error; err != nil {
+		return repositories.ConvertError(err)
+	}
+
+	return nil
+}
+
+func (adapter *projectAdapter) IncreaseFork(r *domain.ResourceIndex) error {
+	filter := projectDO{
+		Owner: r.Owner.Account(),
+		Id:    r.Id,
+	}
+
+	err := adapter.daoImpl.IncrementStatistic(&filter, "fieldForkCount", 1)
+	if err != nil {
+		return repositories.ConvertError(err)
+	}
+
+	return nil
+}
+
+func (adapter *projectAdapter) IncreaseDownload(r *domain.ResourceIndex) error {
+	filter := projectDO{
+		Owner: r.Owner.Account(),
+		Id:    r.Id,
+	}
+
+	err := adapter.daoImpl.IncrementStatistic(&filter, "download", 1)
+	if err != nil {
+		return repositories.ConvertError(err)
+	}
+
+	return nil
 }

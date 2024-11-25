@@ -472,7 +472,7 @@ func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUp
 		ResourceToUpdate: s.toResourceToUpdate(&space),
 		Property:         space.ProjectModifiableProperty,
 	}
-	err = s.repo.UpdateProperty(&info)
+	err = s.repoPg.UpdateProperty(&info)
 
 	if err != nil {
 		err = xerrors.Errorf("save space failed, err: %w", err)

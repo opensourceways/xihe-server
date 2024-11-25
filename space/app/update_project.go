@@ -86,7 +86,7 @@ func (s projectService) Update(
 		ResourceToUpdate: s.toResourceToUpdate(p),
 		Property:         p.ProjectModifiableProperty,
 	}
-	if err = s.repo.UpdateProperty(&info); err != nil {
+	if err = s.repoPg.UpdateProperty(&info); err != nil {
 		return
 	}
 
@@ -109,7 +109,7 @@ func (s projectService) SetTags(p *spacedomain.Project, cmd *app.ResourceTagsUpd
 		Property:         p.ProjectModifiableProperty,
 	}
 
-	return s.repo.UpdateProperty(&info)
+	return s.repoPg.UpdateProperty(&info)
 }
 
 func (s projectService) AddRelatedModel(
@@ -176,7 +176,7 @@ func (s projectService) RemoveRelatedModel(
 ) error {
 	return s.removeRelatedResource(
 		p, p.RelatedModels, index, domain.ResourceTypeModel,
-		s.repo.RemoveRelatedModel,
+		s.repoPg.RemoveRelatedModel,
 	)
 }
 
@@ -185,7 +185,7 @@ func (s projectService) RemoveRelatedDataset(
 ) error {
 	return s.removeRelatedResource(
 		p, p.RelatedDatasets, index, domain.ResourceTypeDataset,
-		s.repo.RemoveRelatedDataset,
+		s.repoPg.RemoveRelatedDataset,
 	)
 }
 

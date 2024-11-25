@@ -75,6 +75,41 @@ func (dao *daoImpl) DeleteSingleRow(row interface{}) error {
 	return err
 }
 
+func (dao *daoImpl) IncrementStatistic(filter *projectDO, fieldName string, increment int) error {
+	// 使用 GORM 进行数据库更新操作
+	result := dao.db().Model(&projectDO{}).
+		Where(equalQuery(fieldOwner), filter.Owner).
+		Where(equalQuery(fieldID), filter.Id).
+		Update(fieldName, gorm.Expr(fieldName+" + ?", increment))
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return repository.NewErrorResourceNotExists(errors.New("project not found"))
+	}
+
+	return nil
+}
+
+func (dao *daoImpl) DecrementProjectLike(filter *projectDO) error {
+	result := dao.db().Model(&projectDO{}).
+		Where(equalQuery(fieldOwner), filter.Owner).
+		Where(equalQuery(fieldID), filter.Id).
+		Update(fieldLikeCount, gorm.Expr("fieldLikeCount - ?", 1))
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return repository.NewErrorResourceNotExists(errors.New("project not found"))
+	}
+
+	return nil
+}
+
 func (dao *daoImpl) ListAndSortByUpdateTime(
 	owner string, do *repositories.ResourceListDO,
 ) ([]ProjectSummaryDO, int, error) {
@@ -82,7 +117,7 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 	var count int64
 
 	// 基础查询条件
-	baseQuery := dao.db().Where("owner = ?", owner)
+	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
 	// 计算总数
 	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
@@ -121,7 +156,7 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 		}
 		// 查询标签
 		var tagResults []projectTagsDO
-		if err := dao.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+		if err := dao.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
 			return nil, 0, err
 		}
 		tags := make([]string, len(tagResults))
@@ -143,7 +178,7 @@ func (dao *daoImpl) ListAndSortByFirstLetter(
 	var count int64
 
 	// 基础查询条件
-	baseQuery := dao.db().Where("owner = ?", owner)
+	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
 	// 计算总数
 	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
@@ -182,7 +217,7 @@ func (dao *daoImpl) ListAndSortByFirstLetter(
 		}
 		// 查询标签
 		var tagResults []projectTagsDO
-		if err := dao.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+		if err := dao.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
 			return nil, 0, err
 		}
 		tags := make([]string, len(tagResults))
@@ -204,7 +239,7 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 	var count int64
 
 	// 基础查询条件
-	baseQuery := dao.db().Where("owner = ?", owner)
+	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
 	// 计算总数
 	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
@@ -243,7 +278,7 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 		}
 		// 查询标签
 		var tagResults []projectTagsDO
-		if err := dao.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+		if err := dao.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
 			return nil, 0, err
 		}
 		tags := make([]string, len(tagResults))

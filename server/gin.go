@@ -399,7 +399,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForSearchController(
-			v1, user, proj, model, dataset,
+			v1, user, proj, projPg, model, dataset,
 		)
 
 		controller.AddRouterForCompetitionController(

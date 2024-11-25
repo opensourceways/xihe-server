@@ -16,11 +16,12 @@ func AddRouterForSearchController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
 	proj spacerepo.Project,
+	projPg spacerepo.ProjectPg,
 	model repository.Model,
 	dataset repository.Dataset,
 ) {
 	ctl := SearchController{
-		s: app.NewSearchService(user, model, proj, dataset),
+		s: app.NewSearchService(user, model, proj, projPg, dataset),
 	}
 
 	rg.GET("/v1/search", ctl.List)
