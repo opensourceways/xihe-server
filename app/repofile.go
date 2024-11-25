@@ -33,7 +33,8 @@ type RepoFileService interface {
 	DownloadRepo(u *UserInfo, obj *domain.RepoDownloadedEvent, handle func(io.Reader, int64)) error
 }
 
-func NewRepoFileService(rf platform.RepoFile, sender message.RepoMessageProducer, filescan filescanapp.FileScanService) RepoFileService {
+func NewRepoFileService(
+	rf platform.RepoFile, sender message.RepoMessageProducer, filescan filescanapp.FileScanService) RepoFileService {
 	return &repoFileService{
 		rf:     rf,
 		sender: sender,
