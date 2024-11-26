@@ -30,10 +30,8 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 	}
 
 	doTags := toProjectTagsDO(v)
-	for _, doTag := range doTags {
-		if err := adapter.dbTag().Clauses(clause.Returning{}).Create(&doTag).Error; err != nil {
-			return spacedomain.Project{}, err
-		}
+	if err := adapter.dbTag().CreateInBatches(doTags, 1000).Error; err != nil {
+		return spacedomain.Project{}, err
 	}
 	return *v, nil
 }
@@ -201,7 +199,7 @@ func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceLi
 				return nil, err
 			}
 			//projectCoverId
-			recourceCoverId, err := domain.NewCoverId(project.CoverId)
+			resourceCoverId, err := domain.NewCoverId(project.CoverId)
 			if err != nil {
 				return nil, err
 			}
@@ -227,7 +225,7 @@ func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceLi
 				Desc:          resourceDesc,
 				Title:         resourceTitle,
 				Level:         domain.NewResourceLevelByNum(project.Level),
-				CoverId:       recourceCoverId,
+				CoverId:       resourceCoverId,
 				UpdatedAt:     project.UpdatedAt,
 				LikeCount:     project.LikeCount,
 				ForkCount:     project.ForkCount,
@@ -294,7 +292,8 @@ func (adapter *projectAdapter) ListGlobalAndSortByUpdateTime(
 	)
 }
 
-func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
+func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
+	do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
 	var items []projectDO
 	var count int64
 
@@ -360,7 +359,8 @@ func (adapter *projectAdapter) ListGlobalAndSortByDownloadCount(
 	)
 }
 
-func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
+func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
+	do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
 	var items []projectDO
 	var count int64
 
@@ -426,7 +426,8 @@ func (adapter *projectAdapter) ListGlobalAndSortByFirstLetter(
 	)
 }
 
-func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
+func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
+	do *repositories.GlobalResourceListDO) ([]ProjectSummaryDO, int, error) {
 	var items []projectDO
 	var count int64
 
@@ -622,7 +623,8 @@ func (adapter *projectAdapter) RemoveLike(p *domain.ResourceIndex) error {
 	return nil
 }
 
-func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (r repository.ResourceSearchResult, err error) {
+func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
+	r repository.ResourceSearchResult, err error) {
 	var projectDOs []projectDO
 
 	// 构建查询

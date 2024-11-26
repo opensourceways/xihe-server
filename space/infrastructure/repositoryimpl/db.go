@@ -21,7 +21,8 @@ func Init(db *gorm.DB, tables *Tables) error {
 
 	dbInstance = db
 
-	projectDao := daoImpl{table: projectTableName, tableTag: tagsTableName, tableDataset: datasetTableName, tableModel: modelTableName}
+	projectDao := daoImpl{
+		table: projectTableName, tableTag: tagsTableName, tableDataset: datasetTableName, tableModel: modelTableName}
 
 	projectAdapterInstance = &projectAdapter{
 		daoImpl: projectDao,
