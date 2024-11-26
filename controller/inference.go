@@ -55,8 +55,7 @@ type InferenceController struct {
 	s          spaceappApp.InferenceService
 	appService spaceappApp.SpaceappAppService
 
-	project   spacerepo.Project
-	projectPg spacerepo.ProjectPg
+	project spacerepo.Project
 
 	inferenceDir      domain.Directory
 	inferenceBootFile domain.FilePath

@@ -53,8 +53,7 @@ type InferenceInternalController struct {
 
 	s spaceappApp.InferenceService
 
-	project   spacerepo.Project
-	projectPg spacerepo.ProjectPg
+	project spacerepo.Project
 
 	inferenceDir      types.Directory
 	inferenceBootFile types.FilePath
