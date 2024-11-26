@@ -1,10 +1,12 @@
 package space
 
 import (
+	"github.com/opensourceways/xihe-server/space/infrastructure"
 	"github.com/opensourceways/xihe-server/space/infrastructure/repositoryimpl"
 )
 
 type Config struct {
+	Topics infrastructure.Topics `json:"topics"`
 	Tables repositoryimpl.Tables `json:"tables"`
 }
 
