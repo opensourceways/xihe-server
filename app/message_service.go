@@ -229,7 +229,7 @@ func (s projectMessageService) IncreaseFork(index *domain.ResourceIndex) error {
 }
 
 func (s projectMessageService) IncreaseDownload(index *domain.ResourceIndex) error {
-	return s.repo.IncreaseDownload(index)
+	return s.repoPg.IncreaseDownload(index)
 }
 
 func (s projectMessageService) toResourceToUpdate(p *spacedomain.Project) repository.ResourceToUpdate {
