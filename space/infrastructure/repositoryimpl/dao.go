@@ -93,23 +93,6 @@ func (dao *daoImpl) IncrementStatistic(filter *projectDO, fieldName string, incr
 	return nil
 }
 
-func (dao *daoImpl) DecrementProjectLike(filter *projectDO) error {
-	result := dao.db().Model(&projectDO{}).
-		Where(equalQuery(fieldOwner), filter.Owner).
-		Where(equalQuery(fieldID), filter.Id).
-		Update(fieldLikeCount, gorm.Expr("fieldLikeCount - ?", 1))
-
-	if result.Error != nil {
-		return result.Error
-	}
-
-	if result.RowsAffected == 0 {
-		return repository.NewErrorResourceNotExists(errors.New("project not found"))
-	}
-
-	return nil
-}
-
 func (dao *daoImpl) ListAndSortByUpdateTime(
 	owner string, do *repositories.ResourceListDO,
 ) ([]ProjectSummaryDO, int, error) {

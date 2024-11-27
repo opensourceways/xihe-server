@@ -324,7 +324,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	if err != nil {
 		return err
 	}
+
 	projPg := spacerepo.ProjectAdapter()
+
+	projectMessageService := app.NewProjectMessageService(proj, projPg)
+
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
 		spaceappRepository, proj, projPg, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
 	)
@@ -431,6 +435,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForComputilityWebController(
 			v1, computilityWebService,
+		)
+		controller.AddRouterForMessageInternalController(
+			internal, projectMessageService, proj, projPg,
 		)
 	}
 

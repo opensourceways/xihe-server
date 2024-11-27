@@ -27,12 +27,11 @@ func AddRouterForRepoFileController(
 	us uapp.UserService,
 ) {
 	ctl := RepoFileController{
-		s:         app.NewRepoFileService(p, sender),
-		us:        us,
-		model:     model,
-		project:   project,
-		projectPg: projectPg,
-		dataset:   dataset,
+		s:       app.NewRepoFileService(p, sender),
+		us:      us,
+		model:   model,
+		project: project,
+		dataset: dataset,
 	}
 
 	rg.GET("/v1/repo/:type/:user/:name", ctl.DownloadRepo)

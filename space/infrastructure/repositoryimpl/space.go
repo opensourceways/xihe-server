@@ -602,7 +602,7 @@ func (adapter *projectAdapter) AddLike(p *domain.ResourceIndex) error {
 		Id:    p.Id,
 	}
 
-	err := adapter.daoImpl.IncrementStatistic(&filter, "fieldForkCount", 1)
+	err := adapter.daoImpl.IncrementStatistic(&filter, "fieldLikeCount", 1)
 	if err != nil {
 		return err
 	}
@@ -616,7 +616,7 @@ func (adapter *projectAdapter) RemoveLike(p *domain.ResourceIndex) error {
 		Id:    p.Id,
 	}
 
-	if err := adapter.daoImpl.DecrementProjectLike(&filter); err != nil {
+	if err := adapter.daoImpl.IncrementStatistic(&filter, "fieldLikeCount", -1); err != nil {
 		return err
 	}
 
