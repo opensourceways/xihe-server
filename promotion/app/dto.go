@@ -62,36 +62,36 @@ type PromotionCmd struct {
 }
 
 type PromotionDTO struct {
-	Id             string `json:"id"`
-	Name           string `json:"name"`
-	Desc           string `json:"desc"`
-	Poster         string `json:"poster"`
-	Status         string `json:"status"`
-	IsRegister     bool   `json:"is_register"`
-	Total          int    `json:"total"`
-	Duration       string `json:"duration"`
-	RegistrantsNum int    `json:"registrants_num"`
-	Host           string `json:"host"`
-	Way            string `json:"way"`
-	Type           string `json:"type"`
-	Intro          string `json:"intro"`
-	IsStatic       bool   `json:"is_static"`
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Desc       string `json:"desc"`
+	Poster     string `json:"poster"`
+	Status     string `json:"status"`
+	IsRegister bool   `json:"is_register"`
+	Total      int    `json:"total"`
+	Duration   string `json:"duration"`
+	Count      int64  `json:"count"`
+	Host       string `json:"host"`
+	Way        string `json:"way"`
+	Type       string `json:"type"`
+	Intro      string `json:"intro"`
+	IsStatic   bool   `json:"is_static"`
 }
 
 func (dto *PromotionDTO) toDTO(p *domain.Promotion, user types.Account, total int) error {
 	var err error
 
 	*dto = PromotionDTO{
-		Id:             p.Id,
-		Name:           p.Name.PromotionName(),
-		Desc:           p.Desc.PromotionDesc(),
-		Poster:         p.Poster,
-		IsRegister:     p.HasRegister(user),
-		Total:          total,
-		RegistrantsNum: p.CountRegUsers(),
-		Host:           p.Host,
-		Intro:          p.Intro,
-		IsStatic:       p.IsStatic,
+		Id:         p.Id,
+		Name:       p.Name.PromotionName(),
+		Desc:       p.Desc.PromotionDesc(),
+		Poster:     p.Poster,
+		IsRegister: p.HasRegister(user),
+		Total:      total,
+		Count:      p.CountRegUsers(),
+		Host:       p.Host,
+		Intro:      p.Intro,
+		IsStatic:   p.IsStatic,
 	}
 
 	if dto.Status, err = p.Status(); err != nil {
