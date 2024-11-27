@@ -178,7 +178,6 @@ func (req listPromotionsReq) toCmd(user types.Account) (*app.ListPromotionsCmd, 
 		User:     user,
 		PageNo:   req.PageNo,
 		PageSize: req.PageSize,
-		Tags:     strings.Split(req.Tags, ","),
 	}
 
 	if cmd.Type, err = domain.NewPromotionType(req.Type); err != nil {
@@ -191,6 +190,10 @@ func (req listPromotionsReq) toCmd(user types.Account) (*app.ListPromotionsCmd, 
 
 	if cmd.Way, err = domain.NewPromotionWay(req.Way); err != nil {
 		return cmd, err
+	}
+
+	if req.Tags != "" {
+		cmd.Tags = strings.Split(req.Tags, ",")
 	}
 
 	return cmd, nil
