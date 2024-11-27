@@ -17,9 +17,9 @@ func AddRouterForMessageInternalController(
 	ctl := MessageInternalController{
 		message: message,
 	}
-	rg.PUT("/v1/like/", ctl.ChangeProjectLike)
-	rg.PUT("/v1/fork/", ctl.IncreaseFork)
-	rg.PUT("/v1/download/", ctl.IncreaseDownload)
+	rg.PUT("/like/", ctl.ChangeProjectLike)
+	rg.PUT("/fork/", ctl.IncreaseFork)
+	rg.PUT("/download/", ctl.IncreaseDownload)
 }
 
 type MessageInternalController struct {
