@@ -49,11 +49,12 @@ type RepoFileDeleteCmd = RepoFileInfo
 type RepoFilePreviewCmd = RepoFileInfo
 
 type RepoFileDownloadCmd struct {
-	MyAccount domain.Account
-	MyToken   string
-	Path      domain.FilePath
-	Type      domain.ResourceType
-	Resource  domain.ResourceSummary
+	MyAccount   domain.Account
+	MyToken     string
+	Path        domain.FilePath
+	Type        domain.ResourceType
+	Resource    domain.ResourceSummary
+	NotRecorded bool
 }
 
 type RepoFileCreateCmd struct {
@@ -116,7 +117,7 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	RepoFileDownloadDTO, error,
 ) {
 	dto, err := s.download(cmd)
-	if err == nil {
+	if err == nil && !cmd.NotRecorded {
 		r := &cmd.Resource
 
 		_ = s.sender.AddOperateLogForDownloadFile(

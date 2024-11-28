@@ -43,6 +43,9 @@ func AddRouterForRepoFileController(
 	rg.POST("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.DELETE("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
 	rg.DELETE("/v1/repo/:type/:name/dir/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.DeleteDir)
+	rg.GET("/v1/internal/repo/:type/:user/:name/file/:path",
+		internalApiCheckMiddleware(&ctl.baseController), ctl.download,
+	)
 }
 
 type RepoFileController struct {
@@ -697,4 +700,53 @@ func (ctl *RepoFileController) containFile(v []platform.RepoPathItem, fileName s
 type resourceSummary struct {
 	rt domain.ResourceType
 	domain.ResourceSummary
+}
+
+// @Summary		download
+// @Description	Download repo file without checking view
+// @Tags			RepoFile
+// @Param			user	path	string	true	"user"
+// @Param			name	path	string	true	"repo name"
+// @Param			path	path	string	true	"repo file path"
+// @Accept			json
+// @Success		200	{object}			app.RepoFileDownloadDTO
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/internal/repo/{type}/{user}/{name}/file/{path} [get]
+func (ctl *RepoFileController) download(ctx *gin.Context) {
+	user, err := domain.NewAccount(ctx.Param("user"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	repoInfo, err := ctl.getRepoInfo(ctx, user)
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
+	}
+
+	cmd := app.RepoFileDownloadCmd{
+		Type:        repoInfo.rt,
+		Resource:    repoInfo.ResourceSummary,
+		NotRecorded: true,
+	}
+
+	if cmd.Path, err = domain.NewFilePath(ctx.Param("path")); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	if v, err := ctl.s.Download(&cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, v)
+	}
 }
