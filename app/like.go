@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -114,7 +115,7 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 			ResourceObject: obj,
 		},
 	}
-
+	fmt.Printf("==========================v: %+v\n", v)
 	if err := s.repo.Save(&v); err != nil {
 		return err
 	}

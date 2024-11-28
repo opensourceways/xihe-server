@@ -363,7 +363,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForLikeController(
-			v1, like, user, proj, model, dataset, activity, likeAdapter,
+			v1, like, user, proj, projPg, model, dataset, activity, likeAdapter,
 		)
 
 		controller.AddRouterForActivityController(

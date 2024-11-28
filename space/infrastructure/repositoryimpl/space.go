@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/opensourceways/xihe-server/domain"
@@ -561,6 +562,7 @@ func (adapter *projectAdapter) GetSummaryByName(owner domain.Account, name domai
 	domain.ResourceSummary, error,
 ) {
 	v, err := adapter.getSummaryByName(owner.Account(), name.ResourceName())
+	fmt.Printf("============================v: %+v\n", v)
 	if err != nil {
 		return domain.ResourceSummary{}, repositories.ConvertError(err)
 	}
@@ -582,7 +584,7 @@ func (adapter *projectAdapter) getSummaryByName(owner, name string) (
 	if err := adapter.daoImpl.GetProjectRecord(&filter, &project); err != nil {
 		return repositories.ResourceSummaryDO{}, err
 	}
-
+	fmt.Printf("============================project: %+v\n", project)
 	// Convert projectDO to ProjectResourceSummaryDO
 	do = repositories.ResourceSummaryDO{
 		Owner:    project.Owner,

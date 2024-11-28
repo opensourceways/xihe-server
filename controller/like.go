@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +20,7 @@ func AddRouterForLikeController(
 	repo repository.Like,
 	user userrepo.User,
 	proj spacerepo.Project,
+	projPg spacerepo.ProjectPg,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -30,6 +32,7 @@ func AddRouterForLikeController(
 			dataset, activity, sender,
 		),
 		proj:    proj,
+		projPg:  projPg,
 		model:   model,
 		dataset: dataset,
 	}
@@ -45,6 +48,7 @@ type LikeController struct {
 	s app.LikeService
 
 	proj    spacerepo.Project
+	projPg  spacerepo.ProjectPg
 	model   repository.Model
 	dataset repository.Dataset
 }
@@ -69,12 +73,12 @@ func (ctl *LikeController) Create(ctx *gin.Context) {
 
 		return
 	}
-
+	fmt.Printf("=========================req: %+v\n", req)
 	cmd, ok := req.toCmd(ctx, ctl.getResourceId)
 	if !ok {
 		return
 	}
-
+	fmt.Printf("==========================cmd: %+v\n", cmd)
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return
@@ -173,7 +177,7 @@ func (ctl *LikeController) getResourceId(
 ) (string, error) {
 	switch rt.ResourceType() {
 	case domain.ResourceTypeProject.ResourceType():
-		v, err := ctl.proj.GetByName(owner, name)
+		v, err := ctl.projPg.GetByName(owner, name)
 		if err != nil {
 			return "", err
 		}
