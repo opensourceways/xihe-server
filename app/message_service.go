@@ -172,7 +172,7 @@ func (s projectMessageService) AddRelatedModel(info *ReverselyRelatedResourceInf
 }
 
 func (s projectMessageService) RemoveRelatedModel(info *ReverselyRelatedResourceInfo) error {
-	p, err := s.repo.Get(info.Resource.Owner, info.Resource.Id)
+	p, err := s.repoPg.Get(info.Resource.Owner, info.Resource.Id)
 	if err != nil {
 		return err
 	}
@@ -197,7 +197,7 @@ func (s projectMessageService) AddRelatedDataset(info *ReverselyRelatedResourceI
 }
 
 func (s projectMessageService) RemoveRelatedDataset(info *ReverselyRelatedResourceInfo) error {
-	p, err := s.repo.Get(info.Resource.Owner, info.Resource.Id)
+	p, err := s.repoPg.Get(info.Resource.Owner, info.Resource.Id)
 	if err != nil {
 		return err
 	}

@@ -144,7 +144,7 @@ func (s *spaceappAppService) getPrivateReadSpaceApp(
 ) (spaceappdomain.SpaceApp, error) {
 	var spaceApp spaceappdomain.SpaceApp
 
-	space, err := s.spaceRepo.GetByName(user, index.Name)
+	space, err := s.spaceRepoPg.GetByName(user, index.Name)
 	if err != nil {
 		return spaceApp, err
 	}
@@ -219,7 +219,7 @@ func toSpaceAppDTO(app *spaceappdomain.SpaceApp) SpaceAppDTO {
 // CheckPermissionRead  check user permission for read space app.
 func (s *spaceappAppService) CheckPermissionRead(
 	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex) error {
-	space, err := s.spaceRepo.GetByName(index.Owner, index.Name)
+	space, err := s.spaceRepoPg.GetByName(index.Owner, index.Name)
 	if err != nil {
 		return err
 	}
