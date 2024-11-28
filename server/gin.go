@@ -418,6 +418,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForHomeController(
 			v1, courseAppService, competitionAppService, projectService, modelService, datasetService,
+			promotionAppService,
 		)
 
 		controller.AddRouterForCloudController(
