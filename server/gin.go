@@ -387,6 +387,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		controller.AddRouterForRepoFileController(
 			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,
 		)
+		controller.AddRouterForRepoFileInternalController(
+			internal, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,
+		)
 
 		controller.AddRouterForInferenceController(
 			v1, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
