@@ -2,7 +2,6 @@ package controller
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -73,12 +72,12 @@ func (ctl *LikeController) Create(ctx *gin.Context) {
 
 		return
 	}
-	fmt.Printf("=========================req: %+v\n", req)
+
 	cmd, ok := req.toCmd(ctx, ctl.getResourceId)
 	if !ok {
 		return
 	}
-	fmt.Printf("==========================cmd: %+v\n", cmd)
+
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
 		return

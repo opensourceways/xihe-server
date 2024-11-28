@@ -228,7 +228,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	courseAppService := courseapp.NewCourseService(
 		courseusercli.NewUserCli(userRegService),
-		proj,
+		proj, spacerepo.ProjectAdapter(),
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
@@ -410,7 +410,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForCompetitionController(
-			v1, competitionAppService, userRegService, proj,
+			v1, competitionAppService, userRegService, proj, projPg,
 		)
 
 		controller.AddRouterForPromotionController(
@@ -422,7 +422,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForCourseController(
-			v1, courseAppService, userRegService, proj, user,
+			v1, courseAppService, userRegService, proj, projPg, user,
 		)
 
 		controller.AddRouterForHomeController(

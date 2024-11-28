@@ -427,7 +427,7 @@ func (s ResourceService) FindUserAvater(users []userdomain.Account) ([]string, e
 }
 
 func (s ResourceService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
-	if _, err := s.Project.GetSummaryByName(owner, name); err == nil {
+	if _, err := s.ProjectPg.GetSummaryByName(owner, name); err == nil {
 		return false
 	}
 
@@ -446,7 +446,7 @@ func (s ResourceService) IsPrivate(owner domain.Account, resourceType domain.Res
 ) (isprivate bool, ok bool) {
 	switch resourceType.ResourceType() {
 	case domain.ResourceProject:
-		if p, err := s.Project.Get(owner, id); err == nil {
+		if p, err := s.ProjectPg.Get(owner, id); err == nil {
 			return p.IsPrivate(), true
 		}
 	case domain.ResourceModel:
