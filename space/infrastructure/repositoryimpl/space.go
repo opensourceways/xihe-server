@@ -584,7 +584,7 @@ func (adapter *projectAdapter) getSummaryByName(owner, name string) (
 	if err := adapter.daoImpl.GetProjectRecord(&filter, &project); err != nil {
 		return repositories.ResourceSummaryDO{}, err
 	}
-	fmt.Printf("============================project: %+v\n", project)
+
 	// Convert projectDO to ProjectResourceSummaryDO
 	do = repositories.ResourceSummaryDO{
 		Owner:    project.Owner,

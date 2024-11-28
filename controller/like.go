@@ -27,7 +27,7 @@ func AddRouterForLikeController(
 ) {
 	ctl := LikeController{
 		s: app.NewLikeService(
-			repo, user, model, proj,
+			repo, user, model, proj, projPg,
 			dataset, activity, sender,
 		),
 		proj:    proj,

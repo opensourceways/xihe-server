@@ -398,8 +398,6 @@ func (ctl *baseController) getCookieToken(ctx *gin.Context) (token string, err e
 		return "", nil
 	}
 
-	fmt.Printf("private token ==================================u: %+v\n", u)
-
 	// insert encode username to context
 	ctx.Set(encodeUsername, u)
 
