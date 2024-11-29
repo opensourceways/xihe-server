@@ -672,11 +672,13 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 			return r, err
 		}
 
-		r.Top[i].Id = do.Id
-		r.Top[i].RepoId = do.RepoId
 		if r.Top[i].RepoType, err = domain.NewRepoType(do.Type); err != nil {
 			return r, err
 		}
+
+		r.Top[i].Id = do.Id
+		r.Top[i].RepoId = do.RepoId
+		fmt.Printf("======================r.Top[i]: %+v\n", r.Top[i])
 	}
 	fmt.Printf("==========================r: %+v\n", r)
 

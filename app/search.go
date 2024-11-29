@@ -81,6 +81,7 @@ func (s searchService) Search(name string) (dto SearchDTO) {
 
 	v, err := s.search(&option, s.projectPg.Search)
 	fmt.Printf("================================v: %+v\n", v)
+	fmt.Printf("================================err: %v\n", err)
 	if err == nil {
 		dto.Project = v
 	}
