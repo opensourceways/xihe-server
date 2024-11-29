@@ -672,7 +672,7 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 			return r, err
 		}
 
-		if r.Top[i].RepoType, err = domain.NewRepoType(do.Type); err != nil {
+		if r.Top[i].RepoType, err = domain.NewRepoType(do.RepoType); err != nil {
 			return r, err
 		}
 
