@@ -97,7 +97,7 @@ func (ctl *ProjectInternalController) GetSpaceById(ctx *gin.Context) {
 // @Param    body  body  reqToNotifyUpdateCode  true  "body"
 // @Accept   json
 // @Security Internal
-// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Success  202   {object}  responseData{data=string,msg=string,code=string}
 // @Router   /v1/space/{id}/notify_update_code [put]
 func (ctl *ProjectInternalController) NotifyUpdateCode(ctx *gin.Context) {
 	req := reqToNotifyUpdateCode{}
