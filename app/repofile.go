@@ -11,8 +11,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
-	filescanapp "github.com/opensourceways/xihe-server/filescan/app"
-	filescan "github.com/opensourceways/xihe-server/filescan/domain"
 )
 
 type RepoDir = platform.RepoDir
@@ -33,19 +31,16 @@ type RepoFileService interface {
 	DownloadRepo(u *UserInfo, obj *domain.RepoDownloadedEvent, handle func(io.Reader, int64)) error
 }
 
-func NewRepoFileService(
-	rf platform.RepoFile, sender message.RepoMessageProducer, filescan filescanapp.FileScanService) RepoFileService {
+func NewRepoFileService(rf platform.RepoFile, sender message.RepoMessageProducer) RepoFileService {
 	return &repoFileService{
 		rf:     rf,
 		sender: sender,
-		f:      filescan,
 	}
 }
 
 type repoFileService struct {
 	rf     platform.RepoFile
 	sender message.RepoMessageProducer
-	f      filescanapp.FileScanService
 }
 
 type RepoFileListCmd = RepoDir
@@ -192,43 +187,18 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 		return nil, err
 	}
 
-	owner := u.User.Account()
-	repoName := d.RepoName.ResourceName()
+	sort.Slice(r, func(i, j int) bool {
+		a := &r[i]
+		b := &r[j]
 
-	// 直接调用 Get 方法获取所有文件的扫描结果
-	scanRes, err := s.f.Get(owner, repoName)
-	if err != nil {
-		return nil, err
-	}
-
-	// 创建扫描结果映射
-	scanMap := make(map[string]filescan.FilescanRes)
-	for _, scan := range scanRes {
-		scanMap[scan.Name] = scan
-	}
-
-	results := make([]RepoPathItem, 0, len(r))
-
-	// 遍历所有文件，添加扫描结果
-	for _, item := range r {
-		results = append(results, item)
-		if scan, exists := scanMap[item.Name]; exists {
-			results[len(results)-1].Filescan = filescanapp.FilescanDTO{
-				ModerationStatus: scan.ModerationStatus,
-				ModerationResult: scan.ModerationResult,
-			}
+		if a.IsDir != b.IsDir {
+			return a.IsDir
 		}
-	}
 
-	// 排序结果
-	sort.Slice(results, func(i, j int) bool {
-		if results[i].IsDir != results[j].IsDir {
-			return results[i].IsDir
-		}
-		return results[i].Name < results[j].Name
+		return a.Name < b.Name
 	})
 
-	return results, nil
+	return r, nil
 }
 
 func (s *repoFileService) DownloadRepo(

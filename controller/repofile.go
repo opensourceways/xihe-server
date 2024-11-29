@@ -12,7 +12,6 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
-	filescan "github.com/opensourceways/xihe-server/filescan/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	uapp "github.com/opensourceways/xihe-server/user/app"
 )
@@ -25,15 +24,13 @@ func AddRouterForRepoFileController(
 	dataset repository.Dataset,
 	sender message.RepoMessageProducer,
 	us uapp.UserService,
-	f filescan.FileScanService,
 ) {
 	ctl := RepoFileController{
-		s:        app.NewRepoFileService(p, sender, f),
-		us:       us,
-		model:    model,
-		project:  project,
-		dataset:  dataset,
-		filescan: f,
+		s:       app.NewRepoFileService(p, sender),
+		us:      us,
+		model:   model,
+		project: project,
+		dataset: dataset,
 	}
 
 	rg.GET("/v1/repo/:type/:user/:name", ctl.DownloadRepo)
@@ -51,12 +48,11 @@ func AddRouterForRepoFileController(
 type RepoFileController struct {
 	baseController
 
-	s        app.RepoFileService
-	us       uapp.UserService
-	model    repository.Model
-	project  spacerepo.Project
-	dataset  repository.Dataset
-	filescan filescan.FileScanService
+	s       app.RepoFileService
+	us      uapp.UserService
+	model   repository.Model
+	project spacerepo.Project
+	dataset repository.Dataset
 }
 
 // @Summary		Create
