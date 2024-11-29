@@ -10,6 +10,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	filescan "github.com/opensourceways/xihe-server/filescan/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	uapp "github.com/opensourceways/xihe-server/user/app"
 )
@@ -22,9 +23,10 @@ func AddRouterForRepoFileInternalController(
 	dataset repository.Dataset,
 	sender message.RepoMessageProducer,
 	us uapp.UserService,
+	f filescan.FileScanService,
 ) {
 	ctl := RepoFileInternalController{
-		s:       app.NewRepoFileService(p, sender),
+		s:       app.NewRepoFileService(p, sender, f),
 		us:      us,
 		model:   model,
 		project: project,
