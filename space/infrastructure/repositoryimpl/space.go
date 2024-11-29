@@ -651,14 +651,11 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 		return r, err
 	}
 
-	fmt.Printf("===================projectDOs: %+v\n", projectDOs)
-
 	// 计算总数
 	var total int64
 	if err = query.Count(&total).Error; err != nil {
 		return r, err
 	}
-	fmt.Printf("========================total: %v\n", total)
 	r.Total = int(total)
 
 	// 转换结果
@@ -678,9 +675,7 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 
 		r.Top[i].Id = do.Id
 		r.Top[i].RepoId = do.RepoId
-		fmt.Printf("======================r.Top[i]: %+v\n", r.Top[i])
 	}
-	fmt.Printf("==========================r: %+v\n", r)
 
 	return r, nil
 }
@@ -705,6 +700,8 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 		NoApplicationFile: p.NoApplicationFile,
 		Exception:         p.Exception.Exception(),
 	}
+
+	fmt.Printf("======================do: %+v\n", do)
 
 	result := adapter.db().Model(&projectDO{}).Where("id = ?", do.Id).Updates(do)
 	if result.Error != nil {
@@ -732,7 +729,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 	if err := adapter.db().Create(&newTagsDOs).Error; err != nil {
 		return repositories.ConvertError(err)
 	}
-
+	fmt.Printf("======================newTagsDOs: %+v\n", newTagsDOs)
 	return nil
 }
 
