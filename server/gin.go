@@ -327,7 +327,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	projPg := spacerepo.ProjectAdapter()
 
-	projectMessageService := app.NewProjectMessageService(proj, projPg)
+	// projectMessageService := app.NewProjectMessageService(proj, projPg)
 
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
 		spaceappRepository, proj, projPg, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
@@ -436,9 +436,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		controller.AddRouterForComputilityWebController(
 			v1, computilityWebService,
 		)
-		controller.AddRouterForMessageInternalController(
-			internal, projectMessageService, proj, projPg,
-		)
+		// controller.AddRouterForMessageInternalController(
+		// 	internal, projectMessageService, proj, projPg,
+		// )
 	}
 
 	engine.UseRawPath = true
