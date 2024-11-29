@@ -181,8 +181,6 @@ func (s userService) AgreementRevoke(u domain.Account, t app.AgreementType) (err
 		user.CourseAgreement = ""
 	case app.Finetune:
 		user.FinetuneAgreement = ""
-	case app.User:
-		user.UserAgreement = ""
 	default:
 		str := fmt.Sprintf("Invalid agreement type :%s", t)
 		logrus.Error(str)
