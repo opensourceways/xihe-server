@@ -196,7 +196,7 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 	repoName := d.RepoName.ResourceName()
 
 	// 直接调用 Get 方法获取所有文件的扫描结果
-	scanRes, err := s.f.Get(owner, repoName) // 假设 false 表示获取所有文件的扫描结果
+	scanRes, err := s.f.Get(owner, repoName)
 	if err != nil {
 		return nil, err
 	}
@@ -211,7 +211,7 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 
 	// 遍历所有文件，添加扫描结果
 	for _, item := range r {
-		results = append(results, item) // 先添加文件到结果列表
+		results = append(results, item)
 		if scan, exists := scanMap[item.Name]; exists {
 			results[len(results)-1].Filescan = filescanapp.FilescanDTO{
 				ModerationStatus: scan.ModerationStatus,
