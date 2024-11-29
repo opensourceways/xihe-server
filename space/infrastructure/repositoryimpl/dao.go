@@ -76,7 +76,6 @@ func (dao *daoImpl) DeleteSingleRow(row interface{}) error {
 }
 
 func (dao *daoImpl) IncrementStatistic(filter *projectDO, fieldName string, increment int) error {
-	// 使用 GORM 进行数据库更新操作
 	result := dao.db().Model(&projectDO{}).
 		Where(equalQuery(fieldOwner), filter.Owner).
 		Where(equalQuery(fieldID), filter.Id).

@@ -651,11 +651,14 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 		return r, err
 	}
 
+	fmt.Printf("===================projectDOs: %+v\n", projectDOs)
+
 	// 计算总数
 	var total int64
 	if err = query.Count(&total).Error; err != nil {
 		return r, err
 	}
+	fmt.Printf("========================total: %v\n", total)
 	r.Total = int(total)
 
 	// 转换结果
@@ -675,6 +678,7 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 			return r, err
 		}
 	}
+	fmt.Printf("==========================r: %+v\n", r)
 
 	return r, nil
 }
