@@ -1,8 +1,8 @@
 package app
 
 import (
-	"context"
 	"encoding/hex"
+	"errors"
 	"fmt"
 
 	"github.com/sirupsen/logrus"
@@ -29,7 +29,7 @@ type UserService interface {
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
 
 	UpdateAgreement(u domain.Account, t app.AgreementType) error
-	PrivacyRevoke(context.Context, domain.Account) (string, error)
+	PrivacyRevoke(domain.Account) error
 	AgreementRevoke(u domain.Account, t app.AgreementType) error
 
 	UserInfo(domain.Account) (UserInfoDTO, error)
@@ -148,24 +148,25 @@ func (s userService) UpdateAgreement(u domain.Account, t app.AgreementType) (err
 }
 
 // PrivacyRevoke revokes the privacy settings for a user.
-func (s userService) PrivacyRevoke(ctx context.Context, user domain.Account) (string, error) {
+func (s userService) PrivacyRevoke(user domain.Account) error {
 	userInfo, err := s.repo.GetByAccount(user)
 	if err != nil {
 		if typerepo.IsErrorResourceNotExists(err) {
 			e := xerrors.Errorf("user %s not found: %w", user.Account(), err)
-			return "", allerror.New(allerror.ErrorCodeUserNotFound, "", e)
+			return allerror.New(allerror.ErrorCodeUserNotFound, "", e)
 		} else {
-			return "", xerrors.Errorf("failed to get user: %w", err)
+			return xerrors.Errorf("failed to get user: %w", err)
 		}
 	}
 
 	userInfo.RevokePrivacy()
 	if _, err = s.repo.Save(&userInfo); err != nil {
-		return "", allerror.New(allerror.ErrorCodeRevokePrivacyFailed, "",
+		return allerror.New(allerror.ErrorCodeRevokePrivacyFailed, "",
 			xerrors.Errorf("failed to save user: %w", err))
 	}
 
-	return "", err
+	return allerror.New(allerror.ErrorCodeRevokePrivacyFailed, "",
+		xerrors.Errorf("failed to save user: %w", err))
 }
 
 func (s userService) AgreementRevoke(u domain.Account, t app.AgreementType) (err error) {
@@ -181,13 +182,16 @@ func (s userService) AgreementRevoke(u domain.Account, t app.AgreementType) (err
 	case app.Finetune:
 		user.FinetuneAgreement = ""
 	default:
-		str := fmt.Sprintf("Invalid agreement type :%s", t)
-		logrus.Error(str)
-		return fmt.Errorf("%s", str)
+		err = errors.New("invalid agreement type")
+		return allerror.New(allerror.ErrorCodeRevokeAgreementFailed, "",
+			xerrors.Errorf("failed to save user: %w", err))
 	}
 
 	// update userinfo
-	_, err = s.repo.Save(&user)
+	if _, err = s.repo.Save(&user); err != nil {
+		return allerror.New(allerror.ErrorCodeRevokeAgreementFailed, "",
+			xerrors.Errorf("failed to save user: %w", err))
+	}
 
 	return
 }

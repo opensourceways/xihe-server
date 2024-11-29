@@ -119,7 +119,7 @@ func (ctl *UserController) UpdateAgreement(ctx *gin.Context) {
 // @Tags     User
 // @Accept   json
 // @Security Bearer
-// @Success  202   {object}  commonctl.ResponseData{data=revokePrivacyInfo,msg=string,code=string}
+// @Success  202   {object}  commonctl.ResponseData{data=string,msg=string,code=string}
 // @Router   /v1/user/privacy/revoke [put]
 func (ctl *UserController) PrivacyRevoke(ctx *gin.Context) {
 	middleware.SetAction(ctx, "privacy revoke")
@@ -130,11 +130,11 @@ func (ctl *UserController) PrivacyRevoke(ctx *gin.Context) {
 		return
 	}
 
-	if idToken, err := ctl.s.PrivacyRevoke(ctx.Request.Context(), pl.DomainAccount()); err != nil {
+	if err := ctl.s.PrivacyRevoke(pl.DomainAccount()); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
 		ctl.ClearCookieAfterRevokePrivacy(ctx)
-		ctl.sendRespOfPut(ctx, revokePrivacyInfo{IdToken: idToken})
+		ctl.sendRespOfPut(ctx, "success")
 	}
 }
 
@@ -143,7 +143,7 @@ func (ctl *UserController) PrivacyRevoke(ctx *gin.Context) {
 // @Tags     User
 // @Accept   json
 // @Security Bearer
-// @Success  202   {object}  commonctl.ResponseData{data=revokePrivacyInfo,msg=string,code=string}
+// @Success  202   {object}  commonctl.ResponseData{data=string,msg=string,code=string}
 // @Router   /v1/user/agreement/revoke [put]
 func (ctl *UserController) AgreementRevoke(ctx *gin.Context) {
 	middleware.SetAction(ctx, "agreement revoke")

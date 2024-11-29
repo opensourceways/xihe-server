@@ -55,6 +55,9 @@ const (
 
 	// ErrorCodeRevokePrivacyFailed
 	ErrorCodeRevokePrivacyFailed = "revoke_privacy_failed"
+
+	// ErrorCodeRevokeAgreementFailed
+	ErrorCodeRevokeAgreementFailed = "revoke_agreement_failed"
 )
 
 // errorImpl
