@@ -28,6 +28,7 @@ type RepoFileService interface {
 	Preview(*UserInfo, *RepoFilePreviewCmd) ([]byte, error)
 	DeleteDir(*UserInfo, *RepoDirDeleteCmd) (string, error)
 	Download(*RepoFileDownloadCmd) (RepoFileDownloadDTO, error)
+	StreamDownload(*RepoFileDownloadCmd, func(io.Reader, int64)) error
 	DownloadRepo(u *UserInfo, obj *domain.RepoDownloadedEvent, handle func(io.Reader, int64)) error
 }
 
@@ -49,12 +50,11 @@ type RepoFileDeleteCmd = RepoFileInfo
 type RepoFilePreviewCmd = RepoFileInfo
 
 type RepoFileDownloadCmd struct {
-	MyAccount   domain.Account
-	MyToken     string
-	Path        domain.FilePath
-	Type        domain.ResourceType
-	Resource    domain.ResourceSummary
-	NotRecorded bool
+	MyAccount domain.Account
+	MyToken   string
+	Path      domain.FilePath
+	Type      domain.ResourceType
+	Resource  domain.ResourceSummary
 }
 
 type RepoFileCreateCmd struct {
@@ -117,7 +117,7 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	RepoFileDownloadDTO, error,
 ) {
 	dto, err := s.download(cmd)
-	if err == nil && !cmd.NotRecorded {
+	if err == nil {
 		r := &cmd.Resource
 
 		_ = s.sender.AddOperateLogForDownloadFile(
@@ -135,6 +135,13 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	}
 
 	return dto, err
+}
+
+func (s *repoFileService) StreamDownload(cmd *RepoFileDownloadCmd, handle func(io.Reader, int64)) error {
+	return s.rf.StreamDownload(cmd.MyToken, &RepoFileInfo{
+		Path:   cmd.Path,
+		RepoId: cmd.Resource.RepoId,
+	}, handle)
 }
 
 func (s *repoFileService) download(cmd *RepoFileDownloadCmd) (

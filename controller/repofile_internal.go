@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +35,9 @@ func AddRouterForRepoFileInternalController(
 
 	rg.GET("/v1/repo/:type/:user/:name/files", internalApiCheckMiddleware(&ctl.baseController), ctl.List)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path", internalApiCheckMiddleware(&ctl.baseController), ctl.Download)
+	rg.GET("/v1/stream/repo/:type/:user/:name/file/:path",
+		internalApiCheckMiddleware(&ctl.baseController), ctl.StreamDownload,
+	)
 }
 
 type RepoFileInternalController struct {
@@ -123,6 +128,53 @@ func (ctl *RepoFileInternalController) List(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, newResponseData(v))
+}
+
+// @Summary		StreamDownload
+// @Description	Download repo file as data stream
+// @Tags			RepoFileInternal
+// @Param			user	path	string	true	"user"
+// @Param			name	path	string	true	"repo name"
+// @Param			path	path	string	true	"repo file path"
+// @Accept			octet-stream
+// @Success		200	{object}			byte "the byte of file"
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/stream/repo/{type}/{user}/{name}/file/{path} [get]
+func (ctl *RepoFileInternalController) StreamDownload(ctx *gin.Context) {
+	u, repoInfo, ok := ctl.checkForView(ctx)
+	if !ok {
+		return
+	}
+
+	cmd := app.RepoFileDownloadCmd{
+		Type:     repoInfo.rt,
+		MyToken:  u.Token,
+		Resource: repoInfo.ResourceSummary,
+	}
+
+	var err error
+	if cmd.Path, err = domain.NewFilePath(ctx.Param("path")); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+		return
+	}
+
+	if err := ctl.s.StreamDownload(&cmd, func(r io.Reader, size int64) {
+		ctx.DataFromReader(
+			http.StatusOK, size, "application/octet-stream", r,
+			map[string]string{
+				"Content-Disposition": fmt.Sprintf(
+					"attachment; filename=%s",
+					cmd.Path.FilePath(),
+				),
+				"Content-Transfer-Encoding": "binary",
+			},
+		)
+	}); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	}
 }
 
 func (ctl *RepoFileInternalController) checkForView(ctx *gin.Context) (
