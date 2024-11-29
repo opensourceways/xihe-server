@@ -14,6 +14,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/app"
 	common "github.com/opensourceways/xihe-server/common/domain"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	"github.com/opensourceways/xihe-server/utils"
@@ -771,4 +772,13 @@ func setCookieOfPrivateToken(ctx *gin.Context, value, domain string, expiry *tim
 	if apiConfig.LocalDomainCookie {
 		setCookie(ctx, csrfToken, value, "", false, *expiry, http.SameSiteLaxMode)
 	}
+}
+
+// SendError sends an error response based on the given error.
+func SendError(ctx *gin.Context, err error) {
+	sc, code := httpError(err)
+
+	_ = ctx.AbortWithError(sc, allerror.InnerErr(err))
+
+	ctx.JSON(sc, newResponseCodeMsg(code, err.Error()))
 }
