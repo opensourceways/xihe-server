@@ -167,7 +167,6 @@ func (ctl *UserController) AgreementRevoke(ctx *gin.Context) {
 	if err := ctl.s.AgreementRevoke(pl.DomainAccount(), m.Type); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 	} else {
-		ctl.ClearCookieAfterRevokePrivacy(ctx)
 		ctl.sendRespOfPut(ctx, "success")
 	}
 }
