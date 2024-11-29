@@ -693,7 +693,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 		Description:       p.Desc.ResourceDesc(),
 		Title:             p.Title.ResourceTitle(),
 		Type:              p.RepoType.RepoType(),
-		Level:             p.Level.Int(),
+		Level:             p.Level.Int(), // error
 		CoverId:           p.CoverId.CoverId(),
 		RepoType:          p.RepoType.RepoType(),
 		CommitId:          p.CommitId,
