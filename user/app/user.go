@@ -11,7 +11,6 @@ import (
 	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
-	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/message"
@@ -152,7 +151,7 @@ func (s userService) UpdateAgreement(u domain.Account, t app.AgreementType) (err
 func (s userService) PrivacyRevoke(ctx context.Context, user domain.Account) (string, error) {
 	userInfo, err := s.repo.GetByAccount(user)
 	if err != nil {
-		if repoerr.IsErrorResourceNotExists(err) {
+		if typerepo.IsErrorResourceNotExists(err) {
 			e := xerrors.Errorf("user %s not found: %w", user.Account(), err)
 			return "", allerror.New(allerror.ErrorCodeUserNotFound, "", e)
 		} else {
