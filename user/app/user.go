@@ -1,18 +1,23 @@
 package app
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 
+	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
+
 	"github.com/opensourceways/xihe-server/agreement/app"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
+	repoerr "github.com/opensourceways/xihe-server/domain/repository"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/message"
 	pointsPort "github.com/opensourceways/xihe-server/user/domain/points"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
-	"github.com/sirupsen/logrus"
 )
 
 type UserService interface {
@@ -23,7 +28,10 @@ type UserService interface {
 	UpdatePlateformToken(*UpdatePlateformTokenCmd) error
 	NewPlatformAccountWithUpdate(*CreatePlatformAccountCmd) error
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
+
 	UpdateAgreement(u domain.Account, t app.AgreementType) error
+	PrivacyRevoke(context.Context, domain.Account) (string, error)
+	AgreementRevoke(u domain.Account, t app.AgreementType) error
 
 	UserInfo(domain.Account) (UserInfoDTO, error)
 	GetByAccount(domain.Account) (UserDTO, error)
@@ -128,6 +136,53 @@ func (s userService) UpdateAgreement(u domain.Account, t app.AgreementType) (err
 			return nil
 		}
 		user.UserAgreement = ver
+	default:
+		str := fmt.Sprintf("Invalid agreement type :%s", t)
+		logrus.Error(str)
+		return fmt.Errorf("%s", str)
+	}
+
+	// update userinfo
+	_, err = s.repo.Save(&user)
+
+	return
+}
+
+// PrivacyRevoke revokes the privacy settings for a user.
+func (s userService) PrivacyRevoke(ctx context.Context, user domain.Account) (string, error) {
+	userInfo, err := s.repo.GetByAccount(user)
+	if err != nil {
+		if repoerr.IsErrorResourceNotExists(err) {
+			e := xerrors.Errorf("user %s not found: %w", user.Account(), err)
+			return "", allerror.New(allerror.ErrorCodeUserNotFound, "", e)
+		} else {
+			return "", xerrors.Errorf("failed to get user: %w", err)
+		}
+	}
+
+	userInfo.RevokePrivacy()
+	if _, err = s.repo.Save(&userInfo); err != nil {
+		return "", allerror.New(allerror.ErrorCodeRevokePrivacyFailed, "",
+			xerrors.Errorf("failed to save user: %w", err))
+	}
+
+	return "", err
+}
+
+func (s userService) AgreementRevoke(u domain.Account, t app.AgreementType) (err error) {
+	user, err := s.repo.GetByAccount(u)
+	if err != nil {
+		return
+	}
+
+	// revoke agreement
+	switch t {
+	case app.Course:
+		user.CourseAgreement = ""
+	case app.Finetune:
+		user.FinetuneAgreement = ""
+	case app.User:
+		user.UserAgreement = ""
 	default:
 		str := fmt.Sprintf("Invalid agreement type :%s", t)
 		logrus.Error(str)

@@ -73,6 +73,7 @@ func toUserDoc(u domain.User, doc *DUser) {
 		UserAgreement:           u.UserAgreement,
 		CourseAgreement:         u.CourseAgreement,
 		FinetuneAgreement:       u.FinetuneAgreement,
+		IsAgreePrivacy:          u.IsAgreePrivacy,
 	}
 
 	if u.Bio != nil {

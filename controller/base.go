@@ -748,3 +748,27 @@ func (ctl baseController) checkBigmodelApiToken(ctx *gin.Context) (user string, 
 
 	return user, true
 }
+
+func (ctl baseController) ClearCookieAfterRevokePrivacy(ctx *gin.Context) {
+	clearCookie(ctx, apiConfig.SessionDomain)
+}
+
+func clearCookie(ctx *gin.Context, domain string) {
+	expiry := time.Now().AddDate(0, 0, -1)
+	setCookieOfPrivateToken(ctx, "", domain, &expiry)
+	setCookieOfCSRFToken(ctx, "", domain, &expiry)
+}
+
+func setCookieOfCSRFToken(ctx *gin.Context, value, domain string, expiry *time.Time) {
+	setCookie(ctx, csrfToken, value, domain, false, *expiry, http.SameSiteStrictMode)
+	if apiConfig.LocalDomainCookie {
+		setCookie(ctx, csrfToken, value, "", false, *expiry, http.SameSiteLaxMode)
+	}
+}
+
+func setCookieOfPrivateToken(ctx *gin.Context, value, domain string, expiry *time.Time) {
+	setCookie(ctx, PrivateToken, value, domain, false, *expiry, http.SameSiteStrictMode)
+	if apiConfig.LocalDomainCookie {
+		setCookie(ctx, csrfToken, value, "", false, *expiry, http.SameSiteLaxMode)
+	}
+}

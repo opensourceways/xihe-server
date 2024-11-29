@@ -66,3 +66,7 @@ func toCheckWhiteListCmd(user domain.Account, t string) (cmd app.UserWhiteListCm
 	cmd.Type = v
 	return
 }
+
+type revokePrivacyInfo struct {
+	IdToken string `json:"id_token"`
+}
