@@ -2,6 +2,7 @@ package repositoryimpl
 
 import (
 	"errors"
+	"fmt"
 
 	"gorm.io/gorm"
 
@@ -79,8 +80,7 @@ func (dao *daoImpl) IncrementStatistic(filter *projectDO, fieldName string, incr
 	result := dao.db().Model(&projectDO{}).
 		Where(equalQuery(fieldOwner), filter.Owner).
 		Where(equalQuery(fieldID), filter.Id).
-		UpdateColumn(fieldName, gorm.Expr(fieldName+" + ?", increment))
-
+		Update(fieldName, gorm.Expr(fmt.Sprintf("%s + ?", fieldName), increment))
 	if result.Error != nil {
 		return result.Error
 	}
