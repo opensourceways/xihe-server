@@ -12,6 +12,8 @@ const (
 	fieldID        = "id"
 	fieldLikeCount = "like_count"
 	fieldProjectId = "project_id"
+	fieldForkCount = "fork_count"
+	fieldDownload  = "download_count"
 )
 
 var (

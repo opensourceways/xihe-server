@@ -611,7 +611,7 @@ func (adapter *projectAdapter) AddLike(p *domain.ResourceIndex) error {
 		Id:    p.Id,
 	}
 
-	err := adapter.daoImpl.IncrementStatistic(&filter, "fieldLikeCount", 1)
+	err := adapter.daoImpl.IncrementStatistic(&filter, fieldLikeCount, 1)
 	if err != nil {
 		return err
 	}
@@ -625,7 +625,7 @@ func (adapter *projectAdapter) RemoveLike(p *domain.ResourceIndex) error {
 		Id:    p.Id,
 	}
 
-	if err := adapter.daoImpl.IncrementStatistic(&filter, "fieldLikeCount", -1); err != nil {
+	if err := adapter.daoImpl.IncrementStatistic(&filter, fieldLikeCount, -1); err != nil {
 		return err
 	}
 
@@ -746,7 +746,7 @@ func (adapter *projectAdapter) IncreaseFork(r *domain.ResourceIndex) error {
 		Id:    r.Id,
 	}
 
-	err := adapter.daoImpl.IncrementStatistic(&filter, "fieldForkCount", 1)
+	err := adapter.daoImpl.IncrementStatistic(&filter, fieldForkCount, 1)
 	if err != nil {
 		return repositories.ConvertError(err)
 	}
@@ -760,7 +760,7 @@ func (adapter *projectAdapter) IncreaseDownload(r *domain.ResourceIndex) error {
 		Id:    r.Id,
 	}
 
-	err := adapter.daoImpl.IncrementStatistic(&filter, "download", 1)
+	err := adapter.daoImpl.IncrementStatistic(&filter, fieldDownload, 1)
 	if err != nil {
 		return repositories.ConvertError(err)
 	}
