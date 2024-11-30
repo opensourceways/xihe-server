@@ -288,6 +288,7 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 	adapter.getProjectTags(&r, tagResults)
 
 	err = result.toProject(&r)
+	fmt.Printf("=========================r: %+v\n", r)
 	return
 
 }
