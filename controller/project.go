@@ -918,7 +918,7 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 	}
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "set tags for project")
-
+	fmt.Printf("=======================proj: %+v\n", proj)
 	if err = ctl.s.SetTags(&proj, &cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
