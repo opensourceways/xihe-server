@@ -280,6 +280,13 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 		return spacedomain.Project{}, err
 	}
 
+	// find tags
+	var tagResults []projectTagsDO
+	if err := adapter.daoImpl.dbTag().Where("project_id", identity).Find(&tagResults).Error; err != nil {
+		return spacedomain.Project{}, err
+	}
+	adapter.getProjectTags(&r, tagResults)
+
 	err = result.toProject(&r)
 	return
 

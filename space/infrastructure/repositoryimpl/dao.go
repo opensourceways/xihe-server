@@ -79,7 +79,7 @@ func (dao *daoImpl) IncrementStatistic(filter *projectDO, fieldName string, incr
 	result := dao.db().Model(&projectDO{}).
 		Where(equalQuery(fieldOwner), filter.Owner).
 		Where(equalQuery(fieldID), filter.Id).
-		Update(fieldName, gorm.Expr(fieldName+" + ?", increment))
+		UpdateColumn(fieldName, gorm.Expr(fieldName+" + ?", increment))
 
 	if result.Error != nil {
 		return result.Error
