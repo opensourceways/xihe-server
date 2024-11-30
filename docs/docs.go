@@ -5165,6 +5165,12 @@ const docTemplate = `{
                         "name": "path",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "whether record operation",
+                        "name": "not_recorded",
+                        "in": "query"
                     }
                 ],
                 "responses": {

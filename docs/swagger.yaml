@@ -5691,6 +5691,10 @@ paths:
         name: path
         required: true
         type: string
+      - description: whether record operation
+        in: query
+        name: not_recorded
+        type: boolean
       responses:
         "200":
           description: OK
