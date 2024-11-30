@@ -5681,7 +5681,7 @@ const docTemplate = `{
                     "application/octet-stream"
                 ],
                 "tags": [
-                    "RepoFileInternal"
+                    "RepoFile"
                 ],
                 "summary": "StreamDownload",
                 "parameters": [

@@ -6061,7 +6061,7 @@ paths:
             type: system_error
       summary: StreamDownload
       tags:
-      - RepoFileInternal
+      - RepoFile
   /v1/tags/{type}:
     get:
       consumes:
