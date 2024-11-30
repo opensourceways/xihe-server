@@ -279,7 +279,7 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
 		return spacedomain.Project{}, err
 	}
-
+	fmt.Printf("=====================result: %+v\n", result)
 	// find tags
 	var tagResults []projectTagsDO
 	if err := adapter.daoImpl.dbTag().Where("project_id", identity).Find(&tagResults).Error; err != nil {
@@ -689,6 +689,8 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 
 func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) error {
 	p := &info.Property
+
+	fmt.Printf("==================p.Level: %+v\n", p.Level)
 
 	do := projectDO{
 		Id:                info.Id,
