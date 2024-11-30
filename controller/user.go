@@ -553,19 +553,19 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 		return
 	}
 
-	// update registration info
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user registration info")
+	// // update registration info
+	// prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user registration info")
 
-	cmd, err := req.ApplyRequest.ToCmd(pl.DomainAccount())
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
+	// cmd, err := req.ApplyRequest.ToCmd(pl.DomainAccount())
+	// if err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
 
-		return
-	}
+	// 	return
+	// }
 
-	if err := ctl.register.UpsertUserRegInfo(&cmd); err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseData(err))
-	}
+	// if err := ctl.register.UpsertUserRegInfo(&cmd); err != nil {
+	// 	ctl.sendRespWithInternalError(ctx, newResponseData(err))
+	// }
 
 	// update base info
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user basic info")
