@@ -274,21 +274,30 @@ func (adapter *projectAdapter) RemoveRelatedModel(info *repository.RelatedResour
 
 func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
 	do := projectDO{Owner: owner.Account(), RepoId: identity}
+	fmt.Printf("=====================do: %+v\n", do)
 	result := projectDO{}
 
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
 		return spacedomain.Project{}, err
 	}
 	fmt.Printf("=====================result: %+v\n", result)
+
+	if err = result.toProject(&r); err != nil {
+		return spacedomain.Project{}, err
+	}
+	fmt.Printf("=========================r1: %+v\n", r)
 	// find tags
 	var tagResults []projectTagsDO
 	if err := adapter.daoImpl.dbTag().Where("project_id", identity).Find(&tagResults).Error; err != nil {
 		return spacedomain.Project{}, err
 	}
-	adapter.getProjectTags(&r, tagResults)
+	tags := make([]string, len(tagResults))
+	for i, tag := range tagResults {
+		tags[i] = tag.TagName
+	}
+	r.Tags = tags
 
-	err = result.toProject(&r)
-	fmt.Printf("=========================r: %+v\n", r)
+	fmt.Printf("=========================r2: %+v\n", r)
 	return
 
 }
