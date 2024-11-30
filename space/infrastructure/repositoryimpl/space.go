@@ -700,7 +700,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 		Description:       p.Desc.ResourceDesc(),
 		Title:             p.Title.ResourceTitle(),
 		Type:              p.RepoType.RepoType(),
-		Level:             p.Level.Int(), // error
+		Level:             p.Level.Int(),
 		CoverId:           p.CoverId.CoverId(),
 		RepoType:          p.RepoType.RepoType(),
 		CommitId:          p.CommitId,
@@ -720,7 +720,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 	}
 
 	// 删除旧的标签关联
-	if err := adapter.db().Where("project_id = ?", do.Id).Delete(&projectTagsDO{}).Error; err != nil {
+	if err := adapter.dbTag().Where("project_id = ?", do.Id).Delete(&projectTagsDO{}).Error; err != nil {
 		return repositories.ConvertError(err)
 	}
 
@@ -733,7 +733,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 		})
 	}
 
-	if err := adapter.db().Create(&newTagsDOs).Error; err != nil {
+	if err := adapter.dbTag().Create(&newTagsDOs).Error; err != nil {
 		return repositories.ConvertError(err)
 	}
 	fmt.Printf("======================newTagsDOs: %+v\n", newTagsDOs)
