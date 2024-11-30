@@ -165,14 +165,14 @@ func (s userService) PrivacyRevoke(user domain.Account) error {
 			xerrors.Errorf("failed to save user: %w", err))
 	}
 
-	return allerror.New(allerror.ErrorCodeRevokePrivacyFailed, "",
-		xerrors.Errorf("failed to save user: %w", err))
+	return nil
 }
 
-func (s userService) AgreementRevoke(u domain.Account, t app.AgreementType) (err error) {
+func (s userService) AgreementRevoke(u domain.Account, t app.AgreementType) error {
 	user, err := s.repo.GetByAccount(u)
 	if err != nil {
-		return
+		e := xerrors.Errorf("user %s not found: %w", user.Account.Account(), err)
+		return allerror.New(allerror.ErrorCodeUserNotFound, "", e)
 	}
 
 	// revoke agreement
@@ -193,7 +193,7 @@ func (s userService) AgreementRevoke(u domain.Account, t app.AgreementType) (err
 			xerrors.Errorf("failed to save user: %w", err))
 	}
 
-	return
+	return nil
 }
 
 func (s userService) GetByAccount(account domain.Account) (dto UserDTO, err error) {
