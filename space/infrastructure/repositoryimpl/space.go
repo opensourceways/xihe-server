@@ -580,7 +580,7 @@ func (adapter *projectAdapter) GetSummaryByName(owner domain.Account, name domai
 ) {
 	v, err := adapter.getSummaryByName(owner.Account(), name.ResourceName())
 	if err != nil {
-		return domain.ResourceSummary{}, repositories.ConvertError(err)
+		return domain.ResourceSummary{}, err
 	}
 
 	return v.ToProject()
