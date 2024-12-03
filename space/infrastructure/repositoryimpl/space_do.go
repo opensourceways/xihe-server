@@ -159,16 +159,12 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 		return
 	}
 
-	if do.Hardware != "" {
-		if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
-			return
-		}
-
+	if r.Hardware, err = domain.NewHardware(do.Hardware, do.Type); err != nil {
+		return
 	}
-	if do.BaseImage != "" {
-		if r.BaseImage, err = domain.NewBaseImage(do.BaseImage, do.Hardware); err != nil {
-			return
-		}
+
+	if r.BaseImage, err = domain.NewBaseImage(do.BaseImage, do.Hardware); err != nil {
+		return
 	}
 
 	r.Level = domain.NewResourceLevelByNum(do.Level)

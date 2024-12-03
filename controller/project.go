@@ -911,14 +911,15 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 
 		return
 	}
-
+	fmt.Printf("======================cmd: %+v\n", cmd)
 	pl, proj, ok := ctl.checkPermission(ctx)
+	fmt.Printf("=======================proj: %+v\n", proj)
 	if !ok {
 		return
 	}
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "set tags for project")
-	fmt.Printf("=======================proj: %+v\n", proj)
+
 	if err = ctl.s.SetTags(&proj, &cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 

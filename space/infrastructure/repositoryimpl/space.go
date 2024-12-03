@@ -579,7 +579,6 @@ func (adapter *projectAdapter) GetSummaryByName(owner domain.Account, name domai
 	domain.ResourceSummary, error,
 ) {
 	v, err := adapter.getSummaryByName(owner.Account(), name.ResourceName())
-	fmt.Printf("============================v: %+v\n", v)
 	if err != nil {
 		return domain.ResourceSummary{}, repositories.ConvertError(err)
 	}
