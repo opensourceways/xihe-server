@@ -43,8 +43,8 @@ func AddRouterForProjectInternalController(
 		newPlatformRepository: newPlatformRepository,
 	}
 
-	rg.GET("/v1/space/:id", ctl.GetSpaceById)
-	rg.PUT("/v1/space/:id/notify_update_code", ctl.NotifyUpdateCode)
+	rg.GET("/v1/space/:id", internalApiCheckMiddleware(&ctl.baseController), ctl.GetSpaceById)
+	rg.PUT("/v1/space/:id/notify_update_code", internalApiCheckMiddleware(&ctl.baseController), ctl.NotifyUpdateCode)
 }
 
 type ProjectInternalController struct {
