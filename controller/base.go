@@ -614,6 +614,9 @@ func (ctl baseController) sendRespOfDelete(ctx *gin.Context) {
 	ctx.JSON(http.StatusNoContent, newResponseData("success"))
 }
 
+func (ctl baseController) sendRespModerateFail(ctx *gin.Context, data interface{}) {
+	ctx.JSON(http.StatusModerateFail, newResponseData(data))
+}
 func (ctl baseController) getListResourceParameter(
 	ctx *gin.Context,
 ) (cmd app.ResourceListCmd, err error) {

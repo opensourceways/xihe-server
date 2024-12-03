@@ -7,6 +7,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"path/filepath"
+
+	"github.com/opensourceways/xihe-sdk/space"
+	spaceapi "github.com/opensourceways/xihe-sdk/space/api"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -100,6 +104,19 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 			errorBadRequestParam, err,
 		))
 
+		return
+	}
+	//sdk text audit
+	// get file name
+	fileName := filepath.Base(ctx.Param("type"))
+	//audit text
+	var resp space.ModerationDTO
+	resp, _, err = spaceapi.Text(fileName, "title")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, nil)
 		return
 	}
 

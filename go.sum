@@ -1084,8 +1084,8 @@ github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43 h1:9u
 github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43/go.mod h1:VYpD1Hx3gcIT3Oqw/r+Fqzgz6wLr01yS2Y0PvVAZ3uo=
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142ee87 h1:yTxoRp9jLCSbDF+3WlSvjvCN2uZx0k8FFs+eRxUm0xY=
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142ee87/go.mod h1:NgaidYIn75D0QhptFnXtXdb6ezvH/2NrTz1Ulc3dkNE=
-github.com/opensourceways/xihe-sdk v0.0.0-20241022122920-59279dd6cc0c h1:8DkK51gdMeTWlpdW7VKvPjDfCrt/OACrDz/tTCqDKho=
-github.com/opensourceways/xihe-sdk v0.0.0-20241022122920-59279dd6cc0c/go.mod h1:RvLf2RtP+9zZaM7Zknun+MoBUx2jhu/jKwu84pbUAq4=
+github.com/opensourceways/xihe-sdk v1.0.1-0.20241203071446-18e8bc086211 h1:Xel8tNRtI1Ix89BN5E6OTopD9nr3ufPpGahG4fvaj9Y=
+github.com/opensourceways/xihe-sdk v1.0.1-0.20241203071446-18e8bc086211/go.mod h1:RvLf2RtP+9zZaM7Zknun+MoBUx2jhu/jKwu84pbUAq4=
 github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37 h1:BtuQhXKv/EdH36nm26fUrCQnfzKw7UqbPNPZmBS+b70=
 github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37/go.mod h1:INt/SP760CQIuTT/tJfU+bFKig2ISyY6a1DRVN6407o=
 github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=

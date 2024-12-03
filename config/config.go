@@ -15,6 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
+	"github.com/opensourceways/xihe-server/common/infrastructure/xihesdk"
 	"github.com/opensourceways/xihe-server/competition"
 	"github.com/opensourceways/xihe-server/computility"
 	"github.com/opensourceways/xihe-server/controller"
@@ -76,6 +77,7 @@ type Config struct {
 	Computility  computility.Config              `json:"computility"`
 	SpaceApp     spaceapp.Config                 `json:"space_app"`
 	Space        space.Config                    `json:"space"`
+	XiheSdk      xihesdk.Config                  `json:"xihe_sdk"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {

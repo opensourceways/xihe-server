@@ -16,6 +16,9 @@ import (
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+
+	"github.com/opensourceways/xihe-sdk/space"
+	spaceapi "github.com/opensourceways/xihe-sdk/space/api"
 )
 
 func AddRouterForProjectController(
@@ -174,6 +177,17 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 			"can't create project for other user",
 		))
 
+		return
+	}
+	//sdk text audit
+	projName := cmd.Name.ResourceName()
+	var resp space.ModerationDTO
+	resp, _, err = spaceapi.Text(projName, "title")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, nil)
 		return
 	}
 
