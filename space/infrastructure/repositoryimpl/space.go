@@ -274,18 +274,15 @@ func (adapter *projectAdapter) RemoveRelatedModel(info *repository.RelatedResour
 
 func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
 	do := projectDO{Owner: owner.Account(), RepoId: identity}
-	fmt.Printf("=====================do: %+v\n", do)
 	result := projectDO{}
 
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
 		return spacedomain.Project{}, err
 	}
-	fmt.Printf("=====================result: %+v\n", result)
 
 	if err = result.toProject(&r); err != nil {
 		return spacedomain.Project{}, err
 	}
-	fmt.Printf("=========================r1: %+v\n", r)
 	// find tags
 	var tagResults []projectTagsDO
 	if err := adapter.daoImpl.dbTag().Where("project_id", identity).Find(&tagResults).Error; err != nil {
@@ -297,7 +294,6 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 	}
 	r.Tags = tags
 
-	fmt.Printf("=========================r2: %+v\n", r)
 	return
 
 }
@@ -702,24 +698,27 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 	fmt.Printf("==================p.Level: %+v\n", p.Level)
 
 	do := projectDO{
-		Id:                info.Id,
-		Owner:             info.Owner.Account(),
-		Version:           info.Version,
-		UpdatedAt:         info.UpdatedAt,
-		Name:              p.Name.ResourceName(),
-		FL:                p.Name.FirstLetterOfName(),
-		Description:       p.Desc.ResourceDesc(),
-		Title:             p.Title.ResourceTitle(),
-		Type:              p.RepoType.RepoType(),
-		Level:             p.Level.Int(),
+		Id:          info.Id,
+		Owner:       info.Owner.Account(),
+		Version:     info.Version,
+		UpdatedAt:   info.UpdatedAt,
+		Name:        p.Name.ResourceName(),
+		FL:          p.Name.FirstLetterOfName(),
+		Description: p.Desc.ResourceDesc(),
+		Title:       p.Title.ResourceTitle(),
+		Type:        p.RepoType.RepoType(),
+		Level: func() int {
+			if p.Level != nil {
+				return p.Level.Int()
+			}
+			return 0
+		}(),
 		CoverId:           p.CoverId.CoverId(),
 		RepoType:          p.RepoType.RepoType(),
 		CommitId:          p.CommitId,
 		NoApplicationFile: p.NoApplicationFile,
 		Exception:         p.Exception.Exception(),
 	}
-
-	fmt.Printf("======================do: %+v\n", do)
 
 	result := adapter.db().Model(&projectDO{}).Where("id = ?", do.Id).Updates(do)
 	if result.Error != nil {
