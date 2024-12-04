@@ -384,6 +384,7 @@ func (ctl *ProjectController) Get(ctx *gin.Context) {
 	}
 
 	proj, err := ctl.s.GetByName(owner, name, !visitor && pl.isMyself(owner))
+	fmt.Printf("===================proj: %+v\n", proj)
 	if err != nil {
 		if isErrorOfAccessingPrivateRepo(err) {
 			ctx.JSON(http.StatusNotFound, newResponseCodeMsg(

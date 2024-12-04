@@ -694,9 +694,6 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 
 func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) error {
 	p := &info.Property
-
-	fmt.Printf("==================p.Level: %+v\n", p.Level)
-
 	do := projectDO{
 		Id:          info.Id,
 		Owner:       info.Owner.Account(),
@@ -706,7 +703,6 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 		FL:          p.Name.FirstLetterOfName(),
 		Description: p.Desc.ResourceDesc(),
 		Title:       p.Title.ResourceTitle(),
-		Type:        p.RepoType.RepoType(),
 		Level: func() int {
 			if p.Level != nil {
 				return p.Level.Int()
