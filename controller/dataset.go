@@ -21,6 +21,7 @@ func AddRouterForDatasetController(
 	repo repository.Dataset,
 	model repository.Model,
 	proj spacerepo.Project,
+	projPg spacerepo.Project,
 	activity repository.Activity,
 	tags repository.Tags,
 	like repository.Like,
@@ -32,7 +33,7 @@ func AddRouterForDatasetController(
 		repo: repo,
 		tags: tags,
 		like: like,
-		s:    app.NewDatasetService(user, repo, proj, model, activity, nil, sender),
+		s:    app.NewDatasetService(user, repo, proj, projPg, model, activity, nil, sender),
 
 		newPlatformRepository: newPlatformRepository,
 	}
