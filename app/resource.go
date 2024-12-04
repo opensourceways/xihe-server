@@ -188,7 +188,7 @@ func (s ResourceService) listResources(
 	r := dtos
 
 	if len(projects) > 0 {
-		all, err := s.ProjectPg.FindUserProjects(projects) //nil error
+		all, err := s.ProjectPg.FindUserProjects(projects)
 		if err != nil {
 			return nil, err
 		}

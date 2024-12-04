@@ -173,10 +173,11 @@ func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceLi
 	[]spacedomain.ProjectSummary, error,
 ) {
 	var projectSummaries []spacedomain.ProjectSummary
-
+	fmt.Printf("======================opts: %+v\n", opts)
 	for _, opt := range opts {
 		var projects []projectDO
 		query := adapter.db().Where("owner = ? AND id IN (?)", opt.Owner.Account(), opt.Ids).Order("updated_at DESC")
+		//nil error
 
 		err := query.Find(&projects).Error
 		if err != nil {
