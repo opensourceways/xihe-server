@@ -23,15 +23,17 @@ func NewActivityService(
 	user userrepo.User,
 	model repository.Model,
 	project spacerepo.Project,
+	projectPg spacerepo.ProjectPg,
 	dataset repository.Dataset,
 ) ActivityService {
 	return activityService{
 		repo: repo,
 		rs: ResourceService{
-			User:    user,
-			Model:   model,
-			Project: project,
-			Dataset: dataset,
+			User:      user,
+			Model:     model,
+			Project:   project,
+			ProjectPg: projectPg,
+			Dataset:   dataset,
 		},
 	}
 }

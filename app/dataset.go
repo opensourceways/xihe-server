@@ -128,6 +128,7 @@ func NewDatasetService(
 	user userrepo.User,
 	repo repository.Dataset,
 	proj spacerepo.Project,
+	projPg spacerepo.ProjectPg,
 	model repository.Model,
 	activity repository.Activity,
 	pr platform.Repository,
@@ -138,10 +139,11 @@ func NewDatasetService(
 		activity: activity,
 		sender:   sender,
 		rs: ResourceService{
-			User:    user,
-			Model:   model,
-			Project: proj,
-			Dataset: repo,
+			User:      user,
+			Model:     model,
+			Project:   proj,
+			ProjectPg: projPg,
+			Dataset:   repo,
 		},
 	}
 }

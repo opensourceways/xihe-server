@@ -271,6 +271,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityAccountAdapter(),
 	)
 
+	projPg := spacerepo.ProjectAdapter()
+
 	err = spacerepo.Init(pgsql.DB(), &cfg.Space.Tables)
 	if err != nil {
 		return err
@@ -282,9 +284,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		user, proj, spacerepo.ProjectAdapter(), model, dataset, activity, resProducer, computilityService, spaceProducer,
 	)
 
-	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
+	modelService := app.NewModelService(user, model, proj, projPg, dataset, activity, nil, resProducer)
 
-	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, resProducer)
+	datasetService := app.NewDatasetService(user, dataset, proj, projPg, model, activity, nil, resProducer)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	internal := engine.Group("internal")
@@ -325,8 +327,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		return err
 	}
 
-	projPg := spacerepo.ProjectAdapter()
-
 	// projectMessageService := app.NewProjectMessageService(proj, projPg)
 
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
@@ -344,12 +344,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForModelController(
-			v1, user, model, proj, dataset, activity, tags, like, resProducer,
+			v1, user, model, proj, projPg, dataset, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
 		controller.AddRouterForDatasetController(
-			v1, user, dataset, model, proj, activity, tags, like, resProducer,
+			v1, user, dataset, model, proj, projPg, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
@@ -367,7 +367,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForActivityController(
-			v1, activity, user, proj, model, dataset,
+			v1, activity, user, proj, projPg, model, dataset,
 		)
 
 		controller.AddRouterForAICCFinetuneController(
