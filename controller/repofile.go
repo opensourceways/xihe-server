@@ -116,7 +116,7 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
 	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, nil)
+		ctl.sendRespModerateFail(ctx, resp)
 		return
 	}
 
