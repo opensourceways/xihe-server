@@ -229,7 +229,7 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 	}
 
 	// 构建分页查询
-	query := baseQuery.Order("download_count ASC")
+	query := baseQuery.Order("download_count DESC")
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
