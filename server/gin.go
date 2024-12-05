@@ -271,12 +271,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityAccountAdapter(),
 	)
 
-	projPg := spacerepo.ProjectAdapter()
-
 	err = spacerepo.Init(pgsql.DB(), &cfg.Space.Tables)
 	if err != nil {
 		return err
 	}
+
+	projPg := spacerepo.ProjectAdapter()
 
 	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
 
