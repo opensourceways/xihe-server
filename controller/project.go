@@ -183,6 +183,9 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 	projName := cmd.Name.ResourceName()
 	var resp space.ModerationDTO
 	resp, _, err = spaceapi.Text(projName, "title")
+	fmt.Printf("========================resp: %+v\n", resp)
+	fmt.Printf("========================err: %+v\n", err)
+
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return

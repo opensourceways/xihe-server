@@ -532,6 +532,9 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 	bio := cmd2.Bio.Bio()
 	var resp space.ModerationDTO
 	resp, _, err = spaceapi.Text(bio, "profile")
+	fmt.Printf("========================resp: %+v\n", resp)
+	fmt.Printf("========================err: %+v\n", err)
+
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return

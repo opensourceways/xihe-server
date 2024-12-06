@@ -112,6 +112,9 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 	//audit text
 	var resp space.ModerationDTO
 	resp, _, err = spaceapi.Text(fileName, "title")
+	fmt.Printf("========================resp: %+v\n", resp)
+	fmt.Printf("========================err: %+v\n", err)
+
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
