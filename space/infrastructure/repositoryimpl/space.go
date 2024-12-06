@@ -321,7 +321,6 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 		return nil, 0, err
 	}
 
-	// 构建分页查询
 	query := baseQuery.Order("updated_at DESC")
 
 	//名字查询
@@ -329,6 +328,18 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
 	}
 
+	//level查询
+	if do.Level > 0 {
+		query = query.Where("Level = ?", do.Level)
+	}
+
+	// 标签查询
+	if do.Tags != nil {
+		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id").
+			Where("project_tags.tag_name IN ?", do.Tags)
+	}
+
+	// 构建分页查询
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
@@ -394,7 +405,6 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 		return nil, 0, err
 	}
 
-	// 构建分页查询
 	query := baseQuery.Order("download_count DESC")
 
 	//名字查询
@@ -402,6 +412,17 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
 	}
 
+	// 标签查询
+	if do.Tags != nil {
+		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id").
+			Where("project_tags.tag_name IN ?", do.Tags)
+	}
+
+	//level查询
+	if do.Level > 0 {
+		query = query.Where("Level = ?", do.Level)
+	}
+	// 构建分页查询
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
@@ -470,9 +491,20 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 	// 构建分页查询
 	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
 
-	//名字查询
+	// 名字查询
 	if do.Name != "" {
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
+	// 标签查询
+	if do.Tags != nil {
+		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id").
+			Where("project_tags.tag_name IN ?", do.Tags)
+	}
+
+	//level查询
+	if do.Level > 0 {
+		query = query.Where("Level = ?", do.Level)
 	}
 
 	if do.PageNum > 0 && do.CountPerPage > 0 {
