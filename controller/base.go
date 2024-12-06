@@ -615,7 +615,7 @@ func (ctl baseController) sendRespOfDelete(ctx *gin.Context) {
 }
 
 func (ctl baseController) sendRespModerateFail(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusModerateFail, newResponseData(data))
+	ctx.JSON(http.StatusUnprocessableEntity, newResponseData(data))
 }
 func (ctl baseController) getListResourceParameter(
 	ctx *gin.Context,
