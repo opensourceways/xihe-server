@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
@@ -80,8 +78,6 @@ func (s searchService) Search(name string) (dto SearchDTO) {
 	}
 
 	v, err := s.search(&option, s.projectPg.Search)
-	fmt.Printf("================================v: %+v\n", v)
-	fmt.Printf("================================err: %v\n", err)
 	if err == nil {
 		dto.Project = v
 	}

@@ -323,6 +323,12 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 
 	// 构建分页查询
 	query := baseQuery.Order("updated_at DESC")
+
+	//名字查询
+	if do.Name != "" {
+		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
@@ -390,6 +396,12 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 
 	// 构建分页查询
 	query := baseQuery.Order("download_count DESC")
+
+	//名字查询
+	if do.Name != "" {
+		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
@@ -457,6 +469,12 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 
 	// 构建分页查询
 	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
+
+	//名字查询
+	if do.Name != "" {
+		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
