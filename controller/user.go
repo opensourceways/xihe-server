@@ -10,6 +10,7 @@ import (
 	"github.com/opensourceways/xihe-sdk/space"
 	spaceapi "github.com/opensourceways/xihe-sdk/space/api"
 	"github.com/opensourceways/xihe-server/app"
+	"github.com/opensourceways/xihe-server/common/controller/middleware"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	userapp "github.com/opensourceways/xihe-server/user/app"
@@ -41,6 +42,9 @@ func AddRouterForUserController(
 	}
 
 	rg.PUT("/v1/user/agreement", ctl.UpdateAgreement)
+	rg.PUT("/v1/user/privacy/revoke", ctl.PrivacyRevoke)
+	rg.PUT("/v1/user/agreement/revoke", ctl.AgreementRevoke)
+
 	rg.GET("/v1/user", ctl.Get)
 
 	rg.POST("/v1/user/following", ctl.AddFollowing)
@@ -505,19 +509,19 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 		return
 	}
 
-	// update registration info
-	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user registration info")
+	// // update registration info
+	// prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user registration info")
 
-	cmd, err := req.ApplyRequest.ToCmd(pl.DomainAccount())
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
+	// cmd, err := req.ApplyRequest.ToCmd(pl.DomainAccount())
+	// if err != nil {
+	// 	ctx.JSON(http.StatusBadRequest, respBadRequestParam(err))
 
-		return
-	}
+	// 	return
+	// }
 
-	if err := ctl.register.UpsertUserRegInfo(&cmd); err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseData(err))
-	}
+	// if err := ctl.register.UpsertUserRegInfo(&cmd); err != nil {
+	// 	ctl.sendRespWithInternalError(ctx, newResponseData(err))
+	// }
 
 	// update base info
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update user basic info")

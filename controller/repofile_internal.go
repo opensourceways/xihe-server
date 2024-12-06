@@ -31,8 +31,8 @@ func AddRouterForRepoFileInternalController(
 		dataset: dataset,
 	}
 
-	rg.GET("/v1/repo/:type/:user/:name/files", ctl.List)
-	rg.GET("/v1/repo/:type/:user/:name/file/:path", ctl.Download)
+	rg.GET("/v1/repo/:type/:user/:name/files", internalApiCheckMiddleware(&ctl.baseController), ctl.List)
+	rg.GET("/v1/repo/:type/:user/:name/file/:path", internalApiCheckMiddleware(&ctl.baseController), ctl.Download)
 }
 
 type RepoFileInternalController struct {
