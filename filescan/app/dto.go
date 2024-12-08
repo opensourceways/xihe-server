@@ -31,3 +31,11 @@ type CreateFileScanListCmd struct {
 	RepoName string
 	Added    []string
 }
+
+type LauchModerationCmd struct {
+	RepoId   int64
+	Owner    domain.Account
+	Branch   string
+	RepoName string
+	Modified []string
+}

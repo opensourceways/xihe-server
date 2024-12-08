@@ -12,4 +12,5 @@ type FileScanAdapter interface {
 	Save(*domain.FileScan) error
 	Remove(context.Context, []domain.FileScan) error
 	AddList(context.Context, []domain.FileScan) ([]domain.FileScan, error)
+	FindByRepoIdAndFiles(ctx context.Context, queries []domain.FileScan) ([]domain.FileScan, error)
 }

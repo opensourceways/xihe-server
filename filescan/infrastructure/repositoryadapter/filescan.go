@@ -115,3 +115,27 @@ func (adapter *fileScanAdapter) AddList(
 
 	return addedFileScanList, nil
 }
+
+func (adapter *fileScanAdapter) FindByRepoIdAndFiles(
+	ctx context.Context, queries []domain.FileScan,
+) ([]domain.FileScan, error) {
+	filter := make([]fileScanDO, 0, len(queries))
+
+	for _, v := range queries {
+		filter = append(filter, fileScanDO{
+			RepoId: v.RepoId,
+			Dir:    v.Dir,
+			File:   v.File,
+		})
+	}
+
+	var results []fileScanDO
+	adapter.GetRecordsInDisjunction(ctx, filter, &results)
+
+	var fileScanList []domain.FileScan
+	for _, result := range results {
+		fileScanList = append(fileScanList, result.toFileScan())
+	}
+
+	return fileScanList, nil
+}

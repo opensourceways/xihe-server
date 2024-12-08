@@ -10,7 +10,6 @@ import (
 
 // ReqToUpdateFileScan is the request of updating a file scan.
 type ReqToUpdateFileScan struct {
-	// SensitiveItem    string `json:"sensitive_item"    required:"true"`
 	ModerationResult string `json:"moderation_result" required:"true"`
 }
 
@@ -47,7 +46,7 @@ func (r *ReqToUpdateFileScan) ToCmdToUpdateFileScan(id string) (cmd app.CmdToUpd
 }
 
 type Repository struct {
-	RepoID   int64  `json:"repo_id"`
+	RepoId   int64  `json:"repo_id"`
 	Owner    string `json:"owner"`
 	Branch   string `json:"branch"`
 	RepoName string `json:"repo_name"`
@@ -81,7 +80,27 @@ type RemoveFileScansReq struct {
 
 func (r RemoveFileScansReq) toCmd() (app.RemoveFileScanCmd, error) {
 	return app.RemoveFileScanCmd{
-		RepoID:  r.RepoID,
+		RepoID:  r.RepoId,
 		Removed: r.Removed,
 	}, nil
+}
+
+type ModifyFileScanListReq struct {
+	Repository
+
+	Modified []string `json:"modifyied"`
+}
+
+func (r ModifyFileScanListReq) toCmd() (app.LauchModerationCmd, error) {
+	cmd := app.LauchModerationCmd{
+		RepoId:   r.RepoId,
+		Branch:   r.Branch,
+		RepoName: r.RepoName,
+		Modified: r.Modified,
+	}
+
+	var err error
+	cmd.Owner, err = domain.NewAccount(r.Owner)
+
+	return cmd, err
 }

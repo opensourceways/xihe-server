@@ -17,6 +17,7 @@ type FileScanService interface {
 	Update(context.Context, CmdToUpdateFileScan) error
 	Remove(context.Context, RemoveFileScanCmd) error
 	CreateList(context.Context, CreateFileScanListCmd) error
+	LaunchModeration(context.Context, LauchModerationCmd) error
 }
 
 func NewFileScanService(
@@ -94,7 +95,44 @@ func (s *fileScanService) CreateList(ctx context.Context, cmd CreateFileScanList
 			Dir:      v.Dir,
 			File:     v.File,
 		}); err != nil {
-			logrus.WithField("filescan id", v.Id).Warnf("fail to publish moderation event, err: %s", err.Error())
+			logrus.WithFields(logrus.Fields{
+				"operation":   "create",
+				"filescan_id": v.Id,
+			}).Warnf("fail to publish moderation event, err: %s", err.Error())
+		}
+	}
+
+	return nil
+}
+
+func (s *fileScanService) LaunchModeration(ctx context.Context, cmd LauchModerationCmd) error {
+	queries := make([]filescan.FileScan, 0, len(cmd.Modified))
+
+	for _, path := range cmd.Modified {
+		queries = append(queries, filescan.FileScan{
+			RepoId: cmd.RepoId,
+			Dir:    filepath.Dir(path),
+			File:   filepath.Base(path),
+		})
+	}
+
+	fileScanList, err := s.FileScanAdapter.FindByRepoIdAndFiles(ctx, queries)
+	if err != nil {
+		return err
+	}
+
+	for _, v := range fileScanList {
+		if err := s.moderationPublisher.Publish(filescan.ModerationEvent{
+			ID:       v.Id,
+			Owner:    v.Owner.Account(),
+			RepoName: v.RepoName,
+			Dir:      v.Dir,
+			File:     v.File,
+		}); err != nil {
+			logrus.WithFields(logrus.Fields{
+				"operation":   "modify",
+				"filescan_id": v.Id,
+			}).Warnf("fail to publish moderation event, err: %s", err.Error())
 		}
 	}
 

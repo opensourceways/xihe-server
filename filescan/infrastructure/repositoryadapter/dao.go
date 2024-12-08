@@ -67,3 +67,12 @@ func (impl *daoImpl) Delete(ctx context.Context, filter any) error {
 func (impl *daoImpl) Create(ctx context.Context, value any) error {
 	return impl.db().Create(value).Error
 }
+
+func (impl *daoImpl) GetRecordsInDisjunction(ctx context.Context, filter, results any) error {
+	err := impl.db().Or(filter).Find(&results).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return repository.NewErrorResourceNotExists(errors.New("not found"))
+	}
+
+	return err
+}

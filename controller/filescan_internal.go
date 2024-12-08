@@ -16,8 +16,8 @@ func AddRouterForFileScanInternalController(
 		fileScanService: f,
 	}
 
-	rg.PUT("repo/filescan/:id", ctl.Update)
 	rg.PATCH("/v1/repo/filescan/:id", internalApiCheckMiddleware(&ctl.baseController), ctl.Update)
+	rg.PATCH("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.LaunchModeration)
 	rg.POST("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.CreateList)
 	rg.DELETE("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.Delete)
 }
@@ -48,6 +48,28 @@ func (ctl *FileScanInternalController) Update(ctx *gin.Context) {
 	} else {
 		ctl.sendRespOfPut(ctx, nil)
 	}
+}
+
+func (ctl *FileScanInternalController) LaunchModeration(ctx *gin.Context) {
+	req := ModifyFileScanListReq{}
+	if err := ctx.BindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+
+	if err = ctl.fileScanService.LaunchModeration(ctx.Request.Context(), cmd); err != nil {
+		ctl.sendBadRequestBody(ctx)
+	}
+
+	ctx.JSON(http.StatusNoContent, nil)
 }
 
 func (ctl *FileScanInternalController) CreateList(ctx *gin.Context) {
