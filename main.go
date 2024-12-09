@@ -72,6 +72,7 @@ func main() {
 
 	// cfg
 	cfg := new(config.Config)
+	cfg.Sdk.Endpoint = "http://xihe-audit-sync-service.xihe-test-v2:8080"
 	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
 		logrus.Fatalf("load config, err:%s", err.Error())
 	}
@@ -157,7 +158,7 @@ func main() {
 	}
 	cfg.InitAppConfig()
 
-	// xihe-sdk
+	// sdk
 	sdk.Init(&cfg.Sdk)
 
 	defer kafka.Exit()
