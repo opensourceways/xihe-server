@@ -17,8 +17,8 @@ import (
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 
-	"github.com/opensourceways/xihe-sdk/space"
-	spaceapi "github.com/opensourceways/xihe-sdk/space/api"
+	"github.com/opensourceways/xihe-audit-sync-sdk/space"
+	spaceapi "github.com/opensourceways/xihe-audit-sync-sdk/space/api"
 )
 
 func AddRouterForProjectController(

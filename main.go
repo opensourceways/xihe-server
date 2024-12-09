@@ -15,7 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
-	"github.com/opensourceways/xihe-server/common/infrastructure/xihesdk"
+	"github.com/opensourceways/xihe-server/common/infrastructure/sdk"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -158,7 +158,7 @@ func main() {
 	cfg.InitAppConfig()
 
 	// xihe-sdk
-	xihesdk.Init(&cfg.XiheSdk)
+	sdk.Init(&cfg.Sdk)
 
 	defer kafka.Exit()
 

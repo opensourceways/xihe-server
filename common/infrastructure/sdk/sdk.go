@@ -1,7 +1,7 @@
-package xihesdk
+package sdk
 
 import (
-	"github.com/opensourceways/xihe-sdk/httpclient"
+	"github.com/opensourceways/xihe-audit-sync-sdk/httpclient"
 )
 
 // Init is for http client init

@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
-	"github.com/opensourceways/xihe-sdk/space"
-	spaceapi "github.com/opensourceways/xihe-sdk/space/api"
+	"github.com/opensourceways/xihe-audit-sync-sdk/space"
+	spaceapi "github.com/opensourceways/xihe-audit-sync-sdk/space/api"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
