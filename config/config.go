@@ -77,7 +77,7 @@ type Config struct {
 	Computility  computility.Config              `json:"computility"`
 	SpaceApp     spaceapp.Config                 `json:"space_app"`
 	Space        space.Config                    `json:"space"`
-	Sdk          sdk.Config                      `json:"sdk"`
+	Sdk          sdk.Config                      `json:"audit_sync_sdk"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
