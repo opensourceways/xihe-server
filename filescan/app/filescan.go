@@ -8,6 +8,7 @@ import (
 
 	filescan "github.com/opensourceways/xihe-server/filescan/domain"
 	repo "github.com/opensourceways/xihe-server/filescan/domain/repository"
+	"github.com/sirupsen/logrus"
 )
 
 // FileScanAppService is the app service of file scan.
@@ -15,19 +16,23 @@ type FileScanService interface {
 	Get(string, string) ([]filescan.FilescanRes, error)
 	Update(context.Context, CmdToUpdateFileScan) error
 	Remove(context.Context, RemoveFileScanCmd) error
+	CreateList(context.Context, CreateFileScanListCmd) error
 }
 
 func NewFileScanService(
 	f repo.FileScanAdapter,
+	p filescan.ModerationEventPublisher,
 ) *fileScanService {
 	return &fileScanService{
-		FileScanAdapter: f,
+		FileScanAdapter:     f,
+		moderationPublisher: p,
 	}
 }
 
 // fileScanAppService is the app service of file scan.
 type fileScanService struct {
-	FileScanAdapter repo.FileScanAdapter
+	FileScanAdapter     repo.FileScanAdapter
+	moderationPublisher filescan.ModerationEventPublisher
 }
 
 func (s *fileScanService) Get(owner string, repoName string) ([]filescan.FilescanRes, error) {
@@ -61,4 +66,37 @@ func (s *fileScanService) Remove(ctx context.Context, cmd RemoveFileScanCmd) err
 	}
 
 	return s.FileScanAdapter.Remove(ctx, files)
+}
+
+func (s *fileScanService) CreateList(ctx context.Context, cmd CreateFileScanListCmd) error {
+	fileScanList := make([]filescan.FileScan, 0, len(cmd.Added))
+
+	for _, path := range cmd.Added {
+		fileScanList = append(fileScanList, filescan.FileScan{
+			RepoId:   cmd.RepoId,
+			Owner:    cmd.Owner,
+			RepoName: cmd.RepoName,
+			Dir:      filepath.Dir(path),
+			File:     filepath.Base(path),
+		})
+	}
+
+	addedFileScanList, err := s.FileScanAdapter.AddList(ctx, fileScanList)
+	if err != nil {
+		return err
+	}
+
+	for _, v := range addedFileScanList {
+		if err := s.moderationPublisher.Publish(filescan.ModerationEvent{
+			ID:       v.Id,
+			Owner:    v.Owner.Account(),
+			RepoName: v.RepoName,
+			Dir:      v.Dir,
+			File:     v.File,
+		}); err != nil {
+			logrus.WithField("filescan id", v.Id).Warnf("fail to publish moderation event, err: %s", err.Error())
+		}
+	}
+
+	return nil
 }

@@ -63,3 +63,7 @@ func (dao *daoImpl) EqualQuery(field string) string {
 func (impl *daoImpl) Delete(ctx context.Context, filter any) error {
 	return impl.db().Delete(filter).Error
 }
+
+func (impl *daoImpl) Create(ctx context.Context, value any) error {
+	return impl.db().Create(value).Error
+}

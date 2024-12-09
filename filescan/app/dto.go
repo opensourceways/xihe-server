@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/filescan/domain/primitive"
 )
 
@@ -21,4 +22,12 @@ type CmdToUpdateFileScan struct {
 type RemoveFileScanCmd struct {
 	RepoID  int64
 	Removed []string
+}
+
+type CreateFileScanListCmd struct {
+	RepoId   int64
+	Owner    domain.Account
+	Branch   string
+	RepoName string
+	Added    []string
 }

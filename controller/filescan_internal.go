@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/xihe-server/filescan/app"
 )
@@ -15,6 +17,9 @@ func AddRouterForFileScanInternalController(
 	}
 
 	rg.PUT("repo/filescan/:id", ctl.Update)
+	rg.PATCH("/v1/repo/filescan/:id", internalApiCheckMiddleware(&ctl.baseController), ctl.Update)
+	rg.POST("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.CreateList)
+	rg.DELETE("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.Delete)
 }
 
 // FileScanController is the controller of filescan
@@ -45,12 +50,24 @@ func (ctl *FileScanInternalController) Update(ctx *gin.Context) {
 	}
 }
 
-func (ctl *FileScanInternalController) Create(ctx *gin.Context) {
-	req := CreateFileScansReq{}
+func (ctl *FileScanInternalController) CreateList(ctx *gin.Context) {
+	req := CreateFileScanListReq{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctl.sendBadRequestBody(ctx)
 		return
 	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestBody(ctx)
+		return
+	}
+
+	if err = ctl.fileScanService.CreateList(ctx.Request.Context(), cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	}
+
+	ctx.JSON(http.StatusAccepted, nil)
 }
 
 func (ctl *FileScanInternalController) Delete(ctx *gin.Context) {

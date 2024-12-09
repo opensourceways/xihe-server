@@ -43,6 +43,7 @@ import (
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	filescan "github.com/opensourceways/xihe-server/filescan/app"
+	filescaninfra "github.com/opensourceways/xihe-server/filescan/infrastructure"
 	filescanrepo "github.com/opensourceways/xihe-server/filescan/infrastructure/repositoryadapter"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
@@ -266,8 +267,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	}
 
 	fileScanAdapter := filescanrepo.NewFileScanAdapter()
-
-	fileScanService := filescan.NewFileScanService(fileScanAdapter)
+	moderationEventPublisher := filescaninfra.NewModerationEventPublisher(
+		&cfg.Filescan.ModerationPublisher, kafka.PublisherAdapter(),
+	)
+	fileScanService := filescan.NewFileScanService(fileScanAdapter, moderationEventPublisher)
 
 	err = comprepositoryadapter.Init(pgsql.DB(), &cfg.Computility.Tables)
 	if err != nil {

@@ -5,6 +5,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/filescan/app"
 	"github.com/opensourceways/xihe-server/filescan/domain/primitive"
+	"github.com/opensourceways/xihe-server/user/domain"
 )
 
 // ReqToUpdateFileScan is the request of updating a file scan.
@@ -52,10 +53,24 @@ type Repository struct {
 	RepoName string `json:"repo_name"`
 }
 
-type CreateFileScansReq struct {
+type CreateFileScanListReq struct {
 	Repository
 
 	Added []string `json:"added"`
+}
+
+func (r CreateFileScanListReq) toCmd() (app.CreateFileScanListCmd, error) {
+	cmd := app.CreateFileScanListCmd{
+		RepoId:   r.RepoId,
+		Branch:   r.Branch,
+		RepoName: r.RepoName,
+		Added:    r.Added,
+	}
+
+	var err error
+	cmd.Owner, err = domain.NewAccount(r.Owner)
+
+	return cmd, err
 }
 
 type RemoveFileScansReq struct {

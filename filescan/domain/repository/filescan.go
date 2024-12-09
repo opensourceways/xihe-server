@@ -11,4 +11,5 @@ type FileScanAdapter interface {
 	Find(int64) (domain.FileScan, error)
 	Save(*domain.FileScan) error
 	Remove(context.Context, []domain.FileScan) error
+	AddList(context.Context, []domain.FileScan) ([]domain.FileScan, error)
 }

@@ -77,7 +77,7 @@ type Config struct {
 	Computility  computility.Config              `json:"computility"`
 	SpaceApp     spaceapp.Config                 `json:"space_app"`
 	Space        space.Config                    `json:"space"`
-	Filescan     filescan.Config                 `json:"file_scan"`
+	Filescan     infrastructure.FileScanConfig   `json:"file_scan"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {

@@ -2,6 +2,7 @@ package repositoryadapter
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/opensourceways/xihe-server/filescan/domain"
@@ -10,6 +11,8 @@ import (
 const (
 	fieldId = "id"
 )
+
+var ErrNoFileScan = errors.New("no file scan")
 
 type fileScanAdapter struct {
 	daoImpl
@@ -89,4 +92,26 @@ func (adapter *fileScanAdapter) Remove(ctx context.Context, files []domain.FileS
 	}
 
 	return adapter.Delete(ctx, &filter)
+}
+
+func (adapter *fileScanAdapter) AddList(
+	ctx context.Context, fileScanList []domain.FileScan,
+) ([]domain.FileScan, error) {
+	fileScanListDO := make([]*fileScanDO, 0)
+
+	for _, v := range fileScanList {
+		do := toFileScanDO(&v)
+		fileScanListDO = append(fileScanListDO, &do)
+	}
+
+	addedFileScanList := make([]domain.FileScan, 0, len(fileScanListDO))
+	if err := adapter.Create(ctx, fileScanListDO); err != nil {
+		return addedFileScanList, err
+	}
+
+	for _, v := range fileScanListDO {
+		addedFileScanList = append(addedFileScanList, v.toFileScan())
+	}
+
+	return addedFileScanList, nil
 }
