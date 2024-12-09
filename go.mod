@@ -16,7 +16,7 @@ require (
 	github.com/opensourceways/redis-lib v0.0.0-20231018083224-85bc8e32c7c0
 	github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c
 	github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1
-	github.com/opensourceways/xihe-audit-sync-sdk v0.0.0-20241209031902-c62dd7e18d57
+	github.com/opensourceways/xihe-audit-sync-sdk v0.0.0-20241209133334-b8c817ce4243
 	github.com/opensourceways/xihe-extra-services v1.3.0
 	github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43
 	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142ee87
