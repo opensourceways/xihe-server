@@ -72,10 +72,10 @@ func main() {
 
 	// cfg
 	cfg := new(config.Config)
-	cfg.Sdk.Endpoint = "http://xihe-audit-sync-service.xihe-test-v2:8080"
 	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
 		logrus.Fatalf("load config, err:%s", err.Error())
 	}
+	cfg.Sdk.Endpoint = "http://xihe-audit-sync-service.xihe-test-v2:8080"
 
 	if err := os.Remove(o.service.ConfigFile); err != nil {
 		logrus.Fatalf("config file delete failed, err:%s", err.Error())
