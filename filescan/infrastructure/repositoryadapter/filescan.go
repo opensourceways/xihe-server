@@ -1,6 +1,7 @@
 package repositoryadapter
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/opensourceways/xihe-server/filescan/domain"
@@ -74,4 +75,18 @@ func (adapter *fileScanAdapter) Save(file *domain.FileScan) error {
 	do := toFileScanDO(file)
 	fmt.Printf("===================do: %+v\n", do)
 	return adapter.db().Where(adapter.daoImpl.EqualQuery(fieldId), do.Id).Save(&do).Error
+}
+
+func (adapter *fileScanAdapter) Remove(ctx context.Context, files []domain.FileScan) error {
+	filter := make([]fileScanDO, 0, len(files))
+
+	for _, v := range files {
+		filter = append(filter, fileScanDO{
+			RepoId: v.RepoId,
+			Dir:    v.Dir,
+			File:   v.File,
+		})
+	}
+
+	return adapter.Delete(ctx, &filter)
 }

@@ -44,3 +44,32 @@ func (ctl *FileScanInternalController) Update(ctx *gin.Context) {
 		ctl.sendRespOfPut(ctx, nil)
 	}
 }
+
+func (ctl *FileScanInternalController) Create(ctx *gin.Context) {
+	req := CreateFileScansReq{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+		return
+	}
+}
+
+func (ctl *FileScanInternalController) Delete(ctx *gin.Context) {
+	req := RemoveFileScansReq{}
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+		return
+	}
+
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestBody(ctx)
+		return
+	}
+
+	if err = ctl.fileScanService.Remove(ctx.Request.Context(), cmd); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+
+	ctl.sendRespOfDelete(ctx)
+}

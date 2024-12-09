@@ -4,6 +4,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 
 	filescan "github.com/opensourceways/xihe-server/filescan/domain"
 	repo "github.com/opensourceways/xihe-server/filescan/domain/repository"
@@ -13,6 +14,7 @@ import (
 type FileScanService interface {
 	Get(string, string) ([]filescan.FilescanRes, error)
 	Update(context.Context, CmdToUpdateFileScan) error
+	Remove(context.Context, RemoveFileScanCmd) error
 }
 
 func NewFileScanService(
@@ -45,4 +47,18 @@ func (s *fileScanService) Update(ctx context.Context, cmd CmdToUpdateFileScan) e
 	fmt.Printf("===================fileInfo2: %+v\n", fileInfo)
 
 	return s.FileScanAdapter.Save(&fileInfo)
+}
+
+func (s *fileScanService) Remove(ctx context.Context, cmd RemoveFileScanCmd) error {
+	files := make([]filescan.FileScan, 0, len(cmd.Removed))
+
+	for _, path := range cmd.Removed {
+		files = append(files, filescan.FileScan{
+			RepoId: cmd.RepoID,
+			Dir:    filepath.Dir(path),
+			File:   filepath.Base(path),
+		})
+	}
+
+	return s.FileScanAdapter.Remove(ctx, files)
 }

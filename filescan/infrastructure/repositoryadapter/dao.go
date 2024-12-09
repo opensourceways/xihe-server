@@ -1,6 +1,7 @@
 package repositoryadapter
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -57,4 +58,8 @@ func (dao *daoImpl) GetRecordLarge(filter, result interface{}) error {
 // EqualQuery generates a query string for an "equal" filter condition.
 func (dao *daoImpl) EqualQuery(field string) string {
 	return fmt.Sprintf(`%s = ?`, field)
+}
+
+func (impl *daoImpl) Delete(ctx context.Context, filter any) error {
+	return impl.db().Delete(filter).Error
 }

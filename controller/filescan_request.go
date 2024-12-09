@@ -44,3 +44,29 @@ func (r *ReqToUpdateFileScan) ToCmdToUpdateFileScan(id string) (cmd app.CmdToUpd
 	}
 	return cmd, nil
 }
+
+type Repository struct {
+	RepoID   int64  `json:"repo_id"`
+	Owner    string `json:"owner"`
+	Branch   string `json:"branch"`
+	RepoName string `json:"repo_name"`
+}
+
+type CreateFileScansReq struct {
+	Repository
+
+	Added []string `json:"added"`
+}
+
+type RemoveFileScansReq struct {
+	Repository
+
+	Removed []string `json:"removed"`
+}
+
+func (r RemoveFileScansReq) toCmd() (app.RemoveFileScanCmd, error) {
+	return app.RemoveFileScanCmd{
+		RepoID:  r.RepoID,
+		Removed: r.Removed,
+	}, nil
+}
