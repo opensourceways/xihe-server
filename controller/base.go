@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"strconv"
@@ -235,7 +236,7 @@ func (ctl baseController) checkUserApiTokenBase(
 	if err != nil {
 		return
 	}
-
+	fmt.Printf("================token: %+v\n", token)
 	csrftoken, err := ctl.getCSRFToken(ctx)
 	if err != nil {
 		return
