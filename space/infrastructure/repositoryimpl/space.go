@@ -333,10 +333,20 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 		query = query.Where("Level = ?", do.Level)
 	}
 
-	// 标签查询
-	if do.Tags != nil {
-		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id").
-			Where("project_tags.tag_name IN ?", do.Tags)
+	// 如果需要标签查询或标签类别查询
+	if do.Tags != nil || do.TagKinds != nil {
+		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id")
+
+		// 标签查询
+		if do.Tags != nil {
+			query = query.Where("project_tags.tag_name IN ?", do.Tags)
+		}
+
+		// 标签类别查询
+		if do.TagKinds != nil {
+			query = query.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
+				Where("tag_categories.kind IN ?", do.TagKinds)
+		}
 	}
 
 	// 构建分页查询
@@ -412,10 +422,20 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
 	}
 
-	// 标签查询
-	if do.Tags != nil {
-		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id").
-			Where("project_tags.tag_name IN ?", do.Tags)
+	// 如果需要标签查询或标签类别查询
+	if do.Tags != nil || do.TagKinds != nil {
+		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id")
+
+		// 标签查询
+		if do.Tags != nil {
+			query = query.Where("project_tags.tag_name IN ?", do.Tags)
+		}
+
+		// 标签类别查询
+		if do.TagKinds != nil {
+			query = query.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
+				Where("tag_categories.kind IN ?", do.TagKinds)
+		}
 	}
 
 	//level查询
@@ -496,10 +516,20 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
 	}
 
-	// 标签查询
-	if do.Tags != nil {
-		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id").
-			Where("project_tags.tag_name IN ?", do.Tags)
+	// 如果需要标签查询或标签类别查询
+	if do.Tags != nil || do.TagKinds != nil {
+		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id")
+
+		// 标签查询
+		if do.Tags != nil {
+			query = query.Where("project_tags.tag_name IN ?", do.Tags)
+		}
+
+		// 标签类别查询
+		if do.TagKinds != nil {
+			query = query.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
+				Where("tag_categories.kind IN ?", do.TagKinds)
+		}
 	}
 
 	//level查询
