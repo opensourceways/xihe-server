@@ -19,8 +19,8 @@ type CmdToUpdateFileScan struct {
 	ModerationResult primitive.FileModerationResult
 }
 
-type RemoveFileScanCmd struct {
-	RepoID  int64
+type RemoveFileScanListCmd struct {
+	RepoId  int64
 	Removed []string
 }
 

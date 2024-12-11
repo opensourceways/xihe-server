@@ -72,15 +72,15 @@ func (r CreateFileScanListReq) toCmd() (app.CreateFileScanListCmd, error) {
 	return cmd, err
 }
 
-type RemoveFileScansReq struct {
+type RemoveFileScanListReq struct {
 	Repository
 
 	Removed []string `json:"removed"`
 }
 
-func (r RemoveFileScansReq) toCmd() (app.RemoveFileScanCmd, error) {
-	return app.RemoveFileScanCmd{
-		RepoID:  r.RepoId,
+func (r RemoveFileScanListReq) toCmd() (app.RemoveFileScanListCmd, error) {
+	return app.RemoveFileScanListCmd{
+		RepoId:  r.RepoId,
 		Removed: r.Removed,
 	}, nil
 }

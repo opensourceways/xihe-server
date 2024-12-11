@@ -19,7 +19,7 @@ func AddRouterForFileScanInternalController(
 	rg.PATCH("/v1/repo/filescan/:id", internalApiCheckMiddleware(&ctl.baseController), ctl.Update)
 	rg.PATCH("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.LaunchModeration)
 	rg.POST("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.CreateList)
-	rg.DELETE("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.Delete)
+	rg.DELETE("/v1/repo/filescan", internalApiCheckMiddleware(&ctl.baseController), ctl.DeleteList)
 }
 
 // FileScanController is the controller of filescan
@@ -92,8 +92,8 @@ func (ctl *FileScanInternalController) CreateList(ctx *gin.Context) {
 	ctx.JSON(http.StatusAccepted, nil)
 }
 
-func (ctl *FileScanInternalController) Delete(ctx *gin.Context) {
-	req := RemoveFileScansReq{}
+func (ctl *FileScanInternalController) DeleteList(ctx *gin.Context) {
+	req := RemoveFileScanListReq{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctl.sendBadRequestBody(ctx)
 		return
@@ -105,7 +105,7 @@ func (ctl *FileScanInternalController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if err = ctl.fileScanService.Remove(ctx.Request.Context(), cmd); err != nil {
+	if err = ctl.fileScanService.RemoveList(ctx.Request.Context(), cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
 	}

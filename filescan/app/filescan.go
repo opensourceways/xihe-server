@@ -15,7 +15,7 @@ import (
 type FileScanService interface {
 	Get(string, string) ([]filescan.FilescanRes, error)
 	Update(context.Context, CmdToUpdateFileScan) error
-	Remove(context.Context, RemoveFileScanCmd) error
+	RemoveList(context.Context, RemoveFileScanListCmd) error
 	CreateList(context.Context, CreateFileScanListCmd) error
 	LaunchModeration(context.Context, LauchModerationCmd) error
 }
@@ -55,18 +55,28 @@ func (s *fileScanService) Update(ctx context.Context, cmd CmdToUpdateFileScan) e
 	return s.FileScanAdapter.Save(&fileInfo)
 }
 
-func (s *fileScanService) Remove(ctx context.Context, cmd RemoveFileScanCmd) error {
-	files := make([]filescan.FileScan, 0, len(cmd.Removed))
+func (s *fileScanService) RemoveList(ctx context.Context, cmd RemoveFileScanListCmd) error {
+	queries := make([]filescan.FileScan, 0, len(cmd.Removed))
 
 	for _, path := range cmd.Removed {
-		files = append(files, filescan.FileScan{
-			RepoId: cmd.RepoID,
+		queries = append(queries, filescan.FileScan{
+			RepoId: cmd.RepoId,
 			Dir:    filepath.Dir(path),
 			File:   filepath.Base(path),
 		})
 	}
 
-	return s.FileScanAdapter.Remove(ctx, files)
+	removedFileScanList, err := s.FileScanAdapter.FindByRepoIdAndFiles(ctx, queries)
+	if err != nil {
+		return err
+	}
+
+	removedIds := make([]int64, 0, len(removedFileScanList))
+	for _, v := range removedFileScanList {
+		removedIds = append(removedIds, v.Id)
+	}
+
+	return s.FileScanAdapter.RemoveList(ctx, removedIds)
 }
 
 func (s *fileScanService) CreateList(ctx context.Context, cmd CreateFileScanListCmd) error {

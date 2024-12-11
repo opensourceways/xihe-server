@@ -80,14 +80,12 @@ func (adapter *fileScanAdapter) Save(file *domain.FileScan) error {
 	return adapter.db().Where(adapter.daoImpl.EqualQuery(fieldId), do.Id).Save(&do).Error
 }
 
-func (adapter *fileScanAdapter) Remove(ctx context.Context, files []domain.FileScan) error {
-	filter := make([]fileScanDO, 0, len(files))
+func (adapter *fileScanAdapter) RemoveList(ctx context.Context, ids []int64) error {
+	filter := make([]fileScanDO, 0, len(ids))
 
-	for _, v := range files {
+	for _, id := range ids {
 		filter = append(filter, fileScanDO{
-			RepoId: v.RepoId,
-			Dir:    v.Dir,
-			File:   v.File,
+			Id: id,
 		})
 	}
 
