@@ -117,7 +117,7 @@ func (adapter *fileScanAdapter) AddList(
 func (adapter *fileScanAdapter) FindByRepoIdAndFiles(
 	ctx context.Context, queries []domain.FileScan,
 ) ([]domain.FileScan, error) {
-	filter := make([]fileScanDO, 0, len(queries))
+	filter := make([]any, 0, len(queries))
 
 	for _, v := range queries {
 		filter = append(filter, fileScanDO{
@@ -128,7 +128,7 @@ func (adapter *fileScanAdapter) FindByRepoIdAndFiles(
 	}
 
 	var results []fileScanDO
-	adapter.GetRecordsInDisjunction(ctx, filter, &results)
+	adapter.GetRecordsOnDisjunction(ctx, filter, &results)
 
 	var fileScanList []domain.FileScan
 	for _, result := range results {
