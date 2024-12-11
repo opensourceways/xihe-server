@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	filescan "github.com/opensourceways/xihe-server/filescan/domain"
+	"github.com/opensourceways/xihe-server/filescan/domain/primitive"
 	repo "github.com/opensourceways/xihe-server/filescan/domain/repository"
 	"github.com/sirupsen/logrus"
 )
@@ -84,11 +85,13 @@ func (s *fileScanService) CreateList(ctx context.Context, cmd CreateFileScanList
 
 	for _, path := range cmd.Added {
 		fileScanList = append(fileScanList, filescan.FileScan{
-			RepoId:   cmd.RepoId,
-			Owner:    cmd.Owner,
-			RepoName: cmd.RepoName,
-			Dir:      filepath.Dir(path),
-			File:     filepath.Base(path),
+			RepoId:           cmd.RepoId,
+			Owner:            cmd.Owner,
+			RepoName:         cmd.RepoName,
+			Dir:              filepath.Dir(path),
+			File:             filepath.Base(path),
+			ModerationStatus: primitive.NewInitModerationStatus(),
+			ModerationResult: primitive.NewInitModerationResult(),
 		})
 	}
 
