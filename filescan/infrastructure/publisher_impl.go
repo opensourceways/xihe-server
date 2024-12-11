@@ -11,7 +11,7 @@ import (
 	"github.com/opensourceways/xihe-server/filescan/domain/primitive"
 )
 
-type ModerationTopics struct {
+type AuditTopics struct {
 	CreateDocModerationTask     string `json:"create_doc_moderation_task"     required:"true"`
 	CreateReadmeModerationTask  string `json:"create_readme_moderation_task"  required:"true"`
 	CreatePictureModerationTask string `json:"create_picture_moderation_task" required:"true"`
@@ -19,7 +19,7 @@ type ModerationTopics struct {
 	CreateAudioModerationTask   string `json:"create_audio_moderation_task"   required:"true"`
 }
 
-type ModerationSupportedFileType struct {
+type AuditSupportedFileType struct {
 	MarkDown []string `json:"markdown"`
 	Document []string `json:"document"`
 	Audio    []string `json:"audio"`
@@ -28,7 +28,7 @@ type ModerationSupportedFileType struct {
 }
 
 type moderationEventPublisher struct {
-	topics      ModerationTopics
+	topics      AuditTopics
 	publisher   message.Publisher
 	markdownExt sets.Set[string]
 	documentExt sets.Set[string]
@@ -37,20 +37,20 @@ type moderationEventPublisher struct {
 	imageExt    sets.Set[string]
 }
 
-type ModerationPublisherConfig struct {
-	ModerationTopics            ModerationTopics            `json:"moderation_topics"`
-	ModerationSupportedFileType ModerationSupportedFileType `json:"moderation_supported_file_type"`
+type AuditPublisherConfig struct {
+	Topics   AuditTopics            `json:"topics"`
+	FileType AuditSupportedFileType `json:"file_type"`
 }
 
-func NewModerationEventPublisher(config *ModerationPublisherConfig, p message.Publisher) domain.ModerationEventPublisher {
+func NewModerationEventPublisher(config *AuditPublisherConfig, p message.Publisher) domain.ModerationEventPublisher {
 	return moderationEventPublisher{
-		topics:      config.ModerationTopics,
+		topics:      config.Topics,
 		publisher:   p,
-		markdownExt: sets.New[string](config.ModerationSupportedFileType.MarkDown...),
-		documentExt: sets.New[string](config.ModerationSupportedFileType.Document...),
-		audioExt:    sets.New[string](config.ModerationSupportedFileType.Audio...),
-		videoExt:    sets.New[string](config.ModerationSupportedFileType.Video...),
-		imageExt:    sets.New[string](config.ModerationSupportedFileType.Image...),
+		markdownExt: sets.New[string](config.FileType.MarkDown...),
+		documentExt: sets.New[string](config.FileType.Document...),
+		audioExt:    sets.New[string](config.FileType.Audio...),
+		videoExt:    sets.New[string](config.FileType.Video...),
+		imageExt:    sets.New[string](config.FileType.Image...),
 	}
 }
 

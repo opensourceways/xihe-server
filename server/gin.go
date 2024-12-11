@@ -268,7 +268,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	fileScanAdapter := filescanrepo.NewFileScanAdapter()
 	moderationEventPublisher := filescaninfra.NewModerationEventPublisher(
-		&cfg.Filescan.ModerationPublisher, kafka.PublisherAdapter(),
+		&cfg.Filescan.Audit, kafka.PublisherAdapter(),
 	)
 	fileScanService := filescan.NewFileScanService(fileScanAdapter, moderationEventPublisher)
 
