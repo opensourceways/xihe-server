@@ -23,6 +23,10 @@ type largeFileScanDO struct {
 	File             string    `gorm:"column:file"`
 }
 
+func (largeFileScanDO) TableName() string {
+	return largeFileScanTableName
+}
+
 func (do *largeFileScanDO) toFilescanRes() domain.FilescanRes {
 	return domain.FilescanRes{
 		Name:             do.File,

@@ -32,6 +32,10 @@ type fileScanDO struct {
 	Xxxxx            string    `gorm:"column:xxxxx"`
 }
 
+func (fileScanDO) TableName() string {
+	return fileScanTableName
+}
+
 func (do *fileScanDO) toFilescanRes() domain.FilescanRes {
 	return domain.FilescanRes{
 		Name:             do.File,
