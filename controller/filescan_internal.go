@@ -71,7 +71,7 @@ func (ctl *FileScanInternalController) LaunchModeration(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusNoContent, nil)
+	ctx.JSON(http.StatusNoContent, newResponseData(nil))
 }
 
 func (ctl *FileScanInternalController) CreateList(ctx *gin.Context) {
@@ -95,7 +95,7 @@ func (ctl *FileScanInternalController) CreateList(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusAccepted, nil)
+	ctx.JSON(http.StatusAccepted, newResponseData(nil))
 }
 
 func (ctl *FileScanInternalController) DeleteList(ctx *gin.Context) {
