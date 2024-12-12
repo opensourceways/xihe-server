@@ -128,7 +128,9 @@ func (adapter *fileScanAdapter) FindByRepoIdAndFiles(
 	}
 
 	var results []fileScanDO
-	adapter.GetRecordsOnDisjunction(ctx, filter, &results)
+	if err := adapter.GetRecordsOnDisjunction(ctx, filter, &results); err != nil {
+		return nil, err
+	}
 
 	var fileScanList []domain.FileScan
 	for _, result := range results {
