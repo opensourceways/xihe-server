@@ -25,6 +25,7 @@ type AuditSupportedFileType struct {
 	Audio    []string `json:"audio"`
 	Video    []string `json:"video"`
 	Image    []string `json:"image"`
+	Code     []string `json:"code"`
 }
 
 type moderationEventPublisher struct {
@@ -35,6 +36,7 @@ type moderationEventPublisher struct {
 	audioExt    sets.Set[string]
 	videoExt    sets.Set[string]
 	imageExt    sets.Set[string]
+	codeExt     sets.Set[string]
 }
 
 type AuditPublisherConfig struct {
@@ -51,6 +53,7 @@ func NewModerationEventPublisher(config *AuditPublisherConfig, p message.Publish
 		audioExt:    sets.New[string](config.FileType.Audio...),
 		videoExt:    sets.New[string](config.FileType.Video...),
 		imageExt:    sets.New[string](config.FileType.Image...),
+		codeExt:     sets.New[string](config.FileType.Code...),
 	}
 }
 
@@ -58,7 +61,7 @@ func (m moderationEventPublisher) Publish(event domain.ModerationEvent) error {
 	fileType := m.getFileType(event.File)
 
 	switch fileType.Value() {
-	case primitive.MarkdownFileType.Value():
+	case primitive.MarkdownFileType.Value(), primitive.CodeFileType.Value():
 		return m.publisher.Publish(m.topics.CreateReadmeModerationTask, event, nil)
 	case primitive.DocumentFileType.Value():
 		return m.publisher.Publish(m.topics.CreateDocModerationTask, event, nil)
@@ -86,6 +89,8 @@ func (m moderationEventPublisher) getFileType(file string) primitive.FileType {
 		return primitive.VideoFileType
 	} else if m.imageExt.Has(ext) {
 		return primitive.ImageFileType
+	} else if m.codeExt.Has(ext) {
+		return primitive.CodeFileType
 	}
 
 	return primitive.UnKnownFileType

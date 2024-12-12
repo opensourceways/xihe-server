@@ -17,4 +17,5 @@ var (
 	VideoFileType    fileType = 3
 	DocumentFileType fileType = 4
 	MarkdownFileType fileType = 5
+	CodeFileType     fileType = 6
 )
