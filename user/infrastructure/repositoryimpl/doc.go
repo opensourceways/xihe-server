@@ -19,18 +19,19 @@ const (
 type DUser struct {
 	Id primitive.ObjectID `bson:"_id"       json:"-"`
 
-	Name                    string `bson:"name"       json:"name"`
-	Email                   string `bson:"email"      json:"email"`
-	Bio                     string `bson:"bio"        json:"bio"`
-	AvatarId                string `bson:"avatar_id"  json:"avatar_id"`
-	PlatformToken           string `bson:"token"      json:"token"`
-	PlatformTokenCreateAt   int64  `bson:"token_create_time"      json:"token_create_time"`
-	PlatformUserId          string `bson:"uid"        json:"uid"`
-	PlatformUserNamespaceId string `bson:"nid"        json:"nid"`
+	Name                    string `bson:"name"                json:"name"`
+	Email                   string `bson:"email"               json:"email"`
+	Bio                     string `bson:"bio"                 json:"bio"`
+	AvatarId                string `bson:"avatar_id"           json:"avatar_id"`
+	PlatformToken           string `bson:"token"               json:"token"`
+	PlatformTokenCreateAt   int64  `bson:"token_create_time"   json:"token_create_time"`
+	PlatformUserId          string `bson:"uid"                 json:"uid"`
+	PlatformUserNamespaceId string `bson:"nid"                 json:"nid"`
 
-	CourseAgreement   string `bson:"course_agreement"        json:"course_agreement"`
-	FinetuneAgreement string `bson:"finetune_agreement"        json:"finetune_agreement"`
-	UserAgreement     string `bson:"user_agreement"        json:"user_agreement"`
+	CourseAgreement   string `bson:"course_agreement"    json:"course_agreement"`
+	FinetuneAgreement string `bson:"finetune_agreement"  json:"finetune_agreement"`
+	UserAgreement     string `bson:"user_agreement"      json:"user_agreement"`
+	IsAgreePrivacy    bool   `bson:"is_agree_privacy"    json:"is_agree_privacy"`
 
 	Follower  []string `bson:"follower"   json:"-"`
 	Following []string `bson:"following"  json:"-"`

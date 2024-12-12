@@ -20,6 +20,7 @@ type Promotion struct {
 	Type      PromotionType
 	Desc      PromotionDesc
 	Way       PromotionWay
+	Tags      []string
 	RegUsers  []RegUser
 	StartTime int64
 	EndTime   int64
@@ -71,6 +72,6 @@ func (r *Promotion) Duration() (string, error) {
 		time.Unix(r.EndTime, 0).In(loc).Format(layout)), nil
 }
 
-func (r *Promotion) CountRegUsers() int {
-	return len(r.RegUsers)
+func (r *Promotion) CountRegUsers() int64 {
+	return int64(len(r.RegUsers))
 }

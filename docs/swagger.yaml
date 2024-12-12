@@ -35,6 +35,19 @@ definitions:
       times:
         type: integer
     type: object
+  app.AccountQuotaDetailDTO:
+    properties:
+      compute_type:
+        type: string
+      quota_balance:
+        type: integer
+      total_quota:
+        type: integer
+      used_quota:
+        type: integer
+      user_name:
+        type: string
+    type: object
   app.ActivityDTO:
     properties:
       resource:
@@ -113,6 +126,11 @@ definitions:
   app.BaiChuanDTO:
     properties:
       text:
+        type: string
+    type: object
+  app.BuildLogsDTO:
+    properties:
+      logs:
         type: string
     type: object
   app.CertInfoDTO:
@@ -441,6 +459,8 @@ definitions:
         type: integer
       id:
         type: string
+      is_npu:
+        type: boolean
       level:
         type: string
       like_count:
@@ -626,6 +646,8 @@ definitions:
         type: integer
       id:
         type: string
+      is_npu:
+        type: boolean
       level:
         type: string
       like_count:
@@ -797,6 +819,17 @@ definitions:
           $ref: '#/definitions/app.LessonDTO'
         type: array
       name:
+        type: string
+    type: object
+  app.SpaceAppDTO:
+    properties:
+      app_url:
+        type: string
+      id:
+        type: string
+      reason:
+        type: string
+      status:
         type: string
     type: object
   app.Spec:
@@ -1064,6 +1097,23 @@ definitions:
         type: string
       task:
         type: string
+    type: object
+  controller.IndustryDTO:
+    properties:
+      comp:
+        items:
+          $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO'
+        type: array
+      course:
+        items:
+          $ref: '#/definitions/app.CourseSummaryDTO'
+        type: array
+      dataset:
+        $ref: '#/definitions/app.GlobalDatasetsDTO'
+      model:
+        $ref: '#/definitions/app.GlobalModelsDTO'
+      project:
+        $ref: '#/definitions/app.GlobalProjectsDTO'
     type: object
   controller.JoinTeamRequest:
     properties:
@@ -1503,23 +1553,6 @@ definitions:
       top_p:
         type: number
     type: object
-  controller.homeElectricityInfo:
-    properties:
-      comp:
-        items:
-          $ref: '#/definitions/github_com_opensourceways_xihe-server_competition_app.CompetitionSummaryDTO'
-        type: array
-      course:
-        items:
-          $ref: '#/definitions/app.CourseSummaryDTO'
-        type: array
-      dataset:
-        $ref: '#/definitions/app.GlobalDatasetsDTO'
-      model:
-        $ref: '#/definitions/app.GlobalModelsDTO'
-      project:
-        $ref: '#/definitions/app.GlobalProjectsDTO'
-    type: object
   controller.homeInfo:
     properties:
       comp:
@@ -1698,9 +1731,13 @@ definitions:
     type: object
   controller.projectCreateRequest:
     properties:
+      base_image:
+        type: string
       cover_id:
         type: string
       desc:
+        type: string
+      hardware:
         type: string
       name:
         type: string
@@ -1725,6 +1762,10 @@ definitions:
     properties:
       avatar_id:
         type: string
+      base_image:
+        type: string
+      commit_id:
+        type: string
       cover_id:
         type: string
       created_at:
@@ -1735,8 +1776,12 @@ definitions:
         type: integer
       fork_count:
         type: integer
+      hardware:
+        type: string
       id:
         type: string
+      is_npu:
+        type: boolean
       like_count:
         type: integer
       liked:
@@ -1817,6 +1862,55 @@ definitions:
       id:
         type: string
       owner:
+        type: string
+    type: object
+  controller.reqToFailedStatus:
+    properties:
+      all_build_log:
+        type: string
+      commit_id:
+        type: string
+      reason:
+        type: string
+      space_id:
+        type: string
+      status:
+        type: string
+    type: object
+  controller.reqToNotifyStarting:
+    properties:
+      all_build_log:
+        type: string
+      commit_id:
+        type: string
+      space_id:
+        type: string
+    type: object
+  controller.reqToNotifyUpdateCode:
+    properties:
+      commit_id:
+        type: string
+      no_application_file:
+        type: boolean
+    type: object
+  controller.reqToUpdateBuildInfo:
+    properties:
+      commit_id:
+        type: string
+      log_url:
+        type: string
+      space_id:
+        type: string
+    type: object
+  controller.reqToUpdateServiceInfo:
+    properties:
+      app_url:
+        type: string
+      commit_id:
+        type: string
+      log_url:
+        type: string
+      space_id:
         type: string
     type: object
   controller.resourceTagsUpdateRequest:
@@ -3651,6 +3745,36 @@ paths:
       summary: GetRegisterInfo
       tags:
       - Competition
+  /v1/computility/account/{type}:
+    get:
+      consumes:
+      - application/json
+      description: get user computility account detail
+      parameters:
+      - description: computility type
+        in: path
+        name: type
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.AccountQuotaDetailDTO'
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.responseData'
+            - properties:
+                code:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      summary: GetComputilityAccountDetail
+      tags:
+      - ComputilityWeb
   /v1/course:
     get:
       consumes:
@@ -4302,23 +4426,54 @@ paths:
       summary: ListAll
       tags:
       - HomePage
-  /v1/homepage/electricity:
+  /v1/homepage/{industry}:
     get:
       consumes:
       - application/json
-      description: list the project dataset model courses and competitions
+      description: get the project dataset model courses and competitions
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/controller.homeElectricityInfo'
+            $ref: '#/definitions/controller.IndustryDTO'
         "500":
           description: Internal Server Error
           schema:
             type: system_error
-      summary: ListAllElectricity
+      summary: Get
       tags:
       - HomePage
+  /v1/inference/failed_status:
+    put:
+      consumes:
+      - application/json
+      description: notify space app failed status
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.reqToFailedStatus'
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.responseData'
+            - properties:
+                code:
+                  type: string
+                data:
+                  type: object
+                msg:
+                  type: string
+              type: object
+      security:
+      - Internal: []
+      summary: NotifySpaceAppFailedStatus
+      tags:
+      - SpaceApp
   /v1/inference/project/{owner}/{pid}:
     get:
       consumes:
@@ -4355,6 +4510,99 @@ paths:
       summary: Create
       tags:
       - Inference
+  /v1/inference/serving:
+    put:
+      consumes:
+      - application/json
+      description: notify space app service is started
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.reqToUpdateServiceInfo'
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.responseData'
+            - properties:
+                code:
+                  type: string
+                data:
+                  type: object
+                msg:
+                  type: string
+              type: object
+      security:
+      - Internal: []
+      summary: NotifySpaceAppServing
+      tags:
+      - SpaceApp
+  /v1/inference/starting:
+    put:
+      consumes:
+      - application/json
+      description: notify space app build is starting
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.reqToNotifyStarting'
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.responseData'
+            - properties:
+                code:
+                  type: string
+                data:
+                  type: object
+                msg:
+                  type: string
+              type: object
+      security:
+      - Internal: []
+      summary: NotifySpaceAppStarting
+      tags:
+      - SpaceApp
+  /v1/infernce/building:
+    put:
+      consumes:
+      - application/json
+      description: notify space app building is started
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.reqToUpdateBuildInfo'
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.responseData'
+            - properties:
+                code:
+                  type: string
+                data:
+                  type: object
+                msg:
+                  type: string
+              type: object
+      security:
+      - Internal: []
+      summary: NotifySpaceAppBuilding
+      tags:
+      - SpaceApp
   /v1/login:
     get:
       consumes:
@@ -5598,6 +5846,177 @@ paths:
             type: system_error
       tags:
       - Login
+  /v1/space-app/:owner/:name/spacelog/realtime:
+    get:
+      consumes:
+      - application/json
+      description: get space app real-time space log
+      parameters:
+      - description: owner of space
+        in: path
+        maxLength: 40
+        name: owner
+        required: true
+        type: string
+      - description: name of space
+        in: path
+        maxLength: 100
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.SpaceAppDTO'
+      summary: GetSpaceLog
+      tags:
+      - SpaceApp
+  /v1/space-app/{owner}/{name}:
+    get:
+      consumes:
+      - application/json
+      description: get space app
+      parameters:
+      - description: owner of space
+        in: path
+        maxLength: 40
+        name: owner
+        required: true
+        type: string
+      - description: name of space
+        in: path
+        maxLength: 100
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.SpaceAppDTO'
+      summary: Get
+      tags:
+      - SpaceApp
+  /v1/space-app/{owner}/{name}/buildlog/complete:
+    get:
+      consumes:
+      - application/json
+      description: get space app complete build logs
+      parameters:
+      - description: space app id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.BuildLogsDTO'
+      summary: GetBuildLogs
+      tags:
+      - SpaceApp
+  /v1/space-app/{owner}/{name}/buildlog/realtime:
+    get:
+      consumes:
+      - application/json
+      description: get space app real-time build log
+      parameters:
+      - description: owner of space
+        in: path
+        maxLength: 40
+        name: owner
+        required: true
+        type: string
+      - description: name of space
+        in: path
+        maxLength: 100
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/app.SpaceAppDTO'
+      summary: GetBuildLog
+      tags:
+      - SpaceApp
+  /v1/space-app/{owner}/{name}/read:
+    get:
+      consumes:
+      - application/json
+      description: check permission for read space app
+      parameters:
+      - description: owner of space
+        in: path
+        maxLength: 40
+        name: owner
+        required: true
+        type: string
+      - description: name of space
+        in: path
+        maxLength: 100
+        name: name
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.responseData'
+            - properties:
+                code:
+                  type: string
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      summary: CanRead
+      tags:
+      - SpaceAppWeb
+      x-example:
+        data: successfully
+  /v1/space/{id}/notify_update_code:
+    put:
+      consumes:
+      - application/json
+      description: NotifyUpdateCode space
+      parameters:
+      - description: id of space
+        in: path
+        maxLength: 20
+        name: id
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/controller.reqToNotifyUpdateCode'
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            allOf:
+            - $ref: '#/definitions/controller.responseData'
+            - properties:
+                code:
+                  type: string
+                data:
+                  type: string
+                msg:
+                  type: string
+              type: object
+      security:
+      - Internal: []
+      summary: NotifyUpdateCode space
+      tags:
+      - SpaceInternal
   /v1/tags/{type}:
     get:
       consumes:

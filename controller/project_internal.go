@@ -44,8 +44,8 @@ func AddRouterForProjectInternalController(
 		newPlatformRepository: newPlatformRepository,
 	}
 
-	rg.GET("/v1/space/:id", ctl.GetSpaceById)
-	rg.PUT("/v1/space/:id/notify_update_code", ctl.NotifyUpdateCode)
+	rg.GET("/v1/space/:id", internalApiCheckMiddleware(&ctl.baseController), ctl.GetSpaceById)
+	rg.PUT("/v1/space/:id/notify_update_code", internalApiCheckMiddleware(&ctl.baseController), ctl.NotifyUpdateCode)
 }
 
 type ProjectInternalController struct {
@@ -98,7 +98,7 @@ func (ctl *ProjectInternalController) GetSpaceById(ctx *gin.Context) {
 // @Param    body  body  reqToNotifyUpdateCode  true  "body"
 // @Accept   json
 // @Security Internal
-// @Success  202   {object}  commonctl.ResponseData{data=nil,msg=string,code=string}
+// @Success  202   {object}  responseData{data=string,msg=string,code=string}
 // @Router   /v1/space/{id}/notify_update_code [put]
 func (ctl *ProjectInternalController) NotifyUpdateCode(ctx *gin.Context) {
 	req := reqToNotifyUpdateCode{}
