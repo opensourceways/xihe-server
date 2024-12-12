@@ -70,7 +70,7 @@ func (impl *daoImpl) Create(ctx context.Context, value any) error {
 
 // GetRecordsOnDisjunction get results by multiple conditions on disjunction
 func (impl *daoImpl) GetRecordsOnDisjunction(ctx context.Context, filter []any, results any) error {
-	db := impl.db().Where("1 = 1")
+	db := impl.db().Where("1 = 0")
 	for _, cond := range filter {
 		db = db.Or(cond)
 	}
