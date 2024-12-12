@@ -67,6 +67,8 @@ func (ctl *FileScanInternalController) LaunchModeration(ctx *gin.Context) {
 
 	if err = ctl.fileScanService.LaunchModeration(ctx.Request.Context(), cmd); err != nil {
 		ctl.sendBadRequestBody(ctx)
+
+		return
 	}
 
 	ctx.JSON(http.StatusNoContent, nil)
@@ -76,17 +78,21 @@ func (ctl *FileScanInternalController) CreateList(ctx *gin.Context) {
 	req := CreateFileScanListReq{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctl.sendBadRequestBody(ctx)
+
 		return
 	}
 
 	cmd, err := req.toCmd()
 	if err != nil {
 		ctl.sendBadRequestBody(ctx)
+
 		return
 	}
 
 	if err = ctl.fileScanService.CreateList(ctx.Request.Context(), cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
+		return
 	}
 
 	ctx.JSON(http.StatusAccepted, nil)
@@ -96,17 +102,20 @@ func (ctl *FileScanInternalController) DeleteList(ctx *gin.Context) {
 	req := RemoveFileScanListReq{}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctl.sendBadRequestBody(ctx)
+
 		return
 	}
 
 	cmd, err := req.toCmd()
 	if err != nil {
 		ctl.sendBadRequestBody(ctx)
+
 		return
 	}
 
 	if err = ctl.fileScanService.RemoveList(ctx.Request.Context(), cmd); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+
 		return
 	}
 
