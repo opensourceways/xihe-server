@@ -117,13 +117,13 @@ func (adapter *fileScanAdapter) AddList(
 func (adapter *fileScanAdapter) FindByRepoIdAndFiles(
 	ctx context.Context, queries []domain.FileScan,
 ) ([]domain.FileScan, error) {
-	filter := make([]any, 0, len(queries))
+	filter := make([]map[string]any, 0, len(queries))
 
 	for _, v := range queries {
-		filter = append(filter, fileScanDO{
-			RepoId: v.RepoId,
-			Dir:    v.Dir,
-			File:   v.File,
+		filter = append(filter, map[string]any{
+			"repo_id": v.RepoId,
+			"dir":     v.Dir,
+			"file":    v.File,
 		})
 	}
 

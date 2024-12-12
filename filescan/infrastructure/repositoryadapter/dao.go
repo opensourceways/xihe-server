@@ -68,14 +68,14 @@ func (impl *daoImpl) Create(ctx context.Context, value any) error {
 	return impl.db().Create(value).Error
 }
 
-// GetRecordsOnDisjunction get results by multiple conditions on disjunction
-func (impl *daoImpl) GetRecordsOnDisjunction(ctx context.Context, filter []any, results any) error {
+// GetRecordsOnDisjunction returns results by multiple conditions on disjunction
+func (impl *daoImpl) GetRecordsOnDisjunction(ctx context.Context, filter []map[string]any, results any) error {
 	db := impl.db().Where("1 = 0")
 	for _, cond := range filter {
 		db = db.Or(cond)
 	}
 
-	err := db.Debug().Find(&results).Error
+	err := db.Debug().Find(results).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return repository.NewErrorResourceNotExists(errors.New("not found"))
 	}
