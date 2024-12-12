@@ -88,7 +88,7 @@ func (r RemoveFileScanListReq) toCmd() (app.RemoveFileScanListCmd, error) {
 type ModifyFileScanListReq struct {
 	Repository
 
-	Modified []string `json:"modifyied"`
+	Modified []string `json:"modified"`
 }
 
 func (r ModifyFileScanListReq) toCmd() (app.LauchModerationCmd, error) {
