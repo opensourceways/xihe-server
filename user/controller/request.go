@@ -8,6 +8,7 @@ import (
 
 type UserInfoUpdateRequest struct {
 	UserBasicInfoUpdateRequest
+	ApplyRequest
 }
 
 type ApplyRequest struct {

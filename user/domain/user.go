@@ -27,8 +27,6 @@ type User struct {
 	// following fields is not under the controlling of version
 	FollowerCount  int
 	FollowingCount int
-
-	IsAgreePrivacy bool
 }
 
 type PlatformUser struct {
@@ -84,8 +82,4 @@ func (w WhiteListInfo) Enable() bool {
 	t := time.Now()
 
 	return w.Enabled && t.After(time.Unix(w.StartTime, 0)) && t.Before(time.Unix(w.EndTime, 0))
-}
-
-func (u *User) RevokePrivacy() {
-	u.IsAgreePrivacy = false
 }

@@ -17,7 +17,6 @@ const (
 	courseTypeScholar     = "scholar"
 	courseTypeIndustry    = "industry"
 	courseTypeElectricity = "electricity"
-	courseTypeBiology     = "biology"
 	courseTypeScientific  = "scientific_computing"
 
 	studentIdentityStudent   = "student"
@@ -177,8 +176,7 @@ func NewCourseType(v string) (CourseType, error) {
 		v == courseTypeIndustry ||
 		v == courseTypeScholar ||
 		v == courseTypeElectricity ||
-		v == courseTypeScientific ||
-		v == courseTypeBiology
+		v == courseTypeScientific
 
 	if b {
 		return courseType(v), nil

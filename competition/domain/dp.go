@@ -26,7 +26,6 @@ const (
 	competitionSubmissionStatusSuccess = "success"
 
 	competitionTagElectricity = "electricity"
-	competitionTagBiology     = "biology"
 	competitionTagLearn       = "learn"
 	competitionTagChallenge   = "challenge"
 )
@@ -438,8 +437,7 @@ type CompetitionTag interface {
 func NewCompetitionTag(v string) (CompetitionTag, error) {
 	b := v == competitionTagChallenge ||
 		v == competitionTagElectricity ||
-		v == competitionTagLearn ||
-		v == competitionTagBiology
+		v == competitionTagLearn
 
 	if b {
 		return competitionTag(v), nil

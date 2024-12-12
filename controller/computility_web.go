@@ -40,8 +40,8 @@ type ComputilityWebController struct {
 // @Tags     ComputilityWeb
 // @Param    type   path  string  true  "computility type"
 // @Accept   json
-// @Success  200  {object} app.AccountQuotaDetailDTO
-// @Failure  400  {object} responseData{code=string,msg=string}
+// @Success  200  {object} commonctl.ResponseData{data=app.AccountQuotaDetailDTO,msg=string,code=string}
+// @Failure  400  {object} commonctl.ResponseData{data=error,msg=string,code=string}
 // @Router   /v1/computility/account/{type} [get]
 func (ctl *ComputilityWebController) GetComputilityAccountDetail(ctx *gin.Context) {
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)

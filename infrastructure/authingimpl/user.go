@@ -1,14 +1,12 @@
 package authingimpl
 
 import (
-	"bytes"
 	"errors"
 	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/opensourceways/community-robot-lib/utils"
-	libutils "github.com/opensourceways/server-common-lib/utils"
 
 	"github.com/opensourceways/xihe-server/domain/authing"
 	"github.com/opensourceways/xihe-server/user/domain"
@@ -31,7 +29,6 @@ func Init(v *Config) {
 		getManagerTokenURL: v.Endpoint + "/manager/token",
 		sendEmailURL:       v.Endpoint + "/manager/sendcode",
 		bindEmailURL:       v.Endpoint + "/manager/bind/account",
-		privacyRevokeURL:   v.Endpoint + "/manager/privacy/revoke",
 	}
 }
 
@@ -46,7 +43,6 @@ type user struct {
 	getManagerTokenURL string
 	sendEmailURL       string
 	bindEmailURL       string
-	privacyRevokeURL   string
 }
 
 func (impl *user) GetByAccessToken(accessToken string) (userInfo authing.UserInfo, err error) {
@@ -159,32 +155,4 @@ func sendHttpRequest(req *http.Request, result interface{}) error {
 	_, err := hc.ForwardTo(req, result)
 
 	return err
-}
-
-// PrivacyRevoke sends a request to revoke privacy for the given user ID.
-func (impl *user) PrivacyRevoke(userid string) error {
-	var v = struct {
-		UserId string `json:"userId"`
-	}{
-		UserId: userid,
-	}
-
-	body, err := libutils.JsonMarshal(&v)
-	if err != nil {
-		return err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, impl.privacyRevokeURL, bytes.NewBuffer(body))
-	if err != nil {
-		return err
-	}
-
-	token, err := impl.getManagerToken()
-	if err != nil {
-		return err
-	}
-
-	req.Header.Add("token", token)
-
-	return sendHttpRequest(req, nil)
 }
