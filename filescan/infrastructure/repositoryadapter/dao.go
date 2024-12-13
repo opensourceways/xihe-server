@@ -69,10 +69,18 @@ func (impl *daoImpl) Create(ctx context.Context, value any) error {
 }
 
 // GetRecordsOnDisjunction returns results by multiple conditions on disjunction
-func (impl *daoImpl) GetRecordsOnDisjunction(ctx context.Context, filter []map[string]any, results any) error {
-	db := impl.db().Where("1 = 0")
-	for _, cond := range filter {
-		db = db.Or(cond)
+func (impl *daoImpl) GetRecordsOnDisjunction(ctx context.Context, conditions []map[string]any, results any) error {
+	if len(conditions) == 0 {
+		return repository.NewErrorResourceNotExists(errors.New("no query conditions"))
+	}
+
+	db := impl.db()
+	for i, cond := range conditions {
+		if i == 0 {
+			db = db.Where(cond)
+		} else {
+			db = db.Or(db.Where(cond))
+		}
 	}
 
 	err := db.Find(results).Error

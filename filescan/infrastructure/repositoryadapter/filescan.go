@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	"github.com/opensourceways/xihe-server/filescan/domain"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -118,38 +117,25 @@ func (adapter *fileScanAdapter) AddList(
 func (adapter *fileScanAdapter) FindByRepoIdAndFiles(
 	ctx context.Context, queries []domain.FileScan,
 ) ([]domain.FileScan, error) {
-	filter := make([]map[string]any, 0, len(queries))
+	conditions := make([]map[string]any, 0, len(queries))
 
 	for _, v := range queries {
-		filter = append(filter, map[string]any{
+		conditions = append(conditions, map[string]any{
 			"repo_id": v.RepoId,
 			"dir":     v.Dir,
 			"file":    v.File,
 		})
 	}
 
-	// var results []fileScanDO
-	// if err := adapter.GetRecordsOnDisjunction(ctx, filter, results); err != nil {
-	// 	logrus.Infof("=============================== query: %+v, err: %+v", queries, err)
-	// 	return nil, err
-	// }
-
-	// logrus.Infof("=============================== query: %+v, FindByRepoIdAndFiles: %+v", queries, results)
-	// XXX: Inefficiency
-	var fileScanList []domain.FileScan
-	for _, cond := range filter {
-		var result fileScanDO
-		if err := adapter.GetRecord(cond, &result); err != nil {
-			logrus.WithField("cond", cond).Warnf("fail to fetch data, err: %s", err.Error())
-			continue
-		}
-		fileScanList = append(fileScanList, result.toFileScan())
+	var results []fileScanDO
+	if err := adapter.GetRecordsOnDisjunction(ctx, conditions, &results); err != nil {
+		return nil, err
 	}
 
-	// var fileScanList []domain.FileScan
-	// for _, result := range results {
-	// 	fileScanList = append(fileScanList, result.toFileScan())
-	// }
+	var fileScanList []domain.FileScan
+	for _, result := range results {
+		fileScanList = append(fileScanList, result.toFileScan())
+	}
 
 	return fileScanList, nil
 }
