@@ -29,7 +29,6 @@ type fileScanDO struct {
 	ModerationResult string    `gorm:"column:moderation_result"`
 	CreatedAt        time.Time `gorm:"column:created_at"`
 	UpdatedAt        time.Time `gorm:"column:updated_at"`
-	Xxxxx            string    `gorm:"column:xxxxx"`
 }
 
 func (fileScanDO) TableName() string {

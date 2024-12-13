@@ -75,7 +75,7 @@ func (impl *daoImpl) GetRecordsOnDisjunction(ctx context.Context, filter []map[s
 		db = db.Or(cond)
 	}
 
-	err := db.Debug().Find(results).Error
+	err := db.Find(results).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return repository.NewErrorResourceNotExists(errors.New("not found"))
 	}
