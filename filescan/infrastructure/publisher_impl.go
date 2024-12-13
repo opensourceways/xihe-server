@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"errors"
 	"path/filepath"
+	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -77,7 +78,7 @@ func (m moderationEventPublisher) Publish(event domain.ModerationEvent) error {
 }
 
 func (m moderationEventPublisher) getFileType(file string) primitive.FileType {
-	ext := filepath.Ext(file)
+	ext := strings.ToLower(filepath.Ext(file))
 
 	if m.markdownExt.Has(ext) {
 		return primitive.MarkdownFileType
