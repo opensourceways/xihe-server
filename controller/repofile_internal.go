@@ -66,10 +66,10 @@ func (ctl *RepoFileInternalController) Download(ctx *gin.Context) {
 	}
 
 	cmd := app.RepoFileDownloadCmd{
-		Type:        repoInfo.rt,
-		MyToken:     u.Token,
-		Resource:    repoInfo.ResourceSummary,
-		NotRecorded: ctx.GetBool("not_recorded"),
+		Type:     repoInfo.rt,
+		MyToken:  u.Token,
+		Resource: repoInfo.ResourceSummary,
+		Unrecord: ctx.Query("unrecord") == "true",
 	}
 
 	var err error
