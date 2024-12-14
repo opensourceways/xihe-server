@@ -11,7 +11,7 @@ func (t fileType) Value() int {
 }
 
 var (
-	UnKnownFileType  fileType = 0
+	UnknownFileType  fileType = 0
 	ImageFileType    fileType = 1
 	AudioFileType    fileType = 2
 	VideoFileType    fileType = 3

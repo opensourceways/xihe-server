@@ -1,7 +1,6 @@
 package infrastructure
 
 import (
-	"errors"
 	"path/filepath"
 	"strings"
 
@@ -18,6 +17,7 @@ type AuditTopics struct {
 	CreatePictureModerationTask string `json:"create_picture_moderation_task" required:"true"`
 	CreateVideoModerationTask   string `json:"create_video_moderation_task"   required:"true"`
 	CreateAudioModerationTask   string `json:"create_audio_moderation_task"   required:"true"`
+	CreateUnknownModerationTask string `json:"create_unknown_moderation_task"   required:"true"`
 }
 
 type AuditSupportedFileType struct {
@@ -72,9 +72,9 @@ func (m moderationEventPublisher) Publish(event domain.ModerationEvent) error {
 		return m.publisher.Publish(m.topics.CreateVideoModerationTask, event, nil)
 	case primitive.ImageFileType.Value():
 		return m.publisher.Publish(m.topics.CreatePictureModerationTask, event, nil)
+	default:
+		return m.publisher.Publish(m.topics.CreateUnknownModerationTask, event, nil)
 	}
-
-	return errors.New("unsupported file type")
 }
 
 func (m moderationEventPublisher) getFileType(file string) primitive.FileType {
@@ -94,5 +94,5 @@ func (m moderationEventPublisher) getFileType(file string) primitive.FileType {
 		return primitive.CodeFileType
 	}
 
-	return primitive.UnKnownFileType
+	return primitive.UnknownFileType
 }
