@@ -91,8 +91,8 @@ type ModifyFileScanListReq struct {
 	Modified []string `json:"modified"`
 }
 
-func (r ModifyFileScanListReq) toCmd() (app.LauchModerationCmd, error) {
-	cmd := app.LauchModerationCmd{
+func (r ModifyFileScanListReq) toCmd() (app.LaunchModerationCmd, error) {
+	cmd := app.LaunchModerationCmd{
 		RepoId:   r.RepoId,
 		Branch:   r.Branch,
 		RepoName: r.RepoName,

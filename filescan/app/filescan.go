@@ -18,7 +18,7 @@ type FileScanService interface {
 	Update(context.Context, CmdToUpdateFileScan) error
 	RemoveList(context.Context, RemoveFileScanListCmd) error
 	CreateList(context.Context, CreateFileScanListCmd) error
-	LaunchModeration(context.Context, LauchModerationCmd) error
+	LaunchModeration(context.Context, LaunchModerationCmd) error
 }
 
 func NewFileScanService(
@@ -118,7 +118,7 @@ func (s *fileScanService) CreateList(ctx context.Context, cmd CreateFileScanList
 	return nil
 }
 
-func (s *fileScanService) LaunchModeration(ctx context.Context, cmd LauchModerationCmd) error {
+func (s *fileScanService) LaunchModeration(ctx context.Context, cmd LaunchModerationCmd) error {
 	queries := make([]filescan.FileScan, 0, len(cmd.Modified))
 
 	for _, path := range cmd.Modified {

@@ -32,7 +32,7 @@ type CreateFileScanListCmd struct {
 	Added    []string
 }
 
-type LauchModerationCmd struct {
+type LaunchModerationCmd struct {
 	RepoId   int64
 	Owner    domain.Account
 	Branch   string
