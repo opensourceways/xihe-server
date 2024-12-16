@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
@@ -31,14 +30,12 @@ type SpaceappAppService interface {
 // NewSpaceappAppService creates a new instance of the space app service.
 func NewSpaceappAppService(
 	repo repository.SpaceAppRepository,
-	spaceRepo spacerepo.Project,
 	spaceRepoPg spacerepo.ProjectPg,
 	sse spaceappdomain.SeverSentEvent,
 	spacesender spacemesage.SpaceAppMessageProducer,
 ) *spaceappAppService {
 	return &spaceappAppService{
 		repo:        repo,
-		spaceRepo:   spaceRepo,
 		spaceRepoPg: spaceRepoPg,
 		sse:         sse,
 		spacesender: spacesender,
@@ -48,7 +45,6 @@ func NewSpaceappAppService(
 // spaceappAppService
 type spaceappAppService struct {
 	repo        repository.SpaceAppRepository
-	spaceRepo   spacerepo.Project
 	spaceRepoPg spacerepo.ProjectPg
 	sse         spaceappdomain.SeverSentEvent
 	spacesender spacemesage.SpaceAppMessageProducer
@@ -61,7 +57,7 @@ func (s *spaceappAppService) GetByName(
 	var dto SpaceAppDTO
 
 	space, err := s.spaceRepoPg.GetByName(index.Owner, index.Name)
-	fmt.Printf("================================space: %+v\n", space)
+
 	if err != nil {
 		logrus.WithField("space_index", index).Errorf("fail to get space, err: %s", err.Error())
 		return dto, err

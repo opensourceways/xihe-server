@@ -112,9 +112,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	collections := &cfg.Mongodb.Collections
 
-	proj := spacerepo.NewProjectRepository(
-		mongodb.NewProjectMapper(collections.Project),
-	)
+	// proj := spacerepo.NewProjectRepository(
+	// 	mongodb.NewProjectMapper(collections.Project),
+	// )
 
 	model := repositories.NewModelRepository(
 		mongodb.NewModelMapper(collections.Model),
@@ -228,7 +228,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	courseAppService := courseapp.NewCourseService(
 		courseusercli.NewUserCli(userRegService),
-		proj, spacerepo.ProjectAdapter(),
+		spacerepo.ProjectAdapter(),
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
@@ -281,12 +281,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
 
 	projectService := spaceapp.NewProjectService(
-		user, proj, spacerepo.ProjectAdapter(), model, dataset, activity, resProducer, computilityService, spaceProducer,
+		user, spacerepo.ProjectAdapter(), model, dataset, activity, resProducer, computilityService, spaceProducer,
 	)
 
-	modelService := app.NewModelService(user, model, proj, projPg, dataset, activity, nil, resProducer)
+	modelService := app.NewModelService(user, model, projPg, dataset, activity, nil, resProducer)
 
-	datasetService := app.NewDatasetService(user, dataset, proj, projPg, model, activity, nil, resProducer)
+	datasetService := app.NewDatasetService(user, dataset, projPg, model, activity, nil, resProducer)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	internal := engine.Group("internal")
@@ -330,26 +330,26 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	// projectMessageService := app.NewProjectMessageService(proj, projPg)
 
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
-		spaceappRepository, proj, projPg, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
+		spaceappRepository, projPg, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
 	)
 
 	{
 		controller.AddRouterForProjectController(
-			v1, user, proj, model, dataset, activity, tags, like, resProducer,
+			v1, user, model, dataset, activity, tags, like, resProducer,
 			newPlatformRepository, computilityService, spaceProducer, projPg,
 		)
 		controller.AddRouterForProjectInternalController(
-			internal, user, proj, model, dataset, activity, tags, like, resProducer,
+			internal, user, model, dataset, activity, tags, like, resProducer,
 			newPlatformRepository, computilityService, spaceProducer, projPg,
 		)
 
 		controller.AddRouterForModelController(
-			v1, user, model, proj, projPg, dataset, activity, tags, like, resProducer,
+			v1, user, model, projPg, dataset, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
 		controller.AddRouterForDatasetController(
-			v1, user, dataset, model, proj, projPg, activity, tags, like, resProducer,
+			v1, user, dataset, model, projPg, activity, tags, like, resProducer,
 			newPlatformRepository,
 		)
 
@@ -363,11 +363,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForLikeController(
-			v1, like, user, proj, projPg, model, dataset, activity, likeAdapter,
+			v1, like, user, projPg, model, dataset, activity, likeAdapter,
 		)
 
 		controller.AddRouterForActivityController(
-			v1, activity, user, proj, projPg, model, dataset,
+			v1, activity, user, projPg, model, dataset,
 		)
 
 		controller.AddRouterForAICCFinetuneController(
@@ -383,7 +383,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForTrainingController(
-			v1, trainingAdapter, training, model, proj, projPg, dataset,
+			v1, trainingAdapter, training, model, projPg, dataset,
 			messages.NewTrainingMessageAdapter(
 				&cfg.Training.Message, publisher,
 			),
@@ -394,23 +394,23 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForRepoFileController(
-			v1, gitlabRepo, model, proj, projPg, dataset, repoAdapter, userAppService,
+			v1, gitlabRepo, model, projPg, dataset, repoAdapter, userAppService,
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, proj, projPg, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
+			v1, gitlabRepo, projPg, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
 		)
 
 		controller.AddRouterForInferenceInternalController(
-			internal, gitlabRepo, proj, projPg, sender, userWhiteListService, spaceappSender, spaceappRepository,
+			internal, gitlabRepo, projPg, sender, userWhiteListService, spaceappSender, spaceappRepository,
 		)
 
 		controller.AddRouterForSearchController(
-			v1, user, proj, projPg, model, dataset,
+			v1, user, projPg, model, dataset,
 		)
 
 		controller.AddRouterForCompetitionController(
-			v1, competitionAppService, userRegService, proj, projPg,
+			v1, competitionAppService, userRegService, projPg,
 		)
 
 		controller.AddRouterForPromotionController(
@@ -422,7 +422,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForCourseController(
-			v1, courseAppService, userRegService, proj, projPg, user,
+			v1, courseAppService, userRegService, projPg, user,
 		)
 
 		controller.AddRouterForHomeController(

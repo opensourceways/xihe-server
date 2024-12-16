@@ -19,7 +19,7 @@ import (
 func AddRouterForProjectInternalController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
-	repo spacerepo.Project,
+
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -33,13 +33,13 @@ func AddRouterForProjectInternalController(
 ) {
 	ctl := ProjectInternalController{
 		user:    user,
-		repo:    repo,
+		repoPg:  repoPg,
 		model:   model,
 		dataset: dataset,
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repo, repoPg, model, dataset, activity, sender, computility, spaceProducer,
+			user, repoPg, model, dataset, activity, sender, computility, spaceProducer,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
@@ -51,9 +51,9 @@ func AddRouterForProjectInternalController(
 type ProjectInternalController struct {
 	baseController
 
-	user userrepo.User
-	repo spacerepo.Project
-	s    spaceapp.ProjectService
+	user   userrepo.User
+	repoPg spacerepo.ProjectPg
+	s      spaceapp.ProjectService
 
 	model   repository.Model
 	dataset repository.Dataset

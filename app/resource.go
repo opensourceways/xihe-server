@@ -51,7 +51,6 @@ func (cmd *ResourceListCmd) ToResourceListOption() repository.ResourceListOption
 type ResourceService struct {
 	User      userrepo.User
 	Model     repository.Model
-	Project   spacerepo.Project
 	ProjectPg spacerepo.ProjectPg
 	Dataset   repository.Dataset
 }

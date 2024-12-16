@@ -155,13 +155,11 @@ type ProjectMessageService interface {
 }
 
 type projectMessageService struct {
-	repo   spacerepo.Project
 	repoPg spacerepo.ProjectPg
 }
 
 func NewProjectMessageService(repo spacerepo.Project, repoPg spacerepo.ProjectPg) ProjectMessageService {
 	return projectMessageService{
-		repo:   repo,
 		repoPg: repoPg,
 	}
 }

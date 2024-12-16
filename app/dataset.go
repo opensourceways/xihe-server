@@ -127,7 +127,6 @@ type DatasetService interface {
 func NewDatasetService(
 	user userrepo.User,
 	repo repository.Dataset,
-	proj spacerepo.Project,
 	projPg spacerepo.ProjectPg,
 	model repository.Model,
 	activity repository.Activity,
@@ -141,7 +140,6 @@ func NewDatasetService(
 		rs: ResourceService{
 			User:      user,
 			Model:     model,
-			Project:   proj,
 			ProjectPg: projPg,
 			Dataset:   repo,
 		},

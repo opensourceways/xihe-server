@@ -65,7 +65,6 @@ func NewInferenceService(
 	minSurvivalTime int,
 	spacesender spacemesage.SpaceAppMessageProducer,
 	spaceappRepo spaceapprepo.SpaceAppRepository,
-	spaceRepo spacerepo.Project,
 	spaceRepoPg spacerepo.ProjectPg,
 ) InferenceService {
 	return inferenceService{
@@ -74,7 +73,6 @@ func NewInferenceService(
 		spacesender:     spacesender,
 		minSurvivalTime: int64(minSurvivalTime),
 		spaceappRepo:    spaceappRepo,
-		spaceRepo:       spaceRepo,
 		spaceRepoPg:     spaceRepoPg,
 	}
 }
@@ -86,7 +84,6 @@ type inferenceService struct {
 	spacesender     spacemesage.SpaceAppMessageProducer
 	minSurvivalTime int64
 	spaceappRepo    spaceapprepo.SpaceAppRepository
-	spaceRepo       spacerepo.Project
 	spaceRepoPg     spacerepo.ProjectPg
 }
 

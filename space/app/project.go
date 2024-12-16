@@ -124,7 +124,6 @@ type ProjectService interface {
 
 func NewProjectService(
 	user userrepo.User,
-	repo spacerepo.Project,
 	repoPg spacerepo.ProjectPg,
 	model repository.Model,
 	dataset repository.Dataset,
@@ -134,14 +133,12 @@ func NewProjectService(
 	spaceProducer spacedomain.SpaceEventProducer,
 ) ProjectService {
 	return projectService{
-		repo:     repo,
 		repoPg:   repoPg,
 		activity: activity,
 		sender:   sender,
 		rs: app.ResourceService{
 			User:      user,
 			Model:     model,
-			Project:   repo,
 			ProjectPg: repoPg,
 			Dataset:   dataset,
 		},
@@ -151,7 +148,6 @@ func NewProjectService(
 }
 
 type projectService struct {
-	repo           spacerepo.Project
 	repoPg         spacerepo.ProjectPg
 	activity       repository.Activity
 	sender         message.ResourceProducer
@@ -243,7 +239,6 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	}
 
 	s.toProjectDTO(&p, &dto)
-	fmt.Printf("==========================dto: %+v\n", dto)
 
 	// add activity
 	r, repoType := p.ResourceObject()
@@ -337,7 +332,6 @@ func (s projectService) GetByName(
 	allowPrivacy bool,
 ) (dto ProjectDetailDTO, err error) {
 	v, err := s.repoPg.GetByName(owner, name)
-	fmt.Printf("=========================v: %+v\n", v)
 	if err != nil {
 		return
 	}
