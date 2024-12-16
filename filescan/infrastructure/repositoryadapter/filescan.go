@@ -97,8 +97,8 @@ func (adapter *fileScanAdapter) AddList(
 ) ([]domain.FileScan, error) {
 	fileScanListDO := make([]*fileScanDO, 0)
 
-	for _, v := range fileScanList {
-		do := toFileScanDO(&v)
+	for i := range fileScanList {
+		do := toFileScanDO(&fileScanList[i])
 		fileScanListDO = append(fileScanListDO, &do)
 	}
 
