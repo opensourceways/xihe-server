@@ -80,10 +80,16 @@ type RepoDirFile struct {
 }
 
 type RepoPathItem struct {
-	Path      string `json:"path"`
-	Name      string `json:"name"`
-	IsDir     bool   `json:"is_dir"`
-	IsLFSFile bool   `json:"is_lfs_file"`
+	Path      string         `json:"path"`
+	Name      string         `json:"name"`
+	IsDir     bool           `json:"is_dir"`
+	IsLFSFile bool           `json:"is_lfs_file"`
+	FileScan  FileScanResult `json:"filescan"`
+}
+
+type FileScanResult struct {
+	ModerationStatus string `json:"moderation_status"`
+	ModerationResult string `json:"moderation_result"`
 }
 
 type RepoFile interface {
