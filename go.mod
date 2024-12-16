@@ -1,6 +1,6 @@
 module github.com/opensourceways/xihe-server
 
-go 1.23.2
+go 1.21
 
 require (
 	github.com/bwmarrin/snowflake v0.3.0
