@@ -17,8 +17,8 @@ import (
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
 
-	"github.com/opensourceways/xihe-audit-sync-sdk/space"
-	spaceapi "github.com/opensourceways/xihe-audit-sync-sdk/space/api"
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 )
 
 func AddRouterForProjectController(
@@ -181,11 +181,30 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 	}
 	//sdk text audit
 	projName := cmd.Name.ResourceName()
-	var resp space.ModerationDTO
-	resp, _, err = spaceapi.Text(projName, "title")
+	var resp audit.ModerationDTO
+	resp, _, err = auditapi.Text(projName, "title")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, resp)
+		return
+	}
+
+	title := cmd.Title.ResourceTitle()
 	fmt.Printf("========================resp: %+v\n", resp)
 	fmt.Printf("========================err: %+v\n", err)
+	resp, _, err = auditapi.Text(title, "title")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, resp)
+		return
+	}
 
+	desc := cmd.Desc.ResourceDesc()
+	resp, _, err = auditapi.Text(desc, "profile")
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
@@ -343,6 +362,28 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 	pr := ctl.newPlatformRepository(
 		pl.PlatformToken, pl.PlatformUserNamespaceId,
 	)
+
+	//sdk text audit
+	title := cmd.Title.ResourceTitle()
+	var resp audit.ModerationDTO
+	resp, _, err = auditapi.Text(title, "title")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, resp)
+		return
+	}
+
+	desc := cmd.Desc.ResourceDesc()
+	resp, _, err = auditapi.Text(desc, "profile")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, resp)
+		return
+	}
 
 	d, err := ctl.s.Update(&proj, &cmd, pr)
 	if err != nil {

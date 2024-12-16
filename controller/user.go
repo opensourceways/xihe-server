@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
-	"github.com/opensourceways/xihe-audit-sync-sdk/space"
-	spaceapi "github.com/opensourceways/xihe-audit-sync-sdk/space/api"
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
@@ -531,8 +531,8 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 	}
 	//sdk text audit
 	bio := cmd2.Bio.Bio()
-	var resp space.ModerationDTO
-	resp, _, err = spaceapi.Text(bio, "profile")
+	var resp audit.ModerationDTO
+	resp, _, err = auditapi.Text(bio, "profile")
 	fmt.Printf("========================resp: %+v\n", resp)
 	fmt.Printf("========================err: %+v\n", err)
 

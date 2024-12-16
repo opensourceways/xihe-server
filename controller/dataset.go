@@ -5,6 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -149,6 +151,28 @@ func (ctl *DatasetController) Create(ctx *gin.Context) {
 		return
 	}
 
+	//sdk text audit
+	var resp audit.ModerationDTO
+	desc := cmd.Desc.ResourceDesc()
+	resp, _, err = auditapi.Text(desc, "profile")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, resp)
+		return
+	}
+
+	title := cmd.Title.ResourceTitle()
+	resp, _, err = auditapi.Text(title, "title")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, resp)
+		return
+	}
+
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "creat dataset")
 
 	if pl.isNotMe(cmd.Owner) {
@@ -283,6 +307,27 @@ func (ctl *DatasetController) Update(ctx *gin.Context) {
 
 	pl, _, ok := ctl.checkUserApiToken(ctx, false)
 	if !ok {
+		return
+	}
+
+	var resp audit.ModerationDTO
+	desc := cmd.Desc.ResourceDesc()
+	resp, _, err = auditapi.Text(desc, "profile")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, resp)
+		return
+	}
+
+	title := cmd.Title.ResourceTitle()
+	resp, _, err = auditapi.Text(title, "title")
+	if err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	} else if resp.Result != "pass" {
+		ctl.sendRespModerateFail(ctx, resp)
 		return
 	}
 

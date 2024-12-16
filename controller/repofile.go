@@ -9,8 +9,8 @@ import (
 
 	"path/filepath"
 
-	"github.com/opensourceways/xihe-audit-sync-sdk/space"
-	spaceapi "github.com/opensourceways/xihe-audit-sync-sdk/space/api"
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -110,8 +110,8 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 	// get file name
 	fileName := filepath.Base(ctx.Param("type"))
 	//audit text
-	var resp space.ModerationDTO
-	resp, _, err = spaceapi.Text(fileName, "title")
+	var resp audit.ModerationDTO
+	resp, _, err = auditapi.Text(fileName, "title")
 	fmt.Printf("========================resp: %+v\n", resp)
 	fmt.Printf("========================err: %+v\n", err)
 
