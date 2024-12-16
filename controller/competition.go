@@ -17,13 +17,11 @@ func AddRouterForCompetitionController(
 	rg *gin.RouterGroup,
 	s app.CompetitionService,
 	us userapp.RegService,
-	project spacerepo.Project,
 	projectPg spacerepo.ProjectPg,
 ) {
 	ctl := CompetitionController{
 		s:         s,
 		us:        us,
-		project:   project,
 		projectPg: projectPg,
 	}
 
@@ -50,7 +48,6 @@ type CompetitionController struct {
 
 	s         app.CompetitionService
 	us        userapp.RegService
-	project   spacerepo.Project
 	projectPg spacerepo.ProjectPg
 }
 

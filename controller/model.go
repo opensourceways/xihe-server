@@ -19,7 +19,6 @@ func AddRouterForModelController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
 	repo repository.Model,
-	proj spacerepo.Project,
 	projPg spacerepo.ProjectPg,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -34,7 +33,7 @@ func AddRouterForModelController(
 		dataset: dataset,
 		tags:    tags,
 		like:    like,
-		s:       app.NewModelService(user, repo, proj, projPg, dataset, activity, nil, sender),
+		s:       app.NewModelService(user, repo, projPg, dataset, activity, nil, sender),
 
 		newPlatformRepository: newPlatformRepository,
 	}

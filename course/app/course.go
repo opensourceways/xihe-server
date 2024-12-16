@@ -31,7 +31,6 @@ type CourseService interface {
 func NewCourseService(
 	userCli user.User,
 
-	projectRepo spacerepo.Project,
 	projectRepoPg spacerepo.ProjectPg,
 
 	courseRepo repository.Course,
@@ -43,7 +42,6 @@ func NewCourseService(
 ) *courseService {
 	return &courseService{
 		userCli:       userCli,
-		projectRepo:   projectRepo,
 		projectRepoPg: projectRepoPg,
 
 		courseRepo: courseRepo,
@@ -58,7 +56,6 @@ func NewCourseService(
 type courseService struct {
 	userCli       user.User
 	userRepo      userrepo.User
-	projectRepo   spacerepo.Project
 	projectRepoPg spacerepo.ProjectPg
 
 	courseRepo repository.Course

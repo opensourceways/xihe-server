@@ -20,7 +20,6 @@ func AddRouterForRepoFileController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
 	model repository.Model,
-	project spacerepo.Project,
 	projectPg spacerepo.ProjectPg,
 	dataset repository.Dataset,
 	sender message.RepoMessageProducer,
@@ -30,7 +29,6 @@ func AddRouterForRepoFileController(
 		s:         app.NewRepoFileService(p, sender),
 		us:        us,
 		model:     model,
-		project:   project,
 		projectPg: projectPg,
 		dataset:   dataset,
 	}
@@ -53,7 +51,6 @@ type RepoFileController struct {
 	s         app.RepoFileService
 	us        uapp.UserService
 	model     repository.Model
-	project   spacerepo.Project
 	projectPg spacerepo.ProjectPg
 	dataset   repository.Dataset
 }

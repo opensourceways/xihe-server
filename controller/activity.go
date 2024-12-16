@@ -16,13 +16,12 @@ func AddRouterForActivityController(
 	rg *gin.RouterGroup,
 	repo repository.Activity,
 	user userrepo.User,
-	proj spacerepo.Project,
 	projPg spacerepo.ProjectPg,
 	model repository.Model,
 	dataset repository.Dataset,
 ) {
 	ctl := ActivityController{
-		s: app.NewActivityService(repo, user, model, proj, projPg, dataset),
+		s: app.NewActivityService(repo, user, model, projPg, dataset),
 	}
 
 	rg.GET("/v1/user/activity/:account", ctl.List)

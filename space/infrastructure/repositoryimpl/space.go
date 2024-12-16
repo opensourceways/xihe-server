@@ -173,9 +173,7 @@ func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceLi
 	[]spacedomain.ProjectSummary, error,
 ) {
 	var projectSummaries []spacedomain.ProjectSummary
-	fmt.Printf("======================opts: %+v\n", opts)
 	for _, opt := range opts {
-		fmt.Printf("======================opt: %+v\n", opt)
 		var projects []projectDO
 		query := adapter.db().Where("owner = ? AND id IN (?)", opt.Owner.Account(), opt.Ids).Order("updated_at DESC")
 		//nil error
@@ -824,7 +822,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 	if err := adapter.dbTag().Create(&newTagsDOs).Error; err != nil {
 		return repositories.ConvertError(err)
 	}
-	fmt.Printf("======================newTagsDOs: %+v\n", newTagsDOs)
+
 	return nil
 }
 

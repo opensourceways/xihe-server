@@ -11,15 +11,14 @@ import (
 func AddRouterForMessageInternalController(
 	rg *gin.RouterGroup,
 	message app.ProjectMessageService,
-	repo spacerepo.Project,
 	repoPg spacerepo.ProjectPg,
 ) {
 	ctl := MessageInternalController{
 		message: message,
 	}
-	rg.PUT("/space/like/", ctl.ChangeProjectLike)
-	rg.PUT("/space//fork/", ctl.IncreaseFork)
-	rg.PUT("/space/download/", ctl.IncreaseDownload)
+	rg.PUT("/space/like", ctl.ChangeProjectLike)
+	rg.PUT("/space//fork", ctl.IncreaseFork)
+	rg.PUT("/space/download", ctl.IncreaseDownload)
 }
 
 type MessageInternalController struct {

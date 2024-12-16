@@ -18,7 +18,6 @@ func AddRouterForLikeController(
 	rg *gin.RouterGroup,
 	repo repository.Like,
 	user userrepo.User,
-	proj spacerepo.Project,
 	projPg spacerepo.ProjectPg,
 	model repository.Model,
 	dataset repository.Dataset,
@@ -27,10 +26,9 @@ func AddRouterForLikeController(
 ) {
 	ctl := LikeController{
 		s: app.NewLikeService(
-			repo, user, model, proj, projPg,
+			repo, user, model, projPg,
 			dataset, activity, sender,
 		),
-		proj:    proj,
 		projPg:  projPg,
 		model:   model,
 		dataset: dataset,
@@ -46,7 +44,6 @@ type LikeController struct {
 
 	s app.LikeService
 
-	proj    spacerepo.Project
 	projPg  spacerepo.ProjectPg
 	model   repository.Model
 	dataset repository.Dataset

@@ -16,15 +16,14 @@ func AddRouterForCourseController(
 
 	s app.CourseService,
 	us userapp.RegService,
-	project spacerepo.Project,
 	projectPg spacerepo.ProjectPg,
 	user userrepo.User,
 ) {
 	ctl := CourseController{
-		s:       s,
-		us:      us,
-		project: project,
-		user:    user,
+		s:         s,
+		us:        us,
+		projectPg: projectPg,
+		user:      user,
 	}
 
 	rg.POST("/v1/course/:id/player", ctl.Apply)
@@ -44,7 +43,6 @@ type CourseController struct {
 
 	s         app.CourseService
 	us        userapp.RegService
-	project   spacerepo.Project
 	projectPg spacerepo.ProjectPg
 	user      userrepo.User
 }
