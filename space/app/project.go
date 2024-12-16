@@ -2,7 +2,6 @@ package app
 
 import (
 	"errors"
-	"fmt"
 
 	sdk "github.com/opensourceways/xihe-sdk/space"
 	"github.com/sirupsen/logrus"
