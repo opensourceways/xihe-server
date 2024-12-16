@@ -530,20 +530,18 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 		return
 	}
 	//sdk text audit
-	bio := cmd2.Bio.Bio()
 	var resp audit.ModerationDTO
-	resp, _, err = auditapi.Text(bio, "profile")
-	fmt.Printf("========================resp: %+v\n", resp)
-	fmt.Printf("========================err: %+v\n", err)
-
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, resp)
-		return
+	bio := cmd2.Bio.Bio()
+	if bio != "" {
+		resp, _, err = auditapi.Text(bio, "profile")
+		if err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+			return
+		} else if resp.Result != "pass" {
+			ctl.sendRespModerateFail(ctx, resp)
+			return
+		}
 	}
-
 	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd2); err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 

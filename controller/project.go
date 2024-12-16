@@ -180,9 +180,11 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 		return
 	}
 	//sdk text audit
-	projName := cmd.Name.ResourceName()
 	var resp audit.ModerationDTO
-	resp, _, err = auditapi.Text(projName, "title")
+
+	name := cmd.Name.ResourceName()
+
+	resp, _, err = auditapi.Text(name, "title")
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
@@ -192,27 +194,29 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 	}
 
 	title := cmd.Title.ResourceTitle()
-	fmt.Printf("========================resp: %+v\n", resp)
-	fmt.Printf("========================err: %+v\n", err)
-	resp, _, err = auditapi.Text(title, "title")
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, resp)
-		return
+	if title != "" {
+		resp, _, err = auditapi.Text(title, "title")
+		fmt.Printf("========================resp: %+v\n", resp)
+		fmt.Printf("========================err: %+v\n", err)
+		if err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+			return
+		} else if resp.Result != "pass" {
+			ctl.sendRespModerateFail(ctx, resp)
+			return
+		}
 	}
-
 	desc := cmd.Desc.ResourceDesc()
-	resp, _, err = auditapi.Text(desc, "profile")
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, resp)
-		return
+	if desc != "" {
+		resp, _, err = auditapi.Text(desc, "profile")
+		if err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+			return
+		} else if resp.Result != "pass" {
+			ctl.sendRespModerateFail(ctx, resp)
+			return
+		}
 	}
-
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create project")
 
 	pr := ctl.newPlatformRepository(

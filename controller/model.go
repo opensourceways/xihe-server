@@ -168,8 +168,10 @@ func (ctl *ModelController) Create(ctx *gin.Context) {
 	}
 	//sdk text audit
 	var resp audit.ModerationDTO
-	desc := cmd.Desc.ResourceDesc()
-	resp, _, err = auditapi.Text(desc, "profile")
+
+	name := cmd.Name.ResourceName()
+
+	resp, _, err = auditapi.Text(name, "title")
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 		return
@@ -179,13 +181,26 @@ func (ctl *ModelController) Create(ctx *gin.Context) {
 	}
 
 	title := cmd.Title.ResourceTitle()
-	resp, _, err = auditapi.Text(title, "title")
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, resp)
-		return
+	if title != "" {
+		resp, _, err = auditapi.Text(title, "title")
+		if err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+			return
+		} else if resp.Result != "pass" {
+			ctl.sendRespModerateFail(ctx, resp)
+			return
+		}
+	}
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		resp, _, err = auditapi.Text(desc, "profile")
+		if err != nil {
+			ctl.sendRespWithInternalError(ctx, newResponseError(err))
+			return
+		} else if resp.Result != "pass" {
+			ctl.sendRespModerateFail(ctx, resp)
+			return
+		}
 	}
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create model")
