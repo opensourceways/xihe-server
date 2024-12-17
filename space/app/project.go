@@ -19,6 +19,9 @@ import (
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 )
 
 type ProjectCreateCmd struct {
@@ -160,6 +163,49 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 }
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
+	//sdk text audit
+	var resp audit.ModerationDTO
+
+	name := cmd.Name.ResourceName()
+
+	resp, _, err = auditapi.Text(name, "title")
+	if err != nil {
+		return ProjectDTO{}, allerror.New(
+			allerror.ErrorCodeFailToModerate,
+			resp.Result, err)
+	} else if resp.Result != "pass" {
+		return ProjectDTO{}, allerror.New(
+			allerror.ErrorCodeModerateUnpass,
+			resp.Result, err)
+	}
+
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		resp, _, err = auditapi.Text(title, "title")
+		if err != nil {
+			return ProjectDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				resp.Result, err)
+		} else if resp.Result != "pass" {
+			return ProjectDTO{}, allerror.New(
+				allerror.ErrorCodeModerateUnpass,
+				resp.Result, err)
+		}
+	}
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		resp, _, err = auditapi.Text(desc, "profile")
+		if err != nil {
+			return ProjectDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				resp.Result, err)
+		} else if resp.Result != "pass" {
+			return ProjectDTO{}, allerror.New(
+				allerror.ErrorCodeModerateUnpass,
+				resp.Result, err)
+		}
+	}
+	
 	v := new(spacedomain.Project)
 	cmd.toProject(v)
 	count := v.GetQuotaCount()

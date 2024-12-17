@@ -3,6 +3,9 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -54,6 +57,36 @@ func (cmd *ModelUpdateCmd) toModel(
 func (s modelService) Update(
 	m *domain.Model, cmd *ModelUpdateCmd, pr platform.Repository,
 ) (dto ModelDTO, err error) {
+	//sdk text audit
+	var resp audit.ModerationDTO
+
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		resp, _, err = auditapi.Text(title, "title")
+		if err != nil {
+			return ModelDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				resp.Result, err)
+		} else if resp.Result != "pass" {
+			return ModelDTO{}, allerror.New(
+				allerror.ErrorCodeModerateUnpass,
+				resp.Result, err)
+		}
+	}
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		resp, _, err = auditapi.Text(desc, "profile")
+		if err != nil {
+			return ModelDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				resp.Result, err)
+		} else if resp.Result != "pass" {
+			return ModelDTO{}, allerror.New(
+				allerror.ErrorCodeModerateUnpass,
+				resp.Result, err)
+		}
+	}
+
 	opt := new(platform.RepoOption)
 	if !cmd.toModel(&m.ModelModifiableProperty, opt) {
 		s.toModelDTO(m, &dto)

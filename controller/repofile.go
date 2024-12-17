@@ -7,10 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"path/filepath"
-
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -104,22 +100,6 @@ func (ctl *RepoFileController) Create(ctx *gin.Context) {
 			errorBadRequestParam, err,
 		))
 
-		return
-	}
-	//sdk text audit
-	// get file name
-	fileName := filepath.Base(ctx.Param("type"))
-	//audit text
-	var resp audit.ModerationDTO
-	resp, _, err = auditapi.Text(fileName, "title")
-	fmt.Printf("========================resp: %+v\n", resp)
-	fmt.Printf("========================err: %+v\n", err)
-
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, resp)
 		return
 	}
 

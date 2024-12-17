@@ -3,7 +3,10 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/app"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -67,6 +70,36 @@ func (cmd *ProjectUpdateCmd) toProject(
 func (s projectService) Update(
 	p *spacedomain.Project, cmd *ProjectUpdateCmd, pr platform.Repository,
 ) (dto ProjectDTO, err error) {
+	//sdk text audit
+	var resp audit.ModerationDTO
+
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		resp, _, err = auditapi.Text(title, "title")
+		if err != nil {
+			return ProjectDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				resp.Result, err)
+		} else if resp.Result != "pass" {
+			return ProjectDTO{}, allerror.New(
+				allerror.ErrorCodeModerateUnpass,
+				resp.Result, err)
+		}
+	}
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		resp, _, err = auditapi.Text(desc, "profile")
+		if err != nil {
+			return ProjectDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				resp.Result, err)
+		} else if resp.Result != "pass" {
+			return ProjectDTO{}, allerror.New(
+				allerror.ErrorCodeModerateUnpass,
+				resp.Result, err)
+		}
+	}
+
 	opt := new(platform.RepoOption)
 	if !cmd.toProject(&p.ProjectModifiableProperty, opt) {
 		s.toProjectDTO(p, &dto)

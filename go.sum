@@ -1080,8 +1080,6 @@ github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1 
 github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1/go.mod h1:KM9s7Ws5FQdBv8suFTLXNtrvOphxFSgIvYaDWEvN3xQ=
 github.com/opensourceways/xihe-audit-sync-sdk v0.0.0-20241216061822-f9bf23a88e08 h1:tsgRYkS1+pPMdQ7+EsLUW0b6MpZe3ExdiXyDcnU5UGY=
 github.com/opensourceways/xihe-audit-sync-sdk v0.0.0-20241216061822-f9bf23a88e08/go.mod h1:JxhcZPxAt0FZCqyaRdmHg7lRupZ7wqDqEROuHf0u/E8=
-github.com/opensourceways/xihe-audit-sync-sdk v1.0.0-temp h1:tJT8tpBJJ3ywU20v685FNoA8cN4sG6RMsO0VOR1e6e0=
-github.com/opensourceways/xihe-audit-sync-sdk v1.0.0-temp/go.mod h1:U2z+jr9bwR4KhWubu4o5iV18waNpFvU0Xnq03rhghX4=
 github.com/opensourceways/xihe-extra-services v1.3.0 h1:p5jRvnjMQeIQdLw/pha5jsOxXbvYMnzzpv6MInz+QWI=
 github.com/opensourceways/xihe-extra-services v1.3.0/go.mod h1:umthEXsl3BqIcQlNbfKx2VeOTUI2pO8reMQwLahiwRk=
 github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43 h1:9u9AcfJeR2zvnjiJXrShL83LtEBhqD3GK7o45eVZ0o0=

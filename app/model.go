@@ -3,6 +3,9 @@ package app
 import (
 	"errors"
 
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -163,6 +166,49 @@ func (s modelService) CanApplyResourceName(owner domain.Account, name domain.Res
 }
 
 func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto ModelDTO, err error) {
+	//sdk text audit
+	var resp audit.ModerationDTO
+
+	name := cmd.Name.ResourceName()
+
+	resp, _, err = auditapi.Text(name, "title")
+	if err != nil {
+		return ModelDTO{}, allerror.New(
+			allerror.ErrorCodeFailToModerate,
+			resp.Result, err)
+	} else if resp.Result != "pass" {
+		return ModelDTO{}, allerror.New(
+			allerror.ErrorCodeModerateUnpass,
+			resp.Result, err)
+	}
+
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		resp, _, err = auditapi.Text(title, "title")
+		if err != nil {
+			return ModelDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				resp.Result, err)
+		} else if resp.Result != "pass" {
+			return ModelDTO{}, allerror.New(
+				allerror.ErrorCodeModerateUnpass,
+				resp.Result, err)
+		}
+	}
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		resp, _, err = auditapi.Text(desc, "profile")
+		if err != nil {
+			return ModelDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				resp.Result, err)
+		} else if resp.Result != "pass" {
+			return ModelDTO{}, allerror.New(
+				allerror.ErrorCodeModerateUnpass,
+				resp.Result, err)
+		}
+	}
+
 	pid, err := pr.New(&platform.RepoOption{
 		Name:     cmd.Name,
 		RepoType: cmd.RepoType,

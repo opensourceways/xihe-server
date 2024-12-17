@@ -16,9 +16,6 @@ import (
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
-
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 )
 
 func AddRouterForProjectController(
@@ -179,44 +176,7 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 
 		return
 	}
-	//sdk text audit
-	var resp audit.ModerationDTO
 
-	name := cmd.Name.ResourceName()
-
-	resp, _, err = auditapi.Text(name, "title")
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, resp)
-		return
-	}
-
-	title := cmd.Title.ResourceTitle()
-	if title != "" {
-		resp, _, err = auditapi.Text(title, "title")
-		fmt.Printf("========================resp: %+v\n", resp)
-		fmt.Printf("========================err: %+v\n", err)
-		if err != nil {
-			ctl.sendRespWithInternalError(ctx, newResponseError(err))
-			return
-		} else if resp.Result != "pass" {
-			ctl.sendRespModerateFail(ctx, resp)
-			return
-		}
-	}
-	desc := cmd.Desc.ResourceDesc()
-	if desc != "" {
-		resp, _, err = auditapi.Text(desc, "profile")
-		if err != nil {
-			ctl.sendRespWithInternalError(ctx, newResponseError(err))
-			return
-		} else if resp.Result != "pass" {
-			ctl.sendRespModerateFail(ctx, resp)
-			return
-		}
-	}
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "create project")
 
 	pr := ctl.newPlatformRepository(
@@ -366,28 +326,6 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 	pr := ctl.newPlatformRepository(
 		pl.PlatformToken, pl.PlatformUserNamespaceId,
 	)
-
-	//sdk text audit
-	title := cmd.Title.ResourceTitle()
-	var resp audit.ModerationDTO
-	resp, _, err = auditapi.Text(title, "title")
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, resp)
-		return
-	}
-
-	desc := cmd.Desc.ResourceDesc()
-	resp, _, err = auditapi.Text(desc, "profile")
-	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	} else if resp.Result != "pass" {
-		ctl.sendRespModerateFail(ctx, resp)
-		return
-	}
 
 	d, err := ctl.s.Update(&proj, &cmd, pr)
 	if err != nil {

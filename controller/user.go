@@ -7,8 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
@@ -529,19 +527,7 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 
 		return
 	}
-	//sdk text audit
-	var resp audit.ModerationDTO
-	bio := cmd2.Bio.Bio()
-	if bio != "" {
-		resp, _, err = auditapi.Text(bio, "profile")
-		if err != nil {
-			ctl.sendRespWithInternalError(ctx, newResponseError(err))
-			return
-		} else if resp.Result != "pass" {
-			ctl.sendRespModerateFail(ctx, resp)
-			return
-		}
-	}
+
 	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd2); err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 
