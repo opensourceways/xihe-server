@@ -173,7 +173,7 @@ func (ctl *ModelController) Create(ctx *gin.Context) {
 
 	d, err := ctl.s.Create(&cmd, pr)
 	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		SendError(ctx, err)
 
 		return
 	}
@@ -316,7 +316,7 @@ func (ctl *ModelController) Update(ctx *gin.Context) {
 
 	d, err := ctl.s.Update(&m, &cmd, pr)
 	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		SendError(ctx, err)
 
 		return
 	}
