@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// FileScanAppService is the app service of file scan.
+// FileScanService is the app service of file scan.
 type FileScanService interface {
 	Get(string, string) ([]filescan.FilescanRes, error)
 	Update(context.Context, CmdToUpdateFileScan) error
