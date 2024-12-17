@@ -684,6 +684,8 @@ definitions:
     type: object
   app.PromotionDTO:
     properties:
+      count:
+        type: integer
       desc:
         type: string
       duration:
@@ -702,8 +704,6 @@ definitions:
         type: string
       poster:
         type: string
-      registrants_num:
-        type: integer
       status:
         type: string
       total:
@@ -1114,6 +1114,10 @@ definitions:
         $ref: '#/definitions/app.GlobalModelsDTO'
       project:
         $ref: '#/definitions/app.GlobalProjectsDTO'
+      promotions:
+        items:
+          $ref: '#/definitions/app.PromotionDTO'
+        type: array
     type: object
   controller.JoinTeamRequest:
     properties:
@@ -5687,6 +5691,10 @@ paths:
         name: path
         required: true
         type: string
+      - description: whether record operation
+        in: query
+        name: not_recorded
+        type: boolean
       responses:
         "200":
           description: OK
@@ -5702,7 +5710,7 @@ paths:
             type: system_error
       summary: Download
       tags:
-      - RepoFile
+      - RepoFileInternal
   /v1/repo/{type}/{user}/{name}/file/{path}/preview:
     get:
       consumes:
@@ -5774,7 +5782,7 @@ paths:
             type: system_error
       summary: List
       tags:
-      - RepoFile
+      - RepoFileInternal
   /v1/repo/{type}/{user}/{name}/readme:
     get:
       consumes:
@@ -6017,6 +6025,43 @@ paths:
       summary: NotifyUpdateCode space
       tags:
       - SpaceInternal
+  /v1/stream/repo/{type}/{user}/{name}/file/{path}:
+    get:
+      consumes:
+      - application/octet-stream
+      description: Download repo file as data stream
+      parameters:
+      - description: user
+        in: path
+        name: user
+        required: true
+        type: string
+      - description: repo name
+        in: path
+        name: name
+        required: true
+        type: string
+      - description: repo file path
+        in: path
+        name: path
+        required: true
+        type: string
+      responses:
+        "200":
+          description: the byte of file
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: bad_request_param
+        "500":
+          description: Internal Server Error
+          schema:
+            type: system_error
+      summary: StreamDownload
+      tags:
+      - RepoFile
   /v1/tags/{type}:
     get:
       consumes:

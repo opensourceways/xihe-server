@@ -20,6 +20,7 @@ import (
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/course"
 	"github.com/opensourceways/xihe-server/domain"
+	"github.com/opensourceways/xihe-server/filescan/infrastructure"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/finetuneimpl"
@@ -76,6 +77,7 @@ type Config struct {
 	Computility  computility.Config              `json:"computility"`
 	SpaceApp     spaceapp.Config                 `json:"space_app"`
 	Space        space.Config                    `json:"space"`
+	Filescan     infrastructure.FileScanConfig   `json:"file_scan"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {

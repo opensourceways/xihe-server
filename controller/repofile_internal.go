@@ -10,6 +10,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	filescan "github.com/opensourceways/xihe-server/filescan/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	uapp "github.com/opensourceways/xihe-server/user/app"
 )
@@ -22,9 +23,10 @@ func AddRouterForRepoFileInternalController(
 	dataset repository.Dataset,
 	sender message.RepoMessageProducer,
 	us uapp.UserService,
+	f filescan.FileScanService,
 ) {
 	ctl := RepoFileInternalController{
-		s:       app.NewRepoFileService(p, sender),
+		s:       app.NewRepoFileService(p, sender, f),
 		us:      us,
 		model:   model,
 		project: project,
@@ -48,9 +50,10 @@ type RepoFileInternalController struct {
 // @Summary		Download
 // @Description	Download repo file
 // @Tags			RepoFileInternal
-// @Param			user	path	string	true	"user"
-// @Param			name	path	string	true	"repo name"
-// @Param			path	path	string	true	"repo file path"
+// @Param			user			path	string	true	"user"
+// @Param			name			path	string	true	"repo name"
+// @Param			path			path	string	true	"repo file path"
+// @Param			not_recorded	query	bool	false	"whether record operation"
 // @Accept			json
 // @Success		200	{object}			app.RepoFileDownloadDTO
 // @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
@@ -66,6 +69,7 @@ func (ctl *RepoFileInternalController) Download(ctx *gin.Context) {
 		Type:     repoInfo.rt,
 		MyToken:  u.Token,
 		Resource: repoInfo.ResourceSummary,
+		Unrecord: ctx.Query("unrecord") == "true",
 	}
 
 	var err error
