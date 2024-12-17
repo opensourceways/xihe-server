@@ -12,9 +12,8 @@ type FilescanDTO struct {
 
 // // CmdToUpdateFileScan is the command to update a file scan.
 type CmdToUpdateFileScan struct {
-	Id     int64
-	Status primitive.FileModerationResult
-	// domain.ScanItem
+	Id               int64
+	Status           primitive.FileModerationResult
 	FileType         string
 	ModerationResult primitive.FileModerationResult
 }

@@ -15,28 +15,11 @@ type ReqToUpdateFileScan struct {
 
 // ToCmdToUpdateFileScan converts the request to the command.
 func (r *ReqToUpdateFileScan) ToCmdToUpdateFileScan(id string) (cmd app.CmdToUpdateFileScan, err error) {
-	// if r.Status == "" && r.ModerationResult == "" {
-	// 	err = errors.New("need status or moderation result parameter")
-	// 	return
-	// }
-
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		return
 	}
 	cmd.Id = int64(idInt)
-
-	// cmd.ModerationStatus, err = primitive.NewFileModerationStatus(r.Status)
-	// if err != nil {
-	// 	return
-	// }
-
-	// cmd.SensitiveItem, err = primitive.NewSensitiveItemResult(r.SensitiveItem)
-	// if err != nil {
-	// 	return
-	// }
-
-	// cmd.Virus = r.Virus
 
 	cmd.ModerationResult, err = primitive.NewFileModerationResult(r.ModerationResult)
 	if err != nil {

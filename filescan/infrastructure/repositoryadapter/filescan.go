@@ -3,7 +3,6 @@ package repositoryadapter
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/opensourceways/xihe-server/filescan/domain"
 )
@@ -76,7 +75,6 @@ func (adapter *fileScanAdapter) Find(id int64) (domain.FileScan, error) {
 
 func (adapter *fileScanAdapter) Save(file *domain.FileScan) error {
 	do := toFileScanDO(file)
-	fmt.Printf("===================do: %+v\n", do)
 	return adapter.db().Where(adapter.daoImpl.EqualQuery(fieldId), do.Id).Save(&do).Error
 }
 
