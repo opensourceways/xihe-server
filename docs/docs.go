@@ -5141,7 +5141,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "RepoFile"
+                    "RepoFileInternal"
                 ],
                 "summary": "Download",
                 "parameters": [
@@ -5165,6 +5165,12 @@ const docTemplate = `{
                         "name": "path",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "whether record operation",
+                        "name": "not_recorded",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -5248,7 +5254,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "RepoFile"
+                    "RepoFileInternal"
                 ],
                 "summary": "List",
                 "parameters": [
@@ -5663,6 +5669,61 @@ const docTemplate = `{
                                     }
                                 }
                             ]
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/stream/repo/{type}/{user}/{name}/file/{path}": {
+            "get": {
+                "description": "Download repo file as data stream",
+                "consumes": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "RepoFile"
+                ],
+                "summary": "StreamDownload",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user",
+                        "name": "user",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "repo name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "repo file path",
+                        "name": "path",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "the byte of file",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "bad_request_param"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "system_error"
                         }
                     }
                 }
@@ -7928,6 +7989,9 @@ const docTemplate = `{
         "app.PromotionDTO": {
             "type": "object",
             "properties": {
+                "count": {
+                    "type": "integer"
+                },
                 "desc": {
                     "type": "string"
                 },
@@ -7954,9 +8018,6 @@ const docTemplate = `{
                 },
                 "poster": {
                     "type": "string"
-                },
-                "registrants_num": {
-                    "type": "integer"
                 },
                 "status": {
                     "type": "string"
@@ -8587,6 +8648,12 @@ const docTemplate = `{
                 },
                 "project": {
                     "$ref": "#/definitions/app.GlobalProjectsDTO"
+                },
+                "promotions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/app.PromotionDTO"
+                    }
                 }
             }
         },

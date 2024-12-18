@@ -42,6 +42,9 @@ import (
 	courseusercli "github.com/opensourceways/xihe-server/course/infrastructure/usercli"
 	"github.com/opensourceways/xihe-server/docs"
 	"github.com/opensourceways/xihe-server/domain/platform"
+	filescan "github.com/opensourceways/xihe-server/filescan/app"
+	filescaninfra "github.com/opensourceways/xihe-server/filescan/infrastructure"
+	filescanrepo "github.com/opensourceways/xihe-server/filescan/infrastructure/repositoryadapter"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/challengeimpl"
 	"github.com/opensourceways/xihe-server/infrastructure/competitionimpl"
@@ -256,6 +259,19 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		userRegService,
 	)
 
+	//Init filescan
+	err = filescanrepo.Init(pgsql.DB(), &cfg.Filescan.Tables)
+
+	if err != nil {
+		return err
+	}
+
+	fileScanAdapter := filescanrepo.NewFileScanAdapter()
+	moderationEventPublisher := filescaninfra.NewModerationEventPublisher(
+		&cfg.Filescan.Audit, kafka.PublisherAdapter(),
+	)
+	fileScanService := filescan.NewFileScanService(fileScanAdapter, moderationEventPublisher)
+
 	err = comprepositoryadapter.Init(pgsql.DB(), &cfg.Computility.Tables)
 	if err != nil {
 		return err
@@ -385,10 +401,10 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForRepoFileController(
-			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,
+			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService, fileScanService,
 		)
 		controller.AddRouterForRepoFileInternalController(
-			internal, gitlabRepo, model, proj, dataset, repoAdapter, userAppService,
+			internal, gitlabRepo, model, proj, dataset, repoAdapter, userAppService, fileScanService,
 		)
 
 		controller.AddRouterForInferenceController(
@@ -430,6 +446,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 		controller.AddRouterForComputilityWebController(
 			v1, computilityWebService,
+		)
+		controller.AddRouterForFileScanInternalController(
+			internal, fileScanService,
 		)
 	}
 

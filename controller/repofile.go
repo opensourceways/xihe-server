@@ -12,6 +12,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	filescan "github.com/opensourceways/xihe-server/filescan/app"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	uapp "github.com/opensourceways/xihe-server/user/app"
 )
@@ -24,13 +25,15 @@ func AddRouterForRepoFileController(
 	dataset repository.Dataset,
 	sender message.RepoMessageProducer,
 	us uapp.UserService,
+	f filescan.FileScanService,
 ) {
 	ctl := RepoFileController{
-		s:       app.NewRepoFileService(p, sender),
-		us:      us,
-		model:   model,
-		project: project,
-		dataset: dataset,
+		s:        app.NewRepoFileService(p, sender, f),
+		us:       us,
+		model:    model,
+		project:  project,
+		dataset:  dataset,
+		filescan: f,
 	}
 
 	rg.GET("/v1/repo/:type/:user/:name", ctl.DownloadRepo)
@@ -43,16 +46,18 @@ func AddRouterForRepoFileController(
 	rg.POST("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.DELETE("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
 	rg.DELETE("/v1/repo/:type/:name/dir/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.DeleteDir)
+	rg.GET("/v1/stream/repo/:type/:user/:name/file/:path", ctl.StreamDownload)
 }
 
 type RepoFileController struct {
 	baseController
 
-	s       app.RepoFileService
-	us      uapp.UserService
-	model   repository.Model
-	project spacerepo.Project
-	dataset repository.Dataset
+	s        app.RepoFileService
+	us       uapp.UserService
+	model    repository.Model
+	project  spacerepo.Project
+	dataset  repository.Dataset
+	filescan filescan.FileScanService
 }
 
 // @Summary		Create
@@ -515,6 +520,65 @@ func (ctl *RepoFileController) List(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, newResponseData(v))
+}
+
+// @Summary		StreamDownload
+// @Description	Download repo file as data stream
+// @Tags			RepoFile
+// @Param			user	path	string	true	"user"
+// @Param			name	path	string	true	"repo name"
+// @Param			path	path	string	true	"repo file path"
+// @Accept			octet-stream
+// @Success		200	{object}			byte "the byte of file"
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/stream/repo/{type}/{user}/{name}/file/{path} [get]
+func (ctl *RepoFileController) StreamDownload(ctx *gin.Context) {
+	var (
+		user domain.Account
+		err  error
+		info resourceSummary
+	)
+
+	if user, err = domain.NewAccount(ctx.Param("user")); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	if info, err = ctl.getRepoInfo(ctx, user); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		return
+	}
+
+	cmd := app.RepoFileDownloadCmd{
+		Type:     info.rt,
+		Resource: info.ResourceSummary,
+	}
+
+	if cmd.Path, err = domain.NewFilePath(ctx.Param("path")); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+		return
+	}
+
+	if err := ctl.s.StreamDownload(&cmd, func(r io.Reader, size int64) {
+		ctx.DataFromReader(
+			http.StatusOK, size, "application/octet-stream", r,
+			map[string]string{
+				"Content-Disposition": fmt.Sprintf(
+					"attachment; filename=%s",
+					cmd.Path.FilePath(),
+				),
+				"Content-Transfer-Encoding": "binary",
+			},
+		)
+	}); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	}
 }
 
 func (ctl *RepoFileController) checkForView(ctx *gin.Context) (
