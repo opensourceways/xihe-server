@@ -52,11 +52,12 @@ func AddRouterForRepoFileController(
 type RepoFileController struct {
 	baseController
 
-	s       app.RepoFileService
-	us      uapp.UserService
-	model   repository.Model
-	project spacerepo.Project
-	dataset repository.Dataset
+	s         app.RepoFileService
+	us        uapp.UserService
+	model     repository.Model
+	projectPg spacerepo.ProjectPg
+	dataset   repository.Dataset
+	filescan  filescan.FileScanService
 }
 
 // @Summary		Create
