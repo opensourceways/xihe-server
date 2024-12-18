@@ -14,13 +14,13 @@ func Init(db *gorm.DB, tables *Tables) error {
 	fileScanTableName = tables.FileScan
 	largeFileScanTableName = tables.LargeFileScan
 
-	if err := db.AutoMigrate(&fileScanDO{}); err != nil {
-		return err
-	}
+	// if err := db.AutoMigrate(&fileScanDO{}); err != nil {
+	// 	return err
+	// }
 
-	if err := db.AutoMigrate(&largeFileScanDO{}); err != nil {
-		return err
-	}
+	// if err := db.AutoMigrate(&largeFileScanDO{}); err != nil {
+	// 	return err
+	// }
 
 	dbInstance = db
 
