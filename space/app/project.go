@@ -170,9 +170,10 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 
 	resp, _, err = auditapi.Text(name, "title")
 	if err != nil {
+		e := xerrors.Errorf("fail to moderate")
 		return ProjectDTO{}, allerror.New(
 			allerror.ErrorCodeFailToModerate,
-			resp.Result, err)
+			resp.Result, e)
 	} else if resp.Result != "pass" {
 		e := xerrors.Errorf("moderate unpass")
 		return ProjectDTO{}, allerror.New(
@@ -184,9 +185,10 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	if title != "" {
 		resp, _, err = auditapi.Text(title, "title")
 		if err != nil {
+			e := xerrors.Errorf("fail to moderate")
 			return ProjectDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, err)
+				resp.Result, e)
 		} else if resp.Result != "pass" {
 			e := xerrors.Errorf("moderate unpass")
 			return ProjectDTO{}, allerror.New(
@@ -198,9 +200,10 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	if desc != "" {
 		resp, _, err = auditapi.Text(desc, "profile")
 		if err != nil {
+			e := xerrors.Errorf("fail to moderate")
 			return ProjectDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, err)
+				resp.Result, e)
 		} else if resp.Result != "pass" {
 			e := xerrors.Errorf("moderate unpass")
 			return ProjectDTO{}, allerror.New(

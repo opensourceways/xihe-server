@@ -175,9 +175,10 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 
 	resp, _, err = auditapi.Text(name, "title")
 	if err != nil {
+		e := xerrors.Errorf("fail to moderate")
 		return ModelDTO{}, allerror.New(
 			allerror.ErrorCodeFailToModerate,
-			resp.Result, err)
+			resp.Result, e)
 	} else if resp.Result != "pass" {
 		e := xerrors.Errorf("moderate unpass")
 		return ModelDTO{}, allerror.New(
@@ -189,9 +190,10 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 	if title != "" {
 		resp, _, err = auditapi.Text(title, "title")
 		if err != nil {
+			e := xerrors.Errorf("fail to moderate")
 			return ModelDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, err)
+				resp.Result, e)
 		} else if resp.Result != "pass" {
 			e := xerrors.Errorf("moderate unpass")
 			return ModelDTO{}, allerror.New(
@@ -203,9 +205,10 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 	if desc != "" {
 		resp, _, err = auditapi.Text(desc, "profile")
 		if err != nil {
+			e := xerrors.Errorf("fail to moderate")
 			return ModelDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, err)
+				resp.Result, e)
 		} else if resp.Result != "pass" {
 			e := xerrors.Errorf("moderate unpass")
 			return ModelDTO{}, allerror.New(

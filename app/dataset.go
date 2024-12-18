@@ -171,9 +171,10 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 
 	resp, _, err = auditapi.Text(name, "title")
 	if err != nil {
+		e := xerrors.Errorf("fail to moderate")
 		return DatasetDTO{}, allerror.New(
 			allerror.ErrorCodeFailToModerate,
-			resp.Result, err)
+			resp.Result, e)
 	} else if resp.Result != "pass" {
 		e := xerrors.Errorf("moderate unpass")
 		return DatasetDTO{}, allerror.New(
@@ -185,9 +186,10 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 	if title != "" {
 		resp, _, err = auditapi.Text(title, "title")
 		if err != nil {
+			e := xerrors.Errorf("fail to moderate")
 			return DatasetDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, err)
+				resp.Result, e)
 		} else if resp.Result != "pass" {
 			e := xerrors.Errorf("moderate unpass")
 			return DatasetDTO{}, allerror.New(
@@ -199,9 +201,10 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 	if desc != "" {
 		resp, _, err = auditapi.Text(desc, "profile")
 		if err != nil {
+			e := xerrors.Errorf("fail to moderate")
 			return DatasetDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, err)
+				resp.Result, e)
 		} else if resp.Result != "pass" {
 			e := xerrors.Errorf("moderate unpass")
 			return DatasetDTO{}, allerror.New(

@@ -14,9 +14,10 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 	if bio != "" {
 		resp, _, err := auditapi.Text(bio, "profile")
 		if err != nil {
+			e := xerrors.Errorf("fail to moderate")
 			return allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, err)
+				resp.Result, e)
 		} else if resp.Result != "pass" {
 			e := xerrors.Errorf("moderate unpass")
 			return allerror.New(
