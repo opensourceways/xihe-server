@@ -78,6 +78,35 @@ func (impl *repoFile) Download(
 	return
 }
 
+func (impl *repoFile) StreamDownload(token string, info *platform.RepoFileInfo, handle func(io.Reader, int64)) error {
+	var (
+		req  *http.Request
+		resp *http.Response
+		err  error
+	)
+
+	if req, err = http.NewRequest(
+		http.MethodGet, impl.baseURL(info)+"/raw?ref="+defaultBranch, nil,
+	); err != nil {
+		return err
+	}
+
+	if token != "" {
+		h := &req.Header
+		h.Add("PRIVATE-TOKEN", token)
+	}
+
+	if resp, err = http.DefaultClient.Do(req); err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	handle(resp.Body, resp.ContentLength)
+
+	return nil
+}
+
 func (impl *repoFile) IsLFSFile(data []byte) (is bool, sha string) {
 	if len(data) > 200 {
 		return

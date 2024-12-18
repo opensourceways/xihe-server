@@ -27,7 +27,9 @@ jobs:
         env:
           TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
           USER: ${{ secrets.ZYK_USER_NAME }}
-        run: echo "machine github.com login $USER password $TOKEN" > ~/.netrc
+        run: |
+          touch ~/.netrc & chmod 600 ~/.netrc
+          echo "machine github.com login $USER password $TOKEN" > ~/.netrc
       - name: golangci-lint
         uses: golangci/golangci-lint-action@master
         with:

@@ -11,6 +11,8 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
+	filescanapp "github.com/opensourceways/xihe-server/filescan/app"
+	filescan "github.com/opensourceways/xihe-server/filescan/domain"
 )
 
 type RepoDir = platform.RepoDir
@@ -28,19 +30,23 @@ type RepoFileService interface {
 	Preview(*UserInfo, *RepoFilePreviewCmd) ([]byte, error)
 	DeleteDir(*UserInfo, *RepoDirDeleteCmd) (string, error)
 	Download(*RepoFileDownloadCmd) (RepoFileDownloadDTO, error)
+	StreamDownload(*RepoFileDownloadCmd, func(io.Reader, int64)) error
 	DownloadRepo(u *UserInfo, obj *domain.RepoDownloadedEvent, handle func(io.Reader, int64)) error
 }
 
-func NewRepoFileService(rf platform.RepoFile, sender message.RepoMessageProducer) RepoFileService {
+func NewRepoFileService(
+	rf platform.RepoFile, sender message.RepoMessageProducer, filescan filescanapp.FileScanService) RepoFileService {
 	return &repoFileService{
 		rf:     rf,
 		sender: sender,
+		f:      filescan,
 	}
 }
 
 type repoFileService struct {
 	rf     platform.RepoFile
 	sender message.RepoMessageProducer
+	f      filescanapp.FileScanService
 }
 
 type RepoFileListCmd = RepoDir
@@ -54,6 +60,7 @@ type RepoFileDownloadCmd struct {
 	Path      domain.FilePath
 	Type      domain.ResourceType
 	Resource  domain.ResourceSummary
+	Unrecord  bool
 }
 
 type RepoFileCreateCmd struct {
@@ -116,7 +123,7 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	RepoFileDownloadDTO, error,
 ) {
 	dto, err := s.download(cmd)
-	if err == nil {
+	if err == nil && !cmd.Unrecord {
 		r := &cmd.Resource
 
 		_ = s.sender.AddOperateLogForDownloadFile(
@@ -134,6 +141,13 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	}
 
 	return dto, err
+}
+
+func (s *repoFileService) StreamDownload(cmd *RepoFileDownloadCmd, handle func(io.Reader, int64)) error {
+	return s.rf.StreamDownload(cmd.MyToken, &RepoFileInfo{
+		Path:   cmd.Path,
+		RepoId: cmd.Resource.RepoId,
+	}, handle)
 }
 
 func (s *repoFileService) download(cmd *RepoFileDownloadCmd) (
@@ -187,18 +201,43 @@ func (s *repoFileService) List(u *UserInfo, d *RepoFileListCmd) ([]RepoPathItem,
 		return nil, err
 	}
 
-	sort.Slice(r, func(i, j int) bool {
-		a := &r[i]
-		b := &r[j]
+	owner := u.User.Account()
+	repoName := d.RepoName.ResourceName()
 
-		if a.IsDir != b.IsDir {
-			return a.IsDir
+	// 直接调用 Get 方法获取所有文件的扫描结果
+	scanRes, err := s.f.Get(owner, repoName)
+	if err != nil {
+		return nil, err
+	}
+
+	// 创建扫描结果映射
+	scanMap := make(map[string]filescan.FilescanRes)
+	for _, scan := range scanRes {
+		scanMap[scan.Name] = scan
+	}
+
+	results := make([]RepoPathItem, 0, len(r))
+
+	// 遍历所有文件，添加扫描结果
+	for _, item := range r {
+		results = append(results, item)
+		if scan, exists := scanMap[item.Name]; exists {
+			results[len(results)-1].Filescan = filescanapp.FilescanDTO{
+				ModerationStatus: scan.ModerationStatus,
+				ModerationResult: scan.ModerationResult,
+			}
 		}
+	}
 
-		return a.Name < b.Name
+	// 排序结果
+	sort.Slice(results, func(i, j int) bool {
+		if results[i].IsDir != results[j].IsDir {
+			return results[i].IsDir
+		}
+		return results[i].Name < results[j].Name
 	})
 
-	return r, nil
+	return results, nil
 }
 
 func (s *repoFileService) DownloadRepo(
