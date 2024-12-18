@@ -1,6 +1,8 @@
 package app
 
 import (
+	"golang.org/x/xerrors"
+
 	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/user/domain"
@@ -16,9 +18,10 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 				allerror.ErrorCodeFailToModerate,
 				resp.Result, err)
 		} else if resp.Result != "pass" {
+			e := xerrors.Errorf("moderate unpass")
 			return allerror.New(
 				allerror.ErrorCodeModerateUnpass,
-				resp.Result, err)
+				resp.Result, e)
 		}
 	}
 

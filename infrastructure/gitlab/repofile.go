@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/xerrors"
+
 	"github.com/opensourceways/community-robot-lib/utils"
 
 	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
@@ -170,9 +172,10 @@ func (impl *repoFile) modify(
 			allerror.ErrorCodeFailToModerate,
 			resp.Result, err)
 	} else if resp.Result != "pass" {
+		e := xerrors.Errorf("moderate unpass")
 		return allerror.New(
 			allerror.ErrorCodeModerateUnpass,
-			resp.Result, err)
+			resp.Result, e)
 	}
 
 	opt := FileCreateOption{

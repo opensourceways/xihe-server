@@ -3,6 +3,8 @@ package app
 import (
 	"errors"
 
+	"golang.org/x/xerrors"
+
 	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
 	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
@@ -68,9 +70,10 @@ func (s modelService) Update(
 				allerror.ErrorCodeFailToModerate,
 				resp.Result, err)
 		} else if resp.Result != "pass" {
+			e := xerrors.Errorf("moderate unpass")
 			return ModelDTO{}, allerror.New(
 				allerror.ErrorCodeModerateUnpass,
-				resp.Result, err)
+				resp.Result, e)
 		}
 	}
 	desc := cmd.Desc.ResourceDesc()
@@ -81,9 +84,10 @@ func (s modelService) Update(
 				allerror.ErrorCodeFailToModerate,
 				resp.Result, err)
 		} else if resp.Result != "pass" {
+			e := xerrors.Errorf("moderate unpass")
 			return ModelDTO{}, allerror.New(
 				allerror.ErrorCodeModerateUnpass,
-				resp.Result, err)
+				resp.Result, e)
 		}
 	}
 

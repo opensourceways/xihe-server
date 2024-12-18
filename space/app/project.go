@@ -7,7 +7,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
 
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
+	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/app"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	computilitydomain "github.com/opensourceways/xihe-server/computility/domain"
 	"github.com/opensourceways/xihe-server/domain"
@@ -19,9 +22,6 @@ import (
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
 )
 
 type ProjectCreateCmd struct {
@@ -174,9 +174,10 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 			allerror.ErrorCodeFailToModerate,
 			resp.Result, err)
 	} else if resp.Result != "pass" {
+		e := xerrors.Errorf("moderate unpass")
 		return ProjectDTO{}, allerror.New(
 			allerror.ErrorCodeModerateUnpass,
-			resp.Result, err)
+			resp.Result, e)
 	}
 
 	title := cmd.Title.ResourceTitle()
@@ -187,9 +188,10 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 				allerror.ErrorCodeFailToModerate,
 				resp.Result, err)
 		} else if resp.Result != "pass" {
+			e := xerrors.Errorf("moderate unpass")
 			return ProjectDTO{}, allerror.New(
 				allerror.ErrorCodeModerateUnpass,
-				resp.Result, err)
+				resp.Result, e)
 		}
 	}
 	desc := cmd.Desc.ResourceDesc()
@@ -200,12 +202,13 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 				allerror.ErrorCodeFailToModerate,
 				resp.Result, err)
 		} else if resp.Result != "pass" {
+			e := xerrors.Errorf("moderate unpass")
 			return ProjectDTO{}, allerror.New(
 				allerror.ErrorCodeModerateUnpass,
-				resp.Result, err)
+				resp.Result, e)
 		}
 	}
-	
+
 	v := new(spacedomain.Project)
 	cmd.toProject(v)
 	count := v.GetQuotaCount()
