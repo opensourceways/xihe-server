@@ -168,9 +168,10 @@ func (impl *repoFile) modify(
 	resp, _, err := auditapi.Text(fileName, "title")
 
 	if err != nil {
+		e := xerrors.Errorf("fail to moderate")
 		return allerror.New(
 			allerror.ErrorCodeFailToModerate,
-			resp.Result, err)
+			resp.Result, e)
 	} else if resp.Result != "pass" {
 		e := xerrors.Errorf("moderate unpass")
 		return allerror.New(
