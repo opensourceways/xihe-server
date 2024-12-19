@@ -180,21 +180,6 @@ func (req *reqToNotifyUpdateCode) toCmd() (cmd spaceapp.CmdToNotifyUpdateCode, e
 	return
 }
 
-type reqToChangeProjectLike struct {
-	Owner     string `json:"owner"`
-	Id        string `json:"id"`
-	ChangeNum int    `json:"change_num"`
-}
-
-func (req *reqToChangeProjectLike) toCmd() (cmd spaceapp.CmdToChangeLike, err error) {
-	cmd.ResourceIndex = domain.ResourceIndex{
-		Owner: domain.CreateAccount(req.Owner),
-		Id:    req.Id,
-	}
-	cmd.ChangeNum = req.ChangeNum
-	return
-}
-
 type reqToIncrease struct {
 	Owner string `json:"owner"`
 	Id    string `json:"id"`
