@@ -15,7 +15,7 @@ var (
 )
 
 type fileScanDO struct {
-	Id               int64     `gorm:"column:id;primaryKey;autoIncrement"`
+	Id               int64     `gorm:"primaryKey;autoIncrement"`
 	RepoId           int64     `gorm:"column:repo_id"`
 	Owner            string    `gorm:"column:owner"`
 	RepoName         string    `gorm:"column:repo_name"`
