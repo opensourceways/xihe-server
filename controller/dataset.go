@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/xihe-server/app"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -26,13 +27,14 @@ func AddRouterForDatasetController(
 	like repository.Like,
 	sender message.ResourceProducer,
 	newPlatformRepository func(token, namespace string) platform.Repository,
+	audit auditcommon.AuditService,
 ) {
 	ctl := DatasetController{
 		user: user,
 		repo: repo,
 		tags: tags,
 		like: like,
-		s:    app.NewDatasetService(user, repo, proj, model, activity, nil, sender),
+		s:    app.NewDatasetService(user, repo, proj, model, activity, nil, sender, audit),
 
 		newPlatformRepository: newPlatformRepository,
 	}

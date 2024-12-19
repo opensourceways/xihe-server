@@ -347,21 +347,21 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	{
 		controller.AddRouterForProjectController(
 			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer,
+			newPlatformRepository, computilityService, spaceProducer, audit,
 		)
 		controller.AddRouterForProjectInternalController(
 			internal, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer,
+			newPlatformRepository, computilityService, spaceProducer, audit,
 		)
 
 		controller.AddRouterForModelController(
 			v1, user, model, proj, dataset, activity, tags, like, resProducer,
-			newPlatformRepository,
+			newPlatformRepository, audit,
 		)
 
 		controller.AddRouterForDatasetController(
 			v1, user, dataset, model, proj, activity, tags, like, resProducer,
-			newPlatformRepository,
+			newPlatformRepository, audit,
 		)
 
 		controller.AddRouterForUserController(
