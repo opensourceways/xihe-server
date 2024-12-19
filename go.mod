@@ -20,7 +20,7 @@ require (
 	github.com/opensourceways/xihe-extra-services v1.3.0
 	github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43
 	github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142ee87
-	github.com/opensourceways/xihe-sdk v1.0.1-temp
+	github.com/opensourceways/xihe-sdk v1.7.0
 	github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/files v1.0.1

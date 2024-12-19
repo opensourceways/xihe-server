@@ -1088,6 +1088,8 @@ github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142
 github.com/opensourceways/xihe-inference-evaluate v0.0.0-20240924070134-982a3142ee87/go.mod h1:NgaidYIn75D0QhptFnXtXdb6ezvH/2NrTz1Ulc3dkNE=
 github.com/opensourceways/xihe-sdk v1.0.1-temp h1:ZYQjRBNeLSDcfAJyeYVWgaWqfSJjwmjWSSC10QP6e0c=
 github.com/opensourceways/xihe-sdk v1.0.1-temp/go.mod h1:RvLf2RtP+9zZaM7Zknun+MoBUx2jhu/jKwu84pbUAq4=
+github.com/opensourceways/xihe-sdk v1.7.0 h1:cTcvUjbEbGar6e3QdEZBVA/BoNHbgDMdjAbsKGa3D8g=
+github.com/opensourceways/xihe-sdk v1.7.0/go.mod h1:RvLf2RtP+9zZaM7Zknun+MoBUx2jhu/jKwu84pbUAq4=
 github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37 h1:BtuQhXKv/EdH36nm26fUrCQnfzKw7UqbPNPZmBS+b70=
 github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37/go.mod h1:INt/SP760CQIuTT/tJfU+bFKig2ISyY6a1DRVN6407o=
 github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=

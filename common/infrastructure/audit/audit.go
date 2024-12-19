@@ -38,11 +38,11 @@ func (a *auditImpl) TextAudit(content, contentType string) error {
 	var resp audit.ModerationDTO
 	resp, _, err := auditapi.Text(content, contentType)
 	if err != nil {
-		e := xerrors.Errorf("call audit failed")
+		e := xerrors.New("call audit failed")
 		return allerror.New(
 			allerror.ErrorCodeCallAuditFailed, resp.Result, e)
 	} else if resp.Result != auditPass {
-		e := xerrors.Errorf("audit block")
+		e := xerrors.New("audit block")
 		return allerror.New(
 			allerror.ErrorCodeAuditBlock, resp.Result, e)
 	}

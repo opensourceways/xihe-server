@@ -16,7 +16,6 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
-	"github.com/opensourceways/xihe-server/common/infrastructure/sdk"
 	"github.com/opensourceways/xihe-server/config"
 	"github.com/opensourceways/xihe-server/controller"
 	"github.com/opensourceways/xihe-server/infrastructure/authingimpl"
@@ -157,11 +156,6 @@ func main() {
 		logrus.Fatalf("init domain config failed, err:%s", err.Error())
 	}
 	cfg.InitAppConfig()
-
-	// sdk
-	sdk.Init(&cfg.AuditSyncSdk)
-
-	defer kafka.Exit()
 
 	//audit
 	audit.Init(&cfg.AuditSyncSdk)
