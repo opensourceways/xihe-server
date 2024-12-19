@@ -10,6 +10,8 @@ import (
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 )
 
+const auditPass = "pass"
+
 var instance *auditImpl
 
 // NewModerationService returns the singleton instance of the moderation service.
@@ -38,13 +40,11 @@ func (a *auditImpl) TextAudit(content, contentType string) error {
 	if err != nil {
 		e := xerrors.Errorf("call audit failed")
 		return allerror.New(
-			allerror.ErrorCodeCallAuditFailed,
-			"", e)
-	} else if resp.Result != "pass" {
+			allerror.ErrorCodeCallAuditFailed, resp.Result, e)
+	} else if resp.Result != auditPass {
 		e := xerrors.Errorf("audit block")
 		return allerror.New(
-			allerror.ErrorCodeAuditBlock,
-			"", e)
+			allerror.ErrorCodeAuditBlock, resp.Result, e)
 	}
 	return nil
 }
