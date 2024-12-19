@@ -45,8 +45,7 @@ func AddRouterForProjectInternalController(
 	}
 
 	rg.GET("/v1/space/:id", internalApiCheckMiddleware(&ctl.baseController), ctl.GetSpaceById)
-	rg.PUT("/v1/space/:id/notify_update_code", internalApiCheckMiddleware(&ctl.baseController),
-		ctl.NotifyUpdateCode)
+	rg.PUT("/v1/space/:id/notify_update_code", internalApiCheckMiddleware(&ctl.baseController), ctl.NotifyUpdateCode)
 }
 
 type ProjectInternalController struct {
