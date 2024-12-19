@@ -54,14 +54,14 @@ func (s datasetService) Update(
 	//sdk text audit
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
-		if err := s.audit.TextAudit(title, audiTitle); err != nil {
+		if err := s.audit.TextAudit(title, auditTitle); err != nil {
 			return DatasetDTO{}, err
 		}
 	}
 
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
-		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
+		if err := s.audit.TextAudit(desc, auditProfile); err != nil {
 			return DatasetDTO{}, err
 		}
 	}

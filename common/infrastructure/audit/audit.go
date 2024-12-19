@@ -1,13 +1,13 @@
 package audit
 
 import (
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	"github.com/opensourceways/xihe-audit-sync-sdk/httpclient"
 	"golang.org/x/xerrors"
 
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
-
+	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
 	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
+	"github.com/opensourceways/xihe-audit-sync-sdk/httpclient"
+
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 )
 
 var instance *auditImpl
@@ -36,14 +36,14 @@ func (a *auditImpl) TextAudit(content, contentType string) error {
 	var resp audit.ModerationDTO
 	resp, _, err := auditapi.Text(content, contentType)
 	if err != nil {
-		e := xerrors.Errorf("fail to moderate")
+		e := xerrors.Errorf("call audit failed")
 		return allerror.New(
 			allerror.ErrorCodeFailToModerate,
 			"", e)
 	} else if resp.Result != "pass" {
-		e := xerrors.Errorf("fail to moderate")
+		e := xerrors.Errorf("audit block")
 		return allerror.New(
-			allerror.ErrorCodeModerateUnpass,
+			allerror.ErrorCodeModerateBlock,
 			"", e)
 	}
 	return nil

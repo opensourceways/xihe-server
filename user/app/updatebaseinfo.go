@@ -5,14 +5,14 @@ import (
 )
 
 const (
-	audiTitle = "title"
+	auditTitle = "title"
 )
 
 func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasicInfoCmd) error {
 	//sdk text audit
 	bio := cmd.Bio.Bio()
 	if bio != "" {
-		if err := s.audit.TextAudit(bio, audiTitle); err != nil {
+		if err := s.audit.TextAudit(bio, auditTitle); err != nil {
 			return err
 		}
 	}

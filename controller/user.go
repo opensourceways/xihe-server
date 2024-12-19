@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/opensourceways/xihe-server/app"
+	"github.com/opensourceways/xihe-server/common/controller/middleware"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	userapp "github.com/opensourceways/xihe-server/user/app"
@@ -109,6 +110,63 @@ func (ctl *UserController) UpdateAgreement(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusAccepted, newResponseData(nil))
+}
+
+// @Summary  PrivacyRevoke
+// @Description  revoke
+// @Tags     User
+// @Accept   json
+// @Security Bearer
+// @Success  202   {object}  commonctl.ResponseData{data=string,msg=string,code=string}
+// @Router   /v1/user/privacy/revoke [put]
+func (ctl *UserController) PrivacyRevoke(ctx *gin.Context) {
+	middleware.SetAction(ctx, "privacy revoke")
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		logrus.Errorln("failed to get user info")
+		return
+	}
+
+	if err := ctl.s.PrivacyRevoke(pl.DomainAccount()); err != nil {
+		SendError(ctx, err)
+	} else {
+		ctl.ClearCookieAfterRevokePrivacy(ctx)
+		ctl.sendRespOfPut(ctx, "success")
+	}
+}
+
+// @Summary  AgreementRevoke
+// @Description  Agreement Revoke
+// @Tags     User
+// @Accept   json
+// @Security Bearer
+// @Success  202   {object}  commonctl.ResponseData{data=string,msg=string,code=string}
+// @Router   /v1/user/agreement/revoke [put]
+func (ctl *UserController) AgreementRevoke(ctx *gin.Context) {
+	middleware.SetAction(ctx, "agreement revoke")
+	m := UserAgreement{}
+
+	if err := ctx.ShouldBindJSON(&m); err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
+			errorBadRequestBody,
+			"can't fetch request body",
+		))
+
+		return
+	}
+
+	pl, _, ok := ctl.checkUserApiToken(ctx, false)
+	if !ok {
+		logrus.Errorln("failed to get user info")
+		return
+	}
+
+	if err := ctl.s.AgreementRevoke(pl.DomainAccount(), m.Type); err != nil {
+		SendError(ctx, err)
+	} else {
+		ctl.sendRespOfPut(ctx, "success")
+	}
 }
 
 // @Summary		Get

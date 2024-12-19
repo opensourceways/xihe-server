@@ -23,8 +23,8 @@ import (
 )
 
 const (
-	audiProfile = "profile"
-	audiTitle   = "title"
+	auditProfile = "profile"
+	auditTitle   = "title"
 )
 
 type ProjectCreateCmd struct {
@@ -171,20 +171,20 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
 	//sdk text audit
 	name := cmd.Name.ResourceName()
-	if err := s.audit.TextAudit(name, audiTitle); err != nil {
+	if err := s.audit.TextAudit(name, auditTitle); err != nil {
 		return ProjectDTO{}, err
 	}
 
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
-		if err := s.audit.TextAudit(title, audiTitle); err != nil {
+		if err := s.audit.TextAudit(title, auditTitle); err != nil {
 			return ProjectDTO{}, err
 		}
 	}
 
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
-		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
+		if err := s.audit.TextAudit(desc, auditProfile); err != nil {
 			return ProjectDTO{}, err
 		}
 	}
