@@ -450,6 +450,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		controller.AddRouterForFileScanInternalController(
 			internal, fileScanService,
 		)
+
+		internal.GET("/heartbeat", func(*gin.Context) {})
 	}
 
 	engine.UseRawPath = true
