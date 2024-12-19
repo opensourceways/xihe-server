@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/opensourceways/xihe-server/app"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -26,6 +27,7 @@ func AddRouterForModelController(
 	like repository.Like,
 	sender message.ResourceProducer,
 	newPlatformRepository func(token, namespace string) platform.Repository,
+	audit auditcommon.AuditService,
 ) {
 	ctl := ModelController{
 		user:    user,
@@ -33,7 +35,7 @@ func AddRouterForModelController(
 		dataset: dataset,
 		tags:    tags,
 		like:    like,
-		s:       app.NewModelService(user, repo, proj, dataset, activity, nil, sender),
+		s:       app.NewModelService(user, repo, proj, dataset, activity, nil, sender, audit),
 
 		newPlatformRepository: newPlatformRepository,
 	}
