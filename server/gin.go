@@ -115,10 +115,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	collections := &cfg.Mongodb.Collections
 
-	// proj := spacerepo.NewProjectRepository(
-	// 	mongodb.NewProjectMapper(collections.Project),
-	// )
-
 	model := repositories.NewModelRepository(
 		mongodb.NewModelMapper(collections.Model),
 	)
@@ -442,7 +438,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForHomeController(
-			v1, courseAppService, competitionAppService, projectService, modelService, datasetService,
+			v1, courseAppService, competitionAppService, projectService, modelService, datasetService, promotionAppService,
 		)
 
 		controller.AddRouterForCloudController(

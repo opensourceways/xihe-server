@@ -13,15 +13,6 @@ type homeInfo struct {
 	Course []courseapp.CourseSummaryDTO    `json:"course"`
 }
 
-type homeElectricityInfo struct {
-	Comp       []compapp.CompetitionSummaryDTO `json:"comp"`
-	Course     []courseapp.CourseSummaryDTO    `json:"course"`
-	Promotions []promapp.PromotionDTO          `json:"promotions"`
-	Dataset    app.GlobalDatasetsDTO           `json:"dataset"`
-	Model      app.GlobalModelsDTO             `json:"model"`
-	Peoject    spaceapp.GlobalProjectsDTO      `json:"project"`
-}
-
 type IndustryDTO struct {
 	Comp       []compapp.CompetitionSummaryDTO `json:"comp"`
 	Course     []courseapp.CourseSummaryDTO    `json:"course"`

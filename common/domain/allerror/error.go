@@ -49,6 +49,15 @@ const (
 
 	// ErrorCodeSpaceAppCreateFailed
 	ErrorCodeSpaceAppCreateFailed = "space_app_create_failed"
+
+	// ErrorCodeUserNotFound
+	ErrorCodeUserNotFound = "user_not_found"
+
+	// ErrorCodeRevokePrivacyFailed
+	ErrorCodeRevokePrivacyFailed = "revoke_privacy_failed"
+
+	// ErrorCodeRevokeAgreementFailed
+	ErrorCodeRevokeAgreementFailed = "revoke_agreement_failed"
 )
 
 // errorImpl

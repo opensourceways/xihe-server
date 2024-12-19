@@ -158,7 +158,7 @@ type projectMessageService struct {
 	repoPg spacerepo.ProjectPg
 }
 
-func NewProjectMessageService(repo spacerepo.Project, repoPg spacerepo.ProjectPg) ProjectMessageService {
+func NewProjectMessageService(repo spacerepo.ProjectPg, repoPg spacerepo.ProjectPg) ProjectMessageService {
 	return projectMessageService{
 		repoPg: repoPg,
 	}

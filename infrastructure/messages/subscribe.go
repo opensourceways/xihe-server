@@ -345,21 +345,3 @@ func (r *register) registerHandlerForReleasingCloud(handler interface{}) error {
 
 	return r.subscribe(r.topics.ReleaseCloud, handlerNameReleaseCloud, f)
 }
-
-// func (r *register) registerHandlerForSpaceApp(handler interface{}) error {
-// 	h, ok := handler.(cloudmsg.CloudMessageHandler)
-// 	if !ok {
-// 		return nil
-// 	}
-
-// 	f := func(b []byte, m map[string]string) (err error) {
-// 		body := ReleasePodMsg{}
-// 		if err = json.Unmarshal(b, &body); err != nil {
-// 			return
-// 		}
-
-// 		return h.HandleEventPodRelease(body.PodId, body.CloudType)
-// 	}
-
-// 	return r.subscribe(r.topics.ReleaseCloud, handlerNameReleaseCloud, f)
-// }

@@ -91,7 +91,7 @@ type CmdToIncrease struct {
 func (s projectService) toSpaceMetaDTO(v spacedomain.Project) sdk.SpaceMetaDTO {
 	return sdk.SpaceMetaDTO{
 		Id:           v.RepoId,
-		SDK:          v.Type.ProjType(), //空指针异常
+		SDK:          v.Type.ProjType(),
 		Name:         v.Name.ResourceName(),
 		Owner:        v.Owner.Account(),
 		Hardware:     v.Hardware.Hardware(),
