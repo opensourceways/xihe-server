@@ -675,7 +675,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	pl, proj, ok := ctl.checkPermissionPg(ctx)
+	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
 		return
 	}
@@ -794,7 +794,7 @@ func (ctl *ProjectController) AddRelatedDataset(ctx *gin.Context) {
 		return
 	}
 
-	pl, proj, ok := ctl.checkPermissionPg(ctx)
+	pl, proj, ok := ctl.checkPermission(ctx)
 	if !ok {
 		return
 	}
@@ -928,44 +928,6 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 }
 
 func (ctl *ProjectController) checkPermission(ctx *gin.Context) (
-	info *oldUserTokenPayload, proj spacedomain.Project, ok bool,
-) {
-	owner, err := domain.NewAccount(ctx.Param("owner"))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
-			errorBadRequestParam, err,
-		))
-
-		return
-	}
-
-	pl, _, ok := ctl.checkUserApiToken(ctx, false)
-	if !ok {
-		return
-	}
-
-	if pl.isNotMe(owner) {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeMsg(
-			errorNotAllowed, "not allowed",
-		))
-
-		return
-	}
-
-	proj, err = ctl.repoPg.Get(owner, ctx.Param("id"))
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseError(err))
-
-		return
-	}
-
-	info = pl
-	ok = true
-
-	return
-}
-
-func (ctl *ProjectController) checkPermissionPg(ctx *gin.Context) (
 	info *oldUserTokenPayload, proj spacedomain.Project, ok bool,
 ) {
 	owner, err := domain.NewAccount(ctx.Param("owner"))
