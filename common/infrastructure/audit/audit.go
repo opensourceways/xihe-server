@@ -5,6 +5,8 @@ import (
 	"github.com/opensourceways/xihe-audit-sync-sdk/httpclient"
 	"golang.org/x/xerrors"
 
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
+
 	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 )
 
@@ -34,9 +36,15 @@ func (a *auditImpl) TextAudit(content, contentType string) error {
 	var resp audit.ModerationDTO
 	resp, _, err := auditapi.Text(content, contentType)
 	if err != nil {
-		return xerrors.Errorf("fail to moderate")
+		e := xerrors.Errorf("fail to moderate")
+		return allerror.New(
+			allerror.ErrorCodeFailToModerate,
+			"", e)
 	} else if resp.Result != "pass" {
-		return xerrors.Errorf("moderate unpass")
+		e := xerrors.Errorf("fail to moderate")
+		return allerror.New(
+			allerror.ErrorCodeModerateUnpass,
+			"", e)
 	}
 	return nil
 }

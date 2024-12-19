@@ -3,7 +3,6 @@ package app
 import (
 	"errors"
 
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -171,26 +170,20 @@ func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto M
 	//sdk text audit
 	name := cmd.Name.ResourceName()
 	if err := s.audit.TextAudit(name, audiTitle); err != nil {
-		return ModelDTO{}, allerror.New(
-			allerror.ErrorCodeFailToModerate,
-			"", err)
+		return ModelDTO{}, err
 	}
 
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
 		if err := s.audit.TextAudit(title, audiTitle); err != nil {
-			return ModelDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return ModelDTO{}, err
 		}
 	}
 
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
 		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
-			return ModelDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return ModelDTO{}, err
 		}
 	}
 

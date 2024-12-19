@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/platform"
 	"github.com/opensourceways/xihe-server/domain/repository"
@@ -56,18 +55,14 @@ func (s datasetService) Update(
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
 		if err := s.audit.TextAudit(title, audiTitle); err != nil {
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return DatasetDTO{}, err
 		}
 	}
 
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
 		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return DatasetDTO{}, err
 		}
 	}
 	opt := new(platform.RepoOption)

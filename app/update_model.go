@@ -3,7 +3,6 @@ package app
 import (
 	"errors"
 
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -59,18 +58,14 @@ func (s modelService) Update(
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
 		if err := s.audit.TextAudit(title, audiTitle); err != nil {
-			return ModelDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return ModelDTO{}, err
 		}
 	}
 
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
 		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
-			return ModelDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return ModelDTO{}, err
 		}
 	}
 

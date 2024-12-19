@@ -1,7 +1,6 @@
 package app
 
 import (
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/user/domain"
 )
 
@@ -14,9 +13,7 @@ func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasic
 	bio := cmd.Bio.Bio()
 	if bio != "" {
 		if err := s.audit.TextAudit(bio, audiTitle); err != nil {
-			return allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return err
 		}
 	}
 

@@ -3,7 +3,6 @@ package app
 import (
 	"errors"
 
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -172,26 +171,20 @@ func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (d
 	//sdk text audit
 	name := cmd.Name.ResourceName()
 	if err := s.audit.TextAudit(name, audiTitle); err != nil {
-		return DatasetDTO{}, allerror.New(
-			allerror.ErrorCodeFailToModerate,
-			"", err)
+		return DatasetDTO{}, err
 	}
 
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
 		if err := s.audit.TextAudit(title, audiTitle); err != nil {
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return DatasetDTO{}, err
 		}
 	}
 
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
 		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return DatasetDTO{}, err
 		}
 	}
 
