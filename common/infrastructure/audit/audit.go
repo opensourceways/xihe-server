@@ -38,12 +38,12 @@ func (a *auditImpl) TextAudit(content, contentType string) error {
 	if err != nil {
 		e := xerrors.Errorf("call audit failed")
 		return allerror.New(
-			allerror.ErrorCodeFailToModerate,
+			allerror.ErrorCodeCallAuditFailed,
 			"", e)
 	} else if resp.Result != "pass" {
 		e := xerrors.Errorf("audit block")
 		return allerror.New(
-			allerror.ErrorCodeModerateBlock,
+			allerror.ErrorCodeAuditBlock,
 			"", e)
 	}
 	return nil
