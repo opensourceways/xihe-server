@@ -40,6 +40,8 @@ func AddRouterForUserController(
 	}
 
 	rg.PUT("/v1/user/agreement", ctl.UpdateAgreement)
+	rg.PUT("/v1/user/privacy/revoke", ctl.PrivacyRevoke)
+	rg.PUT("/v1/user/agreement/revoke", ctl.AgreementRevoke)
 
 	rg.GET("/v1/user", ctl.Get)
 
