@@ -397,17 +397,6 @@ type platformInfo struct {
 	CreateAt int64 `json:"create_at"`
 }
 
-// @Title			CheckEmail
-// @Description	check user email
-// @Tags			User
-// @Accept			json
-// @Success		200
-// @Failure		400	no	email	this	api	need	email	of	user"
-// @Router			/v1/user/check_email [get]
-func (ctl *UserController) CheckEmail(ctx *gin.Context) {
-	ctl.sendRespOfGet(ctx, "")
-}
-
 // @Summary		SendBindEmail
 // @Description	send code to user
 // @Tags			User

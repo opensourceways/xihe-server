@@ -79,7 +79,7 @@ type Config struct {
 	SpaceApp     spaceapp.Config                 `json:"space_app"`
 	Space        space.Config                    `json:"space"`
 	Filescan     infrastructure.FileScanConfig   `json:"file_scan"`
-	Sdk          sdk.Config                      `json:"audit_sync_sdk"`
+	AuditSyncSdk sdk.Config                      `json:"audit_sync_sdk"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {

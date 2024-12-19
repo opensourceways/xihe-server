@@ -76,7 +76,6 @@ func main() {
 	if err := config.LoadConfig(o.service.ConfigFile, cfg); err != nil {
 		logrus.Fatalf("load config, err:%s", err.Error())
 	}
-	cfg.Sdk.Endpoint = "http://xihe-audit-sync-service.xihe-test-v2:8080/internal"
 
 	if err := os.Remove(o.service.ConfigFile); err != nil {
 		logrus.Fatalf("config file delete failed, err:%s", err.Error())
@@ -160,12 +159,12 @@ func main() {
 	cfg.InitAppConfig()
 
 	// sdk
-	sdk.Init(&cfg.Sdk)
+	sdk.Init(&cfg.AuditSyncSdk)
 
 	defer kafka.Exit()
 
 	//audit
-	audit.Init(&cfg.Sdk)
+	audit.Init(&cfg.AuditSyncSdk)
 
 	// run
 	server.StartWebServer(o.service.Port, o.service.GracePeriod, cfg)
