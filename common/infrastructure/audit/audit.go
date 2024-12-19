@@ -32,7 +32,7 @@ type auditImpl struct {
 
 func (a *auditImpl) TextAudit(content, contentType string) error {
 	var resp audit.ModerationDTO
-	_, _, err := auditapi.Text(content, contentType)
+	resp, _, err := auditapi.Text(content, contentType)
 	if err != nil {
 		return xerrors.Errorf("fail to moderate")
 	} else if resp.Result != "pass" {
