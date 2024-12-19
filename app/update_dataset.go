@@ -1,10 +1,6 @@
 package app
 
 import (
-	"golang.org/x/xerrors"
-
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -57,39 +53,23 @@ func (s datasetService) Update(
 	d *domain.Dataset, cmd *DatasetUpdateCmd, pr platform.Repository,
 ) (dto DatasetDTO, err error) {
 	//sdk text audit
-	var resp audit.ModerationDTO
-
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
-		resp, _, err = auditapi.Text(title, "title")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(title, audiTitle); err != nil {
 			return DatasetDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
-		}
-	}
-	desc := cmd.Desc.ResourceDesc()
-	if desc != "" {
-		resp, _, err = auditapi.Text(desc, "profile")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
 
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
+			return DatasetDTO{}, allerror.New(
+				allerror.ErrorCodeFailToModerate,
+				"", err)
+		}
+	}
 	opt := new(platform.RepoOption)
 	if !cmd.toDataset(&d.DatasetModifiableProperty, opt) {
 		s.toDatasetDTO(d, &dto)

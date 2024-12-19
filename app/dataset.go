@@ -3,11 +3,8 @@ package app
 import (
 	"errors"
 
-	"golang.org/x/xerrors"
-
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -15,6 +12,11 @@ import (
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+)
+
+const (
+	audiProfile = "profile"
+	audiTitle   = "title"
 )
 
 type DatasetCreateCmd struct {
@@ -137,6 +139,7 @@ func NewDatasetService(
 	activity repository.Activity,
 	pr platform.Repository,
 	sender message.ResourceProducer,
+	audit auditcommon.AuditService,
 ) DatasetService {
 	return datasetService{
 		repo:     repo,
@@ -148,6 +151,7 @@ func NewDatasetService(
 			Project: proj,
 			Dataset: repo,
 		},
+		audit: audit,
 	}
 }
 
@@ -157,6 +161,7 @@ type datasetService struct {
 	activity repository.Activity
 	sender   message.ResourceProducer
 	rs       ResourceService
+	audit    auditcommon.AuditService
 }
 
 func (s datasetService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -165,51 +170,28 @@ func (s datasetService) CanApplyResourceName(owner domain.Account, name domain.R
 
 func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (dto DatasetDTO, err error) {
 	//sdk text audit
-	var resp audit.ModerationDTO
-
 	name := cmd.Name.ResourceName()
-
-	resp, _, err = auditapi.Text(name, "title")
-	if err != nil {
-		e := xerrors.Errorf("fail to moderate")
+	if err := s.audit.TextAudit(name, audiTitle); err != nil {
 		return DatasetDTO{}, allerror.New(
 			allerror.ErrorCodeFailToModerate,
-			resp.Result, e)
-	} else if resp.Result != "pass" {
-		e := xerrors.Errorf("moderate unpass")
-		return DatasetDTO{}, allerror.New(
-			allerror.ErrorCodeModerateUnpass,
-			resp.Result, e)
+			"", err)
 	}
 
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
-		resp, _, err = auditapi.Text(title, "title")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(title, audiTitle); err != nil {
 			return DatasetDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
+
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
-		resp, _, err = auditapi.Text(desc, "profile")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
 			return DatasetDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return DatasetDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
 

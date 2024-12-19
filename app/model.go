@@ -3,11 +3,8 @@ package app
 import (
 	"errors"
 
-	"golang.org/x/xerrors"
-
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -141,6 +138,7 @@ func NewModelService(
 	activity repository.Activity,
 	pr platform.Repository,
 	sender message.ResourceProducer,
+	audit auditcommon.AuditService,
 ) ModelService {
 	return modelService{
 		repo:     repo,
@@ -152,6 +150,7 @@ func NewModelService(
 			Project: proj,
 			Dataset: dataset,
 		},
+		audit: audit,
 	}
 }
 
@@ -161,6 +160,7 @@ type modelService struct {
 	activity repository.Activity
 	rs       ResourceService
 	sender   message.ResourceProducer
+	audit    auditcommon.AuditService
 }
 
 func (s modelService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -169,51 +169,28 @@ func (s modelService) CanApplyResourceName(owner domain.Account, name domain.Res
 
 func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto ModelDTO, err error) {
 	//sdk text audit
-	var resp audit.ModerationDTO
-
 	name := cmd.Name.ResourceName()
-
-	resp, _, err = auditapi.Text(name, "title")
-	if err != nil {
-		e := xerrors.Errorf("fail to moderate")
+	if err := s.audit.TextAudit(name, audiTitle); err != nil {
 		return ModelDTO{}, allerror.New(
 			allerror.ErrorCodeFailToModerate,
-			resp.Result, e)
-	} else if resp.Result != "pass" {
-		e := xerrors.Errorf("moderate unpass")
-		return ModelDTO{}, allerror.New(
-			allerror.ErrorCodeModerateUnpass,
-			resp.Result, e)
+			"", err)
 	}
 
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
-		resp, _, err = auditapi.Text(title, "title")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(title, audiTitle); err != nil {
 			return ModelDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return ModelDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
+
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
-		resp, _, err = auditapi.Text(desc, "profile")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
 			return ModelDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return ModelDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
 

@@ -1,28 +1,22 @@
 package app
 
 import (
-	"golang.org/x/xerrors"
-
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/user/domain"
+)
+
+const (
+	audiTitle = "title"
 )
 
 func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasicInfoCmd) error {
 	//sdk text audit
 	bio := cmd.Bio.Bio()
 	if bio != "" {
-		resp, _, err := auditapi.Text(bio, "profile")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(bio, audiTitle); err != nil {
 			return allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
 

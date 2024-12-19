@@ -3,10 +3,6 @@ package app
 import (
 	"errors"
 
-	"golang.org/x/xerrors"
-
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -60,36 +56,21 @@ func (s modelService) Update(
 	m *domain.Model, cmd *ModelUpdateCmd, pr platform.Repository,
 ) (dto ModelDTO, err error) {
 	//sdk text audit
-	var resp audit.ModerationDTO
-
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
-		resp, _, err = auditapi.Text(title, "title")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(title, audiTitle); err != nil {
 			return ModelDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return ModelDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
+
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
-		resp, _, err = auditapi.Text(desc, "profile")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
 			return ModelDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return ModelDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
 

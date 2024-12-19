@@ -10,13 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"golang.org/x/xerrors"
-
 	"github.com/opensourceways/community-robot-lib/utils"
 
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain/platform"
 )
 
@@ -191,23 +186,6 @@ func (impl *repoFile) modify(
 	u *platform.UserInfo, info *platform.RepoFileInfo,
 	method, action string, content *platform.RepoFileContent,
 ) error {
-	//sdk text audit
-	fileName := info.Path.FilePath()
-	var resp audit.ModerationDTO
-	resp, _, err := auditapi.Text(fileName, "title")
-
-	if err != nil {
-		e := xerrors.Errorf("fail to moderate")
-		return allerror.New(
-			allerror.ErrorCodeFailToModerate,
-			resp.Result, e)
-	} else if resp.Result != "pass" {
-		e := xerrors.Errorf("moderate unpass")
-		return allerror.New(
-			allerror.ErrorCodeModerateUnpass,
-			resp.Result, e)
-	}
-
 	opt := FileCreateOption{
 		CommitInfo: impl.toCommitInfo(u, action+" file: "+info.Path.FilePath()),
 		Content:    *content.Content,

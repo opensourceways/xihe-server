@@ -7,10 +7,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
 
-	"github.com/opensourceways/xihe-audit-sync-sdk/audit"
-	auditapi "github.com/opensourceways/xihe-audit-sync-sdk/audit/api"
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	computilitydomain "github.com/opensourceways/xihe-server/computility/domain"
 	"github.com/opensourceways/xihe-server/domain"
@@ -22,6 +21,11 @@ import (
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+)
+
+const (
+	audiProfile = "profile"
+	audiTitle   = "title"
 )
 
 type ProjectCreateCmd struct {
@@ -133,6 +137,7 @@ func NewProjectService(
 	sender message.ResourceProducer,
 	computilityApp computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
+	audit auditcommon.AuditService,
 ) ProjectService {
 	return projectService{
 		repo:     repo,
@@ -146,6 +151,7 @@ func NewProjectService(
 		},
 		computilityApp: computilityApp,
 		spaceProducer:  spaceProducer,
+		audit:          audit,
 	}
 }
 
@@ -156,6 +162,7 @@ type projectService struct {
 	rs             app.ResourceService
 	computilityApp computilityapp.ComputilityInternalAppService
 	spaceProducer  spacedomain.SpaceEventProducer
+	audit          auditcommon.AuditService
 }
 
 func (s projectService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -164,51 +171,28 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
 	//sdk text audit
-	var resp audit.ModerationDTO
-
 	name := cmd.Name.ResourceName()
-
-	resp, _, err = auditapi.Text(name, "title")
-	if err != nil {
-		e := xerrors.Errorf("fail to moderate")
+	if err := s.audit.TextAudit(name, audiTitle); err != nil {
 		return ProjectDTO{}, allerror.New(
 			allerror.ErrorCodeFailToModerate,
-			resp.Result, e)
-	} else if resp.Result != "pass" {
-		e := xerrors.Errorf("moderate unpass")
-		return ProjectDTO{}, allerror.New(
-			allerror.ErrorCodeModerateUnpass,
-			resp.Result, e)
+			"", err)
 	}
 
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
-		resp, _, err = auditapi.Text(title, "title")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(title, audiTitle); err != nil {
 			return ProjectDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return ProjectDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
+
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
-		resp, _, err = auditapi.Text(desc, "profile")
-		if err != nil {
-			e := xerrors.Errorf("fail to moderate")
+		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
 			return ProjectDTO{}, allerror.New(
 				allerror.ErrorCodeFailToModerate,
-				resp.Result, e)
-		} else if resp.Result != "pass" {
-			e := xerrors.Errorf("moderate unpass")
-			return ProjectDTO{}, allerror.New(
-				allerror.ErrorCodeModerateUnpass,
-				resp.Result, e)
+				"", err)
 		}
 	}
 
