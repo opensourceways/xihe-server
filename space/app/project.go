@@ -8,7 +8,6 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/opensourceways/xihe-server/app"
-	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	computilitydomain "github.com/opensourceways/xihe-server/computility/domain"
@@ -186,9 +185,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	desc := cmd.Desc.ResourceDesc()
 	if desc != "" {
 		if err := s.audit.TextAudit(desc, audiProfile); err != nil {
-			return ProjectDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return ProjectDTO{}, err
 		}
 	}
 
