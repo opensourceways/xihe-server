@@ -173,17 +173,13 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	//sdk text audit
 	name := cmd.Name.ResourceName()
 	if err := s.audit.TextAudit(name, audiTitle); err != nil {
-		return ProjectDTO{}, allerror.New(
-			allerror.ErrorCodeFailToModerate,
-			"", err)
+		return ProjectDTO{}, err
 	}
 
 	title := cmd.Title.ResourceTitle()
 	if title != "" {
 		if err := s.audit.TextAudit(title, audiTitle); err != nil {
-			return ProjectDTO{}, allerror.New(
-				allerror.ErrorCodeFailToModerate,
-				"", err)
+			return ProjectDTO{}, err
 		}
 	}
 
