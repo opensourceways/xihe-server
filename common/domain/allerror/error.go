@@ -60,10 +60,10 @@ const (
 	ErrorCodeRevokeAgreementFailed = "revoke_agreement_failed"
 
 	// ErrorCodeFailToModerate
-	ErrorCodeFailToModerate = "failed_to_audit"
+	ErrorCodeCallAuditFailed = "call audit failed"
 
 	// ErrorCodeModerateUnpass
-	ErrorCodeModerateBlock = "moderate_block"
+	ErrorCodeAuditBlock = "audit block"
 )
 
 // errorImpl
