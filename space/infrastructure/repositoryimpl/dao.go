@@ -103,16 +103,16 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 	// 基础查询条件
 	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
-	// 计算总数
-	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-
 	query := baseQuery.Order("updated_at DESC")
 
 	//名字查询
 	if do.Name != "" {
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
 	// 构建分页查询
@@ -170,17 +170,17 @@ func (dao *daoImpl) ListAndSortByFirstLetter(
 	// 基础查询条件
 	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
-	// 计算总数
-	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-
 	// 构建分页查询
 	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
 
 	//名字查询
 	if do.Name != "" {
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
 	if do.PageNum > 0 && do.CountPerPage > 0 {
@@ -237,17 +237,17 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 	// 基础查询条件
 	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
-	// 计算总数
-	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-
 	// 构建分页查询
 	query := baseQuery.Order("download_count DESC")
 
 	//名字查询
 	if do.Name != "" {
 		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
 	if do.PageNum > 0 && do.CountPerPage > 0 {

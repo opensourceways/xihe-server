@@ -308,11 +308,6 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 	// 基础查询条件
 	baseQuery := adapter.db()
 
-	// 计算总数
-	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
-
 	query := baseQuery.Order("updated_at DESC")
 
 	//名字查询
@@ -339,6 +334,11 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 			query = query.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
 				Where("tag_categories.kind IN ?", do.TagKinds)
 		}
+	}
+
+	// 计算总数
+	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
 	// 构建分页查询
@@ -402,6 +402,32 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 	// 基础查询条件
 	baseQuery := adapter.db()
 
+	// 名字查询
+	if do.Name != "" {
+		baseQuery = baseQuery.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
+	// 如果需要标签查询或标签类别查询
+	if do.Tags != nil || do.TagKinds != nil {
+		baseQuery = baseQuery.Joins("JOIN project_tags ON project_tags.project_id = projects.id")
+
+		// 标签查询
+		if do.Tags != nil {
+			baseQuery = baseQuery.Where("project_tags.tag_name IN ?", do.Tags)
+		}
+
+		// 标签类别查询
+		if do.TagKinds != nil {
+			baseQuery = baseQuery.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
+				Where("tag_categories.kind IN ?", do.TagKinds)
+		}
+	}
+
+	// level查询
+	if do.Level > 0 {
+		baseQuery = baseQuery.Where("Level = ?", do.Level)
+	}
+
 	// 计算总数
 	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
 		return nil, 0, err
@@ -409,31 +435,6 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 
 	query := baseQuery.Order("download_count DESC")
 
-	//名字查询
-	if do.Name != "" {
-		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
-	}
-
-	// 如果需要标签查询或标签类别查询
-	if do.Tags != nil || do.TagKinds != nil {
-		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id")
-
-		// 标签查询
-		if do.Tags != nil {
-			query = query.Where("project_tags.tag_name IN ?", do.Tags)
-		}
-
-		// 标签类别查询
-		if do.TagKinds != nil {
-			query = query.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
-				Where("tag_categories.kind IN ?", do.TagKinds)
-		}
-	}
-
-	//level查询
-	if do.Level > 0 {
-		query = query.Where("Level = ?", do.Level)
-	}
 	// 构建分页查询
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
@@ -479,6 +480,7 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 
 	return projectSummaries, int(count), nil
 }
+
 func (adapter *projectAdapter) ListGlobalAndSortByFirstLetter(
 	option *repository.GlobalResourceListOption,
 ) (spacerepo.UserProjectsInfo, error) {
@@ -494,11 +496,6 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 
 	// 基础查询条件
 	baseQuery := adapter.db()
-
-	// 计算总数
-	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
-		return nil, 0, err
-	}
 
 	// 构建分页查询
 	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
@@ -524,9 +521,14 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 		}
 	}
 
-	//level查询
+	// level查询
 	if do.Level > 0 {
 		query = query.Where("Level = ?", do.Level)
+	}
+
+	// 计算总数
+	if err := query.Model(&projectDO{}).Count(&count).Error; err != nil {
+		return nil, 0, err
 	}
 
 	if do.PageNum > 0 && do.CountPerPage > 0 {
