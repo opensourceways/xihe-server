@@ -2,6 +2,8 @@ module github.com/opensourceways/xihe-server
 
 go 1.21
 
+toolchain go1.21.8
+
 require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/gin-gonic/gin v1.9.1
