@@ -8,6 +8,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"github.com/opensourceways/xihe-server/app"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	computilitydomain "github.com/opensourceways/xihe-server/computility/domain"
 	"github.com/opensourceways/xihe-server/domain"
@@ -19,6 +20,11 @@ import (
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+)
+
+const (
+	auditProfile = "profile"
+	auditTitle   = "title"
 )
 
 type ProjectCreateCmd struct {
@@ -130,6 +136,7 @@ func NewProjectService(
 	sender message.ResourceProducer,
 	computilityApp computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
+	audit auditcommon.AuditService,
 ) ProjectService {
 	return projectService{
 		repo:     repo,
@@ -143,6 +150,7 @@ func NewProjectService(
 		},
 		computilityApp: computilityApp,
 		spaceProducer:  spaceProducer,
+		audit:          audit,
 	}
 }
 
@@ -153,6 +161,7 @@ type projectService struct {
 	rs             app.ResourceService
 	computilityApp computilityapp.ComputilityInternalAppService
 	spaceProducer  spacedomain.SpaceEventProducer
+	audit          auditcommon.AuditService
 }
 
 func (s projectService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -160,6 +169,26 @@ func (s projectService) CanApplyResourceName(owner domain.Account, name domain.R
 }
 
 func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (dto ProjectDTO, err error) {
+	//sdk text audit
+	name := cmd.Name.ResourceName()
+	if err := s.audit.TextAudit(name, auditTitle); err != nil {
+		return ProjectDTO{}, err
+	}
+
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		if err := s.audit.TextAudit(title, auditTitle); err != nil {
+			return ProjectDTO{}, err
+		}
+	}
+
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		if err := s.audit.TextAudit(desc, auditProfile); err != nil {
+			return ProjectDTO{}, err
+		}
+	}
+
 	v := new(spacedomain.Project)
 	cmd.toProject(v)
 	count := v.GetQuotaCount()
