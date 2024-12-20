@@ -188,6 +188,7 @@ func (s ResourceService) listResources(
 
 	if len(projects) > 0 {
 		all, err := s.ProjectPg.FindUserProjects(projects)
+		fmt.Printf("==================all: %+v\n", all)
 		if err != nil {
 			return nil, err
 		}
