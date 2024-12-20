@@ -197,6 +197,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 
 	// step2: save
 	v.RepoId = pid
+	v.Id = pid
 
 	if v.Hardware.IsNpu() {
 		v.CompPowerAllocated = true
