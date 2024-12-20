@@ -10,6 +10,7 @@ import (
 
 	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
@@ -54,6 +55,7 @@ func NewUserService(
 	sender message.MessageProducer,
 	points pointsPort.Points,
 	encryption utils.SymmetricEncryption,
+	audit auditcommon.AuditService,
 ) UserService {
 	return userService{
 		ps:         ps,
@@ -61,6 +63,7 @@ func NewUserService(
 		sender:     sender,
 		points:     points,
 		encryption: encryption,
+		audit:      audit,
 	}
 }
 
@@ -70,6 +73,7 @@ type userService struct {
 	sender     message.MessageProducer
 	points     pointsPort.Points
 	encryption utils.SymmetricEncryption
+	audit      auditcommon.AuditService
 }
 
 func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
