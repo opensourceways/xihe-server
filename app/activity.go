@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
@@ -51,6 +53,7 @@ func (s activityService) list(owner domain.Account, all bool) (
 	dtos []ActivityDTO, err error,
 ) {
 	activities, err := s.repo.Find(owner, repository.ActivityFindOption{})
+	fmt.Printf("=====================activities: %+v\n", activities)
 	if err != nil || len(activities) == 0 {
 		return
 	}

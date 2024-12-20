@@ -2,6 +2,7 @@ package mongodb
 
 import (
 	"context"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 
@@ -82,7 +83,7 @@ func (col activity) List(owner string, opt repositories.ActivityListDO) (
 	for i := range items {
 		col.toActivityDO(&items[i], &r[i])
 	}
-
+	fmt.Printf("=======================r: %+v\n", r)
 	return
 }
 
