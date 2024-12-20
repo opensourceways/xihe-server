@@ -46,7 +46,7 @@ func NewLikeService(
 	repo repository.Like,
 	user userrepo.User,
 	model repository.Model,
-	project spacerepo.Project,
+	projectPg spacerepo.ProjectPg,
 	dataset repository.Dataset,
 	activity repository.Activity,
 	sender message.LikeMessageProducer,
@@ -57,10 +57,10 @@ func NewLikeService(
 		sender:   sender,
 
 		rs: ResourceService{
-			User:    user,
-			Model:   model,
-			Project: project,
-			Dataset: dataset,
+			User:      user,
+			Model:     model,
+			ProjectPg: projectPg,
+			Dataset:   dataset,
 		},
 	}
 }
@@ -114,7 +114,6 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 			ResourceObject: obj,
 		},
 	}
-
 	if err := s.repo.Save(&v); err != nil {
 		return err
 	}

@@ -1,6 +1,8 @@
 package repositoryimpl
 
 import (
+	"fmt"
+
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
@@ -8,6 +10,9 @@ import (
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 )
 
+func equalQuery(field string) string {
+	return fmt.Sprintf(`%s = ?`, field)
+}
 func (impl project) IncreaseFork(p *domain.ResourceIndex) error {
 	err := impl.mapper.IncreaseFork(repositories.ToResourceIndexDO(p))
 	if err != nil {
@@ -145,19 +150,45 @@ func (impl project) ListAndSortByUpdateTime(
 	)
 }
 
+// ListAndSortByUpdateTime Pg
+func (adapter *projectAdapter) ListAndSortByUpdateTime(
+	owner domain.Account, option *repository.ResourceListOption,
+) (spacerepo.UserProjectsInfo, error) {
+	return adapter.list(
+		owner, option, adapter.daoImpl.ListAndSortByUpdateTime,
+	)
+}
+
 func (impl project) ListAndSortByFirstLetter(
 	owner domain.Account, option *repository.ResourceListOption,
 ) (spacerepo.UserProjectsInfo, error) {
 	return impl.list(
-		owner, option, impl.mapper.ListAndSortByFirstLetter,
+		owner, option, impl.mapper.ListAndSortByUpdateTime,
 	)
 }
 
+// ListAndSortByFirstLetter Pg
+func (adapter *projectAdapter) ListAndSortByFirstLetter(
+	owner domain.Account, option *repository.ResourceListOption,
+) (spacerepo.UserProjectsInfo, error) {
+	return adapter.list(
+		owner, option, adapter.daoImpl.ListAndSortByFirstLetter,
+	)
+}
 func (impl project) ListAndSortByDownloadCount(
 	owner domain.Account, option *repository.ResourceListOption,
 ) (spacerepo.UserProjectsInfo, error) {
 	return impl.list(
 		owner, option, impl.mapper.ListAndSortByDownloadCount,
+	)
+}
+
+// // ListAndSortByDownloadCount Pg
+func (adapter *projectAdapter) ListAndSortByDownloadCount(
+	owner domain.Account, option *repository.ResourceListOption,
+) (spacerepo.UserProjectsInfo, error) {
+	return adapter.list(
+		owner, option, adapter.daoImpl.ListAndSortByDownloadCount,
 	)
 }
 
@@ -175,7 +206,54 @@ func (impl project) list(
 	})
 }
 
+// list Pg
+func (adapter *projectAdapter) list(
+	owner domain.Account,
+	option *repository.ResourceListOption,
+	f func(string, *repositories.ResourceListDO) ([]ProjectSummaryDO, int, error),
+) (
+	info spacerepo.UserProjectsInfo, err error,
+) {
+	return adapter.doList(func() ([]ProjectSummaryDO, int, error) {
+		do := repositories.ToResourceListDO(option)
+
+		return f(owner.Account(), &do)
+	})
+}
+
 func (impl project) doList(
+	f func() ([]ProjectSummaryDO, int, error),
+) (
+	info spacerepo.UserProjectsInfo, err error,
+) {
+	v, total, err := f()
+	if err != nil {
+		err = repositories.ConvertError(err)
+
+		return
+	}
+
+	if len(v) == 0 {
+		return
+	}
+
+	r := make([]spacedomain.ProjectSummary, len(v))
+	for i := range v {
+		if err = v[i].toProjectSummary(&r[i]); err != nil {
+			r = nil
+
+			return
+		}
+	}
+
+	info.Projects = r
+	info.Total = total
+
+	return
+}
+
+// doList Pg
+func (adapter *projectAdapter) doList(
 	f func() ([]ProjectSummaryDO, int, error),
 ) (
 	info spacerepo.UserProjectsInfo, err error,

@@ -19,18 +19,18 @@ func AddRouterForRepoFileInternalController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
 	model repository.Model,
-	project spacerepo.Project,
+	projectPg spacerepo.ProjectPg,
 	dataset repository.Dataset,
 	sender message.RepoMessageProducer,
 	us uapp.UserService,
 	f filescan.FileScanService,
 ) {
 	ctl := RepoFileInternalController{
-		s:       app.NewRepoFileService(p, sender, f),
-		us:      us,
-		model:   model,
-		project: project,
-		dataset: dataset,
+		s:         app.NewRepoFileService(p, sender, f),
+		us:        us,
+		model:     model,
+		projectPg: projectPg,
+		dataset:   dataset,
 	}
 
 	rg.GET("/v1/repo/:type/:user/:name/files", internalApiCheckMiddleware(&ctl.baseController), ctl.List)
@@ -40,11 +40,11 @@ func AddRouterForRepoFileInternalController(
 type RepoFileInternalController struct {
 	baseController
 
-	s       app.RepoFileService
-	us      uapp.UserService
-	model   repository.Model
-	project spacerepo.Project
-	dataset repository.Dataset
+	s         app.RepoFileService
+	us        uapp.UserService
+	model     repository.Model
+	projectPg spacerepo.ProjectPg
+	dataset   repository.Dataset
 }
 
 // @Summary		Download
@@ -175,7 +175,7 @@ func (ctl *RepoFileInternalController) getRepoInfo(ctx *gin.Context, user domain
 		s.ResourceSummary, err = ctl.model.GetSummaryByName(user, name)
 
 	case domain.ResourceTypeProject.ResourceType():
-		s.ResourceSummary, err = ctl.project.GetSummaryByName(user, name)
+		s.ResourceSummary, err = ctl.projectPg.GetSummaryByName(user, name)
 
 	case domain.ResourceTypeDataset.ResourceType():
 		s.ResourceSummary, err = ctl.dataset.GetSummaryByName(user, name)

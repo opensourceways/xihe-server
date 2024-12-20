@@ -21,7 +21,6 @@ import (
 func AddRouterForProjectController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
-	repo spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -31,16 +30,17 @@ func AddRouterForProjectController(
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
+	repoPg spacerepo.ProjectPg,
 ) {
 	ctl := ProjectController{
 		user:    user,
-		repo:    repo,
+		repoPg:  repoPg,
 		model:   model,
 		dataset: dataset,
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repo, model, dataset, activity, sender, computility, spaceProducer,
+			user, repoPg, model, dataset, activity, sender, computility, spaceProducer,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
@@ -71,9 +71,10 @@ func AddRouterForProjectController(
 type ProjectController struct {
 	baseController
 
-	user userrepo.User
-	repo spacerepo.Project
-	s    spaceapp.ProjectService
+	user   userrepo.User
+	repoPg spacerepo.ProjectPg
+
+	s spaceapp.ProjectService
 
 	model   repository.Model
 	dataset repository.Dataset
@@ -240,7 +241,7 @@ func (ctl *ProjectController) Delete(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "deleta project")
 
-	proj, err := ctl.repo.GetByName(owner, name)
+	proj, err := ctl.repoPg.GetByName(owner, name)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
@@ -316,7 +317,7 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update project")
 
-	proj, err := ctl.repo.Get(owner, ctx.Param("id"))
+	proj, err := ctl.repoPg.Get(owner, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 
@@ -380,6 +381,7 @@ func (ctl *ProjectController) Get(ctx *gin.Context) {
 	}
 
 	proj, err := ctl.s.GetByName(owner, name, !visitor && pl.isMyself(owner))
+
 	if err != nil {
 		if isErrorOfAccessingPrivateRepo(err) {
 			ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
@@ -590,7 +592,7 @@ func (ctl *ProjectController) Fork(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "fork project")
 
-	proj, err := ctl.repo.Get(owner, ctx.Param("id"))
+	proj, err := ctl.repoPg.Get(owner, ctx.Param("id"))
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
@@ -664,7 +666,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	data, err := ctl.model.GetByName(owner, name)
+	model, err := ctl.model.GetByName(owner, name)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
@@ -678,7 +680,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	if pl.isNotMe(owner) && data.IsPrivate() {
+	if pl.isNotMe(owner) && model.IsPrivate() {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
 			errorResourceNotExists,
 			"can't access private project",
@@ -691,15 +693,16 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 
 	index := domain.ResourceIndex{
 		Owner: owner,
-		Id:    data.Id,
+		Id:    model.Id,
 	}
+
 	if err = ctl.s.AddRelatedModel(&proj, &index); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
 		return
 	}
 
-	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(data)))
+	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(model)))
 }
 
 // @Summary		RemoveRelatedModel
@@ -908,6 +911,7 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 	}
 
 	pl, proj, ok := ctl.checkPermission(ctx)
+
 	if !ok {
 		return
 	}
@@ -948,7 +952,7 @@ func (ctl *ProjectController) checkPermission(ctx *gin.Context) (
 		return
 	}
 
-	proj, err = ctl.repo.Get(owner, ctx.Param("id"))
+	proj, err = ctl.repoPg.Get(owner, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 

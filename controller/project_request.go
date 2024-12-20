@@ -179,3 +179,16 @@ func (req *reqToNotifyUpdateCode) toCmd() (cmd spaceapp.CmdToNotifyUpdateCode, e
 	cmd.CommitId = req.CommitId
 	return
 }
+
+type reqToIncrease struct {
+	Owner string `json:"owner"`
+	Id    string `json:"id"`
+}
+
+func (req *reqToIncrease) toCmd() (cmd spaceapp.CmdToIncrease, err error) {
+	cmd.ResourceIndex = domain.ResourceIndex{
+		Owner: domain.CreateAccount(req.Owner),
+		Id:    req.Id,
+	}
+	return
+}
