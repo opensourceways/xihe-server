@@ -32,14 +32,6 @@ jobs:
           GITHUB_AUTHENTICATION_TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
         with:
           args: ./...
-          
-      - name: Set Login Credentials
-        env:
-          TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
-          USER: ${{ secrets.ZYK_USER_NAME }}
-        run: |
-          chmod 600 ~/.netrc
-          echo "machine github.com login $USER password $TOKEN" > ~/.netrc
-
+        
       - name: cleanup
         run: rm -f ~/.netrc
