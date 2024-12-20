@@ -18,11 +18,6 @@ type projectAdapter struct {
 }
 
 func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project, error) {
-	if v.Id != "" {
-		err := errors.New("must be a new project")
-		return spacedomain.Project{}, err
-	}
-
 	do := toProjectDO(v)
 	err := adapter.db().Clauses(clause.Returning{}).Create(&do).Error
 	if err != nil {
