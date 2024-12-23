@@ -448,6 +448,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		controller.AddRouterForComputilityWebController(
 			v1, computilityWebService,
 		)
+
+		internal.GET("/heartbeat", func(*gin.Context) {})
 	}
 
 	engine.UseRawPath = true
