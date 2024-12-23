@@ -65,6 +65,7 @@ func (s activityService) list(owner domain.Account, all bool) (
 		item := &activities[i]
 
 		objs[i] = &item.ResourceObject
+		objs[i].ResourceIndex.Id = item.RepoId
 		orders[i] = orderByTime{t: item.Time, p: i}
 	}
 	fmt.Printf("==============objs: %+v\n", objs)
