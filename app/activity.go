@@ -65,9 +65,9 @@ func (s activityService) list(owner domain.Account, all bool) (
 		item := &activities[i]
 
 		objs[i] = &item.ResourceObject
-		if objs[i].Type.ResourceType() != "like" {
-			objs[i].ResourceIndex.Id = item.RepoId
-		}
+
+		objs[i].ResourceIndex.Id = item.RepoId
+
 		orders[i] = orderByTime{t: item.Time, p: i}
 	}
 	fmt.Printf("==============objs: %+v\n", objs)
