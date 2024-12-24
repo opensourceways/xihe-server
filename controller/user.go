@@ -576,9 +576,9 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 
 		return
 	}
-	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd2); err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 
+	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd2); err != nil {
+		SendError(ctx, err)
 		return
 	}
 

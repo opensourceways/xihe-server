@@ -67,6 +67,21 @@ func (cmd *ProjectUpdateCmd) toProject(
 func (s projectService) Update(
 	p *spacedomain.Project, cmd *ProjectUpdateCmd, pr platform.Repository,
 ) (dto ProjectDTO, err error) {
+	//sdk text audit
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		if err := s.audit.TextAudit(title, auditTitle); err != nil {
+			return ProjectDTO{}, err
+		}
+	}
+
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		if err := s.audit.TextAudit(desc, auditProfile); err != nil {
+			return ProjectDTO{}, err
+		}
+	}
+
 	opt := new(platform.RepoOption)
 	if !cmd.toProject(&p.ProjectModifiableProperty, opt) {
 		s.toProjectDTO(p, &dto)
