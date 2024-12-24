@@ -86,7 +86,7 @@ func (s projectService) Update(
 		ResourceToUpdate: s.toResourceToUpdate(p),
 		Property:         p.ProjectModifiableProperty,
 	}
-	if err = s.repo.UpdateProperty(&info); err != nil {
+	if err = s.repoPg.UpdateProperty(&info); err != nil {
 		return
 	}
 
@@ -109,7 +109,7 @@ func (s projectService) SetTags(p *spacedomain.Project, cmd *app.ResourceTagsUpd
 		Property:         p.ProjectModifiableProperty,
 	}
 
-	return s.repo.UpdateProperty(&info)
+	return s.repoPg.UpdateProperty(&info)
 }
 
 func (s projectService) AddRelatedModel(
@@ -117,7 +117,7 @@ func (s projectService) AddRelatedModel(
 ) error {
 	return s.addRelatedResource(
 		p, p.RelatedModels, index, domain.ResourceTypeModel,
-		s.repo.AddRelatedModel,
+		s.repoPg.AddRelatedModel,
 	)
 }
 
@@ -126,7 +126,7 @@ func (s projectService) AddRelatedDataset(
 ) error {
 	return s.addRelatedResource(
 		p, p.RelatedDatasets, index, domain.ResourceTypeDataset,
-		s.repo.AddRelatedDataset,
+		s.repoPg.AddRelatedDataset,
 	)
 }
 
@@ -146,7 +146,7 @@ func (s projectService) addRelatedResource(
 	}
 
 	info := repository.RelatedResourceInfo{
-		ResourceToUpdate: s.toResourceToUpdate(p),
+		ResourceToUpdate: s.toResourceToUpdatePg(p),
 		RelatedResource:  *index,
 	}
 
@@ -176,7 +176,7 @@ func (s projectService) RemoveRelatedModel(
 ) error {
 	return s.removeRelatedResource(
 		p, p.RelatedModels, index, domain.ResourceTypeModel,
-		s.repo.RemoveRelatedModel,
+		s.repoPg.RemoveRelatedModel,
 	)
 }
 
@@ -185,7 +185,7 @@ func (s projectService) RemoveRelatedDataset(
 ) error {
 	return s.removeRelatedResource(
 		p, p.RelatedDatasets, index, domain.ResourceTypeDataset,
-		s.repo.RemoveRelatedDataset,
+		s.repoPg.RemoveRelatedDataset,
 	)
 }
 
@@ -228,6 +228,15 @@ func (s projectService) toResourceToUpdate(p *spacedomain.Project) repository.Re
 	return repository.ResourceToUpdate{
 		Owner:     p.Owner,
 		Id:        p.Id,
+		Version:   p.Version,
+		UpdatedAt: utils.Now(),
+	}
+}
+
+func (s projectService) toResourceToUpdatePg(p *spacedomain.Project) repository.ResourceToUpdate {
+	return repository.ResourceToUpdate{
+		Owner:     p.Owner,
+		Id:        p.RepoId,
 		Version:   p.Version,
 		UpdatedAt: utils.Now(),
 	}

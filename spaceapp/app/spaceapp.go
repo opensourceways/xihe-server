@@ -30,13 +30,13 @@ type SpaceappAppService interface {
 // NewSpaceappAppService creates a new instance of the space app service.
 func NewSpaceappAppService(
 	repo repository.SpaceAppRepository,
-	spaceRepo spacerepo.Project,
+	spaceRepoPg spacerepo.ProjectPg,
 	sse spaceappdomain.SeverSentEvent,
 	spacesender spacemesage.SpaceAppMessageProducer,
 ) *spaceappAppService {
 	return &spaceappAppService{
 		repo:        repo,
-		spaceRepo:   spaceRepo,
+		spaceRepoPg: spaceRepoPg,
 		sse:         sse,
 		spacesender: spacesender,
 	}
@@ -45,7 +45,7 @@ func NewSpaceappAppService(
 // spaceappAppService
 type spaceappAppService struct {
 	repo        repository.SpaceAppRepository
-	spaceRepo   spacerepo.Project
+	spaceRepoPg spacerepo.ProjectPg
 	sse         spaceappdomain.SeverSentEvent
 	spacesender spacemesage.SpaceAppMessageProducer
 }
@@ -56,7 +56,8 @@ func (s *spaceappAppService) GetByName(
 ) (SpaceAppDTO, error) {
 	var dto SpaceAppDTO
 
-	space, err := s.spaceRepo.GetByName(index.Owner, index.Name)
+	space, err := s.spaceRepoPg.GetByName(index.Owner, index.Name)
+
 	if err != nil {
 		logrus.WithField("space_index", index).Errorf("fail to get space, err: %s", err.Error())
 		return dto, err
@@ -141,7 +142,7 @@ func (s *spaceappAppService) getPrivateReadSpaceApp(
 ) (spaceappdomain.SpaceApp, error) {
 	var spaceApp spaceappdomain.SpaceApp
 
-	space, err := s.spaceRepo.GetByName(user, index.Name)
+	space, err := s.spaceRepoPg.GetByName(user, index.Name)
 	if err != nil {
 		return spaceApp, err
 	}
@@ -216,7 +217,7 @@ func toSpaceAppDTO(app *spaceappdomain.SpaceApp) SpaceAppDTO {
 // CheckPermissionRead  check user permission for read space app.
 func (s *spaceappAppService) CheckPermissionRead(
 	ctx context.Context, user domain.Account, index *spacedomain.SpaceIndex) error {
-	space, err := s.spaceRepo.GetByName(index.Owner, index.Name)
+	space, err := s.spaceRepoPg.GetByName(index.Owner, index.Name)
 	if err != nil {
 		return err
 	}

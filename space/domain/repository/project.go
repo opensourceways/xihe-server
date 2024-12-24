@@ -22,11 +22,11 @@ type ProjectSummary struct {
 	Tags []string
 }
 
-type Project interface {
+type ProjectPg interface {
 	Save(*spacedomain.Project) (spacedomain.Project, error)
 	Delete(*domain.ResourceIndex) error
-	Get(domain.Account, string) (spacedomain.Project, error)
 	GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)
+	Get(domain.Account, string) (spacedomain.Project, error)
 	GetByRepoId(domain.Identity) (spacedomain.Project, error)
 	GetSummary(domain.Account, string) (ProjectSummary, error)
 	GetSummaryByName(domain.Account, domain.ResourceName) (domain.ResourceSummary, error)
@@ -46,11 +46,11 @@ type Project interface {
 	AddLike(*domain.ResourceIndex) error
 	RemoveLike(*domain.ResourceIndex) error
 
-	AddRelatedModel(*repository.RelatedResourceInfo) error
-	RemoveRelatedModel(*repository.RelatedResourceInfo) error
-
 	AddRelatedDataset(*repository.RelatedResourceInfo) error
 	RemoveRelatedDataset(*repository.RelatedResourceInfo) error
+
+	AddRelatedModel(*repository.RelatedResourceInfo) error
+	RemoveRelatedModel(*repository.RelatedResourceInfo) error
 
 	UpdateProperty(*ProjectPropertyUpdateInfo) error
 

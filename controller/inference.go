@@ -22,7 +22,7 @@ import (
 func AddRouterForInferenceController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
-	project spacerepo.Project,
+	projectPg spacerepo.ProjectPg,
 	sender message.Sender,
 	whitelist userapp.WhiteListService,
 	spacesender spacemesage.SpaceAppMessageProducer,
@@ -31,9 +31,9 @@ func AddRouterForInferenceController(
 ) {
 	ctl := InferenceController{
 		s: spaceappApp.NewInferenceService(
-			p, sender, apiConfig.MinSurvivalTimeOfInference, spacesender, spaceappRepo, project,
+			p, sender, apiConfig.MinSurvivalTimeOfInference, spacesender, spaceappRepo, projectPg,
 		),
-		project:    project,
+		projectPg:  projectPg,
 		whitelist:  whitelist,
 		appService: appService,
 	}
@@ -54,7 +54,7 @@ type InferenceController struct {
 	s          spaceappApp.InferenceService
 	appService spaceappApp.SpaceappAppService
 
-	project spacerepo.Project
+	projectPg spacerepo.ProjectPg
 
 	inferenceDir      domain.Directory
 	inferenceBootFile domain.FilePath
@@ -263,7 +263,7 @@ func (ctl *InferenceController) GetRealTimeSpaceLog(ctx *gin.Context) {
 // @Param    owner  path  string  true  "owner of space" MaxLength(40)
 // @Param    name   path  string  true  "name of space" MaxLength(100)
 // @Accept   json
-// @Success  200  {object}  responseData{data=string,msg=string,code=string}
+// @Success  200  {object}   responseData{data=string,msg=string,code=string}
 // @x-example {"data": "successfully"}
 // @Router   /v1/space-app/{owner}/{name}/read [get]
 func (ctl *InferenceController) CanRead(ctx *gin.Context) {

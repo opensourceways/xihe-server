@@ -19,7 +19,7 @@ import (
 func AddRouterForProjectInternalController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
-	repo spacerepo.Project,
+
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -29,16 +29,17 @@ func AddRouterForProjectInternalController(
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
+	repoPg spacerepo.ProjectPg,
 ) {
 	ctl := ProjectInternalController{
 		user:    user,
-		repo:    repo,
+		repoPg:  repoPg,
 		model:   model,
 		dataset: dataset,
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repo, model, dataset, activity, sender, computility, spaceProducer,
+			user, repoPg, model, dataset, activity, sender, computility, spaceProducer,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
@@ -50,9 +51,9 @@ func AddRouterForProjectInternalController(
 type ProjectInternalController struct {
 	baseController
 
-	user userrepo.User
-	repo spacerepo.Project
-	s    spaceapp.ProjectService
+	user   userrepo.User
+	repoPg spacerepo.ProjectPg
+	s      spaceapp.ProjectService
 
 	model   repository.Model
 	dataset repository.Dataset
@@ -97,7 +98,7 @@ func (ctl *ProjectInternalController) GetSpaceById(ctx *gin.Context) {
 // @Param    body  body  reqToNotifyUpdateCode  true  "body"
 // @Accept   json
 // @Security Internal
-// @Success  202   {object}  responseData{data=string,msg=string,code=string}
+// @Success  202   {object}   responseData{data=string,msg=string,code=string}
 // @Router   /v1/space/{id}/notify_update_code [put]
 func (ctl *ProjectInternalController) NotifyUpdateCode(ctx *gin.Context) {
 	req := reqToNotifyUpdateCode{}
