@@ -72,8 +72,6 @@ type ActivityDO struct {
 	RepoType string
 
 	ResourceObjectDO
-
-	RepoId string
 }
 
 func (do *ActivityDO) toActivity(r *domain.Activity) (err error) {
@@ -88,7 +86,6 @@ func (do *ActivityDO) toActivity(r *domain.Activity) (err error) {
 	}
 
 	r.Time = do.Time
-	r.RepoId = do.RepoId
 
 	return do.ResourceObjectDO.toResourceObject(&r.ResourceObject)
 }
