@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: self-ubuntu-latest
+    runs-on: [self-hosted, Linux]
 
     steps:
       - name: Checkout Source
@@ -33,13 +33,3 @@ jobs:
         with:
           args: ./...
           
-      - name: Set Login Credentials
-        env:
-          TOKEN: ${{ secrets.ZYK_PERSONAL_TOKEN }}
-          USER: ${{ secrets.ZYK_USER_NAME }}
-        run: |
-          chmod 600 ~/.netrc
-          echo "machine github.com login $USER password $TOKEN" > ~/.netrc
-
-      - name: cleanup
-        run: rm -f ~/.netrc

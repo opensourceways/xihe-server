@@ -448,6 +448,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		controller.AddRouterForComputilityWebController(
 			v1, computilityWebService,
 		)
+		controller.AddRouterForFileScanInternalController(
+			internal, fileScanService,
+		)
 
 		internal.GET("/heartbeat", func(*gin.Context) {})
 	}
