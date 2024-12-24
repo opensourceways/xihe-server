@@ -269,7 +269,6 @@ type activityItem struct {
 	RepoType string `bson:"repo_type" json:"repo_type"`
 
 	ResourceObject `bson:",inline"`
-	RepoId         string `bson:"repo_id" json:"repo_id"`
 }
 
 type ResourceObject struct {

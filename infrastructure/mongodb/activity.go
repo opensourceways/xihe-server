@@ -103,6 +103,5 @@ func (col activity) toActivityDO(item *activityItem, do *repositories.ActivityDO
 		Time:             item.Time,
 		RepoType:         item.RepoType,
 		ResourceObjectDO: toResourceObjectDO(&item.ResourceObject),
-		RepoId:           item.RepoId,
 	}
 }

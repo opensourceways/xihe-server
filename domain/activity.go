@@ -56,8 +56,6 @@ type Activity struct {
 	RepoType RepoType
 
 	ResourceObject
-
-	RepoId string
 }
 
 func (r Activity) IsPublic() bool {
