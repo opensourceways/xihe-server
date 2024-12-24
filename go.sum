@@ -1092,6 +1092,8 @@ github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c h
 github.com/opensourceways/server-common-lib v0.0.0-20231027024402-f55c66e6699c/go.mod h1:1iVJ+C3L9e0GJMUhGfbegH4CecnALntzfTW29GzBGUk=
 github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1 h1:iy7RQZk/5GiihoHGYAZbbs58OZjEfacGERgTPLCroWI=
 github.com/opensourceways/xihe-aicc-finetune v0.0.0-20231228122500-0440d3fb56e1/go.mod h1:KM9s7Ws5FQdBv8suFTLXNtrvOphxFSgIvYaDWEvN3xQ=
+github.com/opensourceways/xihe-audit-sync-sdk v0.0.0-20241216061822-f9bf23a88e08 h1:tsgRYkS1+pPMdQ7+EsLUW0b6MpZe3ExdiXyDcnU5UGY=
+github.com/opensourceways/xihe-audit-sync-sdk v0.0.0-20241216061822-f9bf23a88e08/go.mod h1:JxhcZPxAt0FZCqyaRdmHg7lRupZ7wqDqEROuHf0u/E8=
 github.com/opensourceways/xihe-extra-services v1.3.0 h1:p5jRvnjMQeIQdLw/pha5jsOxXbvYMnzzpv6MInz+QWI=
 github.com/opensourceways/xihe-extra-services v1.3.0/go.mod h1:umthEXsl3BqIcQlNbfKx2VeOTUI2pO8reMQwLahiwRk=
 github.com/opensourceways/xihe-finetune v0.0.0-20231114131740-c5f4e59f7e43 h1:9u9AcfJeR2zvnjiJXrShL83LtEBhqD3GK7o45eVZ0o0=
@@ -1104,6 +1106,10 @@ github.com/opensourceways/xihe-inference-evaluate v1.3.0 h1:JsmQh1MX2BY1n9yiqkny
 github.com/opensourceways/xihe-inference-evaluate v1.3.0/go.mod h1:NgaidYIn75D0QhptFnXtXdb6ezvH/2NrTz1Ulc3dkNE=
 github.com/opensourceways/xihe-sdk v0.0.0-20241022122920-59279dd6cc0c h1:8DkK51gdMeTWlpdW7VKvPjDfCrt/OACrDz/tTCqDKho=
 github.com/opensourceways/xihe-sdk v0.0.0-20241022122920-59279dd6cc0c/go.mod h1:RvLf2RtP+9zZaM7Zknun+MoBUx2jhu/jKwu84pbUAq4=
+github.com/opensourceways/xihe-sdk v1.0.1-temp h1:ZYQjRBNeLSDcfAJyeYVWgaWqfSJjwmjWSSC10QP6e0c=
+github.com/opensourceways/xihe-sdk v1.0.1-temp/go.mod h1:RvLf2RtP+9zZaM7Zknun+MoBUx2jhu/jKwu84pbUAq4=
+github.com/opensourceways/xihe-sdk v1.7.0 h1:cTcvUjbEbGar6e3QdEZBVA/BoNHbgDMdjAbsKGa3D8g=
+github.com/opensourceways/xihe-sdk v1.7.0/go.mod h1:RvLf2RtP+9zZaM7Zknun+MoBUx2jhu/jKwu84pbUAq4=
 github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37 h1:BtuQhXKv/EdH36nm26fUrCQnfzKw7UqbPNPZmBS+b70=
 github.com/opensourceways/xihe-training-center v0.0.0-20231025094431-5264247aed37/go.mod h1:INt/SP760CQIuTT/tJfU+bFKig2ISyY6a1DRVN6407o=
 github.com/pelletier/go-toml/v2 v2.2.2 h1:aYUidT7k73Pcl9nb2gScu7NSrKCSHIDE89b3+6Wq+LM=

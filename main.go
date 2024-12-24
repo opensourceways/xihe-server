@@ -12,6 +12,7 @@ import (
 	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/aiccfinetune/infrastructure/aiccfinetuneimpl"
 	"github.com/opensourceways/xihe-server/bigmodel/infrastructure/bigmodels"
+	"github.com/opensourceways/xihe-server/common/infrastructure/audit"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
@@ -155,6 +156,9 @@ func main() {
 		logrus.Fatalf("init domain config failed, err:%s", err.Error())
 	}
 	cfg.InitAppConfig()
+
+	//audit
+	audit.Init(&cfg.AuditSyncSdk)
 
 	// run
 	server.StartWebServer(o.service.Port, o.service.GracePeriod, cfg)
