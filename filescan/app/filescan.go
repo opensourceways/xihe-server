@@ -3,7 +3,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
 
 	filescan "github.com/opensourceways/xihe-server/filescan/domain"
