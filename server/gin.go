@@ -70,6 +70,7 @@ import (
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/sseadapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
+	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
@@ -307,7 +308,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	userAppService := userapp.NewUserService(
 		user, gitlabUser, usermsg.MessageAdapter(&cfg.User.Message, publisher),
-		pointsAppService, controller.EncryptHelperToken(),
+		pointsAppService, controller.EncryptHelperToken(), authingUser, userlogincli.NewLoginCli(loginService),
 	)
 
 	promotionAppService := promotionapp.NewPromotionService(

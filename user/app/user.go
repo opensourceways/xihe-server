@@ -17,7 +17,6 @@ import (
 	platform "github.com/opensourceways/xihe-server/domain/platform"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
-	"github.com/opensourceways/xihe-server/user/domain/account"
 	"github.com/opensourceways/xihe-server/user/domain/login"
 	"github.com/opensourceways/xihe-server/user/domain/message"
 	pointsPort "github.com/opensourceways/xihe-server/user/domain/points"
@@ -83,8 +82,6 @@ type userService struct {
 	sender     message.MessageProducer
 	points     pointsPort.Points
 	encryption utils.SymmetricEncryption
-	account    account.UserAccount
-	config     *domain.Config
 	auth       authing.User
 	login      login.Login
 }
