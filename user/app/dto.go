@@ -143,6 +143,8 @@ type BindEmailCmd struct {
 	PassWord domain.Password
 }
 
+type CmdToModifyInfo = domain.ModifyAccountInfo
+
 type CreatePlatformAccountCmd struct {
 	Email    domain.Email
 	Account  domain.Account

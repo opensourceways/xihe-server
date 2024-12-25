@@ -3,13 +3,21 @@ package domain
 import (
 	"time"
 
+	"golang.org/x/xerrors"
+
 	types "github.com/opensourceways/xihe-server/domain"
+)
+
+const (
+	modifyPhone = "phone"
+	modifyEmail = "email"
 )
 
 // user
 type User struct {
 	Id      string
 	Email   Email
+	Phone   Phone
 	Account Account
 
 	Bio      Bio
@@ -71,6 +79,14 @@ type UserRegInfo struct {
 	Version  int
 }
 
+type ModifyAccountInfo struct {
+	AccountType string `json:"account_type"`
+	OldAccount  string `json:"oldaccount"`
+	OldCode     string `json:"oldcode"`
+	Account     string `json:"account"`
+	Code        string `json:"code"`
+}
+
 // whitelist
 type WhiteListInfo struct {
 	Account   types.Account
@@ -88,4 +104,38 @@ func (w WhiteListInfo) Enable() bool {
 
 func (u *User) RevokePrivacy() {
 	u.IsAgreePrivacy = false
+}
+
+func (cmd *ModifyAccountInfo) isPhone() bool {
+	return cmd.AccountType == modifyPhone
+}
+
+func (cmd *ModifyAccountInfo) isEmail() bool {
+	return cmd.AccountType == modifyEmail
+}
+
+func (cmd *ModifyAccountInfo) IsChange(user *User) error {
+	if cmd.isPhone() {
+		if cmd.Account != cmd.OldAccount {
+			phone, err := NewPhone(cmd.Account)
+			if err != nil {
+				return err
+			}
+			user.Phone = phone
+		} else {
+			return xerrors.New("phone account is not change")
+		}
+	}
+	if cmd.isEmail() {
+		if cmd.Account != cmd.OldAccount {
+			email, err := NewEmail(cmd.Account)
+			if err != nil {
+				return err
+			}
+			user.Email = email
+		} else {
+			return xerrors.New("email account is not change")
+		}
+	}
+	return nil
 }

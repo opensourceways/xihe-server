@@ -2,8 +2,10 @@ package controller
 
 import (
 	agreement "github.com/opensourceways/xihe-server/agreement/app"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/user/app"
 	"github.com/opensourceways/xihe-server/user/domain"
+	"golang.org/x/xerrors"
 )
 
 type UserAgreement struct {
@@ -26,6 +28,14 @@ type EmailCode struct {
 	Code  string `json:"code"`
 }
 
+type ModifyInfo struct {
+	AccountType string `json:"account_type"`
+	OldAccount  string `json:"oldaccount"`
+	OldCode     string `json:"oldcode"`
+	Account     string `json:"account"`
+	Code        string `json:"code"`
+}
+
 func (req *EmailCode) toCmd(user domain.Account) (cmd app.BindEmailCmd, err error) {
 	if cmd.Email, err = domain.NewEmail(req.Email); err != nil {
 		return
@@ -38,6 +48,20 @@ func (req *EmailCode) toCmd(user domain.Account) (cmd app.BindEmailCmd, err erro
 		return
 	}
 
+	return
+}
+
+func (m *ModifyInfo) toCmd() (cmd app.CmdToModifyInfo, err error) {
+	if m.Account == "" || m.OldAccount == "" || m.OldCode == "" || m.AccountType == "" || m.Code == "" {
+		err = allerror.New(allerror.ErrorCodeUserNotFound, "",
+			xerrors.Errorf("user update info empty"))
+		return
+	}
+	cmd.Account = m.Account
+	cmd.AccountType = m.AccountType
+	cmd.OldCode = m.OldCode
+	cmd.OldAccount = m.OldAccount
+	cmd.Code = m.Code
 	return
 }
 
