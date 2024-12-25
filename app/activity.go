@@ -53,7 +53,7 @@ func (s activityService) list(owner domain.Account, all bool) (
 	dtos []ActivityDTO, err error,
 ) {
 	activities, err := s.repo.Find(owner, repository.ActivityFindOption{})
-	fmt.Printf("===============activities: %+v\n", activities)
+
 	if err != nil || len(activities) == 0 {
 		return
 	}
@@ -68,10 +68,9 @@ func (s activityService) list(owner domain.Account, all bool) (
 
 		orders[i] = orderByTime{t: item.Time, p: i}
 	}
-	fmt.Printf("==============objs: %+v\n", objs)
-	fmt.Printf("==============orders: %+v\n", orders)
+
 	resources, err := s.rs.list(objs)
-	fmt.Printf("===============resources: %+v\n", resources)
+
 	if err != nil {
 		return
 	}

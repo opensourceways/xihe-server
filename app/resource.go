@@ -59,8 +59,6 @@ func (s ResourceService) list(resources []*domain.ResourceObject) (
 	dtos []ResourceDTO, err error,
 ) {
 	users, projects, datasets, models := s.toOptions(resources)
-	fmt.Printf("======================projects: %+v\n", projects)
-	fmt.Printf("======================datasets: %+v\n", datasets)
 
 	return s.listResources(users, projects, datasets, models, len(resources))
 }
@@ -190,7 +188,6 @@ func (s ResourceService) listResources(
 
 	if len(projects) > 0 {
 		all, err := s.ProjectPg.FindUserProjects(projects)
-		fmt.Printf("==================all: %+v\n", all)
 		if err != nil {
 			return nil, err
 		}
@@ -225,7 +222,6 @@ func (s ResourceService) listResources(
 
 	if n := len(datasets); n > 0 {
 		all, err := s.Dataset.FindUserDatasets(datasets)
-		fmt.Printf("==================all2: %+v\n", all)
 		if err != nil {
 			return nil, err
 		}
