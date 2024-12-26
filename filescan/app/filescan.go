@@ -105,6 +105,7 @@ func (s *fileScanService) CreateList(ctx context.Context, cmd CreateFileScanList
 			ID:       v.Id,
 			Owner:    v.Owner.Account(),
 			RepoName: v.RepoName,
+			RepoId:   v.RepoId,
 			Dir:      v.Dir,
 			File:     v.File,
 		}); err != nil {
@@ -139,6 +140,7 @@ func (s *fileScanService) LaunchModeration(ctx context.Context, cmd LaunchModera
 			ID:       v.Id,
 			Owner:    v.Owner.Account(),
 			RepoName: v.RepoName,
+			RepoId:   v.RepoId,
 			Dir:      v.Dir,
 			File:     v.File,
 		}); err != nil {

@@ -30,7 +30,7 @@ type RepoFileService interface {
 	Preview(*UserInfo, *RepoFilePreviewCmd) ([]byte, error)
 	DeleteDir(*UserInfo, *RepoDirDeleteCmd) (string, error)
 	Download(*RepoFileDownloadCmd) (RepoFileDownloadDTO, error)
-	StreamDownload(*RepoFileDownloadCmd, func(io.Reader, int64)) error
+	StreamDownload(string, domain.FilePath, func(io.Reader, int64)) error
 	DownloadRepo(u *UserInfo, obj *domain.RepoDownloadedEvent, handle func(io.Reader, int64)) error
 }
 
@@ -143,10 +143,10 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	return dto, err
 }
 
-func (s *repoFileService) StreamDownload(cmd *RepoFileDownloadCmd, handle func(io.Reader, int64)) error {
-	return s.rf.StreamDownload(cmd.MyToken, &RepoFileInfo{
-		Path:   cmd.Path,
-		RepoId: cmd.Resource.RepoId,
+func (s *repoFileService) StreamDownload(repoId string, path domain.FilePath, handle func(io.Reader, int64)) error {
+	return s.rf.StreamDownload(&RepoFileInfo{
+		Path:   path,
+		RepoId: repoId,
 	}, handle)
 }
 
