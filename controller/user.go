@@ -547,12 +547,11 @@ func (ctl *UserController) Modify(ctx *gin.Context) {
 	}
 
 	user, ok := v.(domain.Account)
-
-	if user == nil {
+	if !ok {
 		e := xerrors.Errorf("not found user info")
 		err = allerror.New(allerror.ErrorCodeUserNotFound, "",
 			e)
-		ctl.sendBadRequestBody(ctx)
+		SendError(ctx, err)
 		return
 	}
 
