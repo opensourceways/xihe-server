@@ -61,7 +61,6 @@ type RepoFileDownloadCmd struct {
 	Path      domain.FilePath
 	Type      domain.ResourceType
 	Resource  domain.ResourceSummary
-	Unrecord  bool
 }
 
 type RepoFileCreateCmd struct {
@@ -124,7 +123,7 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	RepoFileDownloadDTO, error,
 ) {
 	dto, err := s.download(cmd)
-	if err == nil && !cmd.Unrecord {
+	if err == nil {
 		r := &cmd.Resource
 
 		_ = s.sender.AddOperateLogForDownloadFile(

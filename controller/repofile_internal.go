@@ -54,7 +54,6 @@ type RepoFileInternalController struct {
 // @Param			user			path	string	true	"user"
 // @Param			name			path	string	true	"repo name"
 // @Param			path			path	string	true	"repo file path"
-// @Param			not_recorded	query	bool	false	"whether record operation"
 // @Accept			json
 // @Success		200	{object}			app.RepoFileDownloadDTO
 // @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
@@ -70,7 +69,6 @@ func (ctl *RepoFileInternalController) Download(ctx *gin.Context) {
 		Type:     repoInfo.rt,
 		MyToken:  u.Token,
 		Resource: repoInfo.ResourceSummary,
-		Unrecord: ctx.Query("unrecord") == "true",
 	}
 
 	var err error
