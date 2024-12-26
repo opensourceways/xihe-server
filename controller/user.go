@@ -555,15 +555,8 @@ func (ctl *UserController) Modify(ctx *gin.Context) {
 		ctl.sendBadRequestBody(ctx)
 		return
 	}
-	middleware.SetAction(ctx, fmt.Sprintf("update user:%s's Contact Details", user.Account()))
-	ut, err1 := ctx.Request.Cookie(cookie_ut)
-	yg, err2 := ctx.Request.Cookie(cookie_yg)
-	if err1 != nil || err2 != nil || ut == nil || yg == nil {
-		err = xerrors.Errorf("gset headers info error:%w,%w", err1, err2)
-		ctl.sendBadRequestBody(ctx)
-		return
-	}
-	if errMsgCode, err := ctl.s.ModifyInfo(ctx, cmd, user, ut.Value, cookie_yg+"="+yg.Value); err != nil {
+
+	if errMsgCode, err := ctl.s.ModifyInfo(ctx, cmd, user); err != nil {
 		SendError(ctx, allerror.New(errMsgCode, "failed to modify user info", err))
 	} else {
 		ctl.sendRespOfPost(ctx, "success")

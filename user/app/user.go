@@ -52,7 +52,7 @@ type UserService interface {
 
 	RefreshGitlabToken(*RefreshTokenCmd) error
 
-	ModifyInfo(ctx context.Context, cmd CmdToModifyInfo, user domain.Account, ut string, yg string) (string, error)
+	ModifyInfo(ctx context.Context, cmd CmdToModifyInfo, user domain.Account) (string, error)
 }
 
 // ps: platform user service
@@ -405,7 +405,7 @@ func (s userService) RefreshGitlabToken(cmd *RefreshTokenCmd) (err error) {
 }
 
 func (s userService) ModifyInfo(ctx context.Context, cmd CmdToModifyInfo, user domain.Account,
-	ut string, yg string) (errMsgCode string, err error) {
+) (errMsgCode string, err error) {
 	//校验验证码
 	info, err := s.login.GetAccessAndIdToken(user)
 	if err != nil {
