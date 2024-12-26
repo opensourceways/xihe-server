@@ -30,6 +30,7 @@ type RepoFileService interface {
 	Preview(*UserInfo, *RepoFilePreviewCmd) ([]byte, error)
 	DeleteDir(*UserInfo, *RepoDirDeleteCmd) (string, error)
 	Download(*RepoFileDownloadCmd) (RepoFileDownloadDTO, error)
+	DownloadByRepoId(string, domain.FilePath) (RepoFileDownloadDTO, error)
 	StreamDownload(string, domain.FilePath, func(io.Reader, int64)) error
 	DownloadRepo(u *UserInfo, obj *domain.RepoDownloadedEvent, handle func(io.Reader, int64)) error
 }
@@ -138,6 +139,31 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 			Type:          cmd.Type,
 			ResourceIndex: r.ResourceIndex(),
 		})
+	}
+
+	return dto, err
+}
+
+func (s *repoFileService) DownloadByRepoId(repoId string, filePath domain.FilePath) (
+	RepoFileDownloadDTO, error,
+) {
+	var dto RepoFileDownloadDTO
+
+	data, notFound, err := s.rf.Download("", &RepoFileInfo{
+		Path:   filePath,
+		RepoId: repoId,
+	})
+	if err != nil {
+		if notFound {
+			err = ErrorUnavailableRepoFile{err}
+		}
+		return dto, err
+	}
+
+	if isLFS, sha := s.rf.IsLFSFile(data); !isLFS {
+		dto.Content = base64.StdEncoding.EncodeToString(data)
+	} else {
+		dto.DownloadURL, err = s.rf.GenLFSDownloadURL(sha)
 	}
 
 	return dto, err
