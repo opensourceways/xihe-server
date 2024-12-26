@@ -442,21 +442,13 @@ func (s userService) ModifyInfo(ctx context.Context, cmd CmdToModifyInfo, user d
 		}
 		return
 	}
+
 	id, err := strconv.Atoi(u.PlatformUser.Id)
 	if err != nil {
 		err = xerrors.Errorf("failed to get user: %w", err)
 		return
 	}
-	if err != nil {
-		if commonrepo.IsErrorResourceNotExists(err) {
-			err = allerror.New(allerror.ErrorCodeUserNotFound, "",
-				xerrors.Errorf("user %s not found: %w", user.Account(), err))
-		} else {
-			err = allerror.New(allerror.ErrorCodeUserNotFound, "",
-				xerrors.Errorf("failed to get user: %w", err))
-		}
-		return
-	}
+
 	//检查是否变化
 	if err = cmd.IsChange(&u); err != nil {
 		logrus.Errorf("nothing changed:%s", err.Error())
