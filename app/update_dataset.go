@@ -51,6 +51,20 @@ func (cmd *DatasetUpdateCmd) toDataset(
 func (s datasetService) Update(
 	d *domain.Dataset, cmd *DatasetUpdateCmd, pr platform.Repository,
 ) (dto DatasetDTO, err error) {
+	//sdk text audit
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		if err := s.audit.TextAudit(title, auditTitle); err != nil {
+			return DatasetDTO{}, err
+		}
+	}
+
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		if err := s.audit.TextAudit(desc, auditProfile); err != nil {
+			return DatasetDTO{}, err
+		}
+	}
 	opt := new(platform.RepoOption)
 	if !cmd.toDataset(&d.DatasetModifiableProperty, opt) {
 		s.toDatasetDTO(d, &dto)

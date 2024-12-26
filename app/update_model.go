@@ -54,6 +54,21 @@ func (cmd *ModelUpdateCmd) toModel(
 func (s modelService) Update(
 	m *domain.Model, cmd *ModelUpdateCmd, pr platform.Repository,
 ) (dto ModelDTO, err error) {
+	//sdk text audit
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		if err := s.audit.TextAudit(title, auditTitle); err != nil {
+			return ModelDTO{}, err
+		}
+	}
+
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		if err := s.audit.TextAudit(desc, auditProfile); err != nil {
+			return ModelDTO{}, err
+		}
+	}
+
 	opt := new(platform.RepoOption)
 	if !cmd.toModel(&m.ModelModifiableProperty, opt) {
 		s.toModelDTO(m, &dto)

@@ -16,6 +16,7 @@ import (
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 )
 
 func AddRouterForProjectController(
@@ -31,6 +32,7 @@ func AddRouterForProjectController(
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
+	audit auditcommon.AuditService,
 ) {
 	ctl := ProjectController{
 		user:    user,
@@ -40,7 +42,7 @@ func AddRouterForProjectController(
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repo, model, dataset, activity, sender, computility, spaceProducer,
+			user, repo, model, dataset, activity, sender, computility, spaceProducer, audit,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
@@ -185,7 +187,7 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 
 	d, err := ctl.s.Create(&cmd, pr)
 	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		SendError(ctx, err)
 
 		return
 	}
@@ -329,7 +331,7 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 
 	d, err := ctl.s.Update(&proj, &cmd, pr)
 	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		SendError(ctx, err)
 
 		return
 	}

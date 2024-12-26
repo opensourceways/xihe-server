@@ -235,7 +235,6 @@ func (ctl baseController) checkUserApiTokenBase(
 	if err != nil {
 		return
 	}
-
 	csrftoken, err := ctl.getCSRFToken(ctx)
 	if err != nil {
 		return

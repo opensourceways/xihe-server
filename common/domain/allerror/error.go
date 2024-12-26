@@ -58,6 +58,12 @@ const (
 
 	// ErrorCodeRevokeAgreementFailed
 	ErrorCodeRevokeAgreementFailed = "revoke_agreement_failed"
+
+	// ErrorCodeFailToModerate
+	ErrorCodeCallAuditFailed = "call_audit_failed"
+
+	// ErrorCodeModerateUnpass
+	ErrorCodeAuditBlock = "audit_block"
 )
 
 // errorImpl

@@ -15,6 +15,7 @@ import (
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	"github.com/opensourceways/xihe-server/common/infrastructure/redis"
+	"github.com/opensourceways/xihe-server/common/infrastructure/sdk"
 	"github.com/opensourceways/xihe-server/competition"
 	"github.com/opensourceways/xihe-server/computility"
 	"github.com/opensourceways/xihe-server/controller"
@@ -78,6 +79,7 @@ type Config struct {
 	SpaceApp     spaceapp.Config                 `json:"space_app"`
 	Space        space.Config                    `json:"space"`
 	Filescan     infrastructure.FileScanConfig   `json:"file_scan"`
+	AuditSyncSdk sdk.Config                      `json:"audit_sync_sdk"`
 }
 
 func (cfg *Config) GetRedisConfig() redislib.Config {
