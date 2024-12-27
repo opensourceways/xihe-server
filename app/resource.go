@@ -49,10 +49,10 @@ func (cmd *ResourceListCmd) ToResourceListOption() repository.ResourceListOption
 }
 
 type ResourceService struct {
-	User      userrepo.User
-	Model     repository.Model
-	ProjectPg spacerepo.ProjectPg
-	Dataset   repository.Dataset
+	User    userrepo.User
+	Model   repository.Model
+	Project spacerepo.Project
+	Dataset repository.Dataset
 }
 
 func (s ResourceService) list(resources []*domain.ResourceObject) (
@@ -187,7 +187,7 @@ func (s ResourceService) listResources(
 	r := dtos
 
 	if len(projects) > 0 {
-		all, err := s.ProjectPg.FindUserProjects(projects)
+		all, err := s.Project.FindUserProjects(projects)
 		if err != nil {
 			return nil, err
 		}
@@ -426,7 +426,7 @@ func (s ResourceService) FindUserAvater(users []userdomain.Account) ([]string, e
 }
 
 func (s ResourceService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
-	if _, err := s.ProjectPg.GetSummaryByName(owner, name); err == nil {
+	if _, err := s.Project.GetSummaryByName(owner, name); err == nil {
 		return false
 	}
 
@@ -445,7 +445,7 @@ func (s ResourceService) IsPrivate(owner domain.Account, resourceType domain.Res
 ) (isprivate bool, ok bool) {
 	switch resourceType.ResourceType() {
 	case domain.ResourceProject:
-		if p, err := s.ProjectPg.Get(owner, id); err == nil {
+		if p, err := s.Project.Get(owner, id); err == nil {
 			return p.IsPrivate(), true
 		}
 	case domain.ResourceModel:
