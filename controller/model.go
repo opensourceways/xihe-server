@@ -20,7 +20,7 @@ func AddRouterForModelController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
 	repo repository.Model,
-	projPg spacerepo.ProjectPg,
+	proj spacerepo.Project,
 	dataset repository.Dataset,
 	activity repository.Activity,
 	tags repository.Tags,

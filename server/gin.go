@@ -292,7 +292,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		return err
 	}
 
-	projPg := spacerepo.ProjectAdapter()
+	proj := spacerepo.ProjectAdapter()
 
 	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
 
@@ -379,11 +379,11 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForLikeController(
-			v1, like, user, projPg, model, dataset, activity, likeAdapter,
+			v1, like, user, proj, model, dataset, activity, likeAdapter,
 		)
 
 		controller.AddRouterForActivityController(
-			v1, activity, user, projPg, model, dataset,
+			v1, activity, user, proj, model, dataset,
 		)
 
 		controller.AddRouterForAICCFinetuneController(
@@ -399,7 +399,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForTrainingController(
-			v1, trainingAdapter, training, model, projPg, dataset,
+			v1, trainingAdapter, training, model, proj, dataset,
 			messages.NewTrainingMessageAdapter(
 				&cfg.Training.Message, publisher,
 			),
@@ -410,7 +410,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForRepoFileController(
-			v1, gitlabRepo, model, projPg, dataset, repoAdapter, userAppService, fileScanService,
+			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService, fileScanService,
 		)
 
 		controller.AddRouterForInferenceController(
