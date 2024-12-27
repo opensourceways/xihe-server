@@ -46,7 +46,7 @@ func NewLikeService(
 	repo repository.Like,
 	user userrepo.User,
 	model repository.Model,
-	projectPg spacerepo.ProjectPg,
+	project spacerepo.Project,
 	dataset repository.Dataset,
 	activity repository.Activity,
 	sender message.LikeMessageProducer,
@@ -57,10 +57,10 @@ func NewLikeService(
 		sender:   sender,
 
 		rs: ResourceService{
-			User:      user,
-			Model:     model,
-			ProjectPg: projectPg,
-			Dataset:   dataset,
+			User:    user,
+			Model:   model,
+			Project: project,
+			Dataset: dataset,
 		},
 	}
 }

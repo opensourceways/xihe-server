@@ -17,12 +17,12 @@ func AddRouterForCompetitionController(
 	rg *gin.RouterGroup,
 	s app.CompetitionService,
 	us userapp.RegService,
-	projectPg spacerepo.ProjectPg,
+	project spacerepo.Project,
 ) {
 	ctl := CompetitionController{
-		s:         s,
-		us:        us,
-		projectPg: projectPg,
+		s:       s,
+		us:      us,
+		project: project,
 	}
 
 	rg.GET("/v1/competition", ctl.List)
@@ -46,9 +46,9 @@ func AddRouterForCompetitionController(
 type CompetitionController struct {
 	baseController
 
-	s         app.CompetitionService
-	us        userapp.RegService
-	projectPg spacerepo.ProjectPg
+	s       app.CompetitionService
+	us      userapp.RegService
+	project spacerepo.Project
 }
 
 // @Summary		Apply
@@ -444,7 +444,7 @@ func (ctl *CompetitionController) AddRelatedProject(ctx *gin.Context) {
 		return
 	}
 
-	p, err := ctl.projectPg.GetSummaryByName(owner, name)
+	p, err := ctl.project.GetSummaryByName(owner, name)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,

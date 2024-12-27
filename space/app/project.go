@@ -129,7 +129,7 @@ type ProjectService interface {
 
 func NewProjectService(
 	user userrepo.User,
-	repoPg spacerepo.ProjectPg,
+	repo spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -139,14 +139,14 @@ func NewProjectService(
 	audit auditcommon.AuditService,
 ) ProjectService {
 	return projectService{
-		repoPg:   repoPg,
+		repo:     repo,
 		activity: activity,
 		sender:   sender,
 		rs: app.ResourceService{
-			User:      user,
-			Model:     model,
-			ProjectPg: repoPg,
-			Dataset:   dataset,
+			User:    user,
+			Model:   model,
+			Project: repo,
+			Dataset: dataset,
 		},
 		computilityApp: computilityApp,
 		spaceProducer:  spaceProducer,
@@ -155,7 +155,7 @@ func NewProjectService(
 }
 
 type projectService struct {
-	repoPg         spacerepo.ProjectPg
+	repo           spacerepo.Project
 	activity       repository.Activity
 	sender         message.ResourceProducer
 	rs             app.ResourceService
@@ -232,7 +232,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 		v.CompPowerAllocated = true
 	}
 	//use repoPg
-	p, err := s.repoPg.Save(v)
+	p, err := s.repo.Save(v)
 	if err != nil {
 		return
 	}
@@ -333,7 +333,7 @@ func (s projectService) Delete(r *spacedomain.Project, pr platform.Repository) (
 	}
 
 	// step3: delete
-	if err = s.repoPg.Delete(&obj.ResourceIndex); err != nil {
+	if err = s.repo.Delete(&obj.ResourceIndex); err != nil {
 		return
 	}
 
@@ -360,7 +360,7 @@ func (s projectService) GetByName(
 	owner domain.Account, name domain.ResourceName,
 	allowPrivacy bool,
 ) (dto ProjectDetailDTO, err error) {
-	v, err := s.repoPg.GetByName(owner, name)
+	v, err := s.repo.GetByName(owner, name)
 	if err != nil {
 		return
 	}
@@ -391,7 +391,7 @@ func (s projectService) GetByName(
 }
 
 func (s projectService) GetByRepoId(id domain.Identity) (sdk.SpaceMetaDTO, error) {
-	v, err := s.repoPg.GetByRepoId(id)
+	v, err := s.repo.GetByRepoId(id)
 
 	if err != nil {
 		return sdk.SpaceMetaDTO{}, err
@@ -409,17 +409,17 @@ func (s projectService) ListGlobal(cmd *app.GlobalResourceListCmd) (
 	var v spacerepo.UserProjectsInfo
 
 	if cmd.SortType == nil {
-		v, err = s.repoPg.ListGlobalAndSortByUpdateTime(&option)
+		v, err = s.repo.ListGlobalAndSortByUpdateTime(&option)
 	} else {
 		switch cmd.SortType.SortType() {
 		case domain.SortTypeUpdateTime:
-			v, err = s.repoPg.ListGlobalAndSortByUpdateTime(&option)
+			v, err = s.repo.ListGlobalAndSortByUpdateTime(&option)
 
 		case domain.SortTypeFirstLetter:
-			v, err = s.repoPg.ListGlobalAndSortByFirstLetter(&option)
+			v, err = s.repo.ListGlobalAndSortByFirstLetter(&option)
 
 		case domain.SortTypeDownloadCount:
-			v, err = s.repoPg.ListGlobalAndSortByDownloadCount(&option)
+			v, err = s.repo.ListGlobalAndSortByDownloadCount(&option)
 		}
 	}
 
@@ -461,17 +461,17 @@ func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 	var v spacerepo.UserProjectsInfo
 
 	if cmd.SortType == nil {
-		v, err = s.repoPg.ListAndSortByUpdateTime(owner, &option)
+		v, err = s.repo.ListAndSortByUpdateTime(owner, &option)
 	} else {
 		switch cmd.SortType.SortType() {
 		case domain.SortTypeUpdateTime:
-			v, err = s.repoPg.ListAndSortByUpdateTime(owner, &option)
+			v, err = s.repo.ListAndSortByUpdateTime(owner, &option)
 
 		case domain.SortTypeFirstLetter:
-			v, err = s.repoPg.ListAndSortByFirstLetter(owner, &option)
+			v, err = s.repo.ListAndSortByFirstLetter(owner, &option)
 
 		case domain.SortTypeDownloadCount:
-			v, err = s.repoPg.ListAndSortByDownloadCount(owner, &option)
+			v, err = s.repo.ListAndSortByDownloadCount(owner, &option)
 		}
 	}
 
@@ -495,7 +495,7 @@ func (s projectService) List(owner domain.Account, cmd *app.ResourceListCmd) (
 func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUpdateCode) (
 	err error,
 ) {
-	space, err := s.repoPg.GetByRepoId(id)
+	space, err := s.repo.GetByRepoId(id)
 	if err != nil {
 		return err
 	}
@@ -508,7 +508,7 @@ func (s projectService) NotifyUpdateCodes(id domain.Identity, cmd *CmdToNotifyUp
 		ResourceToUpdate: s.toResourceToUpdate(&space),
 		Property:         space.ProjectModifiableProperty,
 	}
-	err = s.repoPg.UpdateProperty(&info)
+	err = s.repo.UpdateProperty(&info)
 
 	if err != nil {
 		err = xerrors.Errorf("save space failed, err: %w", err)

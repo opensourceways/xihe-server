@@ -46,7 +46,7 @@ type ProjectMapper interface {
 	UpdateProperty(*ProjectPropertyDO) error
 }
 
-func NewProjectRepository(mapper ProjectMapper) spacerepo.ProjectPg {
+func NewProjectRepository(mapper ProjectMapper) spacerepo.Project {
 	return project{mapper}
 }
 

@@ -22,7 +22,7 @@ type ProjectSummary struct {
 	Tags []string
 }
 
-type ProjectPg interface {
+type Project interface {
 	Save(*spacedomain.Project) (spacedomain.Project, error)
 	Delete(*domain.ResourceIndex) error
 	GetByName(domain.Account, domain.ResourceName) (spacedomain.Project, error)

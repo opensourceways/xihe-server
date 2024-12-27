@@ -32,6 +32,7 @@ func AddRouterForProjectController(
 	computility computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
 	audit auditcommon.AuditService,
+	repo spacerepo.Project,
 ) {
 	ctl := ProjectController{
 		user:    user,
@@ -72,8 +73,8 @@ func AddRouterForProjectController(
 type ProjectController struct {
 	baseController
 
-	user   userrepo.User
-	repoPg spacerepo.ProjectPg
+	user userrepo.User
+	repo spacerepo.Project
 
 	s spaceapp.ProjectService
 
@@ -242,7 +243,7 @@ func (ctl *ProjectController) Delete(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "deleta project")
 
-	proj, err := ctl.repoPg.GetByName(owner, name)
+	proj, err := ctl.repo.GetByName(owner, name)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
@@ -318,7 +319,7 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "update project")
 
-	proj, err := ctl.repoPg.Get(owner, ctx.Param("id"))
+	proj, err := ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 
@@ -593,7 +594,7 @@ func (ctl *ProjectController) Fork(ctx *gin.Context) {
 
 	prepareOperateLog(ctx, pl.Account, OPERATE_TYPE_USER, "fork project")
 
-	proj, err := ctl.repoPg.Get(owner, ctx.Param("id"))
+	proj, err := ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
@@ -953,7 +954,7 @@ func (ctl *ProjectController) checkPermission(ctx *gin.Context) (
 		return
 	}
 
-	proj, err = ctl.repoPg.Get(owner, ctx.Param("id"))
+	proj, err = ctl.repo.Get(owner, ctx.Param("id"))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 

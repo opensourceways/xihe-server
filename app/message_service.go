@@ -155,12 +155,12 @@ type ProjectMessageService interface {
 }
 
 type projectMessageService struct {
-	repoPg spacerepo.ProjectPg
+	repo spacerepo.Project
 }
 
-func NewProjectMessageService(repo spacerepo.ProjectPg, repoPg spacerepo.ProjectPg) ProjectMessageService {
+func NewProjectMessageService(repo spacerepo.Project) ProjectMessageService {
 	return projectMessageService{
-		repoPg: repoPg,
+		repo: repo,
 	}
 }
 
@@ -170,7 +170,7 @@ func (s projectMessageService) AddRelatedModel(info *ReverselyRelatedResourceInf
 }
 
 func (s projectMessageService) RemoveRelatedModel(info *ReverselyRelatedResourceInfo) error {
-	p, err := s.repoPg.Get(info.Resource.Owner, info.Resource.Id)
+	p, err := s.repo.Get(info.Resource.Owner, info.Resource.Id)
 	if err != nil {
 		return err
 	}
@@ -186,7 +186,7 @@ func (s projectMessageService) RemoveRelatedModel(info *ReverselyRelatedResource
 		RelatedResource:  *index,
 	}
 
-	return s.repoPg.RemoveRelatedModel(&param)
+	return s.repo.RemoveRelatedModel(&param)
 }
 
 func (s projectMessageService) AddRelatedDataset(info *ReverselyRelatedResourceInfo) error {
@@ -195,7 +195,7 @@ func (s projectMessageService) AddRelatedDataset(info *ReverselyRelatedResourceI
 }
 
 func (s projectMessageService) RemoveRelatedDataset(info *ReverselyRelatedResourceInfo) error {
-	p, err := s.repoPg.Get(info.Resource.Owner, info.Resource.Id)
+	p, err := s.repo.Get(info.Resource.Owner, info.Resource.Id)
 	if err != nil {
 		return err
 	}
@@ -211,23 +211,23 @@ func (s projectMessageService) RemoveRelatedDataset(info *ReverselyRelatedResour
 		RelatedResource:  *index,
 	}
 
-	return s.repoPg.RemoveRelatedDataset(&param)
+	return s.repo.RemoveRelatedDataset(&param)
 }
 
 func (s projectMessageService) AddLike(r *domain.ResourceIndex) error {
-	return s.repoPg.AddLike(r)
+	return s.repo.AddLike(r)
 }
 
 func (s projectMessageService) RemoveLike(r *domain.ResourceIndex) error {
-	return s.repoPg.RemoveLike(r)
+	return s.repo.RemoveLike(r)
 }
 
 func (s projectMessageService) IncreaseFork(index *domain.ResourceIndex) error {
-	return s.repoPg.IncreaseFork(index)
+	return s.repo.IncreaseFork(index)
 }
 
 func (s projectMessageService) IncreaseDownload(index *domain.ResourceIndex) error {
-	return s.repoPg.IncreaseDownload(index)
+	return s.repo.IncreaseDownload(index)
 }
 
 func (s projectMessageService) toResourceToUpdate(p *spacedomain.Project) repository.ResourceToUpdate {

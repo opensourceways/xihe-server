@@ -31,7 +31,7 @@ type CourseService interface {
 func NewCourseService(
 	userCli user.User,
 
-	projectRepoPg spacerepo.ProjectPg,
+	projectRepo spacerepo.Project,
 
 	courseRepo repository.Course,
 	playerRepo repository.Player,
@@ -41,8 +41,8 @@ func NewCourseService(
 	userRepo userrepo.User,
 ) *courseService {
 	return &courseService{
-		userCli:       userCli,
-		projectRepoPg: projectRepoPg,
+		userCli:     userCli,
+		projectRepo: projectRepo,
 
 		courseRepo: courseRepo,
 		playerRepo: playerRepo,
@@ -54,9 +54,9 @@ func NewCourseService(
 }
 
 type courseService struct {
-	userCli       user.User
-	userRepo      userrepo.User
-	projectRepoPg spacerepo.ProjectPg
+	userCli     user.User
+	userRepo    userrepo.User
+	projectRepo spacerepo.Project
 
 	courseRepo repository.Course
 	playerRepo repository.Player
@@ -206,7 +206,7 @@ func (s *courseService) GetSubmissions(cmd *GetSubmissionCmd) (
 		return
 	}
 
-	project, err := s.projectRepoPg.GetByName(cmd.User, resource)
+	project, err := s.projectRepo.GetByName(cmd.User, resource)
 	if err != nil {
 		return
 	}

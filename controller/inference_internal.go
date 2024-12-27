@@ -21,7 +21,7 @@ import (
 func AddRouterForInferenceInternalController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
-	projectPg spacerepo.ProjectPg,
+	project spacerepo.Project,
 	sender message.Sender,
 	whitelist userapp.WhiteListService,
 	spacesender spacemesage.SpaceAppMessageProducer,
@@ -29,9 +29,9 @@ func AddRouterForInferenceInternalController(
 ) {
 	ctl := InferenceInternalController{
 		s: spaceappApp.NewInferenceService(
-			p, sender, apiConfig.MinSurvivalTimeOfInference, spacesender, spaceappRepo, projectPg,
+			p, sender, apiConfig.MinSurvivalTimeOfInference, spacesender, spaceappRepo, project,
 		),
-		projectPg: projectPg,
+		project:   project,
 		whitelist: whitelist,
 	}
 
@@ -52,7 +52,7 @@ type InferenceInternalController struct {
 
 	s spaceappApp.InferenceService
 
-	projectPg spacerepo.ProjectPg
+	project spacerepo.Project
 
 	inferenceDir      types.Directory
 	inferenceBootFile types.FilePath

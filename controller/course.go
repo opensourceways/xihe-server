@@ -16,14 +16,14 @@ func AddRouterForCourseController(
 
 	s app.CourseService,
 	us userapp.RegService,
-	projectPg spacerepo.ProjectPg,
+	project spacerepo.Project,
 	user userrepo.User,
 ) {
 	ctl := CourseController{
-		s:         s,
-		us:        us,
-		projectPg: projectPg,
-		user:      user,
+		s:       s,
+		us:      us,
+		project: project,
+		user:    user,
 	}
 
 	rg.POST("/v1/course/:id/player", ctl.Apply)
@@ -41,10 +41,10 @@ func AddRouterForCourseController(
 type CourseController struct {
 	baseController
 
-	s         app.CourseService
-	us        userapp.RegService
-	projectPg spacerepo.ProjectPg
-	user      userrepo.User
+	s       app.CourseService
+	us      userapp.RegService
+	project spacerepo.Project
+	user    userrepo.User
 }
 
 // @Summary		Apply
@@ -205,7 +205,7 @@ func (ctl *CourseController) AddCourseRelatedProject(ctx *gin.Context) {
 
 		return
 	}
-	p, err := ctl.projectPg.GetSummaryByName(owner, name)
+	p, err := ctl.project.GetSummaryByName(owner, name)
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(

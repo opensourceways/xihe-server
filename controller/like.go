@@ -18,7 +18,7 @@ func AddRouterForLikeController(
 	rg *gin.RouterGroup,
 	repo repository.Like,
 	user userrepo.User,
-	projPg spacerepo.ProjectPg,
+	proj spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -26,10 +26,10 @@ func AddRouterForLikeController(
 ) {
 	ctl := LikeController{
 		s: app.NewLikeService(
-			repo, user, model, projPg,
+			repo, user, model, proj,
 			dataset, activity, sender,
 		),
-		projPg:  projPg,
+		proj:    proj,
 		model:   model,
 		dataset: dataset,
 	}
@@ -44,7 +44,7 @@ type LikeController struct {
 
 	s app.LikeService
 
-	projPg  spacerepo.ProjectPg
+	proj    spacerepo.Project
 	model   repository.Model
 	dataset repository.Dataset
 }
@@ -173,7 +173,7 @@ func (ctl *LikeController) getResourceId(
 ) (string, error) {
 	switch rt.ResourceType() {
 	case domain.ResourceTypeProject.ResourceType():
-		v, err := ctl.projPg.GetByName(owner, name)
+		v, err := ctl.proj.GetByName(owner, name)
 		if err != nil {
 			return "", err
 		}

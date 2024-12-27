@@ -65,7 +65,7 @@ func NewInferenceService(
 	minSurvivalTime int,
 	spacesender spacemesage.SpaceAppMessageProducer,
 	spaceappRepo spaceapprepo.SpaceAppRepository,
-	spaceRepoPg spacerepo.ProjectPg,
+	spaceRepo spacerepo.Project,
 ) InferenceService {
 	return inferenceService{
 		p:               p,
@@ -73,7 +73,7 @@ func NewInferenceService(
 		spacesender:     spacesender,
 		minSurvivalTime: int64(minSurvivalTime),
 		spaceappRepo:    spaceappRepo,
-		spaceRepoPg:     spaceRepoPg,
+		spaceRepo:       spaceRepo,
 	}
 }
 
@@ -84,11 +84,11 @@ type inferenceService struct {
 	spacesender     spacemesage.SpaceAppMessageProducer
 	minSurvivalTime int64
 	spaceappRepo    spaceapprepo.SpaceAppRepository
-	spaceRepoPg     spacerepo.ProjectPg
+	spaceRepo       spacerepo.Project
 }
 
 func (s inferenceService) Create(ctx context.Context, cmd CmdToCreateApp) error {
-	space, err := s.spaceRepoPg.GetByRepoId(cmd.SpaceId)
+	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
 	if err != nil {
 		return err
 	}
@@ -346,7 +346,7 @@ func (s inferenceService) NotifyIsStartFailed(ctx context.Context, cmd *CmdToNot
 }
 
 func (s inferenceService) getSpaceApp(cmd CmdToCreateApp) (domain.SpaceApp, error) {
-	space, err := s.spaceRepoPg.GetByRepoId(cmd.SpaceId)
+	space, err := s.spaceRepo.GetByRepoId(cmd.SpaceId)
 	if err != nil {
 		if commonrepo.IsErrorResourceNotExists(err) {
 			err = allerror.NewNotFound(allerror.ErrorCodeSpaceNotFound, "space not found", err)

@@ -30,6 +30,7 @@ func AddRouterForProjectInternalController(
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
+	repo spacerepo.Project,
 	audit auditcommon.AuditService,
 ) {
 	ctl := ProjectInternalController{

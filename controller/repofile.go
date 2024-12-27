@@ -21,19 +21,19 @@ func AddRouterForRepoFileController(
 	rg *gin.RouterGroup,
 	p platform.RepoFile,
 	model repository.Model,
-	projectPg spacerepo.ProjectPg,
+	project spacerepo.Project,
 	dataset repository.Dataset,
 	sender message.RepoMessageProducer,
 	us uapp.UserService,
 	f filescan.FileScanService,
 ) {
 	ctl := RepoFileController{
-		s:         app.NewRepoFileService(p, sender, f),
-		us:        us,
-		model:     model,
-		projectPg: projectPg,
-		dataset:   dataset,
-		filescan:  f,
+		s:        app.NewRepoFileService(p, sender, f),
+		us:       us,
+		model:    model,
+		project:  project,
+		dataset:  dataset,
+		filescan: f,
 	}
 
 	rg.GET("/v1/repo/:type/:user/:name", ctl.DownloadRepo)
@@ -52,12 +52,12 @@ func AddRouterForRepoFileController(
 type RepoFileController struct {
 	baseController
 
-	s         app.RepoFileService
-	us        uapp.UserService
-	model     repository.Model
-	projectPg spacerepo.ProjectPg
-	dataset   repository.Dataset
-	filescan  filescan.FileScanService
+	s        app.RepoFileService
+	us       uapp.UserService
+	model    repository.Model
+	project  spacerepo.Project
+	dataset  repository.Dataset
+	filescan filescan.FileScanService
 }
 
 // @Summary		Create
@@ -713,7 +713,7 @@ func (ctl *RepoFileController) getRepoInfo(ctx *gin.Context, user domain.Account
 		s.ResourceSummary, err = ctl.model.GetSummaryByName(user, name)
 
 	case domain.ResourceTypeProject.ResourceType():
-		s.ResourceSummary, err = ctl.projectPg.GetSummaryByName(user, name)
+		s.ResourceSummary, err = ctl.project.GetSummaryByName(user, name)
 
 	case domain.ResourceTypeDataset.ResourceType():
 		s.ResourceSummary, err = ctl.dataset.GetSummaryByName(user, name)

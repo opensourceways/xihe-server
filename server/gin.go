@@ -346,17 +346,17 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	// projectMessageService := app.NewProjectMessageService(proj, projPg)
 
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
-		spaceappRepository, projPg, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
+		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
 	)
 
 	{
 		controller.AddRouterForProjectController(
-			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer, audit,
+			v1, user, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService, spaceProducer, audit, proj,
 		)
 		controller.AddRouterForProjectInternalController(
-			internal, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer, audit,
+			internal, user, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService, spaceProducer, proj, audit,
 		)
 
 		controller.AddRouterForModelController(
@@ -414,19 +414,19 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForInferenceController(
-			v1, gitlabRepo, projPg, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
+			v1, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappAppService, spaceappRepository,
 		)
 
 		controller.AddRouterForInferenceInternalController(
-			internal, gitlabRepo, projPg, sender, userWhiteListService, spaceappSender, spaceappRepository,
+			internal, gitlabRepo, proj, sender, userWhiteListService, spaceappSender, spaceappRepository,
 		)
 
 		controller.AddRouterForSearchController(
-			v1, user, projPg, model, dataset,
+			v1, user, proj, model, dataset,
 		)
 
 		controller.AddRouterForCompetitionController(
-			v1, competitionAppService, userRegService, projPg,
+			v1, competitionAppService, userRegService, proj,
 		)
 
 		controller.AddRouterForPromotionController(
@@ -438,7 +438,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForCourseController(
-			v1, courseAppService, userRegService, projPg, user,
+			v1, courseAppService, userRegService, proj, user,
 		)
 
 		controller.AddRouterForHomeController(

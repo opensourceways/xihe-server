@@ -54,7 +54,7 @@ func (s projectService) Fork(cmd *ProjectForkCmd, pr platform.Repository) (dto P
 	cmd.toProject(v)
 	v.RepoId = pid
 
-	p, err := s.repoPg.Save(v)
+	p, err := s.repo.Save(v)
 	if err != nil {
 		return
 	}

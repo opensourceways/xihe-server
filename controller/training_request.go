@@ -190,7 +190,7 @@ func (ctl *TrainingController) setProjectInfo(
 	ctx *gin.Context, cmd *app.TrainingCreateCmd,
 	user domain.Account, projectId string,
 ) (ok bool) {
-	v, err := ctl.projectPg.GetSummary(user, projectId)
+	v, err := ctl.project.GetSummary(user, projectId)
 	if err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
