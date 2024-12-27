@@ -76,26 +76,19 @@ func (m *administrator) New(u platform.UserOption) (r userdomain.PlatformUser, e
 	return
 }
 
-func (m *administrator) Update(id int, u platform.UserOption) (r userdomain.PlatformUser, err error) {
+func (m *administrator) Update(id int, u platform.UserOption) (err error) {
 	name := u.Name.Account()
 	email := u.Email.Email()
 	pass := u.Password.Password()
 	b := true
 
-	v, _, err := m.cli.Users.ModifyUser(id, &sdk.ModifyUserOptions{
+	_, _, err = m.cli.Users.ModifyUser(id, &sdk.ModifyUserOptions{
 		Name:               &name,
 		Email:              &email,
 		Username:           &name,
-		Password:           &pass,
 		SkipReconfirmation: &b,
+		Password:           &pass,
 	})
-
-	if err != nil {
-		return
-	}
-
-	r.Id = strconv.Itoa(v.ID)
-	r.NamespaceId = strconv.Itoa(v.NamespaceID)
 
 	return
 }

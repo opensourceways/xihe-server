@@ -27,7 +27,7 @@ type UserOption struct {
 
 type User interface {
 	New(UserOption) (userdomain.PlatformUser, error)
-	Update(int, UserOption) (userdomain.PlatformUser, error)
+	Update(int, UserOption) error
 	NewToken(userdomain.PlatformUser) (userdomain.PlatformToken, error)
 	RefreshToken(string) (userdomain.PlatformToken, error)
 	GetToken(string) (userdomain.PlatformToken, error)

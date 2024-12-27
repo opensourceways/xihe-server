@@ -31,7 +31,6 @@ type UserService interface {
 	UpdatePlateformInfo(*UpdatePlateformInfoCmd) error
 	UpdatePlateformToken(*UpdatePlateformTokenCmd) error
 	NewPlatformAccountWithUpdate(*CreatePlatformAccountCmd) error
-	UpdatePlatformAccountWithUpdate(int, *CreatePlatformAccountCmd) error
 	UpdateBasicInfo(domain.Account, UpdateUserBasicInfoCmd) error
 
 	UpdateAgreement(u domain.Account, t app.AgreementType) error
@@ -470,9 +469,10 @@ func (s userService) ModifyInfo(ctx context.Context, cmd CmdToModifyInfo, user d
 	}
 	//更新git用户信息
 	if u.Email != nil && u.Email.Email() != "" {
-		if err = s.UpdatePlatformAccountWithUpdate(id, &CreatePlatformAccountCmd{
-			Account: u.Account,
-			Email:   u.Email,
+		if err = s.ps.Update(id, platform.UserOption{
+			Email:    u.Email,
+			Name:     u.Account,
+			Password: cmd.Password,
 		}); err != nil {
 			u.Email, _ = domain.NewEmail(cmd.OldAccount)
 			u, err = s.repo.Save(&u)
@@ -486,64 +486,5 @@ func (s userService) ModifyInfo(ctx context.Context, cmd CmdToModifyInfo, user d
 			return
 		}
 	}
-	return
-}
-
-func (s userService) UpdatePlatformAccountWithUpdate(id int, cmd *CreatePlatformAccountCmd) (err error) {
-	// create platform account
-	dto, err := s.UpdatePlatformAccount(id, cmd)
-	if err != nil {
-		return
-	}
-
-	// update user information
-	updatecmd := &UpdatePlateformInfoCmd{
-		PlatformInfoDTO: dto,
-		User:            cmd.Account,
-		Email:           cmd.Email,
-	}
-
-	for i := 0; i <= 5; i++ {
-		if err = s.UpdatePlateformInfo(updatecmd); err != nil {
-			if !typerepo.IsErrorConcurrentUpdating(err) {
-				return
-			}
-		} else {
-			break
-		}
-	}
-
-	return
-}
-
-func (s userService) UpdatePlatformAccount(id int, cmd *CreatePlatformAccountCmd) (dto PlatformInfoDTO, err error) {
-	// create platform account
-	pu, err := s.ps.Update(id, platform.UserOption{
-		Email:    cmd.Email,
-		Name:     cmd.Account,
-		Password: cmd.Password,
-	})
-	if err != nil {
-		return
-	}
-
-	dto.PlatformUser = pu
-
-	// apply token
-	token, err := s.ps.NewToken(pu)
-	if err != nil {
-		return
-	}
-
-	eToken, err := s.encryptToken(token.Token)
-	if err != nil {
-		return
-	}
-
-	dto.PlatformToken = domain.PlatformToken{
-		Token:    eToken,
-		CreateAt: token.CreateAt,
-	}
-
 	return
 }

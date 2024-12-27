@@ -3,9 +3,16 @@ package app
 import (
 	"errors"
 
+	"golang.org/x/xerrors"
+
 	"github.com/opensourceways/xihe-server/user/domain"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+)
+
+const (
+	modifyPhone = "phone"
+	modifyEmail = "email"
 )
 
 // user
@@ -143,7 +150,14 @@ type BindEmailCmd struct {
 	PassWord domain.Password
 }
 
-type CmdToModifyInfo = domain.ModifyAccountInfo
+type CmdToModifyInfo struct {
+	AccountType string
+	OldAccount  string
+	OldCode     string
+	Account     string
+	Code        string
+	Password    domain.Password
+}
 
 type CreatePlatformAccountCmd struct {
 	Email    domain.Email
@@ -245,4 +259,38 @@ func toUserDTO(u *domain.User, dto *UserDTO) {
 	dto.CourseAgreement = u.CourseAgreement
 	dto.UserAgreement = u.UserAgreement
 	dto.FinetuneAgreement = u.FinetuneAgreement
+}
+
+func (cmd *CmdToModifyInfo) isPhone() bool {
+	return cmd.AccountType == modifyPhone
+}
+
+func (cmd *CmdToModifyInfo) isEmail() bool {
+	return cmd.AccountType == modifyEmail
+}
+
+func (cmd *CmdToModifyInfo) IsChange(user *domain.User) error {
+	if cmd.isPhone() {
+		if cmd.Account != cmd.OldAccount {
+			phone, err := domain.NewPhone(cmd.Account)
+			if err != nil {
+				return err
+			}
+			user.Phone = phone
+		} else {
+			return xerrors.New("phone account is not change")
+		}
+	}
+	if cmd.isEmail() {
+		if cmd.Account != cmd.OldAccount {
+			email, err := domain.NewEmail(cmd.Account)
+			if err != nil {
+				return err
+			}
+			user.Email = email
+		} else {
+			return xerrors.New("email account is not change")
+		}
+	}
+	return nil
 }

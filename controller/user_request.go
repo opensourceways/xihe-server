@@ -62,6 +62,9 @@ func (m *ModifyInfo) toCmd() (cmd app.CmdToModifyInfo, err error) {
 	cmd.OldCode = m.OldCode
 	cmd.OldAccount = m.OldAccount
 	cmd.Code = m.Code
+	if cmd.Password, err = domain.NewPassword(apiConfig.DefaultPassword); err != nil {
+		return
+	}
 	return
 }
 
