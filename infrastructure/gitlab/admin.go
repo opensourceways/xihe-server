@@ -86,8 +86,8 @@ func (m *administrator) Update(id int, u platform.UserOption) (err error) {
 		Name:               &name,
 		Email:              &email,
 		Username:           &name,
-		SkipReconfirmation: &b,
 		Password:           &pass,
+		SkipReconfirmation: &b,
 	})
 
 	return
