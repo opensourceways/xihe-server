@@ -35,6 +35,7 @@ func AddRouterForRepoFileInternalController(
 
 	rg.GET("/v1/repo/:type/:user/:name/files", internalApiCheckMiddleware(&ctl.baseController), ctl.List)
 	rg.GET("/v1/repo/:type/:user/:name/file/:path", internalApiCheckMiddleware(&ctl.baseController), ctl.Download)
+	rg.GET("/v1/resource/repo/:id/:path", internalApiCheckMiddleware(&ctl.baseController), ctl.DownloadById)
 }
 
 type RepoFileInternalController struct {
@@ -53,7 +54,6 @@ type RepoFileInternalController struct {
 // @Param			user			path	string	true	"user"
 // @Param			name			path	string	true	"repo name"
 // @Param			path			path	string	true	"repo file path"
-// @Param			not_recorded	query	bool	false	"whether record operation"
 // @Accept			json
 // @Success		200	{object}			app.RepoFileDownloadDTO
 // @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
@@ -69,7 +69,6 @@ func (ctl *RepoFileInternalController) Download(ctx *gin.Context) {
 		Type:     repoInfo.rt,
 		MyToken:  u.Token,
 		Resource: repoInfo.ResourceSummary,
-		Unrecord: ctx.Query("unrecord") == "true",
 	}
 
 	var err error
@@ -182,4 +181,33 @@ func (ctl *RepoFileInternalController) getRepoInfo(ctx *gin.Context, user domain
 	}
 
 	return
+}
+
+// @Summary		DownloadById
+// @Description	Download repo file by Id
+// @Tags			RepoFileInternal
+// @Param			id			    path	string	true	"repository id"
+// @Param			path			path	string	true	"repo file path"
+// @Accept			json
+// @Success		200	{object}			app.RepoFileDownloadDTO
+// @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
+// @Failure		500	system_error		system	error
+// @Router			/v1/repo/{id}/{path} [get]
+func (ctl *RepoFileInternalController) DownloadById(ctx *gin.Context) {
+	repoId := ctx.Param("id")
+
+	filePath, err := domain.NewFilePath(ctx.Param("path"))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
+			errorBadRequestParam, err,
+		))
+
+		return
+	}
+
+	if v, err := ctl.s.DownloadByRepoId(repoId, filePath); err != nil {
+		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+	} else {
+		ctl.sendRespOfGet(ctx, v)
+	}
 }

@@ -78,7 +78,7 @@ func (impl *repoFile) Download(
 	return
 }
 
-func (impl *repoFile) StreamDownload(token string, info *platform.RepoFileInfo, handle func(io.Reader, int64)) error {
+func (impl *repoFile) StreamDownload(info *platform.RepoFileInfo, handle func(io.Reader, int64)) error {
 	var (
 		req  *http.Request
 		resp *http.Response
@@ -89,11 +89,6 @@ func (impl *repoFile) StreamDownload(token string, info *platform.RepoFileInfo, 
 		http.MethodGet, impl.baseURL(info)+"/raw?ref="+defaultBranch, nil,
 	); err != nil {
 		return err
-	}
-
-	if token != "" {
-		h := &req.Header
-		h.Add("PRIVATE-TOKEN", token)
 	}
 
 	if resp, err = http.DefaultClient.Do(req); err != nil {

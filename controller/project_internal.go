@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -29,17 +30,17 @@ func AddRouterForProjectInternalController(
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
-	repoPg spacerepo.ProjectPg,
+	audit auditcommon.AuditService,
 ) {
 	ctl := ProjectInternalController{
 		user:    user,
-		repoPg:  repoPg,
+		repo:    repo,
 		model:   model,
 		dataset: dataset,
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repoPg, model, dataset, activity, sender, computility, spaceProducer,
+			user, repo, model, dataset, activity, sender, computility, spaceProducer, audit,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
@@ -51,9 +52,9 @@ func AddRouterForProjectInternalController(
 type ProjectInternalController struct {
 	baseController
 
-	user   userrepo.User
-	repoPg spacerepo.ProjectPg
-	s      spaceapp.ProjectService
+	user userrepo.User
+	repo spacerepo.Project
+	s    spaceapp.ProjectService
 
 	model   repository.Model
 	dataset repository.Dataset

@@ -133,6 +133,7 @@ func (ctl *UserController) PrivacyRevoke(ctx *gin.Context) {
 	if err := ctl.s.PrivacyRevoke(pl.DomainAccount()); err != nil {
 		SendError(ctx, err)
 	} else {
+		ctl.ClearCookieAfterRevokePrivacy(ctx)
 		ctl.sendRespOfPut(ctx, "success")
 	}
 }
@@ -575,9 +576,9 @@ func (ctl *UserController) UpdateUserRegistrationInfo(ctx *gin.Context) {
 
 		return
 	}
-	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd2); err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseError(err))
 
+	if err := ctl.s.UpdateBasicInfo(pl.DomainAccount(), cmd2); err != nil {
+		SendError(ctx, err)
 		return
 	}
 

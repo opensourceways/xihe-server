@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -10,6 +11,11 @@ import (
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	"github.com/opensourceways/xihe-server/utils"
+)
+
+const (
+	auditProfile = "profile"
+	auditTitle   = "title"
 )
 
 type DatasetCreateCmd struct {
@@ -132,6 +138,7 @@ func NewDatasetService(
 	activity repository.Activity,
 	pr platform.Repository,
 	sender message.ResourceProducer,
+	audit auditcommon.AuditService,
 ) DatasetService {
 	return datasetService{
 		repo:     repo,
@@ -143,6 +150,7 @@ func NewDatasetService(
 			ProjectPg: projPg,
 			Dataset:   repo,
 		},
+		audit: audit,
 	}
 }
 
@@ -152,6 +160,7 @@ type datasetService struct {
 	activity repository.Activity
 	sender   message.ResourceProducer
 	rs       ResourceService
+	audit    auditcommon.AuditService
 }
 
 func (s datasetService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -159,6 +168,26 @@ func (s datasetService) CanApplyResourceName(owner domain.Account, name domain.R
 }
 
 func (s datasetService) Create(cmd *DatasetCreateCmd, pr platform.Repository) (dto DatasetDTO, err error) {
+	//sdk text audit
+	name := cmd.Name.ResourceName()
+	if err := s.audit.TextAudit(name, auditTitle); err != nil {
+		return DatasetDTO{}, err
+	}
+
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		if err := s.audit.TextAudit(title, auditTitle); err != nil {
+			return DatasetDTO{}, err
+		}
+	}
+
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		if err := s.audit.TextAudit(desc, auditProfile); err != nil {
+			return DatasetDTO{}, err
+		}
+	}
+
 	pid, err := pr.New(&platform.RepoOption{
 		Name:     cmd.Name,
 		RepoType: cmd.RepoType,

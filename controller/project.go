@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -30,17 +31,17 @@ func AddRouterForProjectController(
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
-	repoPg spacerepo.ProjectPg,
+	audit auditcommon.AuditService,
 ) {
 	ctl := ProjectController{
 		user:    user,
-		repoPg:  repoPg,
+		repo:    repo,
 		model:   model,
 		dataset: dataset,
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repoPg, model, dataset, activity, sender, computility, spaceProducer,
+			user, repo, model, dataset, activity, sender, computility, spaceProducer, audit,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
@@ -186,7 +187,7 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 
 	d, err := ctl.s.Create(&cmd, pr)
 	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		SendError(ctx, err)
 
 		return
 	}
@@ -330,7 +331,7 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 
 	d, err := ctl.s.Update(&proj, &cmd, pr)
 	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		SendError(ctx, err)
 
 		return
 	}

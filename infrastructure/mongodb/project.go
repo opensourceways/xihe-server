@@ -150,6 +150,11 @@ func (col project) GetByRepoId(id string) (do repositoryimpl.ProjectDO, err erro
 		return
 	}
 
+	if len(v) == 0 {
+		err = repositories.NewErrorDataNotExists(errDocExists)
+		return
+	}
+
 	col.toProjectDO(v[0].Owner, &v[0].Items[0], &do)
 
 	return

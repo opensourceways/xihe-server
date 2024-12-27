@@ -26,6 +26,7 @@ import (
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/audit"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
@@ -199,6 +200,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	// resource producer
 	resProducer := messages.NewResourceMessageAdapter(&cfg.Resource, publisher, operator)
 
+	//audit
+	audit := audit.NewAuditService()
+
 	userRegService := userapp.NewRegService(
 		userrepoimpl.NewUserRegRepo(
 			mongodb.NewCollection(collections.Registration),
@@ -293,12 +297,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
 
 	projectService := spaceapp.NewProjectService(
-		user, spacerepo.ProjectAdapter(), model, dataset, activity, resProducer, computilityService, spaceProducer,
+		user, proj, model, dataset, activity, resProducer, computilityService, spaceProducer, audit,
 	)
 
-	modelService := app.NewModelService(user, model, projPg, dataset, activity, nil, resProducer)
+	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer, audit)
 
-	datasetService := app.NewDatasetService(user, dataset, projPg, model, activity, nil, resProducer)
+	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, resProducer, audit)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	internal := engine.Group("internal")
@@ -310,7 +314,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	userAppService := userapp.NewUserService(
 		user, gitlabUser, usermsg.MessageAdapter(&cfg.User.Message, publisher),
-		pointsAppService, controller.EncryptHelperToken(),
+		pointsAppService, controller.EncryptHelperToken(), audit,
 	)
 
 	promotionAppService := promotionapp.NewPromotionService(
@@ -347,22 +351,22 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	{
 		controller.AddRouterForProjectController(
-			v1, user, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer, projPg,
+			v1, user, proj, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService, spaceProducer, audit,
 		)
 		controller.AddRouterForProjectInternalController(
-			internal, user, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer, projPg,
+			internal, user, proj, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService, spaceProducer, audit,
 		)
 
 		controller.AddRouterForModelController(
-			v1, user, model, projPg, dataset, activity, tags, like, resProducer,
-			newPlatformRepository,
+			v1, user, model, proj, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, audit,
 		)
 
 		controller.AddRouterForDatasetController(
-			v1, user, dataset, model, projPg, activity, tags, like, resProducer,
-			newPlatformRepository,
+			v1, user, dataset, model, proj, activity, tags, like, resProducer,
+			newPlatformRepository, audit,
 		)
 
 		controller.AddRouterForUserController(

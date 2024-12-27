@@ -46,7 +46,7 @@ func AddRouterForRepoFileController(
 	rg.POST("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Create)
 	rg.DELETE("/v1/repo/:type/:name/file/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.Delete)
 	rg.DELETE("/v1/repo/:type/:name/dir/:path", checkUserEmailMiddleware(&ctl.baseController), ctl.DeleteDir)
-	rg.GET("/v1/stream/repo/:type/:user/:name/file/:path", ctl.StreamDownload)
+	rg.GET("/v1/stream/repo/:id/:path", ctl.StreamDownload)
 }
 
 type RepoFileController struct {
@@ -523,55 +523,33 @@ func (ctl *RepoFileController) List(ctx *gin.Context) {
 }
 
 // @Summary		StreamDownload
-// @Description	Download repo file as data stream
+// @Description	Download data stream of repo file by id
 // @Tags			RepoFile
-// @Param			user	path	string	true	"user"
-// @Param			name	path	string	true	"repo name"
+// @Param			id	    path	string	true	"repository id"
 // @Param			path	path	string	true	"repo file path"
 // @Accept			octet-stream
 // @Success		200	{object}			byte "the byte of file"
 // @Failure		400	bad_request_param	some	parameter	of	body	is	invalid
 // @Failure		500	system_error		system	error
-// @Router			/v1/stream/repo/{type}/{user}/{name}/file/{path} [get]
+// @Router			/v1/stream/repo/{id}/{path} [get]
 func (ctl *RepoFileController) StreamDownload(ctx *gin.Context) {
-	var (
-		user domain.Account
-		err  error
-		info resourceSummary
-	)
+	repoId := ctx.Param("id")
 
-	if user, err = domain.NewAccount(ctx.Param("user")); err != nil {
-		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
-			errorBadRequestParam, err,
-		))
-
-		return
-	}
-
-	if info, err = ctl.getRepoInfo(ctx, user); err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
-		return
-	}
-
-	cmd := app.RepoFileDownloadCmd{
-		Type:     info.rt,
-		Resource: info.ResourceSummary,
-	}
-
-	if cmd.Path, err = domain.NewFilePath(ctx.Param("path")); err != nil {
+	filePath, err := domain.NewFilePath(ctx.Param("path"))
+	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
 		))
 		return
 	}
 
-	if err := ctl.s.StreamDownload(&cmd, func(r io.Reader, size int64) {
+	if err := ctl.s.StreamDownload(repoId, filePath, func(r io.Reader, size int64) {
 		ctx.DataFromReader(
 			http.StatusOK, size, "application/octet-stream", r,
 			map[string]string{
 				"Content-Disposition": fmt.Sprintf(
 					"attachment; filename=%s",
-					cmd.Path.FilePath(),
+					filePath.FilePath(),
 				),
 				"Content-Transfer-Encoding": "binary",
 			},
