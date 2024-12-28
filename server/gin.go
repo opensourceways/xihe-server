@@ -229,9 +229,16 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		user,
 	)
 
+	err = spacerepo.Init(pgsql.DB(), &cfg.Space.Tables)
+	if err != nil {
+		return err
+	}
+
+	proj := spacerepo.ProjectAdapter()
+
 	courseAppService := courseapp.NewCourseService(
 		courseusercli.NewUserCli(userRegService),
-		spacerepo.ProjectAdapter(),
+		proj,
 		courserepo.NewCourseRepo(mongodb.NewCollection(collections.Course)),
 		courserepo.NewPlayerRepo(mongodb.NewCollection(collections.CoursePlayer)),
 		courserepo.NewWorkRepo(mongodb.NewCollection(collections.CourseWork)),
@@ -286,13 +293,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		comprepositoryadapter.ComputilityDetailAdapter(),
 		comprepositoryadapter.ComputilityAccountAdapter(),
 	)
-
-	err = spacerepo.Init(pgsql.DB(), &cfg.Space.Tables)
-	if err != nil {
-		return err
-	}
-
-	proj := spacerepo.ProjectAdapter()
 
 	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
 

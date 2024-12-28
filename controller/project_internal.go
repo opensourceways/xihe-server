@@ -20,7 +20,6 @@ import (
 func AddRouterForProjectInternalController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
-
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
