@@ -114,6 +114,7 @@ func (s likeService) Create(owner domain.Account, cmd LikeCreateCmd) error {
 			ResourceObject: obj,
 		},
 	}
+
 	if err := s.repo.Save(&v); err != nil {
 		return err
 	}

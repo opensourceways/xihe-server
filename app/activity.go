@@ -51,7 +51,6 @@ func (s activityService) list(owner domain.Account, all bool) (
 	dtos []ActivityDTO, err error,
 ) {
 	activities, err := s.repo.Find(owner, repository.ActivityFindOption{})
-
 	if err != nil || len(activities) == 0 {
 		return
 	}
@@ -63,12 +62,10 @@ func (s activityService) list(owner domain.Account, all bool) (
 		item := &activities[i]
 
 		objs[i] = &item.ResourceObject
-
 		orders[i] = orderByTime{t: item.Time, p: i}
 	}
 
 	resources, err := s.rs.list(objs)
-
 	if err != nil {
 		return
 	}

@@ -263,7 +263,7 @@ func (ctl *InferenceController) GetRealTimeSpaceLog(ctx *gin.Context) {
 // @Param    owner  path  string  true  "owner of space" MaxLength(40)
 // @Param    name   path  string  true  "name of space" MaxLength(100)
 // @Accept   json
-// @Success  200  {object}   responseData{data=string,msg=string,code=string}
+// @Success  200  {object}  responseData{data=string,msg=string,code=string}
 // @x-example {"data": "successfully"}
 // @Router   /v1/space-app/{owner}/{name}/read [get]
 func (ctl *InferenceController) CanRead(ctx *gin.Context) {
