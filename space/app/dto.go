@@ -6,8 +6,6 @@ import (
 	"github.com/opensourceways/xihe-server/app"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	"github.com/opensourceways/xihe-server/utils"
-
-	d "github.com/opensourceways/xihe-server/domain"
 )
 
 // Project
@@ -77,15 +75,6 @@ type ProjectDetailDTO struct {
 type CmdToNotifyUpdateCode struct {
 	CommitId          string
 	NoApplicationFile bool
-}
-
-type CmdToChangeLike struct {
-	d.ResourceIndex
-	ChangeNum int
-}
-
-type CmdToIncrease struct {
-	d.ResourceIndex
 }
 
 func (s projectService) toSpaceMetaDTO(v spacedomain.Project) sdk.SpaceMetaDTO {
