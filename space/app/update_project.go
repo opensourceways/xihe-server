@@ -161,7 +161,7 @@ func (s projectService) addRelatedResource(
 	}
 
 	info := repository.RelatedResourceInfo{
-		ResourceToUpdate: s.toResourceToUpdatePg(p),
+		ResourceToUpdate: s.toResourceToUpdate(p),
 		RelatedResource:  *index,
 	}
 
@@ -243,15 +243,6 @@ func (s projectService) toResourceToUpdate(p *spacedomain.Project) repository.Re
 	return repository.ResourceToUpdate{
 		Owner:     p.Owner,
 		Id:        p.Id,
-		Version:   p.Version,
-		UpdatedAt: utils.Now(),
-	}
-}
-
-func (s projectService) toResourceToUpdatePg(p *spacedomain.Project) repository.ResourceToUpdate {
-	return repository.ResourceToUpdate{
-		Owner:     p.Owner,
-		Id:        p.RepoId,
 		Version:   p.Version,
 		UpdatedAt: utils.Now(),
 	}
