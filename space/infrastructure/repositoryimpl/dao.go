@@ -92,7 +92,7 @@ func (dao *daoImpl) IncrementStatistic(filter *projectDO, fieldName string, incr
 	return nil
 }
 
-func (dao *daoImpl) ListAndSortByUpdateTime(
+func (dao *daoImpl) ListAndSortByDownloadCount(
 	owner string, do *repositories.ResourceListDO,
 ) ([]ProjectSummaryDO, int, error) {
 	var items []projectDO
@@ -101,11 +101,12 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 	// 基础查询条件
 	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
-	query := baseQuery.Order("updated_at DESC")
+	// 构建分页查询
+	query := baseQuery.Order(equalQuery(fieldDownload))
 
-	//名字查询
+	// 名字查询
 	if do.Name != "" {
-		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+		query = query.Where(likeQuery(fieldName), "%"+strings.TrimSpace(do.Name)+"%")
 	}
 
 	// 计算总数
@@ -113,7 +114,6 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 		return nil, 0, err
 	}
 
-	// 构建分页查询
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
@@ -127,32 +127,10 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary := ProjectSummaryDO{
-			Id:            item.Id,
-			Owner:         item.Owner,
-			Name:          item.Name,
-			Desc:          item.Description,
-			Title:         item.Title,
-			Level:         item.Level,
-			CoverId:       item.CoverId,
-			UpdatedAt:     item.UpdatedAt,
-			LikeCount:     item.LikeCount,
-			ForkCount:     item.ForkCount,
-			DownloadCount: item.DownloadCount,
-			Hardware:      item.Hardware,
-			Type:          item.Type,
-		}
-		// 查询标签
-		var tagResults []projectTagsDO
-		if err := dao.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
+		summary, err := dao.toProjectSummaryDO(item)
+		if err != nil {
 			return nil, 0, err
 		}
-		tags := make([]string, len(tagResults))
-		for i, tag := range tagResults {
-			tags[i] = tag.TagName
-		}
-		summary.Tags = tags
-
 		projectSummaries = append(projectSummaries, summary)
 	}
 
@@ -169,11 +147,11 @@ func (dao *daoImpl) ListAndSortByFirstLetter(
 	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
 	// 构建分页查询
-	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
+	query := baseQuery.Order("LOWER(" + fieldName + ") COLLATE \"C\" ASC")
 
-	//名字查询
+	// 名字查询
 	if do.Name != "" {
-		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+		query = query.Where(likeQuery(fieldName), "%"+strings.TrimSpace(do.Name)+"%")
 	}
 
 	// 计算总数
@@ -194,39 +172,17 @@ func (dao *daoImpl) ListAndSortByFirstLetter(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary := ProjectSummaryDO{
-			Id:            item.Id,
-			Owner:         item.Owner,
-			Name:          item.Name,
-			Desc:          item.Description,
-			Title:         item.Title,
-			Level:         item.Level,
-			CoverId:       item.CoverId,
-			UpdatedAt:     item.UpdatedAt,
-			LikeCount:     item.LikeCount,
-			ForkCount:     item.ForkCount,
-			DownloadCount: item.DownloadCount,
-			Hardware:      item.Hardware,
-			Type:          item.Type,
-		}
-		// 查询标签
-		var tagResults []projectTagsDO
-		if err := dao.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
+		summary, err := dao.toProjectSummaryDO(item)
+		if err != nil {
 			return nil, 0, err
 		}
-		tags := make([]string, len(tagResults))
-		for i, tag := range tagResults {
-			tags[i] = tag.TagName
-		}
-		summary.Tags = tags
-
 		projectSummaries = append(projectSummaries, summary)
 	}
 
 	return projectSummaries, int(count), nil
 }
 
-func (dao *daoImpl) ListAndSortByDownloadCount(
+func (dao *daoImpl) ListAndSortByUpdateTime(
 	owner string, do *repositories.ResourceListDO,
 ) ([]ProjectSummaryDO, int, error) {
 	var items []projectDO
@@ -235,12 +191,11 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 	// 基础查询条件
 	baseQuery := dao.db().Where(equalQuery(fieldOwner), owner)
 
-	// 构建分页查询
-	query := baseQuery.Order("download_count DESC")
+	query := baseQuery.Order("updated_at DESC")
 
-	//名字查询
+	// 名字查询
 	if do.Name != "" {
-		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
+		query = query.Where(likeQuery(fieldName), "%"+strings.TrimSpace(do.Name)+"%")
 	}
 
 	// 计算总数
@@ -248,6 +203,7 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 		return nil, 0, err
 	}
 
+	// 构建分页查询
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
@@ -261,34 +217,44 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary := ProjectSummaryDO{
-			Id:            item.Id,
-			Owner:         item.Owner,
-			Name:          item.Name,
-			Desc:          item.Description,
-			Title:         item.Title,
-			Level:         item.Level,
-			CoverId:       item.CoverId,
-			UpdatedAt:     item.UpdatedAt,
-			LikeCount:     item.LikeCount,
-			ForkCount:     item.ForkCount,
-			DownloadCount: item.DownloadCount,
-			Hardware:      item.Hardware,
-			Type:          item.Type,
-		}
-		// 查询标签
-		var tagResults []projectTagsDO
-		if err := dao.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
+		summary, err := dao.toProjectSummaryDO(item)
+		if err != nil {
 			return nil, 0, err
 		}
-		tags := make([]string, len(tagResults))
-		for i, tag := range tagResults {
-			tags[i] = tag.TagName
-		}
-		summary.Tags = tags
-
 		projectSummaries = append(projectSummaries, summary)
 	}
 
 	return projectSummaries, int(count), nil
+}
+
+func (dao *daoImpl) toProjectSummaryDO(item projectDO) (ProjectSummaryDO, error) {
+	summary := ProjectSummaryDO{
+		Id:            item.Id,
+		Owner:         item.Owner,
+		Name:          item.Name,
+		Desc:          item.Description,
+		Title:         item.Title,
+		Level:         item.Level,
+		CoverId:       item.CoverId,
+		UpdatedAt:     item.UpdatedAt,
+		LikeCount:     item.LikeCount,
+		ForkCount:     item.ForkCount,
+		DownloadCount: item.DownloadCount,
+		Hardware:      item.Hardware,
+		Type:          item.Type,
+	}
+
+	// 查询标签
+	var tagResults []projectTagsDO
+	if err := dao.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
+		return ProjectSummaryDO{}, err
+	}
+
+	tags := make([]string, len(tagResults))
+	for i, tag := range tagResults {
+		tags[i] = tag.TagName
+	}
+	summary.Tags = tags
+
+	return summary, nil
 }
