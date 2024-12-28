@@ -163,7 +163,7 @@ func (impl project) ListAndSortByFirstLetter(
 	owner domain.Account, option *repository.ResourceListOption,
 ) (spacerepo.UserProjectsInfo, error) {
 	return impl.list(
-		owner, option, impl.mapper.ListAndSortByUpdateTime,
+		owner, option, impl.mapper.ListAndSortByFirstLetter,
 	)
 }
 
