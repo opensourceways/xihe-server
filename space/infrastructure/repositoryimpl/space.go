@@ -2,21 +2,43 @@ package repositoryimpl
 
 import (
 	"errors"
+	"fmt"
 	"strings"
+
+	"gorm.io/gorm"
+
+	"gorm.io/gorm/clause"
 
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
-
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
-	"gorm.io/gorm/clause"
 )
 
 type projectAdapter struct {
 	daoImpl
 }
 
+func equalQuery(field string) string {
+	return fmt.Sprintf(`%s = ?`, field)
+}
+
+func inQuery(field string) string {
+	return fmt.Sprintf(`%s IN ?`, field)
+}
+
+func likeQuery(field string) string {
+	return fmt.Sprintf(`%s LIKE ?`, field)
+}
+
+func connect(parts ...string) string {
+	return strings.Join(parts, ".")
+}
+
+func joinOn(joinTable, onField, primaryTable, primaryField string) string {
+	return fmt.Sprintf("JOIN %s ON %s.%s = %s.%s", joinTable, joinTable, onField, primaryTable, primaryField)
+}
 func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project, error) {
 	do := toProjectDO(v)
 	err := adapter.db().Clauses(clause.Returning{}).Create(&do).Error
@@ -53,21 +75,21 @@ func (adapter *projectAdapter) GetByRepoId(id domain.Identity) (
 
 	// find tags
 	var tagResults []projectTagsDO
-	if err := adapter.daoImpl.dbTag().Where("project_id", id).Find(&tagResults).Error; err != nil {
+	if err := adapter.daoImpl.dbTag().Where(fieldProjectId, id).Find(&tagResults).Error; err != nil {
 		return spacedomain.Project{}, err
 	}
 	adapter.getProjectTags(&r, tagResults)
 
 	// get datasets
 	var datasetResults []datasetDO
-	if err := adapter.daoImpl.dbDataset().Where("project_id", id).Find(&datasetResults).Error; err != nil {
+	if err := adapter.daoImpl.dbDataset().Where(fieldProjectId, id).Find(&datasetResults).Error; err != nil {
 		return spacedomain.Project{}, err
 	}
 	adapter.getDataset(&r, datasetResults)
 
 	// get models
 	var modelResults []modelDO
-	if err := adapter.daoImpl.dbModel().Where("project_id", id).Find(&modelResults).Error; err != nil {
+	if err := adapter.daoImpl.dbModel().Where(fieldProjectId, id).Find(&modelResults).Error; err != nil {
 		return spacedomain.Project{}, err
 	}
 	adapter.getModel(&r, modelResults)
@@ -97,21 +119,21 @@ func (adapter *projectAdapter) GetByName(owner domain.Account, name domain.Resou
 
 	// find tags
 	var tagResults []projectTagsDO
-	if err := adapter.daoImpl.dbTag().Where("project_id", id).Find(&tagResults).Error; err != nil {
+	if err := adapter.daoImpl.dbTag().Where(fieldProjectId, id).Find(&tagResults).Error; err != nil {
 		return spacedomain.Project{}, err
 	}
 	adapter.getProjectTags(&r, tagResults)
 
 	// get datasets
 	var datasetResults []datasetDO
-	if err := adapter.daoImpl.dbDataset().Where("project_id", id).Find(&datasetResults).Error; err != nil {
+	if err := adapter.daoImpl.dbDataset().Where(fieldProjectId, id).Find(&datasetResults).Error; err != nil {
 		return spacedomain.Project{}, err
 	}
 	adapter.getDataset(&r, datasetResults)
 
 	// get models
 	var modelResults []modelDO
-	if err := adapter.daoImpl.dbModel().Where("project_id", id).Find(&modelResults).Error; err != nil {
+	if err := adapter.daoImpl.dbModel().Where(fieldProjectId, id).Find(&modelResults).Error; err != nil {
 		return spacedomain.Project{}, err
 	}
 	adapter.getModel(&r, modelResults)
@@ -162,76 +184,88 @@ func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []mo
 }
 
 func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceListOption) (
-	[]spacedomain.ProjectSummary, error,
-) {
+	[]spacedomain.ProjectSummary, error) {
 	var projectSummaries []spacedomain.ProjectSummary
+
 	for _, opt := range opts {
 		var projects []projectDO
-		query := adapter.db().Where("owner = ? AND id IN (?)", opt.Owner.Account(), opt.Ids).Order("updated_at DESC")
-		//nil error
+
+		query := adapter.db().
+			Where(equalQuery(fieldOwner), opt.Owner.Account()).
+			Where(inQuery(fieldID), opt.Ids).
+			Order("updated_at DESC") // 排序
 
 		err := query.Find(&projects).Error
 		if err != nil {
 			return nil, repositories.ConvertError(err)
 		}
 
+		// 使用 mapProjectToSummary 方法转换每个项目
 		for _, project := range projects {
-			// ResourceName
-			resourceName, err := domain.NewResourceName(project.Name)
+			summary, err := adapter.mapProjectToSummary(project)
 			if err != nil {
 				return nil, err
 			}
-			// ResourceDesc
-			resourceDesc, err := domain.NewResourceDesc(project.Description)
-			if err != nil {
-				return nil, err
-			}
-			// ResourceTitle
-			resourceTitle, err := domain.NewResourceTitle(project.Title)
-			if err != nil {
-				return nil, err
-			}
-			//projectCoverId
-			resourceCoverId, err := domain.NewCoverId(project.CoverId)
-			if err != nil {
-				return nil, err
-			}
-			//projectHardware
-			projectHardware, err := domain.NewHardware(project.Hardware, project.Type)
-			if err != nil {
-				return nil, err
-			}
-			// Tags
-			var tagResults []projectTagsDO
-			if err := adapter.dbTag().Where("project_id = ?", project.Id).Find(&tagResults).Error; err != nil {
-				return nil, err
-			}
-			tags := make([]string, len(tagResults))
-			for i, tag := range tagResults {
-				tags[i] = tag.TagName
-			}
-
-			summary := spacedomain.ProjectSummary{
-				Id:            project.Id,
-				Owner:         domain.CreateAccount(project.Owner),
-				Name:          resourceName,
-				Desc:          resourceDesc,
-				Title:         resourceTitle,
-				Level:         domain.NewResourceLevelByNum(project.Level),
-				CoverId:       resourceCoverId,
-				UpdatedAt:     project.UpdatedAt,
-				LikeCount:     project.LikeCount,
-				ForkCount:     project.ForkCount,
-				DownloadCount: project.DownloadCount,
-				Hardware:      projectHardware,
-				Tags:          tags,
-			}
-
 			projectSummaries = append(projectSummaries, summary)
 		}
 	}
 
 	return projectSummaries, nil
+}
+
+func (adapter *projectAdapter) mapProjectToSummary(project projectDO) (spacedomain.ProjectSummary, error) {
+	// ResourceName
+	resourceName, err := domain.NewResourceName(project.Name)
+	if err != nil {
+		return spacedomain.ProjectSummary{}, err
+	}
+	// ResourceDesc
+	resourceDesc, err := domain.NewResourceDesc(project.Description)
+	if err != nil {
+		return spacedomain.ProjectSummary{}, err
+	}
+	// ResourceTitle
+	resourceTitle, err := domain.NewResourceTitle(project.Title)
+	if err != nil {
+		return spacedomain.ProjectSummary{}, err
+	}
+	// projectCoverId
+	resourceCoverId, err := domain.NewCoverId(project.CoverId)
+	if err != nil {
+		return spacedomain.ProjectSummary{}, err
+	}
+	// projectHardware
+	projectHardware, err := domain.NewHardware(project.Hardware, project.Type)
+	if err != nil {
+		return spacedomain.ProjectSummary{}, err
+	}
+	// Tags
+	var tagResults []projectTagsDO
+	if err := adapter.dbTag().Where(equalQuery(fieldProjectId), project.Id).Find(&tagResults).Error; err != nil {
+		return spacedomain.ProjectSummary{}, err
+	}
+	tags := make([]string, len(tagResults))
+	for i, tag := range tagResults {
+		tags[i] = tag.TagName
+	}
+
+	summary := spacedomain.ProjectSummary{
+		Id:            project.Id,
+		Owner:         domain.CreateAccount(project.Owner),
+		Name:          resourceName,
+		Desc:          resourceDesc,
+		Title:         resourceTitle,
+		Level:         domain.NewResourceLevelByNum(project.Level),
+		CoverId:       resourceCoverId,
+		UpdatedAt:     project.UpdatedAt,
+		LikeCount:     project.LikeCount,
+		ForkCount:     project.ForkCount,
+		DownloadCount: project.DownloadCount,
+		Hardware:      projectHardware,
+		Tags:          tags,
+	}
+
+	return summary, nil
 }
 
 func (adapter *projectAdapter) AddRelatedDataset(info *repository.RelatedResourceInfo) error {
@@ -277,7 +311,7 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 	}
 	// find tags
 	var tagResults []projectTagsDO
-	if err := adapter.daoImpl.dbTag().Where("project_id", identity).Find(&tagResults).Error; err != nil {
+	if err := adapter.daoImpl.dbTag().Where(fieldProjectId, identity).Find(&tagResults).Error; err != nil {
 		return spacedomain.Project{}, err
 	}
 	tags := make([]string, len(tagResults))
@@ -288,6 +322,36 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 
 	return
 
+}
+
+func (adapter *projectAdapter) applyFilters(query *gorm.DB, do *repositories.GlobalResourceListDO) *gorm.DB {
+	// 名字查询
+	if do.Name != "" {
+		query = query.Where(likeQuery(fieldName), "%"+strings.TrimSpace(do.Name)+"%")
+	}
+
+	// level查询
+	if do.Level > 0 {
+		query = query.Where(equalQuery(connect(tableProjects, fieldLevel)), do.Level)
+	}
+
+	// 如果需要标签查询或标签类别查询
+	if do.Tags != nil || do.TagKinds != nil {
+		query = query.Joins(joinOn(tableProjectTags, fieldProjectId, tableProjects, fieldID))
+
+		// 标签查询
+		if do.Tags != nil {
+			query = query.Where(inQuery(connect(tableProjectTags, fieldTagName)), do.Tags)
+		}
+
+		// 标签类别查询
+		if do.TagKinds != nil {
+			query = query.Joins(joinOn(tableTagCategories, fieldTagName, tableProjectTags, fieldTagName)).
+				Where(inQuery(connect(tableTagCategories, fieldKind)), do.TagKinds)
+		}
+	}
+
+	return query
 }
 
 func (adapter *projectAdapter) ListGlobalAndSortByUpdateTime(
@@ -306,36 +370,14 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 	// 基础查询条件
 	baseQuery := adapter.db()
 
+	// 排序
 	query := baseQuery.Order("updated_at DESC")
 
-	//名字查询
-	if do.Name != "" {
-		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
-	}
-
-	//level查询
-	if do.Level > 0 {
-		query = query.Where("Level = ?", do.Level)
-	}
-
-	// 如果需要标签查询或标签类别查询
-	if do.Tags != nil || do.TagKinds != nil {
-		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id")
-
-		// 标签查询
-		if do.Tags != nil {
-			query = query.Where("project_tags.tag_name IN ?", do.Tags)
-		}
-
-		// 标签类别查询
-		if do.TagKinds != nil {
-			query = query.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
-				Where("tag_categories.kind IN ?", do.TagKinds)
-		}
-	}
+	// 应用过滤器
+	query = adapter.applyFilters(query, do)
 
 	// 计算总数
-	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+	if err := query.Model(&projectDO{}).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -370,7 +412,7 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 		}
 		// 查询标签
 		var tagResults []projectTagsDO
-		if err := adapter.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+		if err := adapter.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
 			return nil, 0, err
 		}
 		tags := make([]string, len(tagResults))
@@ -400,38 +442,16 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 	// 基础查询条件
 	baseQuery := adapter.db()
 
-	// 名字查询
-	if do.Name != "" {
-		baseQuery = baseQuery.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
-	}
+	// 排序
+	query := baseQuery.Order(fieldDownload + " DESC")
 
-	// 如果需要标签查询或标签类别查询
-	if do.Tags != nil || do.TagKinds != nil {
-		baseQuery = baseQuery.Joins("JOIN project_tags ON project_tags.project_id = projects.id")
-
-		// 标签查询
-		if do.Tags != nil {
-			baseQuery = baseQuery.Where("project_tags.tag_name IN ?", do.Tags)
-		}
-
-		// 标签类别查询
-		if do.TagKinds != nil {
-			baseQuery = baseQuery.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
-				Where("tag_categories.kind IN ?", do.TagKinds)
-		}
-	}
-
-	// level查询
-	if do.Level > 0 {
-		baseQuery = baseQuery.Where("Level = ?", do.Level)
-	}
+	// 应用过滤器
+	query = adapter.applyFilters(query, do)
 
 	// 计算总数
-	if err := baseQuery.Model(&projectDO{}).Count(&count).Error; err != nil {
+	if err := query.Model(&projectDO{}).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
-
-	query := baseQuery.Order("download_count DESC")
 
 	// 构建分页查询
 	if do.PageNum > 0 && do.CountPerPage > 0 {
@@ -464,7 +484,7 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 		}
 		// 查询标签
 		var tagResults []projectTagsDO
-		if err := adapter.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+		if err := adapter.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
 			return nil, 0, err
 		}
 		tags := make([]string, len(tagResults))
@@ -495,40 +515,18 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 	// 基础查询条件
 	baseQuery := adapter.db()
 
-	// 构建分页查询
-	query := baseQuery.Order("LOWER(name) COLLATE \"C\" ASC")
+	// 排序
+	query := baseQuery.Order("LOWER(" + fieldName + ") COLLATE \"C\" ASC")
 
-	// 名字查询
-	if do.Name != "" {
-		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(do.Name)+"%")
-	}
-
-	// 如果需要标签查询或标签类别查询
-	if do.Tags != nil || do.TagKinds != nil {
-		query = query.Joins("JOIN project_tags ON project_tags.project_id = projects.id")
-
-		// 标签查询
-		if do.Tags != nil {
-			query = query.Where("project_tags.tag_name IN ?", do.Tags)
-		}
-
-		// 标签类别查询
-		if do.TagKinds != nil {
-			query = query.Joins("JOIN tag_categories ON project_tags.tag_name = tag_categories.tag_name").
-				Where("tag_categories.kind IN ?", do.TagKinds)
-		}
-	}
-
-	// level查询
-	if do.Level > 0 {
-		query = query.Where("Level = ?", do.Level)
-	}
+	// 应用过滤器
+	query = adapter.applyFilters(query, do)
 
 	// 计算总数
 	if err := query.Model(&projectDO{}).Count(&count).Error; err != nil {
 		return nil, 0, err
 	}
 
+	// 构建分页查询
 	if do.PageNum > 0 && do.CountPerPage > 0 {
 		query = query.Limit(int(do.CountPerPage)).Offset((int(do.PageNum) - 1) * int(do.CountPerPage))
 	}
@@ -559,7 +557,7 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 		}
 		// 查询标签
 		var tagResults []projectTagsDO
-		if err := adapter.dbTag().Where("project_id = ?", item.Id).Find(&tagResults).Error; err != nil {
+		if err := adapter.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
 			return nil, 0, err
 		}
 		tags := make([]string, len(tagResults))
@@ -621,7 +619,7 @@ func (adapter *projectAdapter) getSummary(owner string, projectId string) (
 
 	// find tags
 	var tagResults []projectTagsDO
-	if err := adapter.daoImpl.dbTag().Where("project_id", projectId).Find(&tagResults).Error; err != nil {
+	if err := adapter.daoImpl.dbTag().Where(fieldProjectId, projectId).Find(&tagResults).Error; err != nil {
 		return ProjectResourceSummaryDO{}, err
 	}
 	// Convert tags to a slice of strings
@@ -720,7 +718,7 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 
 	// 添加名称搜索条件
 	if option.Name != "" {
-		query = query.Where("name LIKE ?", "%"+strings.TrimSpace(option.Name)+"%")
+		query = query.Where(likeQuery(fieldName), "%"+strings.TrimSpace(option.Name)+"%")
 	}
 
 	// 添加RepoType搜索条件
@@ -729,7 +727,7 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 		for i, rt := range option.RepoType {
 			repoTypes[i] = rt.RepoType()
 		}
-		query = query.Where("repo_type IN (?)", repoTypes)
+		query = query.Where(inQuery(fieldRepoType), repoTypes)
 	}
 
 	// 执行查询
@@ -790,7 +788,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 		Exception:         p.Exception.Exception(),
 	}
 
-	result := adapter.db().Model(&projectDO{}).Where("id = ?", do.Id).Updates(do)
+	result := adapter.db().Model(&projectDO{}).Where(equalQuery(fieldID), do.Id).Updates(do)
 	if result.Error != nil {
 		return repositories.ConvertError(result.Error)
 	}
@@ -800,7 +798,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 	}
 
 	// 删除旧的标签关联
-	if err := adapter.dbTag().Where("project_id = ?", do.Id).Delete(&projectTagsDO{}).Error; err != nil {
+	if err := adapter.dbTag().Where(equalQuery(fieldProjectId), do.Id).Delete(&projectTagsDO{}).Error; err != nil {
 		return repositories.ConvertError(err)
 	}
 

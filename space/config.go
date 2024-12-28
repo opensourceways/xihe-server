@@ -7,7 +7,7 @@ import (
 
 type Config struct {
 	Topics infrastructure.Topics `json:"topics"`
-	Tables repositoryimpl.Tables `json:"tables"`
+	Tables repositoryimpl.Tables `json:"tables" required:"true"`
 }
 
 // ConfigItems returns a slice of interfaces containing references to the Tables and Topics fields of the Config struct.

@@ -1,8 +1,6 @@
 package repositoryimpl
 
 import (
-	"fmt"
-
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
@@ -10,9 +8,6 @@ import (
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 )
 
-func equalQuery(field string) string {
-	return fmt.Sprintf(`%s = ?`, field)
-}
 func (impl project) IncreaseFork(p *domain.ResourceIndex) error {
 	err := impl.mapper.IncreaseFork(repositories.ToResourceIndexDO(p))
 	if err != nil {

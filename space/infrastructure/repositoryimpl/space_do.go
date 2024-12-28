@@ -7,13 +7,20 @@ import (
 )
 
 const (
-	fieldOwner     = "owner"
-	fieldName      = "name"
-	fieldID        = "id"
-	fieldLikeCount = "like_count"
-	fieldProjectId = "project_id"
-	fieldForkCount = "fork_count"
-	fieldDownload  = "download_count"
+	fieldOwner         = "owner"
+	fieldName          = "name"
+	fieldID            = "id"
+	fieldLikeCount     = "like_count"
+	fieldProjectId     = "project_id"
+	fieldForkCount     = "fork_count"
+	fieldDownload      = "download_count"
+	fieldRepoType      = "repo_type"
+	fieldLevel         = "level"
+	fieldKind          = "kind"
+	fieldTagName       = "tag_name"
+	tableTagCategories = "tag_categories"
+	tableProjectTags   = "project_tags"
+	tableProjects      = "projects"
 )
 
 var (
