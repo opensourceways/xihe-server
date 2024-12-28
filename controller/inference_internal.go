@@ -59,8 +59,11 @@ type InferenceInternalController struct {
 	whitelist         userapp.WhiteListService
 }
 
-// / @Summary		Create
-/// @Param			pid		path	string	true	"project id"
+// @Summary		Create
+// @Description	create inference
+// @Tags			Inference
+// @Param			owner	path	string	true	"project owner"
+// @Param			pid		path	string	true	"project id"
 // @Accept			json
 // @Success		201	{object}			app.InferenceDTO
 // @Failure		400	bad_request_body	can't	parse		request	body
