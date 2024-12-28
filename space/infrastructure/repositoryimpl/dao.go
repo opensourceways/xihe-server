@@ -3,14 +3,12 @@ package repositoryimpl
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"gorm.io/gorm"
 
 	"github.com/opensourceways/xihe-server/common/domain/repository"
-
 	"github.com/opensourceways/xihe-server/infrastructure/repositories"
-
-	"strings"
 )
 
 var dbInstance *gorm.DB
