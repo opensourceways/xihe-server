@@ -15,9 +15,9 @@ func Init(db *gorm.DB, tables *Tables) error {
 	datasetTableName = tables.Dataset
 	modelTableName = tables.Model
 
-	// if err := db.AutoMigrate(&projectDO{}); err != nil {
-	// 	return err
-	// }
+	if err := db.AutoMigrate(&projectDO{}); err != nil {
+		return err
+	}
 
 	dbInstance = db
 

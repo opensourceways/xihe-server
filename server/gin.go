@@ -343,8 +343,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		return err
 	}
 
-	// projectMessageService := app.NewProjectMessageService(proj, projPg)
-
 	spaceappAppService := spaceappApp.NewSpaceappAppService(
 		spaceappRepository, proj, sseadapter.StreamSentAdapter(&cfg.SpaceApp.Controller), spaceappSender,
 	)

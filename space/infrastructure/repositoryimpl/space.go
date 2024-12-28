@@ -140,9 +140,7 @@ func (adapter *projectAdapter) getDataset(p *spacedomain.Project, datasetResult 
 			Id:    dataset.DatasetId,
 		}
 	}
-
 	p.RelatedDatasets = relatedDatasets
-
 }
 
 func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []modelDO) {

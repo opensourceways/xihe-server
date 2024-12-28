@@ -57,7 +57,6 @@ func (s *spaceappAppService) GetByName(
 	var dto SpaceAppDTO
 
 	space, err := s.spaceRepo.GetByName(index.Owner, index.Name)
-
 	if err != nil {
 		logrus.WithField("space_index", index).Errorf("fail to get space, err: %s", err.Error())
 		return dto, err

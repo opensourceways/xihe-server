@@ -28,51 +28,51 @@ func (do *projectDO) TableName() string {
 }
 
 type projectDO struct {
-	Id            string
-	Owner         string
-	Name          string
-	FL            byte
-	Description   string
-	Title         string
-	Type          string
-	Level         int
-	CoverId       string
-	Protocol      string
-	Training      string
-	RepoType      string
-	RepoId        string
-	CreatedAt     int64
-	UpdatedAt     int64
-	Version       int
-	LikeCount     int
-	ForkCount     int
-	DownloadCount int
+	Id            string `gorm:"column:id;primaryKey"`
+	Owner         string `gorm:"column:owner"`
+	Name          string `gorm:"column:name"`
+	FL            byte   `gorm:"column:fl"`
+	Description   string `gorm:"column:description"`
+	Title         string `gorm:"column:title"`
+	Type          string `gorm:"column:type"`
+	Level         int    `gorm:"column:level"`
+	CoverId       string `gorm:"column:cover_id"`
+	Protocol      string `gorm:"column:protocol"`
+	Training      string `gorm:"column:training"`
+	RepoType      string `gorm:"column:repo_type"`
+	RepoId        string `gorm:"column:repo_id"`
+	CreatedAt     int64  `gorm:"column:created_at"`
+	UpdatedAt     int64  `gorm:"column:updated_at"`
+	Version       int    `gorm:"column:version"`
+	LikeCount     int    `gorm:"column:like_count"`
+	ForkCount     int    `gorm:"column:fork_count"`
+	DownloadCount int    `gorm:"column:download_count"`
 
-	CommitId           string
-	NoApplicationFile  bool
-	CompPowerAllocated bool
-	Exception          string
+	CommitId           string `gorm:"column:commit_id"`
+	NoApplicationFile  bool   `gorm:"column:no_application_file"`
+	CompPowerAllocated bool   `gorm:"column:comp_power_allocated"`
+	Exception          string `gorm:"column:exception"`
 
-	Hardware  string
-	BaseImage string
+	Hardware  string `gorm:"column:hardware"`
+	BaseImage string `gorm:"column:base_image"`
 }
 
 type projectTagsDO struct {
-	Id        int
-	ProjectId string
-	TagName   string
+	Id        int    `gorm:"column:id;primaryKey"`
+	ProjectId string `gorm:"column:project_id"`
+	TagName   string `gorm:"column:tag_name"`
 }
 
 type datasetDO struct {
-	DatasetId string
-	ProjectId string
-	Owner     string
+	DatasetId string `gorm:"column:data_set_id;primaryKey"`
+	ProjectId string `gorm:"column:project_id"`
+	Owner     string `gorm:"column:owner"`
 }
 
 type modelDO struct {
-	ModelId   string
-	ProjectId string
-	Owner     string
+	ModelId   string `gorm:"column:model_id;primaryKey"`
+	ProjectId string `gorm:"column:project_id"`
+	Owner     string `gorm:"column:owner"`
 }
 
 func toProjectDO(p *spacedomain.Project) projectDO {
