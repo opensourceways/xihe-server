@@ -22,7 +22,7 @@ func AddRouterForTrainingController(
 	ts training.Training,
 	repo repository.Training,
 	model repository.Model,
-	projectPg spacerepo.Project,
+	project spacerepo.Project,
 	dataset repository.Dataset,
 	sender message.MessageProducer,
 ) {
@@ -31,7 +31,7 @@ func AddRouterForTrainingController(
 			ts, repo, sender, apiConfig.MaxTrainingRecordNum,
 		),
 		model:   model,
-		project: projectPg,
+		project: project,
 		dataset: dataset,
 	}
 
