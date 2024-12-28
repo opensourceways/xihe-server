@@ -231,7 +231,7 @@ func (s projectService) Create(cmd *ProjectCreateCmd, pr platform.Repository) (d
 	if v.Hardware.IsNpu() {
 		v.CompPowerAllocated = true
 	}
-	//use repoPg
+
 	p, err := s.repo.Save(v)
 	if err != nil {
 		return
