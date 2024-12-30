@@ -72,7 +72,7 @@ type projectTagsDO struct {
 }
 
 type datasetDO struct {
-	DatasetId string `gorm:"column:data_set_id;primaryKey"`
+	DatasetId string `gorm:"column:dataset_id;primaryKey"`
 	ProjectId string `gorm:"column:project_id"`
 	Owner     string `gorm:"column:owner"`
 }
