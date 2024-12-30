@@ -436,7 +436,7 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 	baseQuery := adapter.db()
 
 	// 排序
-	query := baseQuery.Order("updated_at DESC")
+	query := baseQuery.Order("LOWER(" + fieldName + ") COLLATE \"C\" ASC")
 
 	// 应用过滤器
 	query = adapter.applyFilters(query, do)

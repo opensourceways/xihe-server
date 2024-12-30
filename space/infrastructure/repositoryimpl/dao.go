@@ -104,7 +104,7 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 	}
 
 	// 添加排序条件
-	query = query.Order(equalQuery(fieldDownload))
+	query = query.Order(fieldDownload + " DESC")
 
 	// 执行查询
 	err = query.Find(&items).Error
