@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"gorm.io/gorm"
-
 	"gorm.io/gorm/clause"
 
 	"github.com/opensourceways/xihe-server/domain"
@@ -178,9 +177,7 @@ func (adapter *projectAdapter) getModel(p *spacedomain.Project, modelResult []mo
 			Id:    model.ModelId,
 		}
 	}
-
 	p.RelatedModels = relatedModels
-
 }
 
 func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceListOption) (
@@ -214,55 +211,22 @@ func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceLi
 }
 
 func (adapter *projectAdapter) mapProjectToSummary(project projectDO) (spacedomain.ProjectSummary, error) {
-	// ResourceName
-	resourceName, err := domain.NewResourceName(project.Name)
+	summaryDO := toProjectSummaryDO(project)
+	var summary spacedomain.ProjectSummary
+
+	err := summaryDO.toProjectSummary(&summary)
 	if err != nil {
 		return spacedomain.ProjectSummary{}, err
 	}
-	// ResourceDesc
-	resourceDesc, err := domain.NewResourceDesc(project.Description)
-	if err != nil {
-		return spacedomain.ProjectSummary{}, err
-	}
-	// ResourceTitle
-	resourceTitle, err := domain.NewResourceTitle(project.Title)
-	if err != nil {
-		return spacedomain.ProjectSummary{}, err
-	}
-	// projectCoverId
-	resourceCoverId, err := domain.NewCoverId(project.CoverId)
-	if err != nil {
-		return spacedomain.ProjectSummary{}, err
-	}
-	// projectHardware
-	projectHardware, err := domain.NewHardware(project.Hardware, project.Type)
-	if err != nil {
-		return spacedomain.ProjectSummary{}, err
-	}
-	// Tags
+
 	var tagResults []projectTagsDO
 	if err := adapter.dbTag().Where(equalQuery(fieldProjectId), project.Id).Find(&tagResults).Error; err != nil {
 		return spacedomain.ProjectSummary{}, err
 	}
-	tags := make([]string, len(tagResults))
-	for i, tag := range tagResults {
-		tags[i] = tag.TagName
-	}
 
-	summary := spacedomain.ProjectSummary{
-		Id:            project.Id,
-		Owner:         domain.CreateAccount(project.Owner),
-		Name:          resourceName,
-		Desc:          resourceDesc,
-		Title:         resourceTitle,
-		Level:         domain.NewResourceLevelByNum(project.Level),
-		CoverId:       resourceCoverId,
-		UpdatedAt:     project.UpdatedAt,
-		LikeCount:     project.LikeCount,
-		ForkCount:     project.ForkCount,
-		DownloadCount: project.DownloadCount,
-		Hardware:      projectHardware,
-		Tags:          tags,
+	summary.Tags = make([]string, len(tagResults))
+	for i, tag := range tagResults {
+		summary.Tags[i] = tag.TagName
 	}
 
 	return summary, nil

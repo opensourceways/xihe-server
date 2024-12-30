@@ -207,3 +207,21 @@ func toModelDO(r *repository.RelatedResourceInfo) modelDO {
 	}
 	return do
 }
+
+func toProjectSummaryDO(item projectDO) ProjectSummaryDO {
+	return ProjectSummaryDO{
+		Id:            item.Id,
+		Owner:         item.Owner,
+		Name:          item.Name,
+		Desc:          item.Description,
+		Title:         item.Title,
+		Level:         item.Level,
+		CoverId:       item.CoverId,
+		UpdatedAt:     item.UpdatedAt,
+		LikeCount:     item.LikeCount,
+		ForkCount:     item.ForkCount,
+		DownloadCount: item.DownloadCount,
+		Hardware:      item.Hardware,
+		Type:          item.Type,
+	}
+}

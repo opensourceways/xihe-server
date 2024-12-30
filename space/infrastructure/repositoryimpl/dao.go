@@ -228,21 +228,7 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 }
 
 func (dao *daoImpl) toProjectSummaryDO(item projectDO) (ProjectSummaryDO, error) {
-	summary := ProjectSummaryDO{
-		Id:            item.Id,
-		Owner:         item.Owner,
-		Name:          item.Name,
-		Desc:          item.Description,
-		Title:         item.Title,
-		Level:         item.Level,
-		CoverId:       item.CoverId,
-		UpdatedAt:     item.UpdatedAt,
-		LikeCount:     item.LikeCount,
-		ForkCount:     item.ForkCount,
-		DownloadCount: item.DownloadCount,
-		Hardware:      item.Hardware,
-		Type:          item.Type,
-	}
+	summary := toProjectSummaryDO(item)
 
 	// 查询标签
 	var tagResults []projectTagsDO
