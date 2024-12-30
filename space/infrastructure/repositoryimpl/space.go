@@ -359,32 +359,10 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary := ProjectSummaryDO{
-			Id:            item.Id,
-			Owner:         item.Owner,
-			Name:          item.Name,
-			Desc:          item.Description,
-			Title:         item.Title,
-			Level:         item.Level,
-			CoverId:       item.CoverId,
-			UpdatedAt:     item.UpdatedAt,
-			LikeCount:     item.LikeCount,
-			ForkCount:     item.ForkCount,
-			DownloadCount: item.DownloadCount,
-			Hardware:      item.Hardware,
-			Type:          item.Type,
-		}
-		// 查询标签
-		var tagResults []projectTagsDO
-		if err := adapter.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
+		summary, err := adapter.daoImpl.toProjectSummaryDO(item)
+		if err != nil {
 			return nil, 0, err
 		}
-		tags := make([]string, len(tagResults))
-		for i, tag := range tagResults {
-			tags[i] = tag.TagName
-		}
-		summary.Tags = tags
-
 		projectSummaries = append(projectSummaries, summary)
 	}
 
@@ -431,32 +409,10 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary := ProjectSummaryDO{
-			Id:            item.Id,
-			Owner:         item.Owner,
-			Name:          item.Name,
-			Desc:          item.Description,
-			Title:         item.Title,
-			Level:         item.Level,
-			CoverId:       item.CoverId,
-			UpdatedAt:     item.UpdatedAt,
-			LikeCount:     item.LikeCount,
-			ForkCount:     item.ForkCount,
-			DownloadCount: item.DownloadCount,
-			Hardware:      item.Hardware,
-			Type:          item.Type,
-		}
-		// 查询标签
-		var tagResults []projectTagsDO
-		if err := adapter.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
+		summary, err := adapter.daoImpl.toProjectSummaryDO(item)
+		if err != nil {
 			return nil, 0, err
 		}
-		tags := make([]string, len(tagResults))
-		for i, tag := range tagResults {
-			tags[i] = tag.TagName
-		}
-		summary.Tags = tags
-
 		projectSummaries = append(projectSummaries, summary)
 	}
 
@@ -480,7 +436,7 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 	baseQuery := adapter.db()
 
 	// 排序
-	query := baseQuery.Order("LOWER(" + fieldName + ") COLLATE \"C\" ASC")
+	query := baseQuery.Order("updated_at DESC")
 
 	// 应用过滤器
 	query = adapter.applyFilters(query, do)
@@ -504,32 +460,10 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary := ProjectSummaryDO{
-			Id:            item.Id,
-			Owner:         item.Owner,
-			Name:          item.Name,
-			Desc:          item.Description,
-			Title:         item.Title,
-			Level:         item.Level,
-			CoverId:       item.CoverId,
-			UpdatedAt:     item.UpdatedAt,
-			LikeCount:     item.LikeCount,
-			ForkCount:     item.ForkCount,
-			DownloadCount: item.DownloadCount,
-			Hardware:      item.Hardware,
-			Type:          item.Type,
-		}
-		// 查询标签
-		var tagResults []projectTagsDO
-		if err := adapter.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
+		summary, err := adapter.daoImpl.toProjectSummaryDO(item)
+		if err != nil {
 			return nil, 0, err
 		}
-		tags := make([]string, len(tagResults))
-		for i, tag := range tagResults {
-			tags[i] = tag.TagName
-		}
-		summary.Tags = tags
-
 		projectSummaries = append(projectSummaries, summary)
 	}
 
