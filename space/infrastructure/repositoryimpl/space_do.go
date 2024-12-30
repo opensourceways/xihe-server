@@ -209,7 +209,7 @@ func toModelDO(r *repository.RelatedResourceInfo) modelDO {
 	return do
 }
 
-func toProjectSummaryDO(item projectDO) ProjectSummaryDO {
+func toProjectSummaryDO(item projectDO, tags []string) ProjectSummaryDO {
 	return ProjectSummaryDO{
 		Id:            item.Id,
 		Owner:         item.Owner,
@@ -224,6 +224,7 @@ func toProjectSummaryDO(item projectDO) ProjectSummaryDO {
 		DownloadCount: item.DownloadCount,
 		Hardware:      item.Hardware,
 		Type:          item.Type,
+		Tags:          tags,
 	}
 }
 

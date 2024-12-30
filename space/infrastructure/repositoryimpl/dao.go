@@ -114,10 +114,11 @@ func (dao *daoImpl) ListAndSortByDownloadCount(
 
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary, err := dao.toProjectSummaryDO(item)
+		tags, err := dao.findTags(item.Id)
 		if err != nil {
 			return nil, 0, err
 		}
+		summary := toProjectSummaryDO(item, tags)
 		projectSummaries = append(projectSummaries, summary)
 	}
 
@@ -146,10 +147,11 @@ func (dao *daoImpl) ListAndSortByFirstLetter(
 
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary, err := dao.toProjectSummaryDO(item)
+		tags, err := dao.findTags(item.Id)
 		if err != nil {
 			return nil, 0, err
 		}
+		summary := toProjectSummaryDO(item, tags)
 		projectSummaries = append(projectSummaries, summary)
 	}
 
@@ -178,10 +180,11 @@ func (dao *daoImpl) ListAndSortByUpdateTime(
 
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary, err := dao.toProjectSummaryDO(item)
+		tags, err := dao.findTags(item.Id)
 		if err != nil {
 			return nil, 0, err
 		}
+		summary := toProjectSummaryDO(item, tags)
 		projectSummaries = append(projectSummaries, summary)
 	}
 
@@ -209,22 +212,10 @@ func (dao *daoImpl) buildQuery(owner string, do *repositories.ResourceListDO) (*
 	return query, count, nil
 }
 
-func (dao *daoImpl) toProjectSummaryDO(item projectDO) (ProjectSummaryDO, error) {
-	summary := toProjectSummaryDO(item)
-
-	tags, err := dao.getTagsForProject(item)
-	if err != nil {
-		return ProjectSummaryDO{}, err
-	}
-	summary.Tags = tags
-
-	return summary, nil
-}
-
-func (dao *daoImpl) getTagsForProject(item projectDO) ([]string, error) {
+func (dao *daoImpl) findTags(id string) ([]string, error) {
 	// 查询标签
 	var tagResults []projectTagsDO
-	if err := dao.dbTag().Where(equalQuery(fieldProjectId), item.Id).Find(&tagResults).Error; err != nil {
+	if err := dao.dbTag().Where(equalQuery(fieldProjectId), id).Find(&tagResults).Error; err != nil {
 		return nil, err
 	}
 

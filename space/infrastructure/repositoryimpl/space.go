@@ -190,14 +190,13 @@ func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceLi
 		query := adapter.db().
 			Where(equalQuery(fieldOwner), opt.Owner.Account()).
 			Where(inQuery(fieldID), opt.Ids).
-			Order("updated_at DESC") // 排序
+			Order("updated_at DESC")
 
 		err := query.Find(&projects).Error
 		if err != nil {
 			return nil, repositories.ConvertError(err)
 		}
 
-		// 使用 mapProjectToSummary 方法转换每个项目
 		for _, project := range projects {
 			summary, err := adapter.mapProjectToSummary(project)
 			if err != nil {
@@ -211,22 +210,16 @@ func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceLi
 }
 
 func (adapter *projectAdapter) mapProjectToSummary(project projectDO) (spacedomain.ProjectSummary, error) {
-	summaryDO := toProjectSummaryDO(project)
-	var summary spacedomain.ProjectSummary
-
-	err := summaryDO.toProjectSummary(&summary)
+	tags, err := adapter.daoImpl.findTags(project.Id)
 	if err != nil {
 		return spacedomain.ProjectSummary{}, err
 	}
+	summaryDO := toProjectSummaryDO(project, tags)
 
-	var tagResults []projectTagsDO
-	if err := adapter.dbTag().Where(equalQuery(fieldProjectId), project.Id).Find(&tagResults).Error; err != nil {
+	var summary spacedomain.ProjectSummary
+	err = summaryDO.toProjectSummary(&summary)
+	if err != nil {
 		return spacedomain.ProjectSummary{}, err
-	}
-
-	summary.Tags = make([]string, len(tagResults))
-	for i, tag := range tagResults {
-		summary.Tags[i] = tag.TagName
 	}
 
 	return summary, nil
@@ -359,10 +352,11 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary, err := adapter.daoImpl.toProjectSummaryDO(item)
+		tags, err := adapter.daoImpl.findTags(item.Id)
 		if err != nil {
 			return nil, 0, err
 		}
+		summary := toProjectSummaryDO(item, tags)
 		projectSummaries = append(projectSummaries, summary)
 	}
 
@@ -409,10 +403,11 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary, err := adapter.daoImpl.toProjectSummaryDO(item)
+		tags, err := adapter.daoImpl.findTags(item.Id)
 		if err != nil {
 			return nil, 0, err
 		}
+		summary := toProjectSummaryDO(item, tags)
 		projectSummaries = append(projectSummaries, summary)
 	}
 
@@ -460,10 +455,11 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 	// 转换为 ProjectSummaryDO
 	var projectSummaries []ProjectSummaryDO
 	for _, item := range items {
-		summary, err := adapter.daoImpl.toProjectSummaryDO(item)
+		tags, err := adapter.daoImpl.findTags(item.Id)
 		if err != nil {
 			return nil, 0, err
 		}
+		summary := toProjectSummaryDO(item, tags)
 		projectSummaries = append(projectSummaries, summary)
 	}
 
