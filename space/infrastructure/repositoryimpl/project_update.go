@@ -247,7 +247,6 @@ func (impl project) doList(
 	return
 }
 
-// doList Pg
 func (adapter *projectAdapter) doList(
 	f func() ([]ProjectSummaryDO, int, error),
 ) (
