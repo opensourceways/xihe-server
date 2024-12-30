@@ -729,28 +729,7 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 }
 
 func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) error {
-	p := &info.Property
-	do := projectDO{
-		Id:          info.Id,
-		Owner:       info.Owner.Account(),
-		Version:     info.Version,
-		UpdatedAt:   info.UpdatedAt,
-		Name:        p.Name.ResourceName(),
-		FL:          p.Name.FirstLetterOfName(),
-		Description: p.Desc.ResourceDesc(),
-		Title:       p.Title.ResourceTitle(),
-		Level: func() int {
-			if p.Level != nil {
-				return p.Level.Int()
-			}
-			return 0
-		}(),
-		CoverId:           p.CoverId.CoverId(),
-		RepoType:          p.RepoType.RepoType(),
-		CommitId:          p.CommitId,
-		NoApplicationFile: p.NoApplicationFile,
-		Exception:         p.Exception.Exception(),
-	}
+	do := toProjectDOfromUpdateInfo(*info)
 
 	result := adapter.db().Model(&projectDO{}).Where(equalQuery(fieldID), do.Id).Updates(do)
 	if result.Error != nil {
@@ -768,7 +747,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 
 	// 创建新的标签关联
 	var newTagsDOs []projectTagsDO
-	for _, tagName := range p.Tags {
+	for _, tagName := range info.Property.Tags {
 		newTagsDOs = append(newTagsDOs, projectTagsDO{
 			ProjectId: do.Id,
 			TagName:   tagName,

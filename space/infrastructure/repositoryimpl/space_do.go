@@ -4,6 +4,7 @@ import (
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
+	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 )
 
 const (
@@ -223,5 +224,30 @@ func toProjectSummaryDO(item projectDO) ProjectSummaryDO {
 		DownloadCount: item.DownloadCount,
 		Hardware:      item.Hardware,
 		Type:          item.Type,
+	}
+}
+
+func toProjectDOfromUpdateInfo(info spacerepo.ProjectPropertyUpdateInfo) projectDO {
+	p := &info.Property
+	return projectDO{
+		Id:          info.Id,
+		Owner:       info.Owner.Account(),
+		Version:     info.Version,
+		UpdatedAt:   info.UpdatedAt,
+		Name:        p.Name.ResourceName(),
+		FL:          p.Name.FirstLetterOfName(),
+		Description: p.Desc.ResourceDesc(),
+		Title:       p.Title.ResourceTitle(),
+		Level: func() int {
+			if p.Level != nil {
+				return p.Level.Int()
+			}
+			return 0
+		}(),
+		CoverId:           p.CoverId.CoverId(),
+		RepoType:          p.RepoType.RepoType(),
+		CommitId:          p.CommitId,
+		NoApplicationFile: p.NoApplicationFile,
+		Exception:         p.Exception.Exception(),
 	}
 }
