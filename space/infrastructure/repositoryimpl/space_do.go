@@ -227,7 +227,7 @@ func toProjectSummaryDO(item projectDO) ProjectSummaryDO {
 	}
 }
 
-func toProjectDOfromUpdateInfo(info spacerepo.ProjectPropertyUpdateInfo) projectDO {
+func toProjectDOFromUpdateInfo(info spacerepo.ProjectPropertyUpdateInfo) projectDO {
 	p := &info.Property
 	return projectDO{
 		Id:          info.Id,

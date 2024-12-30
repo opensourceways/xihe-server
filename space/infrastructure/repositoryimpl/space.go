@@ -729,7 +729,7 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 }
 
 func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpdateInfo) error {
-	do := toProjectDOfromUpdateInfo(*info)
+	do := toProjectDOFromUpdateInfo(*info)
 
 	result := adapter.db().Model(&projectDO{}).Where(equalQuery(fieldID), do.Id).Updates(do)
 	if result.Error != nil {
