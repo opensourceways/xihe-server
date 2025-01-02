@@ -68,6 +68,8 @@ func (adapter *projectAdapter) GetByRepoId(id domain.Identity) (
 	r spacedomain.Project, err error,
 ) {
 	idInt64, err := strconv.ParseInt(id.Identity(), 10, 64)
+	fmt.Printf("=================id: %+v\n", id)
+	fmt.Printf("================idInt64: %+v\n", idInt64)
 	if err != nil {
 		return spacedomain.Project{}, err
 	}
