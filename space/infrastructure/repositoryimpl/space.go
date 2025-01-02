@@ -58,9 +58,9 @@ func (adapter *projectAdapter) Delete(index *domain.ResourceIndex) (err error) {
 	if err != nil {
 		return err
 	}
-	idInt8 := int8(idInt64)
+
 	return adapter.DeleteSingleRow(
-		&projectDO{Id: idInt8, Owner: index.Owner.Account()},
+		&projectDO{Id: idInt64, Owner: index.Owner.Account()},
 	)
 }
 
@@ -71,10 +71,10 @@ func (adapter *projectAdapter) GetByRepoId(id domain.Identity) (
 	if err != nil {
 		return spacedomain.Project{}, err
 	}
-	idInt8 := int8(idInt64)
+
 	//filter
 	do := projectDO{
-		RepoId: idInt8,
+		RepoId: idInt64,
 	}
 
 	// find project
@@ -271,8 +271,7 @@ func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spa
 	if err != nil {
 		return spacedomain.Project{}, err
 	}
-	idInt8 := int8(idInt64)
-	do := projectDO{Owner: owner.Account(), RepoId: idInt8}
+	do := projectDO{Owner: owner.Account(), RepoId: idInt64}
 	result := projectDO{}
 
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
@@ -519,11 +518,10 @@ func (adapter *projectAdapter) getSummary(owner string, projectId string) (
 	if err != nil {
 		return ProjectResourceSummaryDO{}, err
 	}
-	idInt8 := int8(idInt64)
 	//filter
 	filter := projectDO{
 		Owner:  owner,
-		RepoId: idInt8,
+		RepoId: idInt64,
 	}
 
 	// find project
@@ -533,7 +531,7 @@ func (adapter *projectAdapter) getSummary(owner string, projectId string) (
 	}
 
 	// find tags
-	tags, err := adapter.findTags(idInt8)
+	tags, err := adapter.findTags(idInt64)
 	if err != nil {
 		return ProjectResourceSummaryDO{}, nil
 	}
@@ -585,11 +583,10 @@ func (adapter *projectAdapter) AddLike(p *domain.ResourceIndex) error {
 	if err != nil {
 		return err
 	}
-	idInt8 := int8(idInt64)
 
 	filter := projectDO{
 		Owner: p.Owner.Account(),
-		Id:    idInt8,
+		Id:    idInt64,
 	}
 	err = adapter.daoImpl.IncrementStatistic(&filter, fieldLikeCount, 1)
 	if err != nil {
@@ -604,10 +601,10 @@ func (adapter *projectAdapter) RemoveLike(p *domain.ResourceIndex) error {
 	if err != nil {
 		return err
 	}
-	idInt8 := int8(idInt64)
+
 	filter := projectDO{
 		Owner: p.Owner.Account(),
-		Id:    idInt8,
+		Id:    idInt64,
 	}
 
 	if err := adapter.daoImpl.IncrementStatistic(&filter, fieldLikeCount, -1); err != nil {
@@ -709,11 +706,10 @@ func (adapter *projectAdapter) IncreaseFork(r *domain.ResourceIndex) error {
 	if err != nil {
 		return err
 	}
-	idInt8 := int8(idInt64)
 
 	filter := projectDO{
 		Owner: r.Owner.Account(),
-		Id:    idInt8,
+		Id:    idInt64,
 	}
 
 	err = adapter.daoImpl.IncrementStatistic(&filter, fieldForkCount, 1)
@@ -729,11 +725,10 @@ func (adapter *projectAdapter) IncreaseDownload(r *domain.ResourceIndex) error {
 	if err != nil {
 		return err
 	}
-	idInt8 := int8(idInt64)
 
 	filter := projectDO{
 		Owner: r.Owner.Account(),
-		Id:    idInt8,
+		Id:    idInt64,
 	}
 
 	err = adapter.daoImpl.IncrementStatistic(&filter, fieldDownload, 1)
