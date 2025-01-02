@@ -84,7 +84,9 @@ func (adapter *projectAdapter) GetByRepoId(id domain.Identity) (
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
 		return spacedomain.Project{}, err
 	}
-	result.toProject(&r)
+	if err := result.toProject(&r); err != nil {
+		return spacedomain.Project{}, err
+	}
 
 	fmt.Printf("=================result: %+v\n", result)
 	// find tags
