@@ -197,10 +197,20 @@ func (adapter *projectAdapter) FindUserProjects(opts []repository.UserResourceLi
 
 	for _, opt := range opts {
 		var projects []projectDO
+		var int64Ids []int64
+		for _, idStr := range opt.Ids {
+			if idStr != "" {
+				idInt64, err := strconv.ParseInt(idStr, 10, 64)
+				if err != nil {
+					return nil, err
+				}
+				int64Ids = append(int64Ids, idInt64)
+			}
+		}
 
 		query := adapter.db().
 			Where(equalQuery(fieldOwner), opt.Owner.Account()).
-			Where(inQuery(fieldID), opt.Ids).
+			Where(inQuery(fieldID), int64Ids).
 			Order("updated_at DESC")
 
 		err := query.Find(&projects).Error
