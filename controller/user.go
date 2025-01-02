@@ -133,7 +133,7 @@ func (ctl *UserController) PrivacyRevoke(ctx *gin.Context) {
 	if err := ctl.s.PrivacyRevoke(pl.DomainAccount()); err != nil {
 		SendError(ctx, err)
 	} else {
-		ctl.ClearCookieAfterRevokePrivacy(ctx)
+		// ctl.ClearCookieAfterRevokePrivacy(ctx)
 		ctl.sendRespOfPut(ctx, "success")
 	}
 }
