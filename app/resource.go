@@ -187,7 +187,6 @@ func (s ResourceService) listResources(
 	r := dtos
 
 	if len(projects) > 0 {
-		fmt.Printf("==================projects: %+v\n", projects)
 		all, err := s.Project.FindUserProjects(projects)
 		if err != nil {
 			return nil, err
