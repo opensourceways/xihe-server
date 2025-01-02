@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"fmt"
 
 	sdk "github.com/opensourceways/xihe-sdk/space"
 	"github.com/sirupsen/logrus"
@@ -398,6 +399,7 @@ func (s projectService) GetByRepoId(id domain.Identity) (sdk.SpaceMetaDTO, error
 	}
 
 	res := s.toSpaceMetaDTO(v)
+	fmt.Printf("=================v: %+v\n", v)
 	return res, err
 }
 
