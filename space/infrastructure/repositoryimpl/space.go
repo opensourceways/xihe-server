@@ -54,7 +54,7 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 }
 
 func (adapter *projectAdapter) Delete(index *domain.ResourceIndex) (err error) {
-	idInt64, err := strconv.ParseInt(index.Id, 10, 8)
+	idInt64, err := strconv.ParseInt(index.Id, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (adapter *projectAdapter) Delete(index *domain.ResourceIndex) (err error) {
 func (adapter *projectAdapter) GetByRepoId(id domain.Identity) (
 	r spacedomain.Project, err error,
 ) {
-	idInt64, err := strconv.ParseInt(id.Identity(), 10, 8)
+	idInt64, err := strconv.ParseInt(id.Identity(), 10, 64)
 	if err != nil {
 		return spacedomain.Project{}, err
 	}
@@ -267,7 +267,7 @@ func (adapter *projectAdapter) RemoveRelatedModel(info *repository.RelatedResour
 }
 
 func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
-	idInt64, err := strconv.ParseInt(identity, 10, 8)
+	idInt64, err := strconv.ParseInt(identity, 10, 64)
 	if err != nil {
 		return spacedomain.Project{}, err
 	}
@@ -514,7 +514,7 @@ func (adapter *projectAdapter) GetSummary(owner domain.Account, projectId string
 func (adapter *projectAdapter) getSummary(owner string, projectId string) (
 	do ProjectResourceSummaryDO, err error,
 ) {
-	idInt64, err := strconv.ParseInt(projectId, 10, 8)
+	idInt64, err := strconv.ParseInt(projectId, 10, 64)
 	if err != nil {
 		return ProjectResourceSummaryDO{}, err
 	}
@@ -579,7 +579,7 @@ func (adapter *projectAdapter) getSummaryByName(owner, name string) (
 }
 
 func (adapter *projectAdapter) AddLike(p *domain.ResourceIndex) error {
-	idInt64, err := strconv.ParseInt(p.Id, 10, 8)
+	idInt64, err := strconv.ParseInt(p.Id, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -597,7 +597,7 @@ func (adapter *projectAdapter) AddLike(p *domain.ResourceIndex) error {
 }
 
 func (adapter *projectAdapter) RemoveLike(p *domain.ResourceIndex) error {
-	idInt64, err := strconv.ParseInt(p.Id, 10, 8)
+	idInt64, err := strconv.ParseInt(p.Id, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -702,7 +702,7 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 	return nil
 }
 func (adapter *projectAdapter) IncreaseFork(r *domain.ResourceIndex) error {
-	idInt64, err := strconv.ParseInt(r.Id, 10, 8)
+	idInt64, err := strconv.ParseInt(r.Id, 10, 64)
 	if err != nil {
 		return err
 	}
@@ -721,7 +721,7 @@ func (adapter *projectAdapter) IncreaseFork(r *domain.ResourceIndex) error {
 }
 
 func (adapter *projectAdapter) IncreaseDownload(r *domain.ResourceIndex) error {
-	idInt64, err := strconv.ParseInt(r.Id, 10, 8)
+	idInt64, err := strconv.ParseInt(r.Id, 10, 64)
 	if err != nil {
 		return err
 	}

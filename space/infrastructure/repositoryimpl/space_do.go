@@ -87,7 +87,7 @@ type modelDO struct {
 }
 
 func toProjectDO(p *spacedomain.Project) projectDO {
-	idInt64, err := strconv.ParseInt(p.RepoId, 10, 8)
+	idInt64, err := strconv.ParseInt(p.RepoId, 10, 64)
 	if err != nil {
 		return projectDO{}
 	}
@@ -126,7 +126,7 @@ func toProjectTagsDO(p *spacedomain.Project) []projectTagsDO {
 	var tags []projectTagsDO
 
 	for _, v := range p.Tags {
-		idInt64, err := strconv.ParseInt(p.RepoId, 10, 8)
+		idInt64, err := strconv.ParseInt(p.RepoId, 10, 64)
 		if err != nil {
 			return nil
 		}
@@ -203,7 +203,7 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 }
 
 func toDatasetDO(r *repository.RelatedResourceInfo) datasetDO {
-	projectIdInt64, err := strconv.ParseInt(r.ResourceToUpdate.Id, 10, 8)
+	projectIdInt64, err := strconv.ParseInt(r.ResourceToUpdate.Id, 10, 64)
 	if err != nil {
 		return datasetDO{}
 	}
@@ -217,7 +217,7 @@ func toDatasetDO(r *repository.RelatedResourceInfo) datasetDO {
 }
 
 func toModelDO(r *repository.RelatedResourceInfo) modelDO {
-	projectIdInt64, err := strconv.ParseInt(r.ResourceToUpdate.Id, 10, 8)
+	projectIdInt64, err := strconv.ParseInt(r.ResourceToUpdate.Id, 10, 64)
 	if err != nil {
 		return modelDO{}
 	}
@@ -264,7 +264,7 @@ func toProjectResourceSummaryDO(project projectDO, tags []string) ProjectResourc
 func toProjectDOFromUpdateInfo(info spacerepo.ProjectPropertyUpdateInfo) projectDO {
 	p := &info.Property
 
-	idInt64, err := strconv.ParseInt(info.Id, 10, 8)
+	idInt64, err := strconv.ParseInt(info.Id, 10, 64)
 	if err != nil {
 		return projectDO{}
 	}
