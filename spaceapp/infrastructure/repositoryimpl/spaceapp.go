@@ -56,7 +56,6 @@ func (impl spaceAppRepoImpl) Save(app *domain.SpaceApp) error {
 func (impl spaceAppRepoImpl) FindBySpaceId(id types.Identity) (domain.SpaceApp, error) {
 	do := spaceappDO{SpaceId: id.Integer()}
 
-	// It must new a new DO, otherwise the sql statement will include duplicate conditions.
 	result := spaceappDO{}
 
 	if err := impl.dao.GetRecord(&do, &result); err != nil {
