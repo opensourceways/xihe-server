@@ -3,6 +3,7 @@ package repositoryimpl
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"gorm.io/gorm"
@@ -53,17 +54,27 @@ func (adapter *projectAdapter) Save(v *spacedomain.Project) (spacedomain.Project
 }
 
 func (adapter *projectAdapter) Delete(index *domain.ResourceIndex) (err error) {
+	idInt64, err := strconv.ParseInt(index.Id, 10, 8)
+	if err != nil {
+		return err
+	}
+	idInt8 := int8(idInt64)
 	return adapter.DeleteSingleRow(
-		&projectDO{Id: index.Id, Owner: index.Owner.Account()},
+		&projectDO{Id: idInt8, Owner: index.Owner.Account()},
 	)
 }
 
 func (adapter *projectAdapter) GetByRepoId(id domain.Identity) (
 	r spacedomain.Project, err error,
 ) {
+	idInt64, err := strconv.ParseInt(id.Identity(), 10, 8)
+	if err != nil {
+		return spacedomain.Project{}, err
+	}
+	idInt8 := int8(idInt64)
 	//filter
 	do := projectDO{
-		RepoId: id.Identity(),
+		RepoId: idInt8,
 	}
 
 	// find project
@@ -256,7 +267,12 @@ func (adapter *projectAdapter) RemoveRelatedModel(info *repository.RelatedResour
 }
 
 func (adapter *projectAdapter) Get(owner domain.Account, identity string) (r spacedomain.Project, err error) {
-	do := projectDO{Owner: owner.Account(), RepoId: identity}
+	idInt64, err := strconv.ParseInt(identity, 10, 8)
+	if err != nil {
+		return spacedomain.Project{}, err
+	}
+	idInt8 := int8(idInt64)
+	do := projectDO{Owner: owner.Account(), RepoId: idInt8}
 	result := projectDO{}
 
 	if err := adapter.daoImpl.GetProjectRecord(&do, &result); err != nil {
@@ -499,10 +515,15 @@ func (adapter *projectAdapter) GetSummary(owner domain.Account, projectId string
 func (adapter *projectAdapter) getSummary(owner string, projectId string) (
 	do ProjectResourceSummaryDO, err error,
 ) {
+	idInt64, err := strconv.ParseInt(projectId, 10, 8)
+	if err != nil {
+		return ProjectResourceSummaryDO{}, err
+	}
+	idInt8 := int8(idInt64)
 	//filter
 	filter := projectDO{
 		Owner:  owner,
-		RepoId: projectId,
+		RepoId: idInt8,
 	}
 
 	// find project
@@ -512,28 +533,11 @@ func (adapter *projectAdapter) getSummary(owner string, projectId string) (
 	}
 
 	// find tags
-	var tagResults []projectTagsDO
-	if err := adapter.daoImpl.dbTag().Where(fieldProjectId, projectId).Find(&tagResults).Error; err != nil {
-		return ProjectResourceSummaryDO{}, err
+	tags, err := adapter.findTags(idInt8)
+	if err != nil {
+		return ProjectResourceSummaryDO{}, nil
 	}
-	// Convert tags to a slice of strings
-	tags := make([]string, len(tagResults))
-	for i, tag := range tagResults {
-		tags[i] = tag.TagName
-	}
-
-	// Convert projectDO to ProjectResourceSummaryDO
-	do = ProjectResourceSummaryDO{
-		ResourceSummaryDO: repositories.ResourceSummaryDO{
-			Owner:    project.Owner,
-			Name:     project.Name,
-			Id:       project.Id,
-			RepoId:   project.RepoId,
-			RepoType: project.RepoType,
-		},
-		Tags: tags,
-	}
-
+	do = toProjectResourceSummaryDO(project, tags)
 	return do, nil
 }
 
@@ -567,8 +571,8 @@ func (adapter *projectAdapter) getSummaryByName(owner, name string) (
 	do = repositories.ResourceSummaryDO{
 		Owner:    project.Owner,
 		Name:     project.Name,
-		Id:       project.Id,
-		RepoId:   project.RepoId,
+		Id:       strconv.Itoa(int(project.Id)),
+		RepoId:   strconv.Itoa(int(project.RepoId)),
 		RepoType: project.RepoType,
 	}
 
@@ -577,12 +581,17 @@ func (adapter *projectAdapter) getSummaryByName(owner, name string) (
 }
 
 func (adapter *projectAdapter) AddLike(p *domain.ResourceIndex) error {
+	idInt64, err := strconv.ParseInt(p.Id, 10, 8)
+	if err != nil {
+		return err
+	}
+	idInt8 := int8(idInt64)
+
 	filter := projectDO{
 		Owner: p.Owner.Account(),
-		Id:    p.Id,
+		Id:    idInt8,
 	}
-
-	err := adapter.daoImpl.IncrementStatistic(&filter, fieldLikeCount, 1)
+	err = adapter.daoImpl.IncrementStatistic(&filter, fieldLikeCount, 1)
 	if err != nil {
 		return err
 	}
@@ -591,9 +600,14 @@ func (adapter *projectAdapter) AddLike(p *domain.ResourceIndex) error {
 }
 
 func (adapter *projectAdapter) RemoveLike(p *domain.ResourceIndex) error {
+	idInt64, err := strconv.ParseInt(p.Id, 10, 8)
+	if err != nil {
+		return err
+	}
+	idInt8 := int8(idInt64)
 	filter := projectDO{
 		Owner: p.Owner.Account(),
-		Id:    p.Id,
+		Id:    idInt8,
 	}
 
 	if err := adapter.daoImpl.IncrementStatistic(&filter, fieldLikeCount, -1); err != nil {
@@ -651,8 +665,8 @@ func (adapter *projectAdapter) Search(option *repository.ResourceSearchOption) (
 			return r, err
 		}
 
-		r.Top[i].Id = do.Id
-		r.Top[i].RepoId = do.RepoId
+		r.Top[i].Id = strconv.Itoa(int(do.Id))
+		r.Top[i].RepoId = strconv.Itoa(int(do.RepoId))
 	}
 
 	return r, nil
@@ -690,14 +704,19 @@ func (adapter *projectAdapter) UpdateProperty(info *spacerepo.ProjectPropertyUpd
 
 	return nil
 }
-
 func (adapter *projectAdapter) IncreaseFork(r *domain.ResourceIndex) error {
+	idInt64, err := strconv.ParseInt(r.Id, 10, 8)
+	if err != nil {
+		return err
+	}
+	idInt8 := int8(idInt64)
+
 	filter := projectDO{
 		Owner: r.Owner.Account(),
-		Id:    r.Id,
+		Id:    idInt8,
 	}
 
-	err := adapter.daoImpl.IncrementStatistic(&filter, fieldForkCount, 1)
+	err = adapter.daoImpl.IncrementStatistic(&filter, fieldForkCount, 1)
 	if err != nil {
 		return repositories.ConvertError(err)
 	}
@@ -706,12 +725,18 @@ func (adapter *projectAdapter) IncreaseFork(r *domain.ResourceIndex) error {
 }
 
 func (adapter *projectAdapter) IncreaseDownload(r *domain.ResourceIndex) error {
+	idInt64, err := strconv.ParseInt(r.Id, 10, 8)
+	if err != nil {
+		return err
+	}
+	idInt8 := int8(idInt64)
+
 	filter := projectDO{
 		Owner: r.Owner.Account(),
-		Id:    r.Id,
+		Id:    idInt8,
 	}
 
-	err := adapter.daoImpl.IncrementStatistic(&filter, fieldDownload, 1)
+	err = adapter.daoImpl.IncrementStatistic(&filter, fieldDownload, 1)
 	if err != nil {
 		return repositories.ConvertError(err)
 	}

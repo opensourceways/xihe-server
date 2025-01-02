@@ -212,7 +212,7 @@ func (dao *daoImpl) buildQuery(owner string, do *repositories.ResourceListDO) (*
 	return query, count, nil
 }
 
-func (dao *daoImpl) findTags(id string) ([]string, error) {
+func (dao *daoImpl) findTags(id int8) ([]string, error) {
 	// 查询标签
 	var tagResults []projectTagsDO
 	if err := dao.dbTag().Where(equalQuery(fieldProjectId), id).Find(&tagResults).Error; err != nil {

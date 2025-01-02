@@ -1,8 +1,11 @@
 package repositoryimpl
 
 import (
+	"strconv"
+
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/repository"
+	"github.com/opensourceways/xihe-server/infrastructure/repositories"
 	spacedomain "github.com/opensourceways/xihe-server/space/domain"
 	spacerepo "github.com/opensourceways/xihe-server/space/domain/repository"
 )
@@ -36,7 +39,7 @@ func (do *projectDO) TableName() string {
 }
 
 type projectDO struct {
-	Id            string `gorm:"column:id;primaryKey"`
+	Id            int8   `gorm:"column:id;primaryKey"`
 	Owner         string `gorm:"column:owner"`
 	Name          string `gorm:"column:name"`
 	FL            byte   `gorm:"column:fl"`
@@ -48,7 +51,7 @@ type projectDO struct {
 	Protocol      string `gorm:"column:protocol"`
 	Training      string `gorm:"column:training"`
 	RepoType      string `gorm:"column:repo_type"`
-	RepoId        string `gorm:"column:repo_id"`
+	RepoId        int8   `gorm:"column:repo_id"`
 	CreatedAt     int64  `gorm:"column:created_at"`
 	UpdatedAt     int64  `gorm:"column:updated_at"`
 	Version       int    `gorm:"column:version"`
@@ -67,25 +70,30 @@ type projectDO struct {
 
 type projectTagsDO struct {
 	Id        int    `gorm:"column:id;primaryKey"`
-	ProjectId string `gorm:"column:project_id"`
+	ProjectId int8   `gorm:"column:project_id"`
 	TagName   string `gorm:"column:tag_name"`
 }
 
 type datasetDO struct {
 	DatasetId string `gorm:"column:dataset_id;primaryKey"`
-	ProjectId string `gorm:"column:project_id"`
+	ProjectId int8   `gorm:"column:project_id"`
 	Owner     string `gorm:"column:owner"`
 }
 
 type modelDO struct {
 	ModelId   string `gorm:"column:model_id;primaryKey"`
-	ProjectId string `gorm:"column:project_id"`
+	ProjectId int8   `gorm:"column:project_id"`
 	Owner     string `gorm:"column:owner"`
 }
 
 func toProjectDO(p *spacedomain.Project) projectDO {
+	idInt64, err := strconv.ParseInt(p.RepoId, 10, 8)
+	if err != nil {
+		return projectDO{}
+	}
+	idInt8 := int8(idInt64)
 	do := projectDO{
-		Id:                 p.RepoId,
+		Id:                 idInt8,
 		Owner:              p.Owner.Account(),
 		Name:               p.Name.ResourceName(),
 		FL:                 p.Name.FirstLetterOfName(),
@@ -94,7 +102,7 @@ func toProjectDO(p *spacedomain.Project) projectDO {
 		RepoType:           p.RepoType.RepoType(),
 		Protocol:           p.Protocol.ProtocolName(),
 		Training:           p.Training.TrainingPlatform(),
-		RepoId:             p.RepoId,
+		RepoId:             idInt8,
 		CreatedAt:          p.CreatedAt,
 		UpdatedAt:          p.UpdatedAt,
 		Version:            p.Version,
@@ -119,8 +127,13 @@ func toProjectTagsDO(p *spacedomain.Project) []projectTagsDO {
 	var tags []projectTagsDO
 
 	for _, v := range p.Tags {
+		idInt64, err := strconv.ParseInt(p.RepoId, 10, 8)
+		if err != nil {
+			return nil
+		}
+		idInt8 := int8(idInt64)
 		tags = append(tags, projectTagsDO{
-			ProjectId: p.RepoId,
+			ProjectId: idInt8,
 			TagName:   v,
 		})
 	}
@@ -129,7 +142,7 @@ func toProjectTagsDO(p *spacedomain.Project) []projectTagsDO {
 }
 
 func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
-	r.Id = do.Id
+	r.Id = strconv.Itoa(int(do.Id))
 
 	if r.Owner, err = domain.NewAccount(do.Owner); err != nil {
 		return
@@ -176,7 +189,7 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 	}
 
 	r.Level = domain.NewResourceLevelByNum(do.Level)
-	r.RepoId = do.RepoId
+	r.RepoId = strconv.Itoa(int(do.RepoId))
 	r.Version = do.Version
 	r.CreatedAt = do.CreatedAt
 	r.UpdatedAt = do.UpdatedAt
@@ -192,8 +205,14 @@ func (do *projectDO) toProject(r *spacedomain.Project) (err error) {
 }
 
 func toDatasetDO(r *repository.RelatedResourceInfo) datasetDO {
+	projectIdInt64, err := strconv.ParseInt(r.ResourceToUpdate.Id, 10, 8)
+	if err != nil {
+		return datasetDO{}
+	}
+	projectIdInt8 := int8(projectIdInt64)
+
 	do := datasetDO{
-		ProjectId: r.ResourceToUpdate.Id,
+		ProjectId: projectIdInt8,
 		DatasetId: r.RelatedResource.Id,
 		Owner:     r.RelatedResource.Owner.Account(),
 	}
@@ -201,8 +220,14 @@ func toDatasetDO(r *repository.RelatedResourceInfo) datasetDO {
 }
 
 func toModelDO(r *repository.RelatedResourceInfo) modelDO {
+	projectIdInt64, err := strconv.ParseInt(r.ResourceToUpdate.Id, 10, 8)
+	if err != nil {
+		return modelDO{}
+	}
+	projectIdInt8 := int8(projectIdInt64)
+
 	do := modelDO{
-		ProjectId: r.ResourceToUpdate.Id,
+		ProjectId: projectIdInt8,
 		ModelId:   r.RelatedResource.Id,
 		Owner:     r.RelatedResource.Owner.Account(),
 	}
@@ -211,7 +236,7 @@ func toModelDO(r *repository.RelatedResourceInfo) modelDO {
 
 func toProjectSummaryDO(item projectDO, tags []string) ProjectSummaryDO {
 	return ProjectSummaryDO{
-		Id:            item.Id,
+		Id:            strconv.FormatInt(int64(item.Id), 10),
 		Owner:         item.Owner,
 		Name:          item.Name,
 		Desc:          item.Description,
@@ -228,10 +253,29 @@ func toProjectSummaryDO(item projectDO, tags []string) ProjectSummaryDO {
 	}
 }
 
+func toProjectResourceSummaryDO(project projectDO, tags []string) ProjectResourceSummaryDO {
+	return ProjectResourceSummaryDO{
+		ResourceSummaryDO: repositories.ResourceSummaryDO{
+			Owner:    project.Owner,
+			Name:     project.Name,
+			Id:       strconv.Itoa(int(project.Id)),
+			RepoId:   strconv.Itoa(int(project.RepoId)),
+			RepoType: project.RepoType,
+		},
+		Tags: tags,
+	}
+}
 func toProjectDOFromUpdateInfo(info spacerepo.ProjectPropertyUpdateInfo) projectDO {
 	p := &info.Property
+
+	idInt64, err := strconv.ParseInt(info.Id, 10, 8)
+	if err != nil {
+		return projectDO{}
+	}
+	idInt8 := int8(idInt64)
+
 	return projectDO{
-		Id:          info.Id,
+		Id:          idInt8,
 		Owner:       info.Owner.Account(),
 		Version:     info.Version,
 		UpdatedAt:   info.UpdatedAt,
