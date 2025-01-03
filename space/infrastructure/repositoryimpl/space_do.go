@@ -21,6 +21,7 @@ const (
 	fieldRepoType      = "repo_type"
 	fieldLevel         = "level"
 	fieldKind          = "kind"
+	fieldUpdatedAt     = "updated_at"
 	fieldTagName       = "tag_name"
 	tableTagCategories = "tag_categories"
 	tableProjectTags   = "project_tags"
