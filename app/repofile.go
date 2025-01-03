@@ -30,7 +30,8 @@ type RepoFileService interface {
 	Preview(*UserInfo, *RepoFilePreviewCmd) ([]byte, error)
 	DeleteDir(*UserInfo, *RepoDirDeleteCmd) (string, error)
 	Download(*RepoFileDownloadCmd) (RepoFileDownloadDTO, error)
-	StreamDownload(*RepoFileDownloadCmd, func(io.Reader, int64)) error
+	DownloadByRepoId(string, domain.FilePath) (RepoFileDownloadDTO, error)
+	StreamDownload(string, domain.FilePath, func(io.Reader, int64)) error
 	DownloadRepo(u *UserInfo, obj *domain.RepoDownloadedEvent, handle func(io.Reader, int64)) error
 }
 
@@ -60,7 +61,6 @@ type RepoFileDownloadCmd struct {
 	Path      domain.FilePath
 	Type      domain.ResourceType
 	Resource  domain.ResourceSummary
-	Unrecord  bool
 }
 
 type RepoFileCreateCmd struct {
@@ -123,7 +123,7 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	RepoFileDownloadDTO, error,
 ) {
 	dto, err := s.download(cmd)
-	if err == nil && !cmd.Unrecord {
+	if err == nil {
 		r := &cmd.Resource
 
 		_ = s.sender.AddOperateLogForDownloadFile(
@@ -143,10 +143,35 @@ func (s *repoFileService) Download(cmd *RepoFileDownloadCmd) (
 	return dto, err
 }
 
-func (s *repoFileService) StreamDownload(cmd *RepoFileDownloadCmd, handle func(io.Reader, int64)) error {
-	return s.rf.StreamDownload(cmd.MyToken, &RepoFileInfo{
-		Path:   cmd.Path,
-		RepoId: cmd.Resource.RepoId,
+func (s *repoFileService) DownloadByRepoId(repoId string, filePath domain.FilePath) (
+	RepoFileDownloadDTO, error,
+) {
+	var dto RepoFileDownloadDTO
+
+	data, notFound, err := s.rf.Download("", &RepoFileInfo{
+		Path:   filePath,
+		RepoId: repoId,
+	})
+	if err != nil {
+		if notFound {
+			err = ErrorUnavailableRepoFile{err}
+		}
+		return dto, err
+	}
+
+	if isLFS, sha := s.rf.IsLFSFile(data); !isLFS {
+		dto.Content = base64.StdEncoding.EncodeToString(data)
+	} else {
+		dto.DownloadURL, err = s.rf.GenLFSDownloadURL(sha)
+	}
+
+	return dto, err
+}
+
+func (s *repoFileService) StreamDownload(repoId string, path domain.FilePath, handle func(io.Reader, int64)) error {
+	return s.rf.StreamDownload(&RepoFileInfo{
+		Path:   path,
+		RepoId: repoId,
 	}, handle)
 }
 

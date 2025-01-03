@@ -193,11 +193,11 @@ func (ctl baseController) checkApiToken(
 }
 
 func (ctl baseController) checkUserApiToken(
-	ctx *gin.Context, allowVistor bool,
+	ctx *gin.Context, allowVisitor bool,
 ) (
 	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
-	pl, visitor, ok = ctl.checkUserApiTokenBase(ctx, allowVistor, true)
+	pl, visitor, ok = ctl.checkUserApiTokenBase(ctx, allowVisitor, true)
 	if !ok {
 		if pl == nil || pl.Account == "" {
 			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check api token")
@@ -210,11 +210,11 @@ func (ctl baseController) checkUserApiToken(
 }
 
 func (ctl baseController) checkUserApiTokenNoRefresh(
-	ctx *gin.Context, allowVistor bool,
+	ctx *gin.Context, allowVisitor bool,
 ) (
 	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
-	pl, visitor, ok = ctl.checkUserApiTokenBase(ctx, allowVistor, false)
+	pl, visitor, ok = ctl.checkUserApiTokenBase(ctx, allowVisitor, false)
 	if !ok {
 		if pl == nil || pl.Account == "" {
 			prepareOperateLog(ctx, "anonymous", OPERATE_TYPE_SYSTEM, "check api token")
@@ -227,7 +227,7 @@ func (ctl baseController) checkUserApiTokenNoRefresh(
 }
 
 func (ctl baseController) checkUserApiTokenBase(
-	ctx *gin.Context, allowVistor bool, refresh bool,
+	ctx *gin.Context, allowVisitor bool, refresh bool,
 ) (
 	pl *oldUserTokenPayload, visitor bool, ok bool,
 ) {
@@ -235,7 +235,6 @@ func (ctl baseController) checkUserApiTokenBase(
 	if err != nil {
 		return
 	}
-
 	csrftoken, err := ctl.getCSRFToken(ctx)
 	if err != nil {
 		return
@@ -248,7 +247,7 @@ func (ctl baseController) checkUserApiTokenBase(
 		if token != "" {
 			_, _, _ = ctl.checkToken(ctx, token, pl)
 		}
-		if allowVistor {
+		if allowVisitor {
 			visitor = true
 			ok = true
 		} else {
@@ -347,7 +346,7 @@ func (ctl baseController) setRespToken(ctx *gin.Context, token, csrftoken, usern
 }
 
 func (ctl *baseController) checkTokenForWebsocket(
-	ctx *gin.Context, allowVistor bool,
+	ctx *gin.Context, allowVisitor bool,
 ) (
 	pl *oldUserTokenPayload, csrftoken string, visitor, ok bool,
 ) {
@@ -358,7 +357,7 @@ func (ctl *baseController) checkTokenForWebsocket(
 	}
 
 	if csrftoken == "" {
-		if allowVistor {
+		if allowVisitor {
 			visitor = true
 			ok = true
 		} else {

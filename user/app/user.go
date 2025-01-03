@@ -1,23 +1,19 @@
 package app
 
 import (
-	"context"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/xerrors"
 
 	"github.com/opensourceways/xihe-server/agreement/app"
 	"github.com/opensourceways/xihe-server/common/domain/allerror"
-	commonrepo "github.com/opensourceways/xihe-server/common/domain/repository"
-	"github.com/opensourceways/xihe-server/domain/authing"
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	platform "github.com/opensourceways/xihe-server/domain/platform"
 	typerepo "github.com/opensourceways/xihe-server/domain/repository"
 	"github.com/opensourceways/xihe-server/user/domain"
-	"github.com/opensourceways/xihe-server/user/domain/login"
 	"github.com/opensourceways/xihe-server/user/domain/message"
 	pointsPort "github.com/opensourceways/xihe-server/user/domain/points"
 	"github.com/opensourceways/xihe-server/user/domain/repository"
@@ -50,8 +46,6 @@ type UserService interface {
 	ListFollower(*FollowsListCmd) (FollowsDTO, error)
 
 	RefreshGitlabToken(*RefreshTokenCmd) error
-
-	ModifyInfo(ctx context.Context, cmd CmdToModifyInfo, user domain.Account) (string, error)
 }
 
 // ps: platform user service
@@ -61,8 +55,7 @@ func NewUserService(
 	sender message.MessageProducer,
 	points pointsPort.Points,
 	encryption utils.SymmetricEncryption,
-	auth authing.User,
-	login login.Login,
+	audit auditcommon.AuditService,
 ) UserService {
 	return userService{
 		ps:         ps,
@@ -70,8 +63,7 @@ func NewUserService(
 		sender:     sender,
 		points:     points,
 		encryption: encryption,
-		auth:       auth,
-		login:      login,
+		audit:      audit,
 	}
 }
 
@@ -81,8 +73,7 @@ type userService struct {
 	sender     message.MessageProducer
 	points     pointsPort.Points
 	encryption utils.SymmetricEncryption
-	auth       authing.User
-	login      login.Login
+	audit      auditcommon.AuditService
 }
 
 func (s userService) Create(cmd *UserCreateCmd) (dto UserDTO, err error) {
@@ -400,91 +391,5 @@ func (s userService) RefreshGitlabToken(cmd *RefreshTokenCmd) (err error) {
 		}
 	}
 
-	return
-}
-
-func (s userService) ModifyInfo(ctx context.Context, cmd CmdToModifyInfo, user domain.Account,
-) (errMsgCode string, err error) {
-	//校验验证码
-	info, err := s.login.GetAccessAndIdToken(user)
-	if err != nil {
-		return
-	}
-
-	if info.UserId == "" {
-		errMsgCode = errorNoUserId
-		err = errors.New("cannot read user id")
-
-		return
-	}
-
-	if errMsgCode, err = s.auth.VerifyBindEmail(cmd.Account, cmd.Code, info.UserId); err != nil {
-		if !isCodeUserDuplicateBind(errMsgCode) {
-			return
-		}
-	}
-
-	if errMsgCode, err = s.auth.VerifyBindEmail(cmd.OldAccount, cmd.OldCode, info.UserId); err != nil {
-		if !isCodeUserDuplicateBind(errMsgCode) {
-			return
-		}
-	}
-	//获取用户信息
-	u, err := s.repo.GetByAccount(user)
-	if err != nil {
-		if commonrepo.IsErrorResourceNotExists(err) {
-			err = allerror.New(allerror.ErrorCodeUserNotFound, "",
-				xerrors.Errorf("user %s not found: %w", user.Account(), err))
-		} else {
-			err = allerror.New(allerror.ErrorCodeUserNotFound, "",
-				xerrors.Errorf("failed to get user: %w", err))
-		}
-		return
-	}
-
-	id, err := strconv.Atoi(u.PlatformUser.Id)
-	if err != nil {
-		err = xerrors.Errorf("failed to get user: %w", err)
-		return
-	}
-
-	//检查是否变化
-	if err = cmd.IsChange(&u); err != nil {
-		logrus.Errorf("nothing changed:%s", err.Error())
-		return
-	}
-
-	//修改用户信息
-	u.Email, err = domain.NewEmail(cmd.Account)
-	if err != nil {
-		e := xerrors.Errorf("failed to create email: %w", err)
-		err = allerror.New(allerror.ErrorFailedToCreateEmail, "", e)
-		return
-	}
-	//保存用户信息
-	if u, err = s.repo.Save(&u); err != nil {
-		e := xerrors.Errorf("failed to update user info: %w", err)
-		err = allerror.New(allerror.ErrorFailedToUpdateUserInfo, "", e)
-		return
-	}
-	//更新git用户信息
-	if u.Email != nil && u.Email.Email() != "" {
-		if err = s.ps.Update(id, platform.UserOption{
-			Email:    u.Email,
-			Name:     u.Account,
-			Password: cmd.Password,
-		}); err != nil {
-			u.Email, _ = domain.NewEmail(cmd.OldAccount)
-			u, err = s.repo.Save(&u)
-			if err != nil {
-				e := xerrors.Errorf("failed to update user info and fall back info too: %w", err)
-				err = allerror.New(allerror.ErrorFailedToUpdateUserInfo, "", e)
-				return
-			}
-			e := xerrors.Errorf("failed to update git user info: %w", err)
-			err = allerror.New(allerror.ErrorFailedToUPdateGitUserInfo, "", e)
-			return
-		}
-	}
 	return
 }

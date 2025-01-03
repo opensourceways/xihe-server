@@ -59,14 +59,11 @@ const (
 	// ErrorCodeRevokeAgreementFailed
 	ErrorCodeRevokeAgreementFailed = "revoke_agreement_failed"
 
-	// ErrorFailedToCreateEmail
-	ErrorFailedToCreateEmail = "failed_to_create_email"
+	// ErrorCodeFailToModerate
+	ErrorCodeCallAuditFailed = "call_audit_failed"
 
-	// ErrorFailedToUpdateUserInfo failed to update user info
-	ErrorFailedToUpdateUserInfo = "failed_to_update_user_info"
-
-	// ErrorFailedToUPdateGitUserInfo ailed to update git user info
-	ErrorFailedToUPdateGitUserInfo = "failed_to_update_git_userinfo"
+	// ErrorCodeModerateUnpass
+	ErrorCodeAuditBlock = "audit_block"
 )
 
 // errorImpl

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	computilityapp "github.com/opensourceways/xihe-server/computility/app"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
@@ -21,7 +22,6 @@ import (
 func AddRouterForProjectController(
 	rg *gin.RouterGroup,
 	user userrepo.User,
-	repo spacerepo.Project,
 	model repository.Model,
 	dataset repository.Dataset,
 	activity repository.Activity,
@@ -31,6 +31,8 @@ func AddRouterForProjectController(
 	newPlatformRepository func(token, namespace string) platform.Repository,
 	computility computilityapp.ComputilityInternalAppService,
 	spaceProducer spacedomain.SpaceEventProducer,
+	audit auditcommon.AuditService,
+	repo spacerepo.Project,
 ) {
 	ctl := ProjectController{
 		user:    user,
@@ -40,7 +42,7 @@ func AddRouterForProjectController(
 		tags:    tags,
 		like:    like,
 		s: spaceapp.NewProjectService(
-			user, repo, model, dataset, activity, sender, computility, spaceProducer,
+			user, repo, model, dataset, activity, sender, computility, spaceProducer, audit,
 		),
 		newPlatformRepository: newPlatformRepository,
 	}
@@ -73,7 +75,8 @@ type ProjectController struct {
 
 	user userrepo.User
 	repo spacerepo.Project
-	s    spaceapp.ProjectService
+
+	s spaceapp.ProjectService
 
 	model   repository.Model
 	dataset repository.Dataset
@@ -185,7 +188,7 @@ func (ctl *ProjectController) Create(ctx *gin.Context) {
 
 	d, err := ctl.s.Create(&cmd, pr)
 	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		SendError(ctx, err)
 
 		return
 	}
@@ -329,7 +332,7 @@ func (ctl *ProjectController) Update(ctx *gin.Context) {
 
 	d, err := ctl.s.Update(&proj, &cmd, pr)
 	if err != nil {
-		ctl.sendRespWithInternalError(ctx, newResponseError(err))
+		SendError(ctx, err)
 
 		return
 	}
@@ -380,6 +383,7 @@ func (ctl *ProjectController) Get(ctx *gin.Context) {
 	}
 
 	proj, err := ctl.s.GetByName(owner, name, !visitor && pl.isMyself(owner))
+
 	if err != nil {
 		if isErrorOfAccessingPrivateRepo(err) {
 			ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
@@ -664,7 +668,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	data, err := ctl.model.GetByName(owner, name)
+	model, err := ctl.model.GetByName(owner, name)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, newResponseCodeError(
 			errorBadRequestParam, err,
@@ -678,7 +682,7 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 		return
 	}
 
-	if pl.isNotMe(owner) && data.IsPrivate() {
+	if pl.isNotMe(owner) && model.IsPrivate() {
 		ctx.JSON(http.StatusNotFound, newResponseCodeMsg(
 			errorResourceNotExists,
 			"can't access private project",
@@ -691,15 +695,16 @@ func (ctl *ProjectController) AddRelatedModel(ctx *gin.Context) {
 
 	index := domain.ResourceIndex{
 		Owner: owner,
-		Id:    data.Id,
+		Id:    model.Id,
 	}
+
 	if err = ctl.s.AddRelatedModel(&proj, &index); err != nil {
 		ctl.sendRespWithInternalError(ctx, newResponseError(err))
 
 		return
 	}
 
-	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(data)))
+	ctx.JSON(http.StatusAccepted, newResponseData(convertToRelatedResource(model)))
 }
 
 // @Summary		RemoveRelatedModel
@@ -908,6 +913,7 @@ func (ctl *ProjectController) SetTags(ctx *gin.Context) {
 	}
 
 	pl, proj, ok := ctl.checkPermission(ctx)
+
 	if !ok {
 		return
 	}

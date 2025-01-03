@@ -97,7 +97,7 @@ type RepoFile interface {
 	Delete(u *UserInfo, f *RepoFileInfo) error
 	DeleteDir(u *UserInfo, f *RepoDirInfo) error
 	Download(token string, f *RepoFileInfo) (data []byte, notFound bool, err error)
-	StreamDownload(token string, f *RepoFileInfo, handle func(io.Reader, int64)) error
+	StreamDownload(f *RepoFileInfo, handle func(io.Reader, int64)) error
 	IsLFSFile(data []byte) (is bool, sha string)
 	GenLFSDownloadURL(sha string) (string, error)
 	GetDirFileInfo(u *UserInfo, d *RepoDirFile) (sha string, exist bool, err error)

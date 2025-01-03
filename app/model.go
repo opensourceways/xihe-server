@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 
+	auditcommon "github.com/opensourceways/xihe-server/common/domain/audit"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/message"
 	"github.com/opensourceways/xihe-server/domain/platform"
@@ -136,6 +137,7 @@ func NewModelService(
 	activity repository.Activity,
 	pr platform.Repository,
 	sender message.ResourceProducer,
+	audit auditcommon.AuditService,
 ) ModelService {
 	return modelService{
 		repo:     repo,
@@ -147,6 +149,7 @@ func NewModelService(
 			Project: proj,
 			Dataset: dataset,
 		},
+		audit: audit,
 	}
 }
 
@@ -156,6 +159,7 @@ type modelService struct {
 	activity repository.Activity
 	rs       ResourceService
 	sender   message.ResourceProducer
+	audit    auditcommon.AuditService
 }
 
 func (s modelService) CanApplyResourceName(owner domain.Account, name domain.ResourceName) bool {
@@ -163,6 +167,26 @@ func (s modelService) CanApplyResourceName(owner domain.Account, name domain.Res
 }
 
 func (s modelService) Create(cmd *ModelCreateCmd, pr platform.Repository) (dto ModelDTO, err error) {
+	//sdk text audit
+	name := cmd.Name.ResourceName()
+	if err := s.audit.TextAudit(name, auditTitle); err != nil {
+		return ModelDTO{}, err
+	}
+
+	title := cmd.Title.ResourceTitle()
+	if title != "" {
+		if err := s.audit.TextAudit(title, auditTitle); err != nil {
+			return ModelDTO{}, err
+		}
+	}
+
+	desc := cmd.Desc.ResourceDesc()
+	if desc != "" {
+		if err := s.audit.TextAudit(desc, auditProfile); err != nil {
+			return ModelDTO{}, err
+		}
+	}
+
 	pid, err := pr.New(&platform.RepoOption{
 		Name:     cmd.Name,
 		RepoType: cmd.RepoType,

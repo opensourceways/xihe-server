@@ -1,8 +1,22 @@
 package app
 
-import "github.com/opensourceways/xihe-server/user/domain"
+import (
+	"github.com/opensourceways/xihe-server/user/domain"
+)
+
+const (
+	auditTitle = "title"
+)
 
 func (s userService) UpdateBasicInfo(account domain.Account, cmd UpdateUserBasicInfoCmd) error {
+	//sdk text audit
+	bio := cmd.Bio.Bio()
+	if bio != "" {
+		if err := s.audit.TextAudit(bio, auditTitle); err != nil {
+			return err
+		}
+	}
+
 	user, err := s.repo.GetByAccount(account)
 	if err != nil {
 		return err

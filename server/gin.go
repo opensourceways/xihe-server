@@ -26,6 +26,7 @@ import (
 	cloudapp "github.com/opensourceways/xihe-server/cloud/app"
 	cloudmsg "github.com/opensourceways/xihe-server/cloud/infrastructure/messageadapter"
 	cloudrepo "github.com/opensourceways/xihe-server/cloud/infrastructure/repositoryimpl"
+	"github.com/opensourceways/xihe-server/common/infrastructure/audit"
 	"github.com/opensourceways/xihe-server/common/infrastructure/kafka"
 	"github.com/opensourceways/xihe-server/common/infrastructure/pgsql"
 	competitionapp "github.com/opensourceways/xihe-server/competition/app"
@@ -70,7 +71,6 @@ import (
 	spaceapprepo "github.com/opensourceways/xihe-server/spaceapp/infrastructure/repositoryimpl"
 	"github.com/opensourceways/xihe-server/spaceapp/infrastructure/sseadapter"
 	userapp "github.com/opensourceways/xihe-server/user/app"
-	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
 )
@@ -115,10 +115,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	}
 
 	collections := &cfg.Mongodb.Collections
-
-	proj := spacerepo.NewProjectRepository(
-		mongodb.NewProjectMapper(collections.Project),
-	)
 
 	model := repositories.NewModelRepository(
 		mongodb.NewModelMapper(collections.Model),
@@ -204,6 +200,9 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	// resource producer
 	resProducer := messages.NewResourceMessageAdapter(&cfg.Resource, publisher, operator)
 
+	//audit
+	audit := audit.NewAuditService()
+
 	userRegService := userapp.NewRegService(
 		userrepoimpl.NewUserRegRepo(
 			mongodb.NewCollection(collections.Registration),
@@ -229,6 +228,13 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		competitionusercli.NewUserCli(userRegService),
 		user,
 	)
+
+	err = spacerepo.Init(pgsql.DB(), &cfg.Space.Tables)
+	if err != nil {
+		return err
+	}
+
+	proj := spacerepo.ProjectAdapter()
 
 	courseAppService := courseapp.NewCourseService(
 		courseusercli.NewUserCli(userRegService),
@@ -291,12 +297,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 	spaceProducer := spaceinfra.NewSpaceProducer(&cfg.Space.Topics, publisher)
 
 	projectService := spaceapp.NewProjectService(
-		user, proj, model, dataset, activity, resProducer, computilityService, spaceProducer,
+		user, proj, model, dataset, activity, resProducer, computilityService, spaceProducer, audit,
 	)
 
-	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer)
+	modelService := app.NewModelService(user, model, proj, dataset, activity, nil, resProducer, audit)
 
-	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, resProducer)
+	datasetService := app.NewDatasetService(user, dataset, proj, model, activity, nil, resProducer, audit)
 
 	v1 := engine.Group(docs.SwaggerInfo.BasePath)
 	internal := engine.Group("internal")
@@ -308,7 +314,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	userAppService := userapp.NewUserService(
 		user, gitlabUser, usermsg.MessageAdapter(&cfg.User.Message, publisher),
-		pointsAppService, controller.EncryptHelperToken(), authingUser, userlogincli.NewLoginCli(loginService),
+		pointsAppService, controller.EncryptHelperToken(), audit,
 	)
 
 	promotionAppService := promotionapp.NewPromotionService(
@@ -343,22 +349,22 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	{
 		controller.AddRouterForProjectController(
-			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer,
+			v1, user, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService, spaceProducer, audit, proj,
 		)
 		controller.AddRouterForProjectInternalController(
-			internal, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer,
+			internal, user, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService, spaceProducer, proj, audit,
 		)
 
 		controller.AddRouterForModelController(
 			v1, user, model, proj, dataset, activity, tags, like, resProducer,
-			newPlatformRepository,
+			newPlatformRepository, audit,
 		)
 
 		controller.AddRouterForDatasetController(
 			v1, user, dataset, model, proj, activity, tags, like, resProducer,
-			newPlatformRepository,
+			newPlatformRepository, audit,
 		)
 
 		controller.AddRouterForUserController(
@@ -404,6 +410,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		controller.AddRouterForRepoFileController(
 			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService, fileScanService,
 		)
+
 		controller.AddRouterForRepoFileInternalController(
 			internal, gitlabRepo, model, proj, dataset, repoAdapter, userAppService, fileScanService,
 		)
@@ -437,8 +444,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForHomeController(
-			v1, courseAppService, competitionAppService, projectService, modelService, datasetService,
-			promotionAppService,
+			v1, courseAppService, competitionAppService, projectService, modelService, datasetService, promotionAppService,
 		)
 
 		controller.AddRouterForCloudController(
@@ -451,6 +457,8 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		controller.AddRouterForFileScanInternalController(
 			internal, fileScanService,
 		)
+
+		internal.GET("/heartbeat", func(*gin.Context) {})
 	}
 
 	engine.UseRawPath = true
