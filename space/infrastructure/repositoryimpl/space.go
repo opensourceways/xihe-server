@@ -361,7 +361,7 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 	// 如果 level 字段为空，则使用优先级排序
 	if do.Level == 0 {
 		query = query.Order(
-			"CASE WHEN level = 2 THEN 1 WHEN level = 1 THEN 2 WHEN level = 0 THEN 3 END, " + fieldUpdatedAt + "DESC")
+			"CASE WHEN level = 2 THEN 1 WHEN level = 1 THEN 2 WHEN level = 0 THEN 3 END, " + fieldUpdatedAt + " DESC")
 	} else {
 		// 如果 level 字段不为空，则按照指定的 level 排序
 		query = query.Order(fieldUpdatedAt + "DESC")
@@ -418,7 +418,7 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 	// 如果 level 字段为空，则使用优先级排序
 	if do.Level == 0 {
 		query = query.Order(
-			"CASE WHEN level = 2 THEN 1 WHEN level = 1 THEN 2 WHEN level = 0 THEN 3 END, " + fieldDownload + "DESC")
+			"CASE WHEN level = 2 THEN 1 WHEN level = 1 THEN 2 WHEN level = 0 THEN 3 END, " + fieldDownload + " DESC")
 	} else {
 		// 如果 level 字段不为空，则按照指定的 level 排序
 		query = query.Order(fieldDownload + "DESC")
