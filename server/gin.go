@@ -116,10 +116,6 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	collections := &cfg.Mongodb.Collections
 
-	proj := spacerepo.NewProjectRepository(
-		mongodb.NewProjectMapper(collections.Project),
-	)
-
 	model := repositories.NewModelRepository(
 		mongodb.NewModelMapper(collections.Model),
 	)
@@ -232,6 +228,13 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		competitionusercli.NewUserCli(userRegService),
 		user,
 	)
+
+	err = spacerepo.Init(pgsql.DB(), &cfg.Space.Tables)
+	if err != nil {
+		return err
+	}
+
+	proj := spacerepo.ProjectAdapter()
 
 	courseAppService := courseapp.NewCourseService(
 		courseusercli.NewUserCli(userRegService),
@@ -346,12 +349,12 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	{
 		controller.AddRouterForProjectController(
-			v1, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer, audit,
+			v1, user, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService, spaceProducer, audit, proj,
 		)
 		controller.AddRouterForProjectInternalController(
-			internal, user, proj, model, dataset, activity, tags, like, resProducer,
-			newPlatformRepository, computilityService, spaceProducer, audit,
+			internal, user, model, dataset, activity, tags, like, resProducer,
+			newPlatformRepository, computilityService, spaceProducer, proj, audit,
 		)
 
 		controller.AddRouterForModelController(
@@ -407,6 +410,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		controller.AddRouterForRepoFileController(
 			v1, gitlabRepo, model, proj, dataset, repoAdapter, userAppService, fileScanService,
 		)
+
 		controller.AddRouterForRepoFileInternalController(
 			internal, gitlabRepo, model, proj, dataset, repoAdapter, userAppService, fileScanService,
 		)
@@ -440,8 +444,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 		)
 
 		controller.AddRouterForHomeController(
-			v1, courseAppService, competitionAppService, projectService, modelService, datasetService,
-			promotionAppService,
+			v1, courseAppService, competitionAppService, projectService, modelService, datasetService, promotionAppService,
 		)
 
 		controller.AddRouterForCloudController(

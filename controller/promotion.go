@@ -215,7 +215,7 @@ func (ctl *PromotionController) List(ctx *gin.Context) {
 		return
 	}
 
-	pl, vistor, ok := ctl.checkUserApiToken(ctx, true)
+	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
@@ -227,7 +227,7 @@ func (ctl *PromotionController) List(ctx *gin.Context) {
 		err error
 	)
 
-	if vistor {
+	if visitor {
 		cmd, err = req.toCmd(nil)
 	} else {
 		cmd, err = req.toCmd(pl.DomainAccount())
@@ -254,7 +254,7 @@ func (ctl *PromotionController) List(ctx *gin.Context) {
 // @Failure		500	{object}	controller.responseData
 // @Router			/v1/promotion/{id} [get]
 func (ctl *PromotionController) Get(ctx *gin.Context) {
-	pl, vistor, ok := ctl.checkUserApiToken(ctx, true)
+	pl, visitor, ok := ctl.checkUserApiToken(ctx, true)
 	if !ok {
 		return
 	}
@@ -265,7 +265,7 @@ func (ctl *PromotionController) Get(ctx *gin.Context) {
 		Id:   ctx.Param("id"),
 		User: nil,
 	}
-	if !vistor {
+	if !visitor {
 		cmd.User = pl.DomainAccount()
 	}
 

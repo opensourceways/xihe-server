@@ -3,7 +3,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"path/filepath"
 
 	filescan "github.com/opensourceways/xihe-server/filescan/domain"
@@ -44,14 +43,12 @@ func (s *fileScanService) Get(owner string, repoName string) ([]filescan.Filesca
 // Update updates a file scan.
 func (s *fileScanService) Update(ctx context.Context, cmd CmdToUpdateFileScan) error {
 	fileInfo, err := s.FileScanAdapter.Find(cmd.Id)
-	fmt.Printf("===================fileInfo1: %+v\n", fileInfo)
 
 	if err != nil {
 		return err
 	}
 
 	fileInfo.HandleScanDone(cmd.ModerationResult)
-	fmt.Printf("===================fileInfo2: %+v\n", fileInfo)
 
 	return s.FileScanAdapter.Save(&fileInfo)
 }
