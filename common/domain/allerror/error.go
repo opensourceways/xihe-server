@@ -64,6 +64,15 @@ const (
 
 	// ErrorCodeModerateUnpass
 	ErrorCodeAuditBlock = "audit_block"
+
+	// ErrorFailedToUpdateUserInfo failed to update user info
+	ErrorFailedToUpdateUserInfo = "failed_to_update_user_info"
+
+	// ErrorFailedToUPdateGitUserInfo ailed to update git user info
+	ErrorFailedToUPdateGitUserInfo = "failed_to_update_git_userinfo"
+
+	// ErrorFailedToCreateEmail
+	ErrorFailedToCreateEmail = "failed_to_create_email"
 )
 
 // errorImpl

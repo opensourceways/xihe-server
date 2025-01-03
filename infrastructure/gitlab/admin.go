@@ -76,6 +76,23 @@ func (m *administrator) New(u platform.UserOption) (r userdomain.PlatformUser, e
 	return
 }
 
+func (m *administrator) Update(id int, u platform.UserOption) (err error) {
+	name := u.Name.Account()
+	email := u.Email.Email()
+	pass := u.Password.Password()
+	b := true
+
+	_, _, err = m.cli.Users.ModifyUser(id, &sdk.ModifyUserOptions{
+		Name:               &name,
+		Email:              &email,
+		Username:           &name,
+		Password:           &pass,
+		SkipReconfirmation: &b,
+	})
+
+	return
+}
+
 func (m *administrator) NewToken(u userdomain.PlatformUser) (t userdomain.PlatformToken, err error) {
 	uid, err := strconv.Atoi(u.Id)
 	if err != nil {

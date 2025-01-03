@@ -10,6 +10,7 @@ import (
 type User struct {
 	Id      string
 	Email   Email
+	Phone   Phone
 	Account Account
 
 	Bio      Bio
@@ -69,6 +70,14 @@ type UserRegInfo struct {
 	Province Province
 	Detail   map[string]string
 	Version  int
+}
+
+type ModifyAccountInfo struct {
+	AccountType string `json:"account_type"`
+	OldAccount  string `json:"oldaccount"`
+	OldCode     string `json:"oldcode"`
+	Account     string `json:"account"`
+	Code        string `json:"code"`
 }
 
 // whitelist

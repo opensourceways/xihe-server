@@ -73,6 +73,7 @@ import (
 	userapp "github.com/opensourceways/xihe-server/user/app"
 	usermsg "github.com/opensourceways/xihe-server/user/infrastructure/messageadapter"
 	userrepoimpl "github.com/opensourceways/xihe-server/user/infrastructure/repositoryimpl"
+	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
 )
 
 func StartWebServer(port int, timeout time.Duration, cfg *config.Config) {
@@ -314,7 +315,7 @@ func setRouter(engine *gin.Engine, cfg *config.Config) error {
 
 	userAppService := userapp.NewUserService(
 		user, gitlabUser, usermsg.MessageAdapter(&cfg.User.Message, publisher),
-		pointsAppService, controller.EncryptHelperToken(), audit,
+		pointsAppService, controller.EncryptHelperToken(), audit, authingUser, userlogincli.NewLoginCli(loginService),
 	)
 
 	promotionAppService := promotionapp.NewPromotionService(

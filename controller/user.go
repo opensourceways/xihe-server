@@ -6,9 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/xerrors"
 
 	"github.com/opensourceways/xihe-server/app"
 	"github.com/opensourceways/xihe-server/common/controller/middleware"
+	"github.com/opensourceways/xihe-server/common/domain/allerror"
 	"github.com/opensourceways/xihe-server/domain"
 	"github.com/opensourceways/xihe-server/domain/authing"
 	userapp "github.com/opensourceways/xihe-server/user/app"
@@ -16,6 +18,12 @@ import (
 	userdomain "github.com/opensourceways/xihe-server/user/domain"
 	userrepo "github.com/opensourceways/xihe-server/user/domain/repository"
 	userlogincli "github.com/opensourceways/xihe-server/user/infrastructure/logincli"
+)
+
+const (
+	cookie_ut    = "_U_T_"
+	cookie_yg    = "_Y_G_"
+	userIdParsed = "user_id"
 )
 
 func AddRouterForUserController(
@@ -58,6 +66,7 @@ func AddRouterForUserController(
 	rg.GET("/v1/user/check_email", checkUserEmailMiddleware(&ctl.baseController))
 	rg.POST("/v1/user/email/sendbind", ctl.SendBindEmail)
 	rg.POST("/v1/user/email/bind", ctl.BindEmail)
+	rg.POST("/v1/user/modify", ctl.Modify)
 
 	// userinfo
 	rg.GET("/v1/user/info/:account", ctl.GetInfo)
@@ -504,6 +513,50 @@ func (ctl *UserController) BindEmail(ctx *gin.Context) {
 			}
 		}
 
+		ctl.sendRespOfPost(ctx, "success")
+	}
+}
+
+// @Summary  Modify User Phone or Email
+// @Description  modify user phone or email
+// @Tags     User
+// @Param    body            body     ModifyInfo  true    "body of modify user"
+// @Accept   json
+// @Success  201    {object}    commonctl.ResponseData{data=string,msg=string,code=string}
+// @Router   /v1/user/modify [post]
+// @Security Bearer
+func (ctl *UserController) Modify(ctx *gin.Context) {
+	middleware.SetAction(ctx, "update user Contact Details")
+	var req ModifyInfo
+	if err := ctx.BindJSON(&req); err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+	cmd, err := req.toCmd()
+	if err != nil {
+		ctl.sendBadRequestBody(ctx)
+
+		return
+	}
+	v, ok := ctx.Get(userIdParsed)
+	if !ok {
+		ctl.sendBadRequestBody(ctx)
+		return
+	}
+
+	user, ok := v.(domain.Account)
+	if !ok {
+		e := xerrors.Errorf("not found user info")
+		err = allerror.New(allerror.ErrorCodeUserNotFound, "",
+			e)
+		SendError(ctx, err)
+		return
+	}
+
+	if errMsgCode, err := ctl.s.ModifyInfo(ctx, cmd, user); err != nil {
+		SendError(ctx, allerror.New(errMsgCode, "failed to modify user info", err))
+	} else {
 		ctl.sendRespOfPost(ctx, "success")
 	}
 }
