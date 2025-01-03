@@ -355,11 +355,16 @@ func (adapter *projectAdapter) listGlobalAndSortByUpdateTime(
 	// 基础查询条件
 	baseQuery := adapter.db()
 
-	// 排序
-	query := baseQuery.Order("updated_at DESC")
-
 	// 应用过滤器
-	query = adapter.applyFilters(query, do)
+	query := adapter.applyFilters(baseQuery, do)
+
+	// 如果 level 字段为空，则使用优先级排序
+	if do.Level == 0 {
+		query = query.Order("FIELD(level, 2, 1, 0), " + fieldUpdatedAt + "DESC")
+	} else {
+		// 如果 level 字段不为空，则按照指定的 level 排序
+		query = query.Order(fieldUpdatedAt + "DESC")
+	}
 
 	// 计算总数
 	if err := query.Model(&projectDO{}).Count(&count).Error; err != nil {
@@ -406,11 +411,16 @@ func (adapter *projectAdapter) listGlobalAndSortByDownloadCount(
 	// 基础查询条件
 	baseQuery := adapter.db()
 
-	// 排序
-	query := baseQuery.Order(fieldDownload + " DESC")
-
 	// 应用过滤器
-	query = adapter.applyFilters(query, do)
+	query := adapter.applyFilters(baseQuery, do)
+
+	// 如果 level 字段为空，则使用优先级排序
+	if do.Level == 0 {
+		query = query.Order("FIELD(level, 2, 1, 0), " + fieldDownload + "DESC")
+	} else {
+		// 如果 level 字段不为空，则按照指定的 level 排序
+		query = query.Order(fieldDownload + "DESC")
+	}
 
 	// 计算总数
 	if err := query.Model(&projectDO{}).Count(&count).Error; err != nil {
@@ -458,11 +468,16 @@ func (adapter *projectAdapter) listGlobalAndSortByFirstLetter(
 	// 基础查询条件
 	baseQuery := adapter.db()
 
-	// 排序
-	query := baseQuery.Order("LOWER(" + fieldName + ") COLLATE \"C\" ASC")
-
 	// 应用过滤器
-	query = adapter.applyFilters(query, do)
+	query := adapter.applyFilters(baseQuery, do)
+
+	// 如果 level 字段为空，则使用优先级排序
+	if do.Level == 0 {
+		query = query.Order("FIELD(level, 2, 1, 0), " + "LOWER(" + fieldName + ") COLLATE \"C\" ASC")
+	} else {
+		// 如果 level 字段不为空，则按照指定的 level 排序
+		query = query.Order("LOWER(" + fieldName + ") COLLATE \"C\" ASC")
+	}
 
 	// 计算总数
 	if err := query.Model(&projectDO{}).Count(&count).Error; err != nil {
